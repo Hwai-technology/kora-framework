@@ -1,37 +1,51 @@
 (* ========================================================================== *)
-(* Kora Programming Language — Formal Grammar Specification (v0.1-alpha)      *)
+(* Kora Programming Language — Formal Grammar Specification (v0.1.0 — Full)   *)
 (* Syntax Style: Clean, modern, optional semicolons, strong static typing     *)
+(* Includes Phase 1 Foundation + Phase 5 Advanced Language Features           *)
 (* ========================================================================== *)
 
 Module          = { Item } EOF ;
 
-Item            = StructDecl
-                | ModelDecl
-                | InterfaceDecl
-                | ClassDecl
-                | EnumDecl
-                | FnDecl
+Item            = ModuleDecl
+                | ImportDecl
+                | [ "pub" ] StructDecl
+                | [ "pub" ] ModelDecl
+                | [ "pub" ] InterfaceDecl
+                | [ "pub" ] ClassDecl
+                | [ "pub" ] EnumDecl
+                | [ "pub" ] ExtendDecl
+                | [ "pub" ] FnDecl
                 | Stmt ;              (* Top-level zero-config statements/routes *)
+
+(* --- Modules & Imports (Phase 5) --- *)
+
+ModuleDecl      = "module" Path [ ";" ] ;
+ImportDecl      = "import" Path [ ";" ] ;
+Path            = Ident { "." Ident } ;
+
+TypeParams      = "<" Ident { "," Ident } ">" ;
 
 (* --- Declarations --- *)
 
-StructDecl      = "struct" Ident "{" { FieldDecl } "}" ;
-ModelDecl       = "model" Ident "{" { FieldDecl } "}" ;
+StructDecl      = "struct" Ident [ TypeParams ] "{" { FieldDecl } "}" ;
+ModelDecl       = "model" Ident [ TypeParams ] "{" { FieldDecl } "}" ;
 FieldDecl       = Ident ":" TypeExpr [ ";" | "," ] ;
 
-InterfaceDecl   = "interface" Ident "{" { FnSignature } "}" ;
-FnSignature     = [ "async" ] "fn" Ident "(" [ ParamList ] ")" [ "->" TypeExpr ] [ ";" ] ;
+InterfaceDecl   = "interface" Ident [ TypeParams ] "{" { FnSignature } "}" ;
+FnSignature     = [ "async" ] "fn" Ident [ TypeParams ] "(" [ ParamList ] ")" [ "->" TypeExpr ] [ ";" ] ;
 
-ClassDecl       = "class" Ident [ "implements" Ident { "," Ident } ] "{"
+ClassDecl       = "class" Ident [ TypeParams ] [ "implements" Ident { "," Ident } ] "{"
                     { ClassMember }
                   "}" ;
 ClassMember     = InitDecl | FnDecl | FieldDecl ;
 InitDecl        = "init" "(" [ ParamList ] ")" Block ;
 
-EnumDecl        = "enum" Ident "{" { EnumVariant } "}" ;
+EnumDecl        = "enum" Ident [ TypeParams ] "{" { EnumVariant } "}" ;
 EnumVariant     = Ident [ "(" TypeExpr { "," TypeExpr } ")" ] [ "," | ";" ] ;
 
-FnDecl          = [ "async" ] "fn" Ident "(" [ ParamList ] ")" [ "->" TypeExpr ] Block ;
+ExtendDecl      = "extend" Ident "{" { FnDecl } "}" ;
+
+FnDecl          = [ "async" ] "fn" Ident [ TypeParams ] "(" [ ParamList ] ")" [ "->" TypeExpr ] Block ;
 ParamList       = Param { "," Param } [ "," ] ;
 Param           = Ident ":" TypeExpr ;
 
@@ -70,7 +84,7 @@ CompareExpr     = AdditiveExpr { ( "<" | "<=" | ">" | ">=" ) AdditiveExpr } ;
 AdditiveExpr    = MultiplicativeExpr { ( "+" | "-" ) MultiplicativeExpr } ;
 MultiplicativeExpr = UnaryExpr { ( "*" | "/" | "%" ) UnaryExpr } ;
 
-UnaryExpr       = ( "!" | "-" ) UnaryExpr
+UnaryExpr       = ( "!" | "-" | "await" ) UnaryExpr
                 | PostfixExpr ;
 
 PostfixExpr     = PrimaryExpr { CallSuffix | FieldSuffix | IndexSuffix } ;
@@ -107,4 +121,3 @@ Pattern         = "_"
                 | StringLit
                 | BoolLit
                 | Ident [ "." Ident ] [ "(" [ Ident { "," Ident } ] ")" ] ;
-

@@ -14,7 +14,12 @@ pub enum TokenKind {
     FloatLit(f64),
     StringLit(String),
 
-    // Keywords
+    // Keywords (Phase 1 + Phase 5)
+    Module,
+    Import,
+    Pub,
+    Extend,
+    Await,
     Struct,
     Model,
     Interface,
@@ -77,6 +82,11 @@ impl TokenKind {
             Self::IntLit(_) => "integer literal",
             Self::FloatLit(_) => "float literal",
             Self::StringLit(_) => "string literal",
+            Self::Module => "`module`",
+            Self::Import => "`import`",
+            Self::Pub => "`pub`",
+            Self::Extend => "`extend`",
+            Self::Await => "`await`",
             Self::Struct => "`struct`",
             Self::Model => "`model`",
             Self::Interface => "`interface`",
@@ -318,10 +328,11 @@ impl<'a> Lexer<'a> {
                     Some(TokenKind::AndAnd)
                 } else {
                     self.diagnostics.emit(
-                        Diagnostic::error("E1001", "unexpected single `&`").with_primary_label(
-                            self.make_span(start, self.pos),
-                            "use `&&` for logical AND",
-                        ),
+                        Diagnostic::error("E1001", "unexpected single `&`")
+                            .with_primary_label(
+                                self.make_span(start, self.pos),
+                                "use `&&` for logical AND",
+                            ),
                     );
                     None
                 }
@@ -331,10 +342,11 @@ impl<'a> Lexer<'a> {
                     Some(TokenKind::OrOr)
                 } else {
                     self.diagnostics.emit(
-                        Diagnostic::error("E1001", "unexpected single `|`").with_primary_label(
-                            self.make_span(start, self.pos),
-                            "use `||` for logical OR",
-                        ),
+                        Diagnostic::error("E1001", "unexpected single `|`")
+                            .with_primary_label(
+                                self.make_span(start, self.pos),
+                                "use `||` for logical OR",
+                            ),
                     );
                     None
                 }
@@ -363,6 +375,11 @@ impl<'a> Lexer<'a> {
         let text = &self.src[start..self.pos];
         match text {
             "_" => TokenKind::Underscore,
+            "module" => TokenKind::Module,
+            "import" => TokenKind::Import,
+            "pub" => TokenKind::Pub,
+            "extend" => TokenKind::Extend,
+            "await" => TokenKind::Await,
             "struct" => TokenKind::Struct,
             "model" => TokenKind::Model,
             "interface" => TokenKind::Interface,
@@ -402,7 +419,7 @@ impl<'a> Lexer<'a> {
                 .is_some_and(|next| next.is_ascii_digit());
 
         if is_float {
-            self.pos += 1; // consume '.'
+            self.pos += 1;
             while let Some(b) = self.bytes.get(self.pos).copied() {
                 if b.is_ascii_digit() || b == b'_' {
                     self.pos += 1;
@@ -446,7 +463,7 @@ impl<'a> Lexer<'a> {
     }
 
     fn lex_string(&mut self, start: usize) -> TokenKind {
-        self.pos += 1; // opening '"'
+        self.pos += 1;
         let mut buf = String::new();
         let mut closed = false;
 
@@ -559,6 +576,19 @@ mod tests {
         assert!(tokens[4].had_newline_before);
         assert!(tokens.iter().any(|t| t.kind == TokenKind::ThinArrow));
         assert_eq!(tokens.last().map(|t| &t.kind), Some(&TokenKind::Eof));
+    }
+
+    #[test]
+    fn lexes_phase5_keywords_module_import_pub_extend_await() {
+        let mut bag = DiagnosticBag::new();
+        let src = "module core.app\nimport core.net\npub extend String {}\nawait task\n";
+        let tokens = tokenize(FileId(0), src, &mut bag);
+        assert!(!bag.has_errors());
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::Module));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::Import));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::Pub));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::Extend));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::Await));
     }
 
     #[test]

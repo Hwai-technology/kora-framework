@@ -1,4 +1,6 @@
 //! Abstract Syntax Tree (AST) definitions for the Kora programming language.
+//! Covers Phase 1 Foundation and Phase 5 Advanced Language constructs
+//! (`module`, `import`, `pub`, `Generics <T>`, `extend`, `await`, `Channel<T>`).
 
 use kora_span::{FileId, Span};
 
@@ -29,13 +31,28 @@ pub struct Module {
 /// Top-level declaration or zero-config executable statement.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Item {
+    ModuleDecl(ModulePathDecl),
+    Import(ImportDecl),
     Struct(StructDecl),
     Model(ModelDecl),
     Interface(InterfaceDecl),
     Class(ClassDecl),
     Enum(EnumDecl),
+    Extend(ExtendDecl),
     Fn(FnDecl),
     Stmt(Stmt),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ModulePathDecl {
+    pub segments: Vec<Ident>,
+    pub span: Span,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ImportDecl {
+    pub segments: Vec<Ident>,
+    pub span: Span,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -47,14 +64,18 @@ pub struct FieldDecl {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct StructDecl {
+    pub is_pub: bool,
     pub name: Ident,
+    pub type_params: Vec<Ident>,
     pub fields: Vec<FieldDecl>,
     pub span: Span,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ModelDecl {
+    pub is_pub: bool,
     pub name: Ident,
+    pub type_params: Vec<Ident>,
     pub fields: Vec<FieldDecl>,
     pub span: Span,
 }
@@ -68,8 +89,10 @@ pub struct Param {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct FnSig {
+    pub is_pub: bool,
     pub is_async: bool,
     pub name: Ident,
+    pub type_params: Vec<Ident>,
     pub params: Vec<Param>,
     pub return_ty: Option<TypeExpr>,
     pub span: Span,
@@ -77,7 +100,9 @@ pub struct FnSig {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct InterfaceDecl {
+    pub is_pub: bool,
     pub name: Ident,
+    pub type_params: Vec<Ident>,
     pub methods: Vec<FnSig>,
     pub span: Span,
 }
@@ -91,7 +116,9 @@ pub struct InitDecl {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ClassDecl {
+    pub is_pub: bool,
     pub name: Ident,
+    pub type_params: Vec<Ident>,
     pub implements: Vec<Ident>,
     pub fields: Vec<FieldDecl>,
     pub init: Option<InitDecl>,
@@ -108,8 +135,18 @@ pub struct EnumVariant {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct EnumDecl {
+    pub is_pub: bool,
     pub name: Ident,
+    pub type_params: Vec<Ident>,
     pub variants: Vec<EnumVariant>,
+    pub span: Span,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ExtendDecl {
+    pub is_pub: bool,
+    pub target_type: Ident,
+    pub methods: Vec<FnDecl>,
     pub span: Span,
 }
 
@@ -317,6 +354,10 @@ pub enum Expr {
         span: Span,
     },
     Ident(Ident),
+    Await {
+        expr: Box<Expr>,
+        span: Span,
+    },
     Unary {
         op: UnaryOp,
         expr: Box<Expr>,
@@ -378,6 +419,7 @@ impl Expr {
             | Self::StringLit { span, .. }
             | Self::BoolLit { span, .. }
             | Self::This { span }
+            | Self::Await { span, .. }
             | Self::Unary { span, .. }
             | Self::Binary { span, .. }
             | Self::Assign { span, .. }
@@ -392,4 +434,3 @@ impl Expr {
         }
     }
 }
-
