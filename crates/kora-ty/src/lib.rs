@@ -295,6 +295,7 @@ impl<'a> TypeChecker<'a> {
                     self.functions.insert(func.sig.name.name.clone(), info);
                 }
                 Item::Stmt(_) => {}
+                Item::ModuleDecl(_) | Item::Import(_) | Item::Extend(_) => {}
             }
         }
     }
@@ -558,6 +559,7 @@ impl<'a> TypeChecker<'a> {
                     self.check_stmt(stmt);
                 }
                 Item::Struct(_) | Item::Model(_) | Item::Interface(_) | Item::Enum(_) => {}
+                Item::ModuleDecl(_) | Item::Import(_) | Item::Extend(_) => {}
             }
         }
     }
@@ -924,6 +926,7 @@ impl<'a> TypeChecker<'a> {
                 arms,
                 span,
             } => self.check_match(scrutinee, arms, expected, *span),
+            Expr::Await { expr: inner, .. } => self.check_expr(inner, expected),
         }
     }
 

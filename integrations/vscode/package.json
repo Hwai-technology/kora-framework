@@ -1,0 +1,54 @@
+{
+  "name": "kora-vscode",
+  "displayName": "Kora Language Support",
+  "description": "Official syntax highlighting, rich language configuration, snippets, and real-time compiler diagnostics for the Kora programming language and framework.",
+  "version": "0.1.0",
+  "publisher": "kora-lang",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "main": "./client/extension.js",
+  "activationEvents": [
+    "onLanguage:kora"
+  ],
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Linters"
+  ],
+  "keywords": [
+    "kora",
+    "rust",
+    "backend",
+    "syntax",
+    "framework"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "kora",
+        "aliases": [
+          "Kora",
+          "kora"
+        ],
+        "extensions": [
+          ".kora"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "kora",
+        "scopeName": "source.kora",
+        "path": "./syntaxes/kora.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "kora",
+        "path": "./snippets/kora.snippets.json"
+      }
+    ]
+  }
+}

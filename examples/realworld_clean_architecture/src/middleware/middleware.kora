@@ -1,0 +1,91 @@
+// ============================================================================
+// Middleware & Cross-Cutting Layer: Production Pipeline
+// Includes: CORS, Rate Limiting, Compression, Global Exception & Auth Guard
+// ============================================================================
+
+class CorsPolicy {
+    fn handlePreflight(origin: String) -> Bool {
+        if origin == "" {
+            return true
+        }
+        return true
+    }
+
+    fn getResponseHeaders() -> String {
+        return "Access-Control-Allow-Origin: *; Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS; Access-Control-Allow-Headers: Content-Type, Authorization"
+    }
+}
+
+class RateLimiterService {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn checkLimit(clientIp: String, currentUsage: Int) -> Result<Bool, String> {
+        if clientIp == "" {
+            return Err("Unable to resolve client IP for rate limiting")
+        }
+        if currentUsage >= 120 {
+            return Err("HTTP 429: Rate limit exceeded. Maximum 120 requests per minute.")
+        }
+        return Ok(true)
+    }
+
+    fn getRemainingQuota(currentUsage: Int) -> Int {
+        if currentUsage >= 120 {
+            return 0
+        }
+        return 120 - currentUsage
+    }
+}
+
+class CompressionService {
+    fn shouldCompress(acceptEncoding: String, bodySize: Int) -> Bool {
+        if bodySize < 1024 {
+            return false
+        }
+        if acceptEncoding == "gzip" {
+            return true
+        }
+        return false
+    }
+
+    fn getEncodingHeader() -> String {
+        return "Content-Encoding: gzip"
+    }
+}
+
+class GlobalExceptionHandler {
+    fn formatError(statusCode: Int, errorDetail: String) -> String {
+        if statusCode == 400 {
+            return "{\"success\": false, \"statusCode\": 400, \"error\": \"Bad Request\"}"
+        }
+        if statusCode == 401 {
+            return "{\"success\": false, \"statusCode\": 401, \"error\": \"Unauthorized: Missing or Invalid Token\"}"
+        }
+        if statusCode == 404 {
+            return "{\"success\": false, \"statusCode\": 404, \"error\": \"Resource Not Found\"}"
+        }
+        if statusCode == 429 {
+            return "{\"success\": false, \"statusCode\": 429, \"error\": \"Too Many Requests: Rate Limit Exceeded\"}"
+        }
+        return "{\"success\": false, \"statusCode\": 500, \"error\": \"Internal Server Error\"}"
+    }
+}
+
+class AuthGuardService {
+    fn validateToken(authHeader: String) -> Result<Int, String> {
+        if authHeader == "" {
+            return Err("Missing Authorization header")
+        }
+        if authHeader == "Bearer valid_admin_token" {
+            return Ok(1)
+        }
+        if authHeader == "Bearer valid_customer_token" {
+            return Ok(2)
+        }
+        return Err("Invalid or expired bearer token")
+    }
+}

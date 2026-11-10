@@ -1,0 +1,17 @@
+[package]
+name = "kora-codegen"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+kora-span.workspace = true
+kora-diagnostics.workspace = true
+kora-ast.workspace = true
+kora-hir.workspace = true
+kora-ty.workspace = true
+kora-ownership = { path = "../kora-ownership" }
+
+[lints]
+workspace = true
+

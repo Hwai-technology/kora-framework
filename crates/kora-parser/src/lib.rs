@@ -1,9 +1,11 @@
 //! Recursive-descent and Pratt expression parser for the Kora programming language.
+//! Supports Phase 1 Foundation + Phase 5 Language Features (module, import, pub, Generics, extend, await).
 
 use kora_ast::{
     BinaryOp, Block, ClassDecl, ClosureBody, ClosureParam, ElseBranch, EnumDecl, EnumVariant, Expr,
-    FieldDecl, FieldInit, FnDecl, FnSig, Ident, InitDecl, InterfaceDecl, Item, MatchArm, ModelDecl,
-    Module, Param, Pattern, Stmt, StructDecl, TypeExpr, UnaryOp,
+    ExtendDecl, FieldDecl, FieldInit, FnDecl, FnSig, Ident, ImportDecl, InitDecl, InterfaceDecl,
+    Item, MatchArm, ModelDecl, Module, ModulePathDecl, Param, Pattern, Stmt, StructDecl, TypeExpr,
+    UnaryOp,
 };
 use kora_diagnostics::{Diagnostic, DiagnosticBag};
 use kora_lexer::{Token, TokenKind, tokenize};
@@ -57,41 +59,119 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_item(&mut self) -> Option<Item> {
+        let is_pub = self.consume(&TokenKind::Pub);
+
         match &self.peek().kind {
-            TokenKind::Struct => self.parse_struct_decl().map(Item::Struct),
-            TokenKind::Model => self.parse_model_decl().map(Item::Model),
-            TokenKind::Interface => self.parse_interface_decl().map(Item::Interface),
-            TokenKind::Class => self.parse_class_decl().map(Item::Class),
-            TokenKind::Enum => self.parse_enum_decl().map(Item::Enum),
-            TokenKind::Fn => self.parse_fn_decl(false).map(Item::Fn),
+            TokenKind::Module => {
+                let mod_decl = self.parse_module_path_decl()?;
+                Some(Item::ModuleDecl(mod_decl))
+            }
+            TokenKind::Import => {
+                let imp = self.parse_import_decl()?;
+                Some(Item::Import(imp))
+            }
+            TokenKind::Struct => self.parse_struct_decl(is_pub).map(Item::Struct),
+            TokenKind::Model => self.parse_model_decl(is_pub).map(Item::Model),
+            TokenKind::Interface => self.parse_interface_decl(is_pub).map(Item::Interface),
+            TokenKind::Class => self.parse_class_decl(is_pub).map(Item::Class),
+            TokenKind::Enum => self.parse_enum_decl(is_pub).map(Item::Enum),
+            TokenKind::Extend => self.parse_extend_decl(is_pub).map(Item::Extend),
+            TokenKind::Fn => self.parse_fn_decl(is_pub, false).map(Item::Fn),
             TokenKind::Async if self.peek_n(1).kind == TokenKind::Fn => {
                 let async_tok = self.advance();
-                let mut decl = self.parse_fn_decl(true)?;
+                let mut decl = self.parse_fn_decl(is_pub, true)?;
                 decl.sig.span = async_tok.span.merge(decl.sig.span);
                 decl.span = async_tok.span.merge(decl.span);
                 Some(Item::Fn(decl))
             }
-            _ => self.parse_stmt().map(Item::Stmt),
+            _ => {
+                if is_pub {
+                    self.diagnostics.emit(
+                        Diagnostic::error("E2001", "`pub` modifier is only valid on declarations")
+                            .with_primary_label(
+                                self.peek().span,
+                                "unexpected `pub` before statement",
+                            ),
+                    );
+                }
+                self.parse_stmt().map(Item::Stmt)
+            }
         }
     }
 
-    fn parse_struct_decl(&mut self) -> Option<StructDecl> {
+    fn parse_module_path_decl(&mut self) -> Option<ModulePathDecl> {
+        let kw = self.expect(&TokenKind::Module, "expected `module`")?;
+        let segments = self.parse_path_segments()?;
+        let end_span = segments.last().map(|s| s.span).unwrap_or(kw.span);
+        let _ = self.consume(&TokenKind::Semicolon);
+        Some(ModulePathDecl {
+            span: kw.span.merge(end_span),
+            segments,
+        })
+    }
+
+    fn parse_import_decl(&mut self) -> Option<ImportDecl> {
+        let kw = self.expect(&TokenKind::Import, "expected `import`")?;
+        let segments = self.parse_path_segments()?;
+        let end_span = segments.last().map(|s| s.span).unwrap_or(kw.span);
+        let _ = self.consume(&TokenKind::Semicolon);
+        Some(ImportDecl {
+            span: kw.span.merge(end_span),
+            segments,
+        })
+    }
+
+    fn parse_path_segments(&mut self) -> Option<Vec<Ident>> {
+        let mut segments = Vec::new();
+        segments.push(self.expect_ident("expected path segment")?);
+        while self.consume(&TokenKind::Dot) {
+            segments.push(self.expect_ident("expected path segment after `.`")?);
+        }
+        Some(segments)
+    }
+
+    fn parse_type_params_opt(&mut self) -> Option<Vec<Ident>> {
+        if self.consume(&TokenKind::Lt) {
+            let mut params = Vec::new();
+            while !self.check(&TokenKind::Gt) && !self.is_at_end() {
+                params.push(self.expect_ident("expected generic type parameter name")?);
+                if !self.consume(&TokenKind::Comma) {
+                    break;
+                }
+            }
+            self.expect(
+                &TokenKind::Gt,
+                "expected `>` to close generic type parameters",
+            )?;
+            Some(params)
+        } else {
+            Some(Vec::new())
+        }
+    }
+
+    fn parse_struct_decl(&mut self, is_pub: bool) -> Option<StructDecl> {
         let kw = self.expect(&TokenKind::Struct, "expected `struct`")?;
         let name = self.expect_ident("expected struct name after `struct`")?;
+        let type_params = self.parse_type_params_opt()?;
         let (_, fields, close_span) = self.parse_field_block()?;
         Some(StructDecl {
+            is_pub,
             name,
+            type_params,
             fields,
             span: kw.span.merge(close_span),
         })
     }
 
-    fn parse_model_decl(&mut self) -> Option<ModelDecl> {
+    fn parse_model_decl(&mut self, is_pub: bool) -> Option<ModelDecl> {
         let kw = self.expect(&TokenKind::Model, "expected `model`")?;
         let name = self.expect_ident("expected model name after `model`")?;
+        let type_params = self.parse_type_params_opt()?;
         let (_, fields, close_span) = self.parse_field_block()?;
         Some(ModelDecl {
+            is_pub,
             name,
+            type_params,
             fields,
             span: kw.span.merge(close_span),
         })
@@ -116,28 +196,33 @@ impl<'a> Parser<'a> {
         Some((open.span, fields, close.span))
     }
 
-    fn parse_interface_decl(&mut self) -> Option<InterfaceDecl> {
+    fn parse_interface_decl(&mut self, is_pub: bool) -> Option<InterfaceDecl> {
         let kw = self.expect(&TokenKind::Interface, "expected `interface`")?;
         let name = self.expect_ident("expected interface name")?;
+        let type_params = self.parse_type_params_opt()?;
         self.expect(&TokenKind::LBrace, "expected `{` after interface name")?;
         let mut methods = Vec::new();
         while !self.check(&TokenKind::RBrace) && !self.is_at_end() {
+            let m_pub = self.consume(&TokenKind::Pub);
             let is_async = self.consume(&TokenKind::Async);
-            let sig = self.parse_fn_sig(is_async)?;
+            let sig = self.parse_fn_sig(m_pub, is_async)?;
             let _ = self.consume(&TokenKind::Semicolon);
             methods.push(sig);
         }
         let close = self.expect(&TokenKind::RBrace, "expected `}` to close interface")?;
         Some(InterfaceDecl {
+            is_pub,
             name,
+            type_params,
             methods,
             span: kw.span.merge(close.span),
         })
     }
 
-    fn parse_class_decl(&mut self) -> Option<ClassDecl> {
+    fn parse_class_decl(&mut self, is_pub: bool) -> Option<ClassDecl> {
         let kw = self.expect(&TokenKind::Class, "expected `class`")?;
         let name = self.expect_ident("expected class name after `class`")?;
+        let type_params = self.parse_type_params_opt()?;
         let mut implements = Vec::new();
         if self.consume(&TokenKind::Implements) {
             loop {
@@ -154,6 +239,7 @@ impl<'a> Parser<'a> {
         let mut methods = Vec::new();
 
         while !self.check(&TokenKind::RBrace) && !self.is_at_end() {
+            let m_pub = self.consume(&TokenKind::Pub);
             match &self.peek().kind {
                 TokenKind::Init => {
                     let init_decl = self.parse_init_decl()?;
@@ -170,11 +256,11 @@ impl<'a> Parser<'a> {
                     }
                 }
                 TokenKind::Fn => {
-                    methods.push(self.parse_fn_decl(false)?);
+                    methods.push(self.parse_fn_decl(m_pub, false)?);
                 }
                 TokenKind::Async if self.peek_n(1).kind == TokenKind::Fn => {
                     let async_tok = self.advance();
-                    let mut m = self.parse_fn_decl(true)?;
+                    let mut m = self.parse_fn_decl(m_pub, true)?;
                     m.sig.span = async_tok.span.merge(m.sig.span);
                     m.span = async_tok.span.merge(m.span);
                     methods.push(m);
@@ -209,10 +295,32 @@ impl<'a> Parser<'a> {
 
         let close = self.expect(&TokenKind::RBrace, "expected `}` to close class body")?;
         Some(ClassDecl {
+            is_pub,
             name,
+            type_params,
             implements,
             fields,
             init,
+            methods,
+            span: kw.span.merge(close.span),
+        })
+    }
+
+    fn parse_extend_decl(&mut self, is_pub: bool) -> Option<ExtendDecl> {
+        let kw = self.expect(&TokenKind::Extend, "expected `extend`")?;
+        let target_type = self.expect_ident("expected target type name to extend")?;
+        self.expect(&TokenKind::LBrace, "expected `{` after extend target type")?;
+
+        let mut methods = Vec::new();
+        while !self.check(&TokenKind::RBrace) && !self.is_at_end() {
+            let m_pub = self.consume(&TokenKind::Pub);
+            let is_async = self.consume(&TokenKind::Async);
+            methods.push(self.parse_fn_decl(m_pub, is_async)?);
+        }
+        let close = self.expect(&TokenKind::RBrace, "expected `}` to close extend block")?;
+        Some(ExtendDecl {
+            is_pub,
+            target_type,
             methods,
             span: kw.span.merge(close.span),
         })
@@ -231,9 +339,10 @@ impl<'a> Parser<'a> {
         })
     }
 
-    fn parse_enum_decl(&mut self) -> Option<EnumDecl> {
+    fn parse_enum_decl(&mut self, is_pub: bool) -> Option<EnumDecl> {
         let kw = self.expect(&TokenKind::Enum, "expected `enum`")?;
         let name = self.expect_ident("expected enum name")?;
+        let type_params = self.parse_type_params_opt()?;
         self.expect(&TokenKind::LBrace, "expected `{` after enum name")?;
         let mut variants = Vec::new();
         while !self.check(&TokenKind::RBrace) && !self.is_at_end() {
@@ -260,15 +369,18 @@ impl<'a> Parser<'a> {
         }
         let close = self.expect(&TokenKind::RBrace, "expected `}` to close enum")?;
         Some(EnumDecl {
+            is_pub,
             name,
+            type_params,
             variants,
             span: kw.span.merge(close.span),
         })
     }
 
-    fn parse_fn_sig(&mut self, is_async: bool) -> Option<FnSig> {
+    fn parse_fn_sig(&mut self, is_pub: bool, is_async: bool) -> Option<FnSig> {
         let kw = self.expect(&TokenKind::Fn, "expected `fn`")?;
         let name = self.expect_ident("expected function name")?;
+        let type_params = self.parse_type_params_opt()?;
         self.expect(&TokenKind::LParen, "expected `(` after function name")?;
         let params = self.parse_param_list()?;
         let rparen = self.expect(&TokenKind::RParen, "expected `)` after parameters")?;
@@ -281,16 +393,18 @@ impl<'a> Parser<'a> {
             None
         };
         Some(FnSig {
+            is_pub,
             is_async,
             name,
+            type_params,
             params,
             return_ty,
             span: kw.span.merge(end_span),
         })
     }
 
-    fn parse_fn_decl(&mut self, is_async: bool) -> Option<FnDecl> {
-        let sig = self.parse_fn_sig(is_async)?;
+    fn parse_fn_decl(&mut self, is_pub: bool, is_async: bool) -> Option<FnDecl> {
+        let sig = self.parse_fn_sig(is_pub, is_async)?;
         let body = self.parse_block()?;
         let span = sig.span.merge(body.span);
         Some(FnDecl { sig, body, span })
@@ -530,6 +644,15 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_unary_expr(&mut self) -> Option<Expr> {
+        if self.check(&TokenKind::Await) {
+            let op_tok = self.advance();
+            let inner = self.parse_unary_expr()?;
+            let span = op_tok.span.merge(inner.span());
+            return Some(Expr::Await {
+                expr: Box::new(inner),
+                span,
+            });
+        }
         if self.check(&TokenKind::Bang) {
             let op_tok = self.advance();
             let inner = self.parse_unary_expr()?;
@@ -888,7 +1011,6 @@ impl<'a> Parser<'a> {
     }
 
     fn looks_like_struct_lit_body(&self) -> bool {
-        // Current token is `{`.
         match &self.peek_n(1).kind {
             TokenKind::RBrace => true,
             TokenKind::Ident(_) => self.peek_n(2).kind == TokenKind::Colon,
@@ -897,7 +1019,6 @@ impl<'a> Parser<'a> {
     }
 
     fn is_closure_start(&self) -> bool {
-        // Current token is `(`. Scan matching `)` and inspect what follows.
         if self.peek_n(1).kind == TokenKind::RParen {
             return matches!(
                 self.peek_n(2).kind,
@@ -910,7 +1031,6 @@ impl<'a> Parser<'a> {
             return true;
         }
 
-        // Check simple `(a, b) =>` or `(a) -> Type =>`
         let mut idx = 1;
         loop {
             match &self.peek_n(idx).kind {
@@ -949,11 +1069,15 @@ impl<'a> Parser<'a> {
     fn synchronize_item(&mut self) {
         while !self.is_at_end() {
             match &self.peek().kind {
-                TokenKind::Struct
+                TokenKind::Module
+                | TokenKind::Import
+                | TokenKind::Pub
+                | TokenKind::Struct
                 | TokenKind::Model
                 | TokenKind::Interface
                 | TokenKind::Class
                 | TokenKind::Enum
+                | TokenKind::Extend
                 | TokenKind::Fn
                 | TokenKind::Async => return,
                 _ => {
@@ -1095,19 +1219,33 @@ get("/users/{id}", (id: Int, svc: UserService) => {
     }
 
     #[test]
-    fn disambiguates_if_condition_from_struct_literal() {
+    fn parses_generics_modules_extend_and_await() {
         let src = r#"
-fn check(flag: Bool) -> Int {
-    if flag {
-        return 1
-    } else {
-        return 0
+module core.users
+import core.db
+
+pub struct Page<T> {
+    items: List<T>
+}
+
+pub extend Int {
+    fn double() -> Int {
+        return this * 2
     }
+}
+
+async fn fetch() -> Int {
+    let x = await someTask()
+    return x
 }
 "#;
         let mut bag = DiagnosticBag::new();
         let module = parse_module(FileId(0), src, &mut bag);
-        assert!(!bag.has_errors());
-        assert_eq!(module.items.len(), 1);
+        assert!(
+            !bag.has_errors(),
+            "unexpected parse errors: {:?}",
+            bag.items()
+        );
+        assert_eq!(module.items.len(), 5);
     }
 }

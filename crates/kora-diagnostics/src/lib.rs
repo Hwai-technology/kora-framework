@@ -267,4 +267,3 @@ mod tests {
         assert!(rendered.contains("= help:"));
     }
 }
-

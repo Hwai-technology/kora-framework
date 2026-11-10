@@ -1,0 +1,76 @@
+{
+  "Model Declaration": {
+    "prefix": "model",
+    "body": [
+      "model ${1:Name} {",
+      "    id: Int",
+      "    ${2:field}: ${3:String}",
+      "}"
+    ],
+    "description": "Create a new Kora persistent database model"
+  },
+  "Struct Declaration": {
+    "prefix": "struct",
+    "body": [
+      "struct ${1:Name} {",
+      "    ${2:field}: ${3:String}",
+      "}"
+    ],
+    "description": "Create a lightweight value struct / DTO"
+  },
+  "Service Class with DI": {
+    "prefix": "class",
+    "body": [
+      "class ${1:Name}Service implements ${2:Interface} {",
+      "    db: Database",
+      "",
+      "    init(db: Database) {",
+      "        this.db = db",
+      "    }",
+      "",
+      "    fn ${3:method}() -> ${4:Unit} {",
+      "        ${0}",
+      "    }",
+      "}"
+    ],
+    "description": "Create a service class with compile-time Dependency Injection"
+  },
+  "Interface Declaration": {
+    "prefix": "interface",
+    "body": [
+      "interface ${1:Name} {",
+      "    fn ${2:find}(id: Int) -> Option<${3:Model}>",
+      "}"
+    ],
+    "description": "Create a behavioral contract interface"
+  },
+  "HTTP GET Route": {
+    "prefix": "get",
+    "body": [
+      "get(\"${1:/path}\", (${2:svc: Service}) => {",
+      "    return ${0}",
+      "})"
+    ],
+    "description": "Create a zero-config HTTP GET endpoint"
+  },
+  "HTTP POST Route": {
+    "prefix": "post",
+    "body": [
+      "post(\"${1:/path}\", (request: Request, ${2:svc: Service}) => {",
+      "    return ${0}",
+      "})"
+    ],
+    "description": "Create a zero-config HTTP POST endpoint"
+  },
+  "Match Statement": {
+    "prefix": "match",
+    "body": [
+      "match ${1:value} {",
+      "    Some(${2:val}) => ${3:val},",
+      "    None => ${4:fallback},",
+      "}"
+    ],
+    "description": "Pattern matching expression"
+  }
+}
+

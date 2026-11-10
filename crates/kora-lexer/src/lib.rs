@@ -328,11 +328,10 @@ impl<'a> Lexer<'a> {
                     Some(TokenKind::AndAnd)
                 } else {
                     self.diagnostics.emit(
-                        Diagnostic::error("E1001", "unexpected single `&`")
-                            .with_primary_label(
-                                self.make_span(start, self.pos),
-                                "use `&&` for logical AND",
-                            ),
+                        Diagnostic::error("E1001", "unexpected single `&`").with_primary_label(
+                            self.make_span(start, self.pos),
+                            "use `&&` for logical AND",
+                        ),
                     );
                     None
                 }
@@ -342,11 +341,10 @@ impl<'a> Lexer<'a> {
                     Some(TokenKind::OrOr)
                 } else {
                     self.diagnostics.emit(
-                        Diagnostic::error("E1001", "unexpected single `|`")
-                            .with_primary_label(
-                                self.make_span(start, self.pos),
-                                "use `||` for logical OR",
-                            ),
+                        Diagnostic::error("E1001", "unexpected single `|`").with_primary_label(
+                            self.make_span(start, self.pos),
+                            "use `||` for logical OR",
+                        ),
                     );
                     None
                 }

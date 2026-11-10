@@ -1,0 +1,123 @@
+// ============================================================================
+// Controller Layer: Presentation & HTTP Request Orchestration
+// Clean Architecture: Adapts Transport Protocol to Application Service
+// ============================================================================
+
+model Order {
+    id: Int
+    orderNumber: String
+    userId: Int
+    totalAmount: Int
+    status: String
+    paymentStatus: String
+}
+
+struct CreateOrderInput {
+    userId: Int
+    itemsCount: Int
+    totalAmount: Int
+}
+
+class MySqlOrderRepository {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn findById(id: Int) -> Option<Order> {
+        return Some(Order {
+            id: id,
+            orderNumber: "ORD-2026-9901",
+            userId: 1,
+            totalAmount: 349900,
+            status: "pending",
+            paymentStatus: "unpaid",
+        })
+    }
+
+    fn createOrder(input: CreateOrderInput) -> Result<Order, String> {
+        return Ok(Order {
+            id: 8801,
+            orderNumber: "ORD-2026-8801",
+            userId: input.userId,
+            totalAmount: input.totalAmount,
+            status: "paid",
+            paymentStatus: "captured",
+        })
+    }
+
+    fn cancelOrder(id: Int) -> Result<Bool, String> {
+        return Ok(true)
+    }
+}
+
+class MySqlUserRepository {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+}
+
+class RateLimiterService {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn checkLimit(clientIp: String, currentUsage: Int) -> Result<Bool, String> {
+        return Ok(true)
+    }
+}
+
+class CheckoutService {
+    orderRepo: MySqlOrderRepository
+    userRepo: MySqlUserRepository
+    rateLimiter: RateLimiterService
+
+    init(orderRepo: MySqlOrderRepository, userRepo: MySqlUserRepository, rateLimiter: RateLimiterService) {
+        this.orderRepo = orderRepo
+        this.userRepo = userRepo
+        this.rateLimiter = rateLimiter
+    }
+
+    fn processCheckout(userId: Int, itemsCount: Int, amount: Int, clientIp: String) -> Result<Order, String> {
+        let input = CreateOrderInput {
+            userId: userId,
+            itemsCount: itemsCount,
+            totalAmount: amount,
+        }
+        return this.orderRepo.createOrder(input)
+    }
+
+    fn getOrder(orderId: Int) -> Option<Order> {
+        return this.orderRepo.findById(orderId)
+    }
+
+    fn cancelOrder(orderId: Int) -> Result<Bool, String> {
+        return this.orderRepo.cancelOrder(orderId)
+    }
+}
+
+class OrderController {
+    service: CheckoutService
+
+    init(service: CheckoutService) {
+        this.service = service
+    }
+
+    fn getOrderById(id: Int) -> Option<Order> {
+        return this.service.getOrder(id)
+    }
+
+    fn createOrder(userId: Int, itemsCount: Int, amount: Int, clientIp: String) -> Result<Order, String> {
+        return this.service.processCheckout(userId, itemsCount, amount, clientIp)
+    }
+
+    fn cancelOrder(id: Int) -> Result<Bool, String> {
+        return this.service.cancelOrder(id)
+    }
+}
+

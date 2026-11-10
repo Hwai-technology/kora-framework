@@ -8,6 +8,21 @@ members = [
     "crates/kora-parser",
     "crates/kora-hir",
     "crates/kora-ty",
+    "crates/kora-ownership",
+    "crates/kora-codegen",
+    "crates/kora-runtime",
+    "crates/kora-http",
+    "crates/kora-orm",
+    "crates/kora-auth",
+    "crates/kora-queue",
+    "crates/kora-realtime",
+    "crates/kora-observability",
+    "crates/kora-pkg",
+    "crates/kora-fmt",
+    "crates/kora-lsp",
+    "crates/kora-testing",
+    "crates/kora-profiler",
+    "crates/kora-bench",
     "crates/kora-cli",
 ]
 
@@ -32,4 +47,18 @@ kora-lexer = { path = "crates/kora-lexer" }
 kora-parser = { path = "crates/kora-parser" }
 kora-hir = { path = "crates/kora-hir" }
 kora-ty = { path = "crates/kora-ty" }
-
+kora-ownership = { path = "crates/kora-ownership" }
+kora-codegen = { path = "crates/kora-codegen" }
+kora-runtime = { path = "crates/kora-runtime" }
+kora-http = { path = "crates/kora-http" }
+kora-orm = { path = "crates/kora-orm" }
+kora-auth = { path = "crates/kora-auth" }
+kora-queue = { path = "crates/kora-queue" }
+kora-realtime = { path = "crates/kora-realtime" }
+kora-observability = { path = "crates/kora-observability" }
+kora-pkg = { path = "crates/kora-pkg" }
+kora-fmt = { path = "crates/kora-fmt" }
+kora-lsp = { path = "crates/kora-lsp" }
+kora-testing = { path = "crates/kora-testing" }
+kora-profiler = { path = "crates/kora-profiler" }
+kora-bench = { path = "crates/kora-bench" }

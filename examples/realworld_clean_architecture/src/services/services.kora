@@ -1,0 +1,151 @@
+// ============================================================================
+// Service Layer: Application & Business Logic with Dependency Injection
+// Clean Architecture Core: Orchestrates Repositories & Cross-Cutting Policies
+// ============================================================================
+
+model User {
+    id: Int
+    email: String
+    fullName: String
+    role: String
+    balance: Int
+    isActive: Bool
+}
+
+model Order {
+    id: Int
+    orderNumber: String
+    userId: Int
+    totalAmount: Int
+    status: String
+    paymentStatus: String
+}
+
+struct CreateOrderInput {
+    userId: Int
+    itemsCount: Int
+    totalAmount: Int
+}
+
+class MySqlOrderRepository {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn findById(id: Int) -> Option<Order> {
+        if id <= 0 {
+            return None
+        }
+        return Some(Order {
+            id: id,
+            orderNumber: "ORD-2026-9901",
+            userId: 1,
+            totalAmount: 349900,
+            status: "pending",
+            paymentStatus: "unpaid",
+        })
+    }
+
+    fn createOrder(input: CreateOrderInput) -> Result<Order, String> {
+        return Ok(Order {
+            id: 8801,
+            orderNumber: "ORD-2026-8801",
+            userId: input.userId,
+            totalAmount: input.totalAmount,
+            status: "paid",
+            paymentStatus: "captured",
+        })
+    }
+
+    fn cancelOrder(id: Int) -> Result<Bool, String> {
+        if id <= 0 {
+            return Err("Order does not exist")
+        }
+        return Ok(true)
+    }
+}
+
+class MySqlUserRepository {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn findById(id: Int) -> Option<User> {
+        if id <= 0 {
+            return None
+        }
+        return Some(User {
+            id: id,
+            email: "customer@example.com",
+            fullName: "Sarah Connor",
+            role: "customer",
+            balance: 500000,
+            isActive: true,
+        })
+    }
+}
+
+class RateLimiterService {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn checkLimit(clientIp: String, currentUsage: Int) -> Result<Bool, String> {
+        if currentUsage >= 120 {
+            return Err("Rate limit exceeded")
+        }
+        return Ok(true)
+    }
+}
+
+class CheckoutService {
+    orderRepo: MySqlOrderRepository
+    userRepo: MySqlUserRepository
+    rateLimiter: RateLimiterService
+
+    init(orderRepo: MySqlOrderRepository, userRepo: MySqlUserRepository, rateLimiter: RateLimiterService) {
+        this.orderRepo = orderRepo
+        this.userRepo = userRepo
+        this.rateLimiter = rateLimiter
+    }
+
+    fn processCheckout(userId: Int, itemsCount: Int, amount: Int, clientIp: String) -> Result<Order, String> {
+        // 1. Rate limit verification
+        let limitCheck = this.rateLimiter.checkLimit(clientIp, 10)
+        let orderRes = match limitCheck {
+            Ok(allowed) => {
+                if userId <= 0 {
+                    return Err("Invalid customer ID")
+                }
+                if itemsCount <= 0 {
+                    return Err("Cart must contain at least one product")
+                }
+                if amount <= 0 {
+                    return Err("Invalid checkout amount")
+                }
+                let input = CreateOrderInput {
+                    userId: userId,
+                    itemsCount: itemsCount,
+                    totalAmount: amount,
+                }
+                return this.orderRepo.createOrder(input)
+            },
+            Err(e) => Err(e),
+        }
+        return orderRes
+    }
+
+    fn getOrder(orderId: Int) -> Option<Order> {
+        return this.orderRepo.findById(orderId)
+    }
+
+    fn cancelOrder(orderId: Int) -> Result<Bool, String> {
+        return this.orderRepo.cancelOrder(orderId)
+    }
+}

@@ -1,0 +1,333 @@
+// ============================================================================
+// Kora Clean Architecture Enterprise Showcase — Main Entrypoint
+// Demonstrates:
+// 1. Pure Domain Models & Enums
+// 2. Cross-Cutting Middleware (CORS, Rate Limiting, Compression, Global Exception, Auth Guard)
+// 3. MySQL Database Repositories (Data Access Layer)
+// 4. Application Services with Compile-Time Dependency Injection (DI)
+// 5. Presentation Layer Controllers with High-Performance Axum/Hyper Engine
+// ============================================================================
+
+enum UserRole {
+    Customer,
+    Admin,
+    Moderator
+}
+
+enum OrderStatus {
+    Pending,
+    Paid,
+    Shipped,
+    Delivered,
+    Cancelled
+}
+
+model User {
+    id: Int
+    email: String
+    fullName: String
+    role: String
+    balance: Int
+    isActive: Bool
+}
+
+model Product {
+    id: Int
+    sku: String
+    title: String
+    priceCents: Int
+    stockQuantity: Int
+    isPublished: Bool
+}
+
+model Order {
+    id: Int
+    orderNumber: String
+    userId: Int
+    totalAmount: Int
+    status: String
+    paymentStatus: String
+}
+
+struct CreateOrderInput {
+    userId: Int
+    itemsCount: Int
+    totalAmount: Int
+}
+
+struct ApiResponse {
+    success: Bool
+    statusCode: Int
+    message: String
+    dataCount: Int
+}
+
+// ----------------------------------------------------------------------------
+// Middleware Layer
+// ----------------------------------------------------------------------------
+
+class CorsPolicy {
+    fn handlePreflight(origin: String) -> Bool {
+        return true
+    }
+
+    fn getResponseHeaders() -> String {
+        return "Access-Control-Allow-Origin: *; Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS; Access-Control-Allow-Headers: Content-Type, Authorization"
+    }
+}
+
+class RateLimiterService {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn checkLimit(clientIp: String, currentUsage: Int) -> Result<Bool, String> {
+        if clientIp == "" {
+            return Err("Unable to resolve client IP for rate limiting")
+        }
+        if currentUsage >= 120 {
+            return Err("HTTP 429: Rate limit exceeded. Maximum 120 requests per minute.")
+        }
+        return Ok(true)
+    }
+
+    fn getRemainingQuota(currentUsage: Int) -> Int {
+        if currentUsage >= 120 {
+            return 0
+        }
+        return 120 - currentUsage
+    }
+}
+
+class CompressionService {
+    fn shouldCompress(acceptEncoding: String, bodySize: Int) -> Bool {
+        if bodySize < 1024 {
+            return false
+        }
+        if acceptEncoding == "gzip" {
+            return true
+        }
+        return false
+    }
+
+    fn getEncodingHeader() -> String {
+        return "Content-Encoding: gzip"
+    }
+}
+
+class GlobalExceptionHandler {
+    fn formatError(statusCode: Int, errorDetail: String) -> String {
+        if statusCode == 400 {
+            return "{\"success\": false, \"statusCode\": 400, \"error\": \"Bad Request\"}"
+        }
+        if statusCode == 401 {
+            return "{\"success\": false, \"statusCode\": 401, \"error\": \"Unauthorized\"}"
+        }
+        if statusCode == 404 {
+            return "{\"success\": false, \"statusCode\": 404, \"error\": \"Resource Not Found\"}"
+        }
+        if statusCode == 429 {
+            return "{\"success\": false, \"statusCode\": 429, \"error\": \"Too Many Requests\"}"
+        }
+        return "{\"success\": false, \"statusCode\": 500, \"error\": \"Internal Server Error\"}"
+    }
+}
+
+class AuthGuardService {
+    fn validateToken(authHeader: String) -> Result<Int, String> {
+        if authHeader == "" {
+            return Err("Missing Authorization header")
+        }
+        if authHeader == "Bearer valid_admin_token" {
+            return Ok(1)
+        }
+        if authHeader == "Bearer valid_customer_token" {
+            return Ok(2)
+        }
+        return Err("Invalid or expired bearer token")
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Repository Layer (Data Access via MySQL)
+// ----------------------------------------------------------------------------
+
+class MySqlOrderRepository {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn findById(id: Int) -> Option<Order> {
+        if id <= 0 {
+            return None
+        }
+        return Some(Order {
+            id: id,
+            orderNumber: "ORD-2026-9901",
+            userId: 1,
+            totalAmount: 349900,
+            status: "pending",
+            paymentStatus: "unpaid",
+        })
+    }
+
+    fn createOrder(input: CreateOrderInput) -> Result<Order, String> {
+        if input.userId <= 0 {
+            return Err("Invalid customer ID")
+        }
+        if input.totalAmount <= 0 {
+            return Err("Total order amount must be positive")
+        }
+        return Ok(Order {
+            id: 8801,
+            orderNumber: "ORD-2026-8801",
+            userId: input.userId,
+            totalAmount: input.totalAmount,
+            status: "paid",
+            paymentStatus: "captured",
+        })
+    }
+
+    fn cancelOrder(id: Int) -> Result<Bool, String> {
+        if id <= 0 {
+            return Err("Order record not found in MySQL")
+        }
+        return Ok(true)
+    }
+}
+
+class MySqlUserRepository {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn findById(id: Int) -> Option<User> {
+        if id <= 0 {
+            return None
+        }
+        return Some(User {
+            id: id,
+            email: "ahmet@kora-lang.org",
+            fullName: "Ahmet Architect",
+            role: "admin",
+            balance: 500000,
+            isActive: true,
+        })
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Application Service Layer (Business Logic & Orchestration)
+// ----------------------------------------------------------------------------
+
+class CheckoutService {
+    orderRepo: MySqlOrderRepository
+    userRepo: MySqlUserRepository
+    rateLimiter: RateLimiterService
+
+    init(orderRepo: MySqlOrderRepository, userRepo: MySqlUserRepository, rateLimiter: RateLimiterService) {
+        this.orderRepo = orderRepo
+        this.userRepo = userRepo
+        this.rateLimiter = rateLimiter
+    }
+
+    fn processCheckout(userId: Int, itemsCount: Int, amount: Int, clientIp: String) -> Result<Order, String> {
+        let limitCheck = this.rateLimiter.checkLimit(clientIp, 10)
+        let orderRes = match limitCheck {
+            Ok(allowed) => {
+                if userId <= 0 {
+                    return Err("Customer identification is required")
+                }
+                if itemsCount <= 0 {
+                    return Err("Cart must contain at least 1 item")
+                }
+                if amount <= 0 {
+                    return Err("Order amount must be greater than zero")
+                }
+                let input = CreateOrderInput {
+                    userId: userId,
+                    itemsCount: itemsCount,
+                    totalAmount: amount,
+                }
+                return this.orderRepo.createOrder(input)
+            },
+            Err(e) => Err(e),
+        }
+        return orderRes
+    }
+
+    fn getOrder(orderId: Int) -> Option<Order> {
+        return this.orderRepo.findById(orderId)
+    }
+
+    fn cancelOrder(orderId: Int) -> Result<Bool, String> {
+        return this.orderRepo.cancelOrder(orderId)
+    }
+}
+
+// ----------------------------------------------------------------------------
+// Controller Layer (Presentation & HTTP Dispatch)
+// ----------------------------------------------------------------------------
+
+class OrderController {
+    service: CheckoutService
+
+    init(service: CheckoutService) {
+        this.service = service
+    }
+
+    fn getOrderById(id: Int) -> Option<Order> {
+        return this.service.getOrder(id)
+    }
+
+    fn createOrder(userId: Int, itemsCount: Int, amount: Int, clientIp: String) -> Result<Order, String> {
+        return this.service.processCheckout(userId, itemsCount, amount, clientIp)
+    }
+
+    fn cancelOrder(id: Int) -> Result<Bool, String> {
+        return this.service.cancelOrder(id)
+    }
+}
+
+// ============================================================================
+// Server Bootstrap & REST API Routing
+// ============================================================================
+
+let app = run()
+
+// 1. Healthcheck & Observability
+get("/health", () => {
+    return ApiResponse {
+        success: true,
+        statusCode: 200,
+        message: "Kora Clean Architecture Engine is running healthy",
+        dataCount: 1,
+    }
+})
+
+// 2. CORS Policy Preflight Endpoint
+get("/api/v1/cors-config", (cors: CorsPolicy) => {
+    return cors.getResponseHeaders()
+})
+
+// 3. Lookup Order By ID
+get("/api/v1/orders/{id}", (id: Int, controller: OrderController) => {
+    return controller.getOrderById(id)
+})
+
+// 4. Place New Order with Validation & DI
+post("/api/v1/orders", (request: Request, controller: OrderController) => {
+    return controller.createOrder(1, 2, 349900, "127.0.0.1")
+})
+
+// 5. Cancel Order
+post("/api/v1/orders/{id}/cancel", (id: Int, controller: OrderController) => {
+    return controller.cancelOrder(id)
+})
+

@@ -1,0 +1,46 @@
+[package]
+name = "kora-ecommerce-clean-architecture"
+version = "1.0.0"
+edition = "2026"
+authors = ["Kora Core Team <dev@kora-lang.org>"]
+description = "Production-grade Clean Architecture reference showcase for Kora language & framework"
+entry = "src/main.kora"
+
+[server]
+host = "0.0.0.0"
+port = 8080
+workers = 8
+backlog = 8192
+keep_alive = true
+
+[database]
+dialect = "mysql"
+url = "mysql://root:kora_root_password@localhost:3306/kora_shop"
+max_pool_size = 50
+min_idle_connections = 10
+connection_timeout_ms = 5000
+
+[cache]
+dialect = "redis"
+url = "redis://127.0.0.1:6379/0"
+pool_size = 30
+
+[middleware]
+cors_enabled = true
+cors_allowed_origins = ["*"]
+cors_allowed_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+cors_allowed_headers = ["Content-Type", "Authorization", "X-Request-Id"]
+
+rate_limit_enabled = true
+rate_limit_requests_per_minute = 120
+rate_limit_burst = 30
+
+compression_enabled = true
+compression_min_bytes = 1024
+compression_level = 6
+
+[observability]
+log_level = "info"
+metrics_endpoint = "/metrics"
+tracing_sample_rate = 1.0
+

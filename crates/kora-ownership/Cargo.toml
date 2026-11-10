@@ -1,0 +1,18 @@
+[package]
+name = "kora-ownership"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+kora-span.workspace = true
+kora-diagnostics.workspace = true
+kora-ast.workspace = true
+kora-hir.workspace = true
+kora-ty.workspace = true
+
+[dev-dependencies]
+kora-parser.workspace = true
+
+[lints]
+workspace = true

@@ -1,10 +1,11 @@
 //! High-Level Intermediate Representation (HIR) and multi-pass lexical symbol resolution.
+//! Supports Phase 1 Foundation + Phase 5 Language Features (modules, imports, generics, extend, await).
 
 use std::collections::{HashMap, HashSet};
 
 use kora_ast::{
-    ClassDecl, ClosureBody, ElseBranch, EnumDecl, Expr, FieldDecl, FnDecl, FnSig, Ident,
-    InterfaceDecl, Item, ModelDecl, Module, Pattern, Stmt, StructDecl, TypeExpr,
+    ClassDecl, ClosureBody, ElseBranch, EnumDecl, Expr, ExtendDecl, FieldDecl, FnDecl, FnSig,
+    Ident, InterfaceDecl, Item, ModelDecl, Module, Pattern, Stmt, StructDecl, TypeExpr,
 };
 use kora_diagnostics::{Diagnostic, DiagnosticBag};
 use kora_span::Span;
@@ -48,12 +49,12 @@ pub struct HirModule {
 }
 
 const PRELUDE_TYPES: &[&str] = &[
-    "Int", "Float", "Bool", "String", "Unit", "List", "Option", "Result", "Database", "App",
-    "Request", "Response",
+    "Int", "Float", "Bool", "String", "Unit", "List", "Option", "Result", "Channel", "Database",
+    "App", "Request", "Response",
 ];
 
 const PRELUDE_VALUES: &[&str] = &[
-    "Some", "None", "Ok", "Err", "print", "run", "send", "get", "post", "put", "delete",
+    "Some", "None", "Ok", "Err", "channel", "print", "run", "send", "get", "post", "put", "delete",
 ];
 
 /// Lowers and name-resolves a parsed [`Module`] into [`HirModule`].
@@ -74,7 +75,8 @@ struct Resolver<'a> {
     enum_variants: HashMap<String, HashSet<String>>,
     next_def_id: u32,
     scopes: Vec<HashMap<String, LocalBinding>>,
-    in_class: bool,
+    in_class_or_extend: bool,
+    in_async: bool,
     diagnostics: &'a mut DiagnosticBag,
 }
 
@@ -85,7 +87,8 @@ impl<'a> Resolver<'a> {
             enum_variants: HashMap::new(),
             next_def_id: 0,
             scopes: vec![HashMap::new()],
-            in_class: false,
+            in_class_or_extend: false,
+            in_async: false,
             diagnostics,
         }
     }
@@ -149,6 +152,7 @@ impl<'a> Resolver<'a> {
     fn collect_top_level(&mut self, module: &Module) {
         for item in &module.items {
             match item {
+                Item::ModuleDecl(_) | Item::Import(_) => {}
                 Item::Struct(StructDecl { name, fields, .. }) => {
                     self.register_symbol(name, SymbolKind::Struct);
                     self.check_unique_fields(&name.name, fields);
@@ -191,6 +195,7 @@ impl<'a> Resolver<'a> {
                     }
                     self.enum_variants.insert(name.name.clone(), seen);
                 }
+                Item::Extend(_) => {}
                 Item::Fn(FnDecl { sig, .. }) => {
                     self.register_symbol(&sig.name, SymbolKind::Function);
                 }
@@ -232,6 +237,7 @@ impl<'a> Resolver<'a> {
     fn resolve_items(&mut self, module: &Module) {
         for item in &module.items {
             match item {
+                Item::ModuleDecl(_) | Item::Import(_) => {}
                 Item::Struct(s) => {
                     for f in &s.fields {
                         self.resolve_type_expr(&f.ty);
@@ -277,8 +283,8 @@ impl<'a> Resolver<'a> {
                     for f in &cls.fields {
                         self.resolve_type_expr(&f.ty);
                     }
-                    let prev_class = self.in_class;
-                    self.in_class = true;
+                    let prev_class = self.in_class_or_extend;
+                    self.in_class_or_extend = true;
                     if let Some(init) = &cls.init {
                         self.push_scope();
                         for p in &init.params {
@@ -293,7 +299,7 @@ impl<'a> Resolver<'a> {
                     for method in &cls.methods {
                         self.resolve_fn_decl(method);
                     }
-                    self.in_class = prev_class;
+                    self.in_class_or_extend = prev_class;
                 }
                 Item::Enum(en) => {
                     for v in &en.variants {
@@ -301,6 +307,23 @@ impl<'a> Resolver<'a> {
                             self.resolve_type_expr(t);
                         }
                     }
+                }
+                Item::Extend(ext) => {
+                    if !self.symbols.contains_key(&ext.target_type.name) {
+                        self.diagnostics.emit(
+                            Diagnostic::error(
+                                "E3007",
+                                format!("cannot extend unknown type `{}`", ext.target_type.name),
+                            )
+                            .with_primary_label(ext.target_type.span, "type not found in scope"),
+                        );
+                    }
+                    let prev = self.in_class_or_extend;
+                    self.in_class_or_extend = true;
+                    for method in &ext.methods {
+                        self.resolve_fn_decl(method);
+                    }
+                    self.in_class_or_extend = prev;
                 }
                 Item::Fn(func) => self.resolve_fn_decl(func),
                 Item::Stmt(stmt) => self.resolve_stmt(stmt),
@@ -319,6 +342,8 @@ impl<'a> Resolver<'a> {
 
     fn resolve_fn_decl(&mut self, func: &FnDecl) {
         self.resolve_fn_sig(&func.sig);
+        let prev_async = self.in_async;
+        self.in_async = func.sig.is_async;
         self.push_scope();
         for p in &func.sig.params {
             self.define_local(&p.name, false);
@@ -327,6 +352,7 @@ impl<'a> Resolver<'a> {
             self.resolve_stmt(stmt);
         }
         self.pop_scope();
+        self.in_async = prev_async;
     }
 
     fn resolve_type_expr(&mut self, ty: &TypeExpr) {
@@ -344,10 +370,17 @@ impl<'a> Resolver<'a> {
                                 | SymbolKind::Enum
                         ) => {}
                     _ => {
-                        self.diagnostics.emit(
-                            Diagnostic::error("E3007", format!("unknown type `{}`", name.name))
-                                .with_primary_label(name.span, "unknown type name"),
-                        );
+                        // Allow single-letter or generic parameter tokens (e.g. T, U, V)
+                        if !name
+                            .name
+                            .chars()
+                            .all(|c| c.is_ascii_uppercase() || c == '_')
+                        {
+                            self.diagnostics.emit(
+                                Diagnostic::error("E3007", format!("unknown type `{}`", name.name))
+                                    .with_primary_label(name.span, "unknown type name"),
+                            );
+                        }
                     }
                 }
                 for arg in args {
@@ -427,13 +460,13 @@ impl<'a> Resolver<'a> {
             | Expr::StringLit { .. }
             | Expr::BoolLit { .. } => {}
             Expr::This { span } => {
-                if !self.in_class {
+                if !self.in_class_or_extend {
                     self.diagnostics.emit(
                         Diagnostic::error(
                             "E3005",
-                            "`this` can only be used inside a `class` constructor or method",
+                            "`this` can only be used inside a `class` constructor, method, or `extend` block",
                         )
-                        .with_primary_label(*span, "`this` is not valid outside a `class`"),
+                        .with_primary_label(*span, "`this` is not valid here"),
                     );
                 }
             }
@@ -447,6 +480,15 @@ impl<'a> Resolver<'a> {
                         .with_primary_label(id.span, "not found in scope"),
                     );
                 }
+            }
+            Expr::Await { expr: inner, span } => {
+                if !self.in_async {
+                    self.diagnostics.emit(
+                        Diagnostic::error("E4013", "`await` is only valid inside an `async fn`")
+                            .with_primary_label(*span, "`await` used in synchronous context"),
+                    );
+                }
+                self.resolve_expr(inner);
             }
             Expr::Unary { expr: inner, .. } => self.resolve_expr(inner),
             Expr::Binary { lhs, rhs, .. } => {
@@ -560,7 +602,6 @@ impl<'a> Resolver<'a> {
             | Pattern::StringLit(_, _)
             | Pattern::BoolLit(_, _) => {}
             Pattern::Binding(id) => {
-                // `None` is a built-in unit variant, not a new variable binding.
                 if id.name != "None" && !self.is_unit_enum_variant(&id.name) {
                     self.define_local(id, false);
                 }
@@ -647,11 +688,11 @@ counter = counter + 1
     }
 
     #[test]
-    fn rejects_this_outside_class() {
-        let src = "fn stray() { let x = this }\n";
+    fn rejects_await_outside_async_fn() {
+        let src = "fn bad() { let x = await 1 }\n";
         let mut bag = DiagnosticBag::new();
         let ast = parse_module(FileId(0), src, &mut bag);
         let _ = lower_and_resolve(ast, &mut bag);
-        assert!(bag.items().iter().any(|d| d.code == "E3005"));
+        assert!(bag.items().iter().any(|d| d.code == "E4013"));
     }
 }

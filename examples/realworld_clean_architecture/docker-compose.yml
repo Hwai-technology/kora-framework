@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. MySQL 8 Database Service
+  # ----------------------------------------------------------------------------
+  mysql:
+    image: mysql:8.0
+    container_name: kora-ecommerce-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: kora_root_password
+      MYSQL_DATABASE: kora_shop
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/migrations/001_ecommerce_init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --max_connections=500
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pkora_root_password"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ----------------------------------------------------------------------------
+  # 2. Redis Cache, Rate Limiter & Pub/Sub Queue
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: kora-ecommerce-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ----------------------------------------------------------------------------
+  # 3. Kora Clean Architecture Backend App
+  # ----------------------------------------------------------------------------
+  app:
+    build:
+      context: ../..
+      dockerfile: integrations/docker/Dockerfile
+    container_name: kora-ecommerce-app
+    restart: on-failure
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      - KORA_ENV=production
+      - DATABASE_URL=mysql://root:kora_root_password@mysql:3306/kora_shop
+      - REDIS_URL=redis://redis:6379/0
+      - KORA_PORT=8080
+      - RATE_LIMIT_RPM=120
+    volumes:
+      - ./src:/app/examples/realworld_clean_architecture/src
+
+volumes:
+  mysql_data:
+  redis_data:
+

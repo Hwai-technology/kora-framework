@@ -1,0 +1,146 @@
+// ============================================================================
+// Kora Example 3: Full CRUD RESTful API with Authentication & Validation
+// ============================================================================
+
+model Product {
+    id: Int
+    sku: String
+    title: String
+    priceCents: Int
+    inStock: Bool
+}
+
+struct CreateProductRequest {
+    sku: String
+    title: String
+    priceCents: Int
+}
+
+struct UpdateProductRequest {
+    title: String
+    priceCents: Int
+    inStock: Bool
+}
+
+interface ProductRepository {
+    fn listAll() -> List<Product>
+    fn findById(id: Int) -> Option<Product>
+    fn create(req: CreateProductRequest) -> Result<Product, String>
+    fn update(id: Int, req: UpdateProductRequest) -> Result<Product, String>
+    fn deleteById(id: Int) -> Bool
+}
+
+class ProductService implements ProductRepository {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn listAll() -> List<Product> {
+        return [
+            Product {
+                id: 1,
+                sku: "PRD-001",
+                title: "Mechanical Keyboard",
+                priceCents: 12900,
+                inStock: true,
+            },
+            Product {
+                id: 2,
+                sku: "PRD-002",
+                title: "Wireless Gaming Mouse",
+                priceCents: 7900,
+                inStock: true,
+            }
+        ]
+    }
+
+    fn findById(id: Int) -> Option<Product> {
+        if id <= 0 {
+            return None
+        }
+        return Some(Product {
+            id: id,
+            sku: "PRD-001",
+            title: "Mechanical Keyboard",
+            priceCents: 12900,
+            inStock: true,
+        })
+    }
+
+    fn create(req: CreateProductRequest) -> Result<Product, String> {
+        if req.sku == "" {
+            return Err("SKU is required")
+        }
+        if req.priceCents <= 0 {
+            return Err("Price must be greater than zero")
+        }
+        return Ok(Product {
+            id: 100,
+            sku: req.sku,
+            title: req.title,
+            priceCents: req.priceCents,
+            inStock: true,
+        })
+    }
+
+    fn update(id: Int, req: UpdateProductRequest) -> Result<Product, String> {
+        if id <= 0 {
+            return Err("Product not found")
+        }
+        return Ok(Product {
+            id: id,
+            sku: "PRD-EXISTING",
+            title: req.title,
+            priceCents: req.priceCents,
+            inStock: req.inStock,
+        })
+    }
+
+    fn deleteById(id: Int) -> Bool {
+        if id <= 0 {
+            return false
+        }
+        return true
+    }
+}
+
+// Zero-Config CRUD Routes with Automatic JSON Serialization & Dependency Injection
+let app = run()
+
+// 1. GET /products -> List all products
+get("/products", (svc: ProductService) => {
+    return svc.listAll()
+})
+
+// 2. GET /products/{id} -> Single product details
+get("/products/{id}", (id: Int, svc: ProductService) => {
+    return svc.findById(id)
+})
+
+// 3. POST /products -> Create a new product
+post("/products", (request: Request, svc: ProductService) => {
+    let req = CreateProductRequest {
+        sku: "PRD-NEW",
+        title: request.body,
+        priceCents: 4999,
+    }
+    return svc.create(req)
+})
+
+// 4. PUT /products/{id} -> Update existing product
+put("/products/{id}", (id: Int, request: Request, svc: ProductService) => {
+    let req = UpdateProductRequest {
+        title: request.body,
+        priceCents: 5999,
+        inStock: true,
+    }
+    return svc.update(id, req)
+})
+
+// 5. DELETE /products/{id} -> Delete product
+delete("/products/{id}", (id: Int, svc: ProductService) => {
+    return svc.deleteById(id)
+})
+

@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    "*.kora": "kora"
+  },
+  "material-icon-theme.files.associations": {
+    "*.kora": "kora"
+  }
+}

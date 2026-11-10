@@ -175,4 +175,3 @@ mod tests {
         assert_eq!(Span::dummy().merge(a), a);
     }
 }
-

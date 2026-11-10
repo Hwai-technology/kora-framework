@@ -16,7 +16,21 @@ kora-lexer.workspace = true
 kora-parser.workspace = true
 kora-hir.workspace = true
 kora-ty.workspace = true
+kora-ownership.workspace = true
+kora-codegen.workspace = true
+kora-runtime.workspace = true
+kora-http.workspace = true
+kora-orm.workspace = true
+kora-auth.workspace = true
+kora-queue.workspace = true
+kora-realtime.workspace = true
+kora-observability.workspace = true
+kora-pkg.workspace = true
+kora-fmt.workspace = true
+kora-lsp.workspace = true
+kora-testing.workspace = true
+kora-profiler.workspace = true
+kora-bench.workspace = true
 
 [lints]
 workspace = true
-
