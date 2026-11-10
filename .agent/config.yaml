@@ -1,0 +1,40 @@
+project:
+  name: kora
+  tagline: "Write Less. Build Faster. Run Smarter."
+  language_style: "clean-modern-optional-semicolons"
+  object_model: "hybrid-struct-model-class-interface"
+  backend_target: "validated-rust-codegen-native"
+
+governance:
+  atomic_language_changes: true
+  forbid_raw_rustc_error_leakage: true
+  forbid_unsafe_in_generated_code: true
+  mandatory_checks:
+    - "cargo fmt --all -- --check"
+    - "cargo clippy --workspace --all-targets -- -D warnings"
+    - "cargo test --workspace"
+
+agents:
+  compiler-architect:
+    path: ".agent/agents/compiler-architect.md"
+    scope: ["crates/kora-span", "crates/kora-diagnostics", "crates/kora-hir", "crates/kora-codegen", "docs/architecture.md"]
+    core_review_authority: true
+  language-engineer:
+    path: ".agent/agents/language-engineer.md"
+    scope: ["docs/grammar.ebnf", "crates/kora-ast", "crates/kora-lexer", "crates/kora-parser", "crates/kora-ty"]
+  runtime-engineer:
+    path: ".agent/agents/runtime-engineer.md"
+    scope: ["crates/kora-runtime", "crates/kora-http", "crates/kora-queue", "crates/kora-realtime"]
+  orm-engineer:
+    path: ".agent/agents/orm-engineer.md"
+    scope: ["crates/kora-orm"]
+  security-auditor:
+    path: ".agent/agents/security-auditor.md"
+    scope: ["crates/kora-auth", "crates/kora-http", "crates/kora-orm", "SECURITY.md"]
+  performance-engineer:
+    path: ".agent/agents/performance-engineer.md"
+    scope: ["benchmarks", "crates/kora-bench"]
+  documentation-engineer:
+    path: ".agent/agents/documentation-engineer.md"
+    scope: ["docs", "examples", "README.md", "CHANGELOG.md"]
+

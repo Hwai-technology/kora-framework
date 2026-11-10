@@ -1,0 +1,35 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/kora-span",
+    "crates/kora-diagnostics",
+    "crates/kora-ast",
+    "crates/kora-lexer",
+    "crates/kora-parser",
+    "crates/kora-hir",
+    "crates/kora-ty",
+    "crates/kora-cli",
+]
+
+[workspace.package]
+version = "0.1.0-alpha.1"
+edition = "2024"
+license = "MIT"
+authors = ["Kora Contributors"]
+repository = "https://github.com/kora-lang/kora"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+
+[workspace.dependencies]
+kora-span = { path = "crates/kora-span" }
+kora-diagnostics = { path = "crates/kora-diagnostics" }
+kora-ast = { path = "crates/kora-ast" }
+kora-lexer = { path = "crates/kora-lexer" }
+kora-parser = { path = "crates/kora-parser" }
+kora-hir = { path = "crates/kora-hir" }
+kora-ty = { path = "crates/kora-ty" }
+

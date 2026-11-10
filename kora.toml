@@ -1,0 +1,19 @@
+[package]
+name = "kora-examples"
+version = "0.1.0"
+edition = "2026"
+entry = "examples/users_api.kora"
+
+[compiler]
+target = "native"
+opt_level = "release"
+ownership_hints = true
+
+[server]
+host = "127.0.0.1"
+port = 8080
+
+[database]
+driver = "postgres"
+pool_max_connections = 16
+

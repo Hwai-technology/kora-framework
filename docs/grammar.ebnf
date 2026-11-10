@@ -1,0 +1,110 @@
+(* ========================================================================== *)
+(* Kora Programming Language — Formal Grammar Specification (v0.1-alpha)      *)
+(* Syntax Style: Clean, modern, optional semicolons, strong static typing     *)
+(* ========================================================================== *)
+
+Module          = { Item } EOF ;
+
+Item            = StructDecl
+                | ModelDecl
+                | InterfaceDecl
+                | ClassDecl
+                | EnumDecl
+                | FnDecl
+                | Stmt ;              (* Top-level zero-config statements/routes *)
+
+(* --- Declarations --- *)
+
+StructDecl      = "struct" Ident "{" { FieldDecl } "}" ;
+ModelDecl       = "model" Ident "{" { FieldDecl } "}" ;
+FieldDecl       = Ident ":" TypeExpr [ ";" | "," ] ;
+
+InterfaceDecl   = "interface" Ident "{" { FnSignature } "}" ;
+FnSignature     = [ "async" ] "fn" Ident "(" [ ParamList ] ")" [ "->" TypeExpr ] [ ";" ] ;
+
+ClassDecl       = "class" Ident [ "implements" Ident { "," Ident } ] "{"
+                    { ClassMember }
+                  "}" ;
+ClassMember     = InitDecl | FnDecl | FieldDecl ;
+InitDecl        = "init" "(" [ ParamList ] ")" Block ;
+
+EnumDecl        = "enum" Ident "{" { EnumVariant } "}" ;
+EnumVariant     = Ident [ "(" TypeExpr { "," TypeExpr } ")" ] [ "," | ";" ] ;
+
+FnDecl          = [ "async" ] "fn" Ident "(" [ ParamList ] ")" [ "->" TypeExpr ] Block ;
+ParamList       = Param { "," Param } [ "," ] ;
+Param           = Ident ":" TypeExpr ;
+
+(* --- Types --- *)
+
+TypeExpr        = Ident [ "<" TypeExpr { "," TypeExpr } ">" ]
+                | "(" [ TypeExpr { "," TypeExpr } ] ")" "->" TypeExpr ;
+
+(* --- Statements (Semicolons optional across newlines) --- *)
+
+Block           = "{" { Stmt } "}" ;
+
+Stmt            = LetStmt
+                | VarStmt
+                | ReturnStmt
+                | IfStmt
+                | WhileStmt
+                | ExprStmt ;
+
+LetStmt         = "let" Ident [ ":" TypeExpr ] "=" Expr [ ";" ] ;
+VarStmt         = "var" Ident [ ":" TypeExpr ] "=" Expr [ ";" ] ;
+ReturnStmt      = "return" [ Expr ] [ ";" ] ;
+IfStmt          = "if" Expr Block [ "else" ( IfStmt | Block ) ] ;
+WhileStmt       = "while" Expr Block ;
+ExprStmt        = Expr [ ";" ] ;
+
+(* --- Expressions (Precedence from lowest to highest) --- *)
+
+Expr            = AssignExpr ;
+
+AssignExpr      = OrExpr [ "=" AssignExpr ] ;
+OrExpr          = AndExpr { "||" AndExpr } ;
+AndExpr         = EqualityExpr { "&&" EqualityExpr } ;
+EqualityExpr    = CompareExpr { ( "==" | "!=" ) CompareExpr } ;
+CompareExpr     = AdditiveExpr { ( "<" | "<=" | ">" | ">=" ) AdditiveExpr } ;
+AdditiveExpr    = MultiplicativeExpr { ( "+" | "-" ) MultiplicativeExpr } ;
+MultiplicativeExpr = UnaryExpr { ( "*" | "/" | "%" ) UnaryExpr } ;
+
+UnaryExpr       = ( "!" | "-" ) UnaryExpr
+                | PostfixExpr ;
+
+PostfixExpr     = PrimaryExpr { CallSuffix | FieldSuffix | IndexSuffix } ;
+CallSuffix      = "(" [ ArgList ] ")" ;
+FieldSuffix     = "." Ident ;
+IndexSuffix     = "[" Expr "]" ;
+ArgList         = Expr { "," Expr } [ "," ] ;
+
+PrimaryExpr     = IntLit
+                | FloatLit
+                | StringLit
+                | BoolLit
+                | "this"
+                | MatchExpr
+                | ClosureExpr
+                | ListLit
+                | IdentOrStructLit
+                | "(" Expr ")" ;
+
+IdentOrStructLit = Ident [ "{" [ FieldInit { "," FieldInit } [ "," ] ] "}" ] ;
+FieldInit       = Ident ":" Expr ;
+
+ListLit         = "[" [ Expr { "," Expr } [ "," ] ] "]" ;
+
+ClosureExpr     = "(" [ ClosureParamList ] ")" [ "->" TypeExpr ] "=>" ( Block | Expr ) ;
+ClosureParamList = ClosureParam { "," ClosureParam } ;
+ClosureParam    = Ident [ ":" TypeExpr ] ;
+
+MatchExpr       = "match" Expr "{" { MatchArm } "}" ;
+MatchArm        = Pattern "=>" ( Block | Expr ) [ "," | ";" ] ;
+
+Pattern         = "_"
+                | IntLit
+                | StringLit
+                | BoolLit
+                | Ident [ "." Ident ] [ "(" [ Ident { "," Ident } ] ")" ] ;
+

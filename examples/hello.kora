@@ -1,0 +1,37 @@
+// ============================================================================
+// Kora Example 1: Core Language, Type Inference, Structs, Enums & Match
+// ============================================================================
+
+struct Coordinates {
+    lat: Float
+    lng: Float
+}
+
+enum OrderStatus {
+    Pending
+    Paid(Int)
+    Cancelled(String)
+}
+
+fn describeOrder(status: OrderStatus) -> String {
+    return match status {
+        OrderStatus.Pending => "Order is awaiting payment",
+        OrderStatus.Paid(cents) => "Order payment confirmed",
+        OrderStatus.Cancelled(reason) => reason,
+    }
+}
+
+fn calculateTotal(subtotal: Int, taxRatePercent: Int) -> Int {
+    let tax = (subtotal * taxRatePercent) / 100
+    return subtotal + tax
+}
+
+let developer = "Ahmet"
+let location = Coordinates { lat: 41.0082, lng: 28.9784 }
+let finalAmount = calculateTotal(1200, 18)
+let currentStatus = OrderStatus.Paid(finalAmount)
+let message = describeOrder(currentStatus)
+
+print(developer)
+print(message)
+

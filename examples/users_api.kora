@@ -1,0 +1,67 @@
+// ============================================================================
+// Kora Example 2: Hybrid Models, Interfaces, DI Service Classes & HTTP Routes
+// ============================================================================
+
+model User {
+    id: Int
+    name: String
+    email: String
+    active: Bool
+}
+
+interface UserRepository {
+    fn findById(id: Int) -> Option<User>
+    fn validateNewUser(user: User) -> Result<User, String>
+}
+
+class UserService implements UserRepository {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn findById(id: Int) -> Option<User> {
+        if id <= 0 {
+            return None
+        }
+        return Some(User {
+            id: id,
+            name: "Ahmet",
+            email: "ahmet@kora.dev",
+            active: true,
+        })
+    }
+
+    fn validateNewUser(user: User) -> Result<User, String> {
+        if user.name == "" {
+            return Err("User name is required")
+        }
+        if !user.active {
+            return Err("New user account must be active")
+        }
+        return Ok(user)
+    }
+}
+
+let app = run()
+
+get("/users", () => {
+    return User.all()
+})
+
+get("/users/{id}", (id: Int, service: UserService) => {
+    return service.findById(id)
+})
+
+post("/users", (request: Request, service: UserService) => {
+    let candidate = User {
+        id: 1,
+        name: request.body,
+        email: "new@kora.dev",
+        active: true,
+    }
+    let checked = service.validateNewUser(candidate)
+    return send(checked)
+})
+
