@@ -25,6 +25,34 @@ Kora is engineered around one central philosophy:
 
 Backend developers shouldn't have to choose between developer speed and system performance. Kora compiles directly to native Rust binaries with zero garbage collection pauses and zero manual borrow-checker friction.
 
+### ⚡ A Taste of Kora (10-Line REST API)
+```kora
+model Greeting {
+    message: String,
+    timestamp: Int
+}
+
+let app = run()
+
+get("/api/v1/hello", () => {
+    return Greeting {
+        message: "Hello from Kora!",
+        timestamp: 1773000000
+    }
+})
+```
+
+```bash
+# 1. Compile and launch native binary
+kora run server.kora
+
+# 2. Query the endpoint
+curl -i http://localhost:8080/api/v1/hello
+# HTTP/1.1 200 OK
+# Content-Type: application/json
+# {"message":"Hello from Kora!","timestamp":1773000000}
+```
+
 ---
 
 ## 🚀 Key Language Features
@@ -115,14 +143,48 @@ The Kora compiler (`kora check`) guards directory boundaries at build time:
 ## 🏛️ Compiler Pipeline & Architecture
 
 ```mermaid
-flowchart LR
-    A["Kora Source Code (.kora)"] --> B["kora-lexer\nToken Stream"]
-    B --> C["kora-parser\nAbstract Syntax Tree"]
-    C --> D["kora-hir\nName & Scope Resolution"]
-    D --> E["kora-ty\nType & Purity Checker"]
-    E --> F["kora-codegen\nSafe Native Rust"]
-    F --> G["Native Binary\n(Zero GC, High Throughput)"]
+flowchart TD
+    subgraph Frontend["1. Frontend & Syntax Processing"]
+        SRC["Kora Source (.kora)"] --> LEX["kora-lexer\nTokenizer & Attributes"]
+        LEX --> PARSE["kora-parser\nAbstract Syntax Tree (AST)"]
+    end
+
+    subgraph Semantic["2. Semantic Analysis & Architecture Guard"]
+        PARSE --> HIR["kora-hir\nLexical Scopes & Module Imports"]
+        HIR --> TY["kora-ty\nType Inference & Conformance"]
+        TY --> ARCH["Architectural Purity Guard\n(E5001-E5004 Rules)"]
+        ARCH --> OWN["kora-ownership\nArc Promotion & Cycle Detection"]
+    end
+
+    subgraph Native["3. Native Rust Compilation"]
+        OWN --> CG["kora-codegen\nVerified Safe Rust Emitter"]
+        CG --> RUSTC["rustc & cargo\nLLVM Optimization Backend"]
+        RUSTC --> BIN["Production Standalone Binary\n(Zero GC • 100K+ Req/s • Microsecond Latency)"]
+    end
+
+    subgraph Runtime["4. Embedded Production Engine"]
+        BIN -.-> HTTP["kora-http (Axum & Tokio)"]
+        BIN -.-> ORM["kora-orm (SQLx Prepared Builder)"]
+        BIN -.-> RT["kora-realtime (WebSocket Channels)"]
+        BIN -.-> OBS["kora-observability (Structured JSON Logs)"]
+    end
 ```
+
+---
+
+## 📊 Implementation Status (What's Working vs. In Progress)
+
+| Pillar | Feature | Status | Notes |
+|:---|:---|:---:|:---|
+| **Language Frontend** | Lexer, Parser, AST, Diagnostics | ✅ **Ready** | Full tokenization and error reporting with source spans. |
+| **Type System** | Static Typing, Generic Inference, `Option<T>` | ✅ **Ready** | Strict `null` (`undefined` forbidden, `E2005`). |
+| **Object Model** | `model` (Entities & DTOs) & `class` (DI) | ✅ **Ready** | Auto-constructors, visibility modifiers, zero `struct` confusion. |
+| **Clean Architecture** | Boundary enforcement (`E5001`–`E5004`) | ✅ **Ready** | Enforced purity for `enums/`, `models/`, services, and `main.kora`. |
+| **Database Engine** | Schema Auto-Sync, Migrations, Seeders | ✅ **Ready** | CLI commands (`kora db <migrate\|sync\|seed\|truncate\|drop\|refresh>`). |
+| **Code Generation** | Verified Native Rust Generation | ✅ **Ready** | Compiles to zero-GC native binary via `.kora-build/`. |
+| **Async Concurrency** | Non-blocking I/O & Actor/Channels | 🟡 **Active** | MPSC typed channels & broadcast pub/sub channels. |
+| **Tooling & Ecosystem**| VS Code / Antigravity IDE Extension | 🟡 **Active** | Syntax grammar, snippets, language config & custom icons. |
+| **Package Registry** | Distributed Package Manager (`kora-pkg`) | 🔄 **Planned** | Dependency resolution and community module hosting. |
 
 ---
 
@@ -154,8 +216,8 @@ All components live in a modular Cargo workspace under `crates/`:
 ### Building the Toolchain
 ```bash
 # Clone the repository
-git clone https://github.com/kora-lang/kora.git
-cd kora
+git clone https://github.com/Hwai-technology/kora-framework.git
+cd kora-framework
 
 # Build Kora CLI
 cargo build --bin kora
@@ -191,6 +253,18 @@ Kora includes an enterprise GitHub Actions workflow suite:
 - **Native Auto-Merge (`auto-merge.yml`)**: Automated merge queue for approved pull requests passing all checks.
 - **Automated Contributor Recognition (`contributors.yml`)**: Automatically updates the contributors gallery upon pull request merge.
 - **AI Code Review Agent (`ai-code-review.yml`)**: Automated senior technical reviewer evaluating diffs for Rust correctness, compiler safety, performance, and security.
+
+---
+
+## 🤝 Open Architecture & RFCs: Shaping Kora Together
+
+Kora is an evolving open-source research exploration into language design, ownership inference, and backend developer experience. We invite language designers, compiler engineers, Rust developers, and systems architects to challenge our assumptions, critique our design, and shape the roadmap:
+
+- **Type System Design**: Help refine our single-`null` semantics and generic trait bounds.
+- **Ownership & Lifetime Inference**: Debate how high-level closures and services should be Arc-promoted across Tokio runtime boundaries.
+- **Compiler Optimizations**: Propose optimizations for our HIR-to-Rust transpilation pipeline.
+
+Have a critique, question, or design proposal? [Open an RFC Issue](https://github.com/Hwai-technology/kora-framework/issues/new?template=feature_request.yml) or start a discussion!
 
 ---
 
