@@ -1,0 +1,47 @@
+// ============================================================================
+// User Domain Model & Registration Inputs
+// Decorated with Schema Indexing, Uniqueness & DTO Constraints
+// ============================================================================
+
+model User {
+    @unique
+    @required
+    id: Int
+
+    @unique
+    @index
+    @required
+    @email
+    email: String
+
+    @required
+    fullName: String
+
+    @default("customer")
+    role: String
+
+    @min(0)
+    balance: Int
+
+    @default(true)
+    isActive: Bool
+}
+
+model UserRegisterInput {
+    @required
+    @email
+    email: String
+
+    @required
+    fullName: String
+
+    @min(0)
+    initialBalance: Int
+}
+
+model UserProfileDto {
+    id: Int
+    email: String
+    fullName: String
+    role: String
+}

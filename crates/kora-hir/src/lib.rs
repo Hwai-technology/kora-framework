@@ -458,7 +458,8 @@ impl<'a> Resolver<'a> {
             Expr::IntLit { .. }
             | Expr::FloatLit { .. }
             | Expr::StringLit { .. }
-            | Expr::BoolLit { .. } => {}
+            | Expr::BoolLit { .. }
+            | Expr::Null { .. } => {}
             Expr::This { span } => {
                 if !self.in_class_or_extend {
                     self.diagnostics.emit(
@@ -600,7 +601,8 @@ impl<'a> Resolver<'a> {
             Pattern::Wildcard(_)
             | Pattern::IntLit(_, _)
             | Pattern::StringLit(_, _)
-            | Pattern::BoolLit(_, _) => {}
+            | Pattern::BoolLit(_, _)
+            | Pattern::Null(_) => {}
             Pattern::Binding(id) => {
                 if id.name != "None" && !self.is_unit_enum_variant(&id.name) {
                     self.define_local(id, false);

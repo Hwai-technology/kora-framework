@@ -1,0 +1,54 @@
+// ============================================================================
+// Auth Module: HTTP Presentation Controller
+// Returns One-Line Secure Envelopes via `ApiResponse`
+// ============================================================================
+
+import { User } from "models/user_model";
+import { SecureApiResponse } from "models/response_envelope";
+import { AuthSessionDto } from "modules/auth/auth_types";
+import { AuthService } from "modules/auth/auth_service";
+import { AuthGuard } from "modules/auth/auth_guard";
+import { ApiResponse } from "middleware/api_response_factory";
+
+class AuthController {
+    authService: AuthService
+    authGuard: AuthGuard
+    response: ApiResponse
+
+    init(authService: AuthService, authGuard: AuthGuard, response: ApiResponse) {
+        this.authService = authService
+        this.authGuard = authGuard
+        this.response = response
+    }
+
+    fn handleLogin(email: String, passwordPlain: String) -> SecureApiResponse {
+        let loginRes = this.authService.login(email, passwordPlain)
+        return match loginRes {
+            Ok(session) => this.response.ok("User authenticated successfully", 1),
+            Err(e) => this.response.unauthorized("Authentication failed: invalid credentials"),
+        }
+    }
+
+    fn handleRegister(email: String, fullName: String) -> SecureApiResponse {
+        if email == "" {
+            return this.response.badRequest("Email is required")
+        }
+        let regRes = this.authService.register(email, fullName)
+        return this.response.created("Account registered successfully", 1)
+    }
+
+    fn handleProfile(req: Request) -> SecureApiResponse {
+        let authResult = this.authGuard.validateRequest(req)
+        return match authResult {
+            Ok(userId) => this.response.ok("Profile accessed successfully", 1),
+            Err(err) => this.response.unauthorized("Unauthorized access: " + err),
+        }
+    }
+
+    fn destroy() -> Bool {
+        let d1 = this.authService.destroy()
+        let d2 = this.authGuard.destroy()
+        let d3 = this.response.destroy()
+        return true
+    }
+}

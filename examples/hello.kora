@@ -2,7 +2,7 @@
 // Kora Example 1: Core Language, Type Inference, Structs, Enums & Match
 // ============================================================================
 
-struct Coordinates {
+model Coordinates {
     lat: Float
     lng: Float
 }

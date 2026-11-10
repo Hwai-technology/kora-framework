@@ -1,0 +1,40 @@
+// ============================================================================
+// Method-Level Telemetry & Request Lifecycle Tracker
+// ============================================================================
+
+model TelemetryTrace {
+    traceId: String
+    methodName: String
+    clientIp: String
+    durationMs: Int
+    exitCode: Int
+    status: String
+}
+
+class TelemetryTracker {
+    fn recordExecution(traceId: String, method: String, clientIp: String, durationMs: Int, exitCode: Int) -> TelemetryTrace {
+        if exitCode == 0 {
+            return TelemetryTrace {
+                traceId: traceId,
+                methodName: method,
+                clientIp: clientIp,
+                durationMs: durationMs,
+                exitCode: exitCode,
+                status: "ExitSuccess",
+            }
+        }
+        return TelemetryTrace {
+            traceId: traceId,
+            methodName: method,
+            clientIp: clientIp,
+            durationMs: durationMs,
+            exitCode: exitCode,
+            status: "ExitHandledError",
+        }
+    }
+
+    fn destroy() -> Bool {
+        return true
+    }
+}
+

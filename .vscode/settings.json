@@ -1,8 +1,26 @@
 {
   "files.associations": {
-    "*.kora": "kora"
+    "*.kora": "kora",
+    "*.kr": "kora"
   },
   "material-icon-theme.files.associations": {
-    "*.kora": "kora"
-  }
+    "*.kora": "kora",
+    "*.kr": "kora",
+    "kora.toml": "tune"
+  },
+  "editor.formatOnSave": true,
+  "[kora]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "kora-lang.kora-vscode",
+    "editor.quickSuggestions": {
+      "other": true,
+      "comments": false,
+      "strings": true
+    }
+  },
+  "rust-analyzer.linkedProjects": [
+    "./Cargo.toml"
+  ],
+  "rust-analyzer.check.command": "clippy"
 }

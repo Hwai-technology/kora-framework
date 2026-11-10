@@ -1,0 +1,39 @@
+name: Contributor Recognition
+
+on:
+  pull_request_target:
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  update-contributors:
+    name: Recognize Contributor in README
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && github.actor != 'github-actions[bot]'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Contributor List in README
+        run: python3 .github/scripts/update_contributors.py
+        env:
+          CONTRIBUTOR_USERNAME: ${{ github.event.pull_request.user.login }}
+          CONTRIBUTOR_AVATAR: ${{ github.event.pull_request.user.avatar_url }}
+          CONTRIBUTOR_URL: ${{ github.event.pull_request.user.html_url }}
+
+      - name: Commit and Push Changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "docs: recognize new contributor @${{ github.event.pull_request.user.login }} [skip ci]"
+            git push origin main
+          fi

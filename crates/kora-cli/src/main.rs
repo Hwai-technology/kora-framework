@@ -1,12 +1,13 @@
 //! Comprehensive Command-Line Interface (CLI) for Kora.
 //! Supports all Phase 1–8 workflows: check, types, ast, tokens, codegen, build, run, fmt, bench, and init.
 
+use std::collections::HashSet;
 use std::env;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
-use kora_ast::Module;
+use kora_ast::{Item, Module};
 use kora_codegen::{compile_native, generate_rust};
 use kora_diagnostics::DiagnosticBag;
 use kora_hir::{HirModule, lower_and_resolve};
@@ -15,6 +16,211 @@ use kora_ownership::analyze_ownership;
 use kora_parser::parse_module;
 use kora_span::SourceMap;
 use kora_ty::{TypeCheckOutput, check_module};
+
+fn verify_architectural_purity(path_str: &str, ast: &Module, bag: &mut DiagnosticBag) {
+    let canonical = Path::new(path_str).canonicalize().unwrap_or_else(|_| PathBuf::from(path_str));
+    let p = canonical.to_string_lossy().replace('\\', "/");
+    let is_enum_file = p.contains("/enums/") || p.ends_with("_enum.kora");
+    let is_model_or_iface_file = p.contains("/models/") || p.contains("/interfaces/") || p.ends_with("_model.kora") || p.ends_with("_interface.kora");
+    let is_controller_or_service = !is_model_or_iface_file && !is_enum_file && (p.contains("controller")
+        || p.contains("service")
+        || p.contains("/controllers/")
+        || p.contains("/services/"));
+    let is_main_kora = p.ends_with("main.kora");
+
+    for item in &ast.items {
+        match item {
+            Item::Enum(en) => {
+                if is_controller_or_service {
+                    bag.emit(
+                        kora_diagnostics::Diagnostic::error(
+                            "E5003",
+                            format!(
+                                "architectural violation: controller or service cannot define inline enum `{}`",
+                                en.name.name
+                            ),
+                        )
+                        .with_primary_label(
+                            en.span,
+                            "inline enum definition forbidden in controllers/services; import from `enums/`",
+                        ),
+                    );
+                } else if is_main_kora {
+                    bag.emit(
+                        kora_diagnostics::Diagnostic::error(
+                            "E5004",
+                            format!(
+                                "architectural violation: 'main.kora' cannot define inline enum `{}`",
+                                en.name.name
+                            ),
+                        )
+                        .with_primary_label(
+                            en.span,
+                            "inline enum definition forbidden in 'main.kora'; import from dedicated module",
+                        ),
+                    );
+                }
+            }
+            Item::Model(m) => {
+                if is_controller_or_service {
+                    bag.emit(
+                        kora_diagnostics::Diagnostic::error(
+                            "E5003",
+                            format!(
+                                "architectural violation: controller or service cannot define inline model `{}`",
+                                m.name.name
+                            ),
+                        )
+                        .with_primary_label(
+                            m.span,
+                            "inline model definition forbidden in controllers/services; import from `models/`",
+                        ),
+                    );
+                } else if is_main_kora {
+                    bag.emit(
+                        kora_diagnostics::Diagnostic::error(
+                            "E5004",
+                            format!(
+                                "architectural violation: 'main.kora' cannot define inline model `{}`",
+                                m.name.name
+                            ),
+                        )
+                        .with_primary_label(
+                            m.span,
+                            "inline model definition forbidden in 'main.kora'; import from dedicated module",
+                        ),
+                    );
+                }
+            }
+            Item::Fn(f) => {
+                if is_enum_file {
+                    bag.emit(
+                        kora_diagnostics::Diagnostic::error(
+                            "E5001",
+                            format!(
+                                "architectural violation: file inside 'enums/' cannot define function `{}`",
+                                f.sig.name.name
+                            ),
+                        )
+                        .with_primary_label(f.span, "functions are forbidden inside 'enums/' directory"),
+                    );
+                }
+            }
+            Item::Class(c) => {
+                if is_enum_file {
+                    bag.emit(
+                        kora_diagnostics::Diagnostic::error(
+                            "E5001",
+                            format!(
+                                "architectural violation: file inside 'enums/' cannot define class `{}`",
+                                c.name.name
+                            ),
+                        )
+                        .with_primary_label(c.span, "classes are forbidden inside 'enums/' directory"),
+                    );
+                }
+            }
+            Item::Stmt(s) => {
+                if is_enum_file {
+                    bag.emit(
+                        kora_diagnostics::Diagnostic::error(
+                            "E5001",
+                            "architectural violation: file inside 'enums/' cannot define statements or HTTP routes",
+                        )
+                        .with_primary_label(
+                            s.span(),
+                            "statements/routes forbidden inside 'enums/' directory",
+                        ),
+                    );
+                } else if is_model_or_iface_file {
+                    bag.emit(
+                        kora_diagnostics::Diagnostic::error(
+                            "E5002",
+                            "architectural violation: file inside 'models/' or 'interfaces/' cannot define statements or HTTP routes",
+                        )
+                        .with_primary_label(
+                            s.span(),
+                            "statements/routes forbidden inside 'models/' or 'interfaces/'",
+                        ),
+                    );
+                }
+            }
+            _ => {}
+        }
+    }
+}
+
+fn load_module_with_imports(
+    path: &Path,
+    sm: &mut SourceMap,
+    bag: &mut DiagnosticBag,
+    visited: &mut HashSet<PathBuf>,
+) -> Option<Module> {
+    let canonical = path.canonicalize().unwrap_or_else(|_| path.to_path_buf());
+    if !visited.insert(canonical) {
+        return None;
+    }
+
+    let src = fs::read_to_string(path).ok()?;
+    let fid = sm.add_file(path.to_string_lossy().as_ref(), &src);
+    let mut module = parse_module(fid, &src, bag);
+
+    verify_architectural_purity(path.to_string_lossy().as_ref(), &module, bag);
+
+    let mut imported_items = Vec::new();
+    let current_dir = path.parent().unwrap_or_else(|| Path::new("."));
+
+    for item in &module.items {
+        if let Item::Import(imp) = item {
+            let mut candidate_paths = Vec::new();
+
+            if let Some(path_str) = &imp.path_str {
+                let clean_p = path_str.trim_matches('"');
+                candidate_paths.push(current_dir.join(clean_p));
+                candidate_paths.push(current_dir.join(format!("{clean_p}.kora")));
+                candidate_paths.push(current_dir.join(format!("../{clean_p}")));
+                candidate_paths.push(current_dir.join(format!("../{clean_p}.kora")));
+                candidate_paths.push(current_dir.join(format!("../../{clean_p}")));
+                candidate_paths.push(current_dir.join(format!("../../{clean_p}.kora")));
+                candidate_paths.push(PathBuf::from(format!("src/{clean_p}.kora")));
+                candidate_paths.push(PathBuf::from(format!("src/{clean_p}")));
+                candidate_paths.push(PathBuf::from(format!("{clean_p}.kora")));
+                candidate_paths.push(PathBuf::from(clean_p));
+            }
+
+            if !imp.segments.is_empty() {
+                let segs: Vec<String> = imp.segments.iter().map(|s| s.name.clone()).collect();
+                let rel_str = segs.join("/");
+                candidate_paths.push(current_dir.join(format!("{rel_str}.kora")));
+                candidate_paths.push(current_dir.join(format!("../{rel_str}.kora")));
+                candidate_paths.push(current_dir.join(format!("../../{rel_str}.kora")));
+                candidate_paths.push(PathBuf::from(format!("src/{rel_str}.kora")));
+                candidate_paths.push(PathBuf::from(format!("{rel_str}.kora")));
+            }
+
+            let _symbol_names: HashSet<String> = imp.symbols.iter().map(|s| s.name.clone()).collect();
+
+            for cand in candidate_paths {
+                if cand.exists() {
+                    if let Some(sub_mod) = load_module_with_imports(&cand, sm, bag, visited) {
+                        for sub_item in sub_mod.items {
+                            if !matches!(sub_item, Item::ModuleDecl(_) | Item::Import(_)) {
+                                imported_items.push(sub_item);
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    let mut all_items = imported_items;
+    all_items.extend(module.items);
+    module.items = all_items;
+
+    Some(module)
+}
 
 fn main() -> ExitCode {
     let args: Vec<String> = env::args().skip(1).collect();
@@ -71,16 +277,16 @@ fn cmd_check(path: Option<&String>) -> ExitCode {
         eprintln!("error: missing <file.kora>");
         return ExitCode::FAILURE;
     };
-    let Ok(src) = fs::read_to_string(path) else {
+
+    let mut sm = SourceMap::new();
+    let mut bag = DiagnosticBag::new();
+    let mut visited = HashSet::new();
+
+    let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited) else {
         eprintln!("error: failed to read `{path}`");
         return ExitCode::FAILURE;
     };
 
-    let mut sm = SourceMap::new();
-    let fid = sm.add_file(path, &src);
-    let mut bag = DiagnosticBag::new();
-
-    let ast = parse_module(fid, &src, &mut bag);
     let hir = lower_and_resolve(ast, &mut bag);
     let types = check_module(&hir, &mut bag);
     let _ = analyze_ownership(&hir, &types, &mut bag);
@@ -100,16 +306,16 @@ fn cmd_types(path: Option<&String>) -> ExitCode {
         eprintln!("error: missing <file.kora>");
         return ExitCode::FAILURE;
     };
-    let Ok(src) = fs::read_to_string(path) else {
+
+    let mut sm = SourceMap::new();
+    let mut bag = DiagnosticBag::new();
+    let mut visited = HashSet::new();
+
+    let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited) else {
         eprintln!("error: failed to read `{path}`");
         return ExitCode::FAILURE;
     };
 
-    let mut sm = SourceMap::new();
-    let fid = sm.add_file(path, &src);
-    let mut bag = DiagnosticBag::new();
-
-    let ast = parse_module(fid, &src, &mut bag);
     let hir = lower_and_resolve(ast, &mut bag);
     let types = check_module(&hir, &mut bag);
 
@@ -168,15 +374,16 @@ fn cmd_codegen(path: Option<&String>) -> ExitCode {
     let Some(path) = path else {
         return ExitCode::FAILURE;
     };
-    let Ok(src) = fs::read_to_string(path) else {
+
+    let mut sm = SourceMap::new();
+    let mut bag = DiagnosticBag::new();
+    let mut visited = HashSet::new();
+
+    let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited) else {
+        eprintln!("error: failed to read `{path}`");
         return ExitCode::FAILURE;
     };
 
-    let mut sm = SourceMap::new();
-    let fid = sm.add_file(path, &src);
-    let mut bag = DiagnosticBag::new();
-
-    let ast = parse_module(fid, &src, &mut bag);
     let hir = lower_and_resolve(ast, &mut bag);
     let types = check_module(&hir, &mut bag);
     let ownership = analyze_ownership(&hir, &types, &mut bag);
@@ -195,15 +402,16 @@ fn cmd_build(path: Option<&String>) -> ExitCode {
     let Some(path) = path else {
         return ExitCode::FAILURE;
     };
-    let Ok(src) = fs::read_to_string(path) else {
+
+    let mut sm = SourceMap::new();
+    let mut bag = DiagnosticBag::new();
+    let mut visited = HashSet::new();
+
+    let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited) else {
+        eprintln!("error: failed to read `{path}`");
         return ExitCode::FAILURE;
     };
 
-    let mut sm = SourceMap::new();
-    let fid = sm.add_file(path, &src);
-    let mut bag = DiagnosticBag::new();
-
-    let ast = parse_module(fid, &src, &mut bag);
     let hir = lower_and_resolve(ast, &mut bag);
     let types = check_module(&hir, &mut bag);
     let ownership = analyze_ownership(&hir, &types, &mut bag);
@@ -232,15 +440,16 @@ fn cmd_run(path: Option<&String>) -> ExitCode {
     let Some(path) = path else {
         return ExitCode::FAILURE;
     };
-    let Ok(src) = fs::read_to_string(path) else {
+
+    let mut sm = SourceMap::new();
+    let mut bag = DiagnosticBag::new();
+    let mut visited = HashSet::new();
+
+    let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited) else {
+        eprintln!("error: failed to read `{path}`");
         return ExitCode::FAILURE;
     };
 
-    let mut sm = SourceMap::new();
-    let fid = sm.add_file(path, &src);
-    let mut bag = DiagnosticBag::new();
-
-    let ast = parse_module(fid, &src, &mut bag);
     let hir = lower_and_resolve(ast, &mut bag);
     let types = check_module(&hir, &mut bag);
     let ownership = analyze_ownership(&hir, &types, &mut bag);

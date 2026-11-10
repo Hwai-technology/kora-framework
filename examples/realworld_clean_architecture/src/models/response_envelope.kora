@@ -1,0 +1,54 @@
+// ============================================================================
+// Secure Response Envelope, Request Context, Pagination & Telemetry Models
+// ============================================================================
+
+model RequestContext {
+    traceId: String
+    clientIp: String
+    nonce: String
+    page: Int
+    limit: Int
+}
+
+model PaginationMeta {
+    currentPage: Int
+    perPage: Int
+    totalItems: Int
+    totalPages: Int
+}
+
+model SecureApiResponse {
+    success: Bool
+    statusCode: Int
+    nonce: String
+    securityToken: String
+    message: String
+    executionTimeMs: Int
+    dataCount: Int
+}
+
+model TelemetryTrace {
+    traceId: String
+    methodName: String
+    clientIp: String
+    durationMs: Int
+    exitCode: Int
+    status: String
+}
+
+model DomainEvent {
+    eventId: String
+    eventType: String
+    aggregateId: Int
+    payloadSummary: String
+    emittedAt: Int
+}
+
+model LogEntry {
+    level: String
+    target: String
+    message: String
+    timestampMs: Int
+    traceId: String
+}
+

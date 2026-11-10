@@ -1,0 +1,22 @@
+// ============================================================================
+// Auth Module: Data Transfer Objects (DTOs) & Credentials
+// ============================================================================
+
+model LoginInput {
+    email: String
+    passwordPlain: String
+}
+
+model RegisterInput {
+    email: String
+    fullName: String
+    passwordPlain: String
+}
+
+model AuthSessionDto {
+    userId: Int
+    accessToken: String
+    refreshToken: String
+    expiresInSeconds: Int
+}
+

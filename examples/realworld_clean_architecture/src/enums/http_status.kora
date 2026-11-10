@@ -1,0 +1,15 @@
+// ============================================================================
+// Standard HTTP Status Enum
+// ============================================================================
+
+enum HttpStatus {
+    Ok,
+    Created,
+    BadRequest,
+    Unauthorized,
+    Forbidden,
+    NotFound,
+    TooManyRequests,
+    InternalServerError
+}
+

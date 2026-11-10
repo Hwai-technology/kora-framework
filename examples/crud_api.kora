@@ -10,13 +10,13 @@ model Product {
     inStock: Bool
 }
 
-struct CreateProductRequest {
+model CreateProductRequest {
     sku: String
     title: String
     priceCents: Int
 }
 
-struct UpdateProductRequest {
+model UpdateProductRequest {
     title: String
     priceCents: Int
     inStock: Bool

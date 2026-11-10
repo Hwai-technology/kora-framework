@@ -9,17 +9,17 @@ model AuthUser {
     role: String
 }
 
-struct RegisterRequest {
+model RegisterRequest {
     username: String
     plainPassword: String
 }
 
-struct LoginRequest {
+model LoginRequest {
     username: String
     plainPassword: String
 }
 
-struct AuthTokenResponse {
+model AuthTokenResponse {
     token: String
     tokenType: String
     expiresInSeconds: Int

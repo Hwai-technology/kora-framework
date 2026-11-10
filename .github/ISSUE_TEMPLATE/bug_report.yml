@@ -1,0 +1,41 @@
+name: Bug Report
+description: Create a report to help us improve Kora
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for reporting a problem in Kora.
+  - type: input
+    id: version
+    attributes:
+      label: Kora Version
+      description: What version of Kora CLI or compiler are you using?
+      placeholder: e.g. 0.1.0-alpha.1
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Problem Description
+      description: A clear description of the bug.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal Reproducible Code Example
+      description: Provide the `.kora` code snippet that reproduces the issue.
+      placeholder: |
+        ```kora
+        // Code demonstrating the issue
+        ```
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs Actual Behavior
+      description: What did you expect to happen, and what happened instead?
+    validations:
+      required: true
+

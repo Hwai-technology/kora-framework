@@ -1,0 +1,37 @@
+name: AI Code Review Agent
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  ai-review:
+    name: AI Architectural & Code Review
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Perform AI Review
+        id: review
+        run: python3 .github/scripts/ai_code_review.py
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Post Review Comment to Pull Request
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          if [ -f review_output.md ] && [ -n "$PR_NUMBER" ]; then
+            gh pr comment "$PR_NUMBER" --body-file review_output.md --repo "${{ github.repository }}" || {
+              echo "Could not post comment to PR. Ensure pull-requests: write permission is active."
+            }
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

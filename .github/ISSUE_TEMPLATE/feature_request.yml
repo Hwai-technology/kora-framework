@@ -1,0 +1,31 @@
+name: Feature Proposal
+description: Suggest an idea or enhancement for Kora
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Proposals should align with Kora's core vision (TypeScript ergonomics + Rust performance + Go concurrency).
+  - type: textarea
+    id: problem
+    attributes:
+      label: Is your feature request related to a problem?
+      description: A clear description of the limitation or problem.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Solution or Syntax
+      description: How should the language, compiler, or framework behave?
+      placeholder: |
+        ```kora
+        // Proposed syntax or API design
+        ```
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What alternative approaches or workarounds have you considered?
+

@@ -24,7 +24,7 @@ fn verifies_hello_example_end_to_end() {
     );
 
     let report = format_type_report(&session.types);
-    assert!(report.contains("struct Coordinates"));
+    assert!(report.contains("model Coordinates"));
     assert!(report.contains("enum OrderStatus"));
     assert!(report.contains("let developer: String"));
     assert!(report.contains("let finalAmount: Int"));
@@ -84,4 +84,40 @@ let partial = Item { id: 1 }
 
     let rendered = session.diagnostics.render_all(&session.source_map, false);
     assert!(rendered.contains("broken.kora:"));
+}
+
+#[test]
+fn verifies_null_supported_and_undefined_forbidden() {
+    let valid_null_src = r#"
+class NullCheck {
+    fn check(opt: Option<String>) -> Bool {
+        if opt == null {
+            return false
+        }
+        return match opt {
+            Some(v) => true,
+            null => false,
+        }
+    }
+}
+"#;
+    let valid_session = FrontendSession::check_source("null_check.kora", valid_null_src);
+    assert!(
+        !valid_session.diagnostics.has_errors(),
+        "null_check failed check:\n{}",
+        valid_session.diagnostics.render_all(&valid_session.source_map, false)
+    );
+
+    let bad_undef_src = r#"
+fn bad() {
+    let x = undefined
+}
+"#;
+    let bad_session = FrontendSession::check_source("bad_undef.kora", bad_undef_src);
+    assert!(bad_session.diagnostics.has_errors());
+    let codes: Vec<&str> = bad_session.diagnostics.items().iter().map(|d| d.code).collect();
+    assert!(
+        codes.contains(&"E2005"),
+        "expected E2005 for undefined, got {codes:?}"
+    );
 }

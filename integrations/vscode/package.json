@@ -49,6 +49,13 @@
         "language": "kora",
         "path": "./snippets/kora.snippets.json"
       }
+    ],
+    "iconThemes": [
+      {
+        "id": "kora-icons",
+        "label": "Kora File Icons",
+        "path": "./kora-icons.json"
+      }
     ]
   }
 }

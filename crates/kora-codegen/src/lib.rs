@@ -53,7 +53,7 @@ pub fn generate_rust(
             Item::Model(m) => {
                 let _ = writeln!(
                     out,
-                    "#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]"
+                    "#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]\n#[serde(rename_all = \"kebab-case\")]"
                 );
                 let _ = writeln!(out, "pub struct {} {{", m.name.name);
                 for f in &m.fields {
@@ -130,7 +130,7 @@ pub fn generate_rust(
             Item::Enum(en) => {
                 let _ = writeln!(
                     out,
-                    "#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]"
+                    "#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]\n#[serde(rename_all = \"kebab-case\")]"
                 );
                 let _ = writeln!(out, "pub enum {} {{", en.name.name);
                 for v in &en.variants {
@@ -350,6 +350,7 @@ fn emit_expr(expr: &Expr) -> String {
         Expr::FloatLit { value, .. } => format!("{value:?}"),
         Expr::StringLit { value, .. } => format!("\"{value}\".to_string()"),
         Expr::BoolLit { value, .. } => value.to_string(),
+        Expr::Null { .. } => "None".to_string(),
         Expr::This { .. } => "self".to_string(),
         Expr::Ident(id) => match id.name.as_str() {
             "None" => "None".to_string(),
@@ -384,6 +385,26 @@ fn emit_expr(expr: &Expr) -> String {
             format!("{} = {}", emit_expr(target), emit_expr(value))
         }
         Expr::Call { callee, args, .. } => {
+            if let Expr::FieldAccess { receiver, field, .. } = callee.as_ref() {
+                match field.name.as_str() {
+                    "len" | "length" => return format!("({}.len() as i64)", emit_expr(receiver)),
+                    "contains" => {
+                        let arg = args.first().map(emit_expr).unwrap_or_default();
+                        return format!("{}.contains(&{})", emit_expr(receiver), arg);
+                    }
+                    "startsWith" => {
+                        let arg = args.first().map(emit_expr).unwrap_or_default();
+                        return format!("{}.starts_with(&{})", emit_expr(receiver), arg);
+                    }
+                    "endsWith" => {
+                        let arg = args.first().map(emit_expr).unwrap_or_default();
+                        return format!("{}.ends_with(&{})", emit_expr(receiver), arg);
+                    }
+                    "trim" => return format!("{}.trim().to_string()", emit_expr(receiver)),
+                    "toString" => return format!("{}.to_string()", emit_expr(receiver)),
+                    _ => {}
+                }
+            }
             if let Expr::Ident(id) = callee.as_ref() {
                 match id.name.as_str() {
                     "Some" => {
@@ -458,6 +479,7 @@ fn emit_expr(expr: &Expr) -> String {
                     kora_ast::Pattern::IntLit(i, _) => i.to_string(),
                     kora_ast::Pattern::StringLit(st, _) => format!("\"{st}\""),
                     kora_ast::Pattern::BoolLit(b, _) => b.to_string(),
+                    kora_ast::Pattern::Null(_) => "None".to_string(),
                     kora_ast::Pattern::Binding(id) => id.name.clone(),
                     kora_ast::Pattern::Variant {
                         enum_name,

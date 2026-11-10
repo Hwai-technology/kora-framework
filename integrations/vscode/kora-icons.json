@@ -1,0 +1,33 @@
+{
+  "iconDefinitions": {
+    "_kora_file": {
+      "iconPath": "./icons/kora-file.svg"
+    },
+    "_kora_model": {
+      "iconPath": "./icons/kora-model.svg"
+    },
+    "_kora_config": {
+      "iconPath": "./icons/kora-config.svg"
+    },
+    "_kora_test": {
+      "iconPath": "./icons/kora-test.svg"
+    },
+    "_kora_module": {
+      "iconPath": "./icons/kora-module.svg"
+    }
+  },
+  "file": "_kora_file",
+  "fileExtensions": {
+    "kora": "_kora_file",
+    "kr": "_kora_file",
+    "kora.toml": "_kora_config"
+  },
+  "fileNames": {
+    "kora.toml": "_kora_config",
+    "kora.lock": "_kora_config"
+  },
+  "languageIds": {
+    "kora": "_kora_file"
+  }
+}
+

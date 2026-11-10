@@ -1,0 +1,18 @@
+// ============================================================================
+// CORS Security Middleware
+// ============================================================================
+
+class CorsPolicy {
+    fn handlePreflight(origin: String) -> Bool {
+        return true
+    }
+
+    fn getResponseHeaders() -> String {
+        return "Access-Control-Allow-Origin: *; Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS; Access-Control-Allow-Headers: Content-Type, Authorization, X-Nonce, X-Trace-Id"
+    }
+
+    fn destroy() -> Bool {
+        return true
+    }
+}
+

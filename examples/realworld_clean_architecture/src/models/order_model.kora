@@ -1,0 +1,63 @@
+// ============================================================================
+// Order & OrderItem Domain Models & Inputs
+// Decorated with Schema Indexing, Uniqueness & DTO Constraints
+// ============================================================================
+
+model Order {
+    @unique
+    @required
+    id: Int
+
+    @unique
+    @index
+    @required
+    orderNumber: String
+
+    @index
+    @required
+    userId: Int
+
+    @required
+    @min(0)
+    totalAmount: Int
+
+    @default("pending")
+    status: String
+
+    @default("unpaid")
+    paymentStatus: String
+}
+
+model OrderItem {
+    @unique
+    @required
+    id: Int
+
+    @index
+    @required
+    orderId: Int
+
+    @index
+    @required
+    productId: Int
+
+    @min(1)
+    quantity: Int
+
+    @min(0)
+    unitPrice: Int
+
+    @min(0)
+    subtotal: Int
+}
+
+model CreateOrderInput {
+    @required
+    userId: Int
+
+    @min(1)
+    itemsCount: Int
+
+    @min(0)
+    totalAmount: Int
+}

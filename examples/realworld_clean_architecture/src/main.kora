@@ -1,408 +1,105 @@
 // ============================================================================
-// Kora Clean Architecture Enterprise Showcase — Main Entrypoint
-// Features:
-// 1. Automatic Database Migrations & Seeders
-// 2. Ambient Database Pool (No manual DB passing in constructor)
-// 3. Secure Response Envelope with Nonce & Anti-Tamper Tokens
-// 4. Method-Level Telemetry Tracker & Exit Code Logging
-// 5. Automatic Discounts, Pagination & Domain Event Emitter
-// 6. Memory-Safe Lifecycle Destructors (Zero GC Leaks)
+// Kora Modular Clean Architecture Enterprise Showcase — Main Entrypoint
+// Pure Architectural Discipline: Imports models & enums from dedicated modules
+// Everything is Class-Based Architecture with Compile-Time Dependency Injection
 // ============================================================================
 
-enum UserRole {
-    Customer,
-    Admin,
-    Moderator
-}
+import { HttpStatus } from "enums/http_status";
+import { User, UserProfileDto } from "models/user_model";
+import { Order, OrderItem, CreateOrderInput } from "models/order_model";
+import { SecureApiResponse, LogEntry } from "models/response_envelope";
+import { AuthSessionDto } from "modules/auth/auth_types";
+import { Logger } from "shared/services/logger_service";
+import { AutoMigrator, DatabaseSeeder } from "database/auto_migrator";
+import { ApiResponse } from "middleware/api_response_factory";
+import { AuthController } from "modules/auth/auth_controller";
+import { OrderController } from "modules/orders/order_controller";
 
-enum OrderStatus {
-    Pending,
-    Paid,
-    Shipped,
-    Delivered,
-    Cancelled
-}
+// ============================================================================
+// Enterprise Application Container (Class-based Lifecycle & Orchestration)
+// ============================================================================
 
-model User {
-    id: Int
-    email: String
-    fullName: String
-    role: String
-    balance: Int
-    isActive: Bool
-}
+class Application {
+    migrator: AutoMigrator
+    seeder: DatabaseSeeder
+    auth: AuthController
+    orders: OrderController
+    response: ApiResponse
+    logger: Logger
 
-model Product {
-    id: Int
-    sku: String
-    title: String
-    priceCents: Int
-    stockQuantity: Int
-    isPublished: Bool
-}
+    init(
+        migrator: AutoMigrator,
+        seeder: DatabaseSeeder,
+        auth: AuthController,
+        orders: OrderController,
+        response: ApiResponse,
+        logger: Logger,
+    ) {
+        this.migrator = migrator
+        this.seeder = seeder
+        this.auth = auth
+        this.orders = orders
+        this.response = response
+        this.logger = logger
+    }
 
-model Order {
-    id: Int
-    orderNumber: String
-    userId: Int
-    totalAmount: Int
-    status: String
-    paymentStatus: String
-}
+    fn health() -> SecureApiResponse {
+        let l = this.logger.info("server", "Health check probe OK", "trace_health_01")
+        return this.response.ok("Kora Clean Architecture Enterprise Engine is running healthy", 1)
+    }
 
-struct PaginationMeta {
-    currentPage: Int
-    perPage: Int
-    totalItems: Int
-    totalPages: Int
-}
-
-struct SecureApiResponse {
-    success: Bool
-    statusCode: Int
-    nonce: String
-    securityToken: String
-    message: String
-    executionTimeMs: Int
-    dataCount: Int
-}
-
-struct TelemetryTrace {
-    traceId: String
-    methodName: String
-    clientIp: String
-    durationMs: Int
-    exitCode: Int
-    status: String
-}
-
-struct DomainEvent {
-    eventId: String
-    eventType: String
-    aggregateId: Int
-    payloadSummary: String
-    emittedAt: Int
-}
-
-struct CreateOrderInput {
-    userId: Int
-    itemsCount: Int
-    totalAmount: Int
-}
-
-// ----------------------------------------------------------------------------
-// Database Auto-Migration & Seeder Engine
-// ----------------------------------------------------------------------------
-
-class AutoMigrator {
-    fn runAllMigrations() -> Result<Int, String> {
-        // Automatically creates tables for User, Product, Order and Logs
-        return Ok(4)
+    fn migrateDatabase() -> SecureApiResponse {
+        let mig = this.migrator.runAllMigrations()
+        let seed = this.seeder.seedInitialData()
+        let l = this.logger.info("db", "Migration and seeding completed", "trace_mig_01")
+        return this.response.ok("Auto-migration and database seeding completed successfully", 6)
     }
 
     fn destroy() -> Bool {
-        return true
-    }
-}
-
-class DatabaseSeeder {
-    fn seedInitialData() -> Result<Int, String> {
-        // Seeds initial system admin and store catalog items
-        return Ok(2)
-    }
-
-    fn destroy() -> Bool {
-        return true
-    }
-}
-
-// ----------------------------------------------------------------------------
-// Secure Enveloper, Telemetry & Domain Event Infrastructure
-// ----------------------------------------------------------------------------
-
-class SecureEnveloper {
-    fn wrapSuccess(message: String, count: Int, durationMs: Int) -> SecureApiResponse {
-        return SecureApiResponse {
-            success: true,
-            statusCode: 200,
-            nonce: "9a8b7c6d5e4f3a2b1c0d",
-            securityToken: "sig_hmac256_kora_verified_token",
-            message: message,
-            executionTimeMs: durationMs,
-            dataCount: count,
-        }
-    }
-
-    fn wrapError(statusCode: Int, message: String, durationMs: Int) -> SecureApiResponse {
-        return SecureApiResponse {
-            success: false,
-            statusCode: statusCode,
-            nonce: "err_nonce_998877",
-            securityToken: "sig_hmac256_error_envelope",
-            message: message,
-            executionTimeMs: durationMs,
-            dataCount: 0,
-        }
-    }
-
-    fn destroy() -> Bool {
-        return true
-    }
-}
-
-class TelemetryTracker {
-    fn recordExecution(traceId: String, method: String, clientIp: String, durationMs: Int, exitCode: Int) -> TelemetryTrace {
-        if exitCode == 0 {
-            return TelemetryTrace {
-                traceId: traceId,
-                methodName: method,
-                clientIp: clientIp,
-                durationMs: durationMs,
-                exitCode: exitCode,
-                status: "ExitSuccess",
-            }
-        }
-        return TelemetryTrace {
-            traceId: traceId,
-            methodName: method,
-            clientIp: clientIp,
-            durationMs: durationMs,
-            exitCode: exitCode,
-            status: "ExitHandledError",
-        }
-    }
-
-    fn destroy() -> Bool {
-        return true
-    }
-}
-
-class PaginationHelper {
-    fn calculate(page: Int, limit: Int, totalItems: Int) -> PaginationMeta {
-        let pages = (totalItems + 10 - 1) / 10
-        return PaginationMeta {
-            currentPage: page,
-            perPage: limit,
-            totalItems: totalItems,
-            totalPages: pages,
-        }
-    }
-
-    fn destroy() -> Bool {
-        return true
-    }
-}
-
-class DomainEventEmitter {
-    fn publish(eventType: String, aggregateId: Int, summary: String) -> Result<DomainEvent, String> {
-        return Ok(DomainEvent {
-            eventId: "EVT-2026-9001",
-            eventType: eventType,
-            aggregateId: aggregateId,
-            payloadSummary: summary,
-            emittedAt: 1773000000,
-        })
-    }
-
-    fn destroy() -> Bool {
-        return true
-    }
-}
-
-// ----------------------------------------------------------------------------
-// Repository Layer (Ambient Database Pool - Zero Boilerplate)
-// ----------------------------------------------------------------------------
-
-class MySqlOrderRepository {
-    fn findById(id: Int) -> Option<Order> {
-        if id <= 0 {
-            return None
-        }
-        return Some(Order {
-            id: id,
-            orderNumber: "ORD-2026-9901",
-            userId: 1,
-            totalAmount: 349900,
-            status: "pending",
-            paymentStatus: "unpaid",
-        })
-    }
-
-    fn createOrder(input: CreateOrderInput) -> Result<Order, String> {
-        return Ok(Order {
-            id: 8801,
-            orderNumber: "ORD-2026-8801",
-            userId: input.userId,
-            totalAmount: input.totalAmount,
-            status: "paid",
-            paymentStatus: "captured",
-        })
-    }
-
-    fn cancelOrder(id: Int) -> Result<Bool, String> {
-        return Ok(true)
-    }
-
-    fn destroy() -> Bool {
-        return true
-    }
-}
-
-class MySqlUserRepository {
-    fn findById(id: Int) -> Option<User> {
-        if id <= 0 {
-            return None
-        }
-        return Some(User {
-            id: id,
-            email: "customer@example.com",
-            fullName: "Sarah Connor",
-            role: "customer",
-            balance: 500000,
-            isActive: true,
-        })
-    }
-
-    fn destroy() -> Bool {
-        return true
-    }
-}
-
-// ----------------------------------------------------------------------------
-// Application Service Layer (Business Logic & Event Emission)
-// ----------------------------------------------------------------------------
-
-class CheckoutService {
-    orderRepo: MySqlOrderRepository
-    userRepo: MySqlUserRepository
-    events: DomainEventEmitter
-
-    init(orderRepo: MySqlOrderRepository, userRepo: MySqlUserRepository, events: DomainEventEmitter) {
-        this.orderRepo = orderRepo
-        this.userRepo = userRepo
-        this.events = events
-    }
-
-    fn processCheckout(userId: Int, itemsCount: Int, amount: Int) -> Result<Order, String> {
-        if userId <= 0 {
-            return Err("Invalid customer ID")
-        }
-        if itemsCount <= 0 {
-            return Err("Cart must contain at least one product")
-        }
-        if amount <= 0 {
-            return Err("Invalid checkout amount")
-        }
-
-        // Automatic Discount: 15% discount for bulk orders (>= 5 items)
-        if itemsCount >= 5 {
-            let discountedAmount = (amount * 85) / 100
-            let bulkInput = CreateOrderInput {
-                userId: userId,
-                itemsCount: itemsCount,
-                totalAmount: discountedAmount,
-            }
-            let bulkOrder = this.orderRepo.createOrder(bulkInput)
-            let evt1 = this.events.publish("OrderPlacedEvent", 8801, "Bulk order placed")
-            return bulkOrder
-        }
-
-        let regularInput = CreateOrderInput {
-            userId: userId,
-            itemsCount: itemsCount,
-            totalAmount: amount,
-        }
-        let regularOrder = this.orderRepo.createOrder(regularInput)
-        let evt2 = this.events.publish("OrderPlacedEvent", 8801, "Regular order placed")
-        return regularOrder
-    }
-
-    fn getOrder(orderId: Int) -> Option<Order> {
-        return this.orderRepo.findById(orderId)
-    }
-
-    fn cancelOrder(orderId: Int) -> Result<Bool, String> {
-        return this.orderRepo.cancelOrder(orderId)
-    }
-
-    fn destroy() -> Bool {
-        let d1 = this.orderRepo.destroy()
-        let d2 = this.userRepo.destroy()
-        let d3 = this.events.destroy()
-        return true
-    }
-}
-
-// ----------------------------------------------------------------------------
-// Presentation Controller Layer (Automatic Enveloper & Telemetry)
-// ----------------------------------------------------------------------------
-
-class OrderController {
-    service: CheckoutService
-    enveloper: SecureEnveloper
-    telemetry: TelemetryTracker
-
-    init(service: CheckoutService, enveloper: SecureEnveloper, telemetry: TelemetryTracker) {
-        this.service = service
-        this.enveloper = enveloper
-        this.telemetry = telemetry
-    }
-
-    fn getOrderById(id: Int, clientIp: String) -> SecureApiResponse {
-        let trace = this.telemetry.recordExecution("TRC-001", "OrderController.getOrderById", clientIp, 2, 0)
-        let orderOpt = this.service.getOrder(id)
-        return this.enveloper.wrapSuccess("Order fetched successfully", 1, 2)
-    }
-
-    fn createOrder(userId: Int, itemsCount: Int, amount: Int, clientIp: String) -> SecureApiResponse {
-        let orderRes = this.service.processCheckout(userId, itemsCount, amount)
-        let trace = this.telemetry.recordExecution("TRC-002", "OrderController.createOrder", clientIp, 4, 0)
-        return this.enveloper.wrapSuccess("Order placed successfully with applied discounts and domain event", 1, 4)
-    }
-
-    fn cancelOrder(id: Int, clientIp: String) -> SecureApiResponse {
-        let cancelRes = this.service.cancelOrder(id)
-        let trace = this.telemetry.recordExecution("TRC-003", "OrderController.cancelOrder", clientIp, 1, 0)
-        return this.enveloper.wrapSuccess("Order cancelled successfully", 1, 1)
-    }
-
-    fn destroy() -> Bool {
-        let d1 = this.service.destroy()
-        let d2 = this.enveloper.destroy()
-        let d3 = this.telemetry.destroy()
+        let d1 = this.migrator.destroy()
+        let d2 = this.seeder.destroy()
+        let d3 = this.auth.destroy()
+        let d4 = this.orders.destroy()
+        let d5 = this.response.destroy()
+        let d6 = this.logger.destroy()
         return true
     }
 }
 
 // ============================================================================
-// Server Bootstrap & REST Routing with Automatic Secure Envelope
+// Server Bootstrap & REST Routing via Application Container
 // ============================================================================
 
 let app = run()
 
-// 1. Healthcheck with Nonce & Telemetry
-get("/health", (enveloper: SecureEnveloper) => {
-    return enveloper.wrapSuccess("Kora Clean Architecture Engine is running healthy", 1, 1)
+// 1. Healthcheck Endpoint
+get("/health", (server: Application) => {
+    return server.health()
 })
 
-// 2. Trigger Auto-Migration & Database Seeding
-get("/api/v1/database/migrate", (migrator: AutoMigrator, seeder: DatabaseSeeder, enveloper: SecureEnveloper) => {
-    let migRes = migrator.runAllMigrations()
-    let seedRes = seeder.seedInitialData()
-    return enveloper.wrapSuccess("Auto-migration and database seeding completed successfully", 6, 12)
+// 2. Database Auto-Migration Trigger
+get("/api/v1/database/migrate", (server: Application) => {
+    return server.migrateDatabase()
 })
 
-// 3. Lookup Order By ID with Nonce & Response Protection
-get("/api/v1/orders/{id}", (id: Int, controller: OrderController) => {
-    return controller.getOrderById(id, "127.0.0.1")
+// 3. Auth Routes
+post("/api/v1/auth/login", (server: Application) => {
+    return server.auth.handleLogin("ahmet@kora-lang.org", "secretPassword")
 })
 
-// 4. Place New Order with Automatic Bulk Discount & Event Emission
-post("/api/v1/orders", (request: Request, controller: OrderController) => {
-    return controller.createOrder(1, 5, 500000, "127.0.0.1")
+post("/api/v1/auth/register", (server: Application) => {
+    return server.auth.handleRegister("newuser@kora-lang.org", "New User")
 })
 
-// 5. Cancel Order Endpoint
-post("/api/v1/orders/{id}/cancel", (id: Int, controller: OrderController) => {
-    return controller.cancelOrder(id, "127.0.0.1")
+// 4. Orders Routes
+get("/api/v1/orders/{id}", (id: Int, server: Application) => {
+    return server.orders.handleGet(id)
+})
+
+post("/api/v1/orders", (server: Application) => {
+    return server.orders.handleCreate(1, 5, 500000)
+})
+
+post("/api/v1/orders/{id}/cancel", (id: Int, server: Application) => {
+    return server.orders.handleCancel(id)
 })

@@ -1,0 +1,17 @@
+// ============================================================================
+// Domain Event Emitter Interface Contract
+// ============================================================================
+
+model DomainEvent {
+    eventId: String
+    eventType: String
+    aggregateId: Int
+    payloadSummary: String
+    emittedAt: Int
+}
+
+interface IDomainEventEmitter {
+    fn publish(eventType: String, aggregateId: Int, summary: String) -> Result<DomainEvent, String>
+    fn destroy() -> Bool
+}
+

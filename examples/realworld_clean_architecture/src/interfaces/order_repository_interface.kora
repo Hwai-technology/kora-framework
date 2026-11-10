@@ -1,0 +1,27 @@
+// ============================================================================
+// Order Repository Interface Contract
+// Inversion of Control & Clean Architecture Abstraction
+// ============================================================================
+
+model Order {
+    id: Int
+    orderNumber: String
+    userId: Int
+    totalAmount: Int
+    status: String
+    paymentStatus: String
+}
+
+model CreateOrderInput {
+    userId: Int
+    itemsCount: Int
+    totalAmount: Int
+}
+
+interface IOrderRepository {
+    fn findById(id: Int) -> Option<Order>
+    fn createOrder(input: CreateOrderInput) -> Result<Order, String>
+    fn cancelOrder(id: Int) -> Result<Bool, String>
+    fn destroy() -> Bool
+}
+

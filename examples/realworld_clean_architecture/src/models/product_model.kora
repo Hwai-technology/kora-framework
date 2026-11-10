@@ -1,0 +1,20 @@
+// ============================================================================
+// Product Domain Model & Inventory Data
+// ============================================================================
+
+model Product {
+    id: Int
+    sku: String
+    title: String
+    priceCents: Int
+    stockQuantity: Int
+    isPublished: Bool
+}
+
+model ProductDto {
+    id: Int
+    sku: String
+    title: String
+    priceCents: Int
+}
+

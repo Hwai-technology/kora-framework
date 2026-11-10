@@ -1,82 +1,210 @@
 # Kora
 
-> **Write Less. Build Faster. Run Smarter.**
-> A modern compiled backend programming language and integrated framework, powered by Rust.
+<p align="center">
+  <img src="integrations/vscode/icon.svg" width="100" height="100" alt="Kora Logo" />
+</p>
+
+<p align="center">
+  <strong>Write Less. Build Faster. Run Smarter.</strong><br>
+  <em>A modern compiled backend language and framework powered by Rust.</em>
+</p>
+
+<p align="center">
+  <a href="#vision"><img src="https://img.shields.io/badge/vision-TS%20%2B%20Rust%20%2B%20Go-00D2FF" alt="Vision" /></a>
+  <a href="#license"><img src="https://img.shields.io/badge/license-MIT-0047FF" alt="License" /></a>
+  <a href="#status"><img src="https://img.shields.io/badge/status-active%20development-00FFA3" alt="Status" /></a>
+</p>
 
 ---
 
-## Philosophy
+## 🌟 The Kora Vision
 
-Kora bridges developer productivity (like Laravel and TypeScript) with native compiled performance and safety (like Rust and Go), without exposing manual memory lifetime annotations or boilerplate framework wiring.
+Kora is engineered around one central philosophy:
 
-- **Clean Modern Syntax**: Optional semicolons, clean blocks, algebraic types, and intuitive declarations.
-- **Strong Static Typing + Type Inference**: Zero dynamic guesswork; types are inferred locally and verified strictly at compile time.
-- **3-Tier Ownership Inference (Zero-GC)**: Automatic local borrows (`&T` / `&mut T`), deterministic moves, and automatic thread-safe shared handles (`Arc<T>`) across async/DI boundaries—never exposing raw Rust borrow-checker errors to the Kora developer.
-- **Hybrid Object & Data Model**:
-  - `struct` and `model` for pure value/entity data structures.
-  - `class` for stateful services with built-in compile-time Dependency Injection (`init(...)`).
-  - `interface` for polymorphism without fragile deep class inheritance.
-- **Integrated Backend Ecosystem**: Zero-config HTTP (`Axum`/`Hyper` + `Tokio`), compile-time validated ORM (`SQLx`/PostgreSQL), security, queues, realtime, and OpenTelemetry observability.
+> **The approachable developer experience and clean syntax of TypeScript, the raw performance and memory safety of Rust, and the simple concurrency model of Go — unified in a single backend language and framework.**
+
+Backend developers shouldn't have to choose between developer speed and system performance. Kora compiles directly to native Rust binaries with zero garbage collection pauses and zero manual borrow-checker friction.
 
 ---
 
-## Workspace Architecture
+## 🚀 Key Language Features
 
-All compiler, runtime, framework, and tooling components live in a unified Cargo Workspace under `crates/`:
+### 1. Hybrid Object & Data Model (Struct-Free)
+Kora eliminates `struct` confusion in favor of two distinct, purposeful constructs:
+- **`model`**: Declarative data entities and API DTOs with schema attributes (`@unique`, `@index`, `@required`, `@email`, `@min`, `@max`, `@default`).
+- **`class`**: Stateful business logic, controllers, and services with constructor parameter promotion in `init(...)`.
+- **`interface`**: Polymorphic contracts verified strictly at compile time.
 
-```text
-kora/
-├── crates/
-│   ├── kora-span/          # SourceMap, FileId, BytePos, Span, Line/Column lookup
-│   ├── kora-diagnostics/   # Compiler error codes, labeled spans, snippet renderer
-│   ├── kora-ast/           # Complete Abstract Syntax Tree
-│   ├── kora-lexer/         # Lexical analyzer with optional-semicolon newline awareness
-│   ├── kora-parser/        # Recursive-descent + Pratt expression parser
-│   ├── kora-hir/           # High-Level IR & multi-pass lexical symbol resolution
-│   ├── kora-ty/            # Strong static type system, inference & DI/interface verifier
-│   └── kora-cli/           # Official `kora` command-line tool
-├── docs/
-│   ├── architecture.md     # Complete system architecture & 8-phase roadmap
-│   ├── grammar.ebnf        # Formal EBNF grammar specification
-│   └── language-tour.md    # Kora syntax & type system tour
-├── examples/
-│   ├── hello.kora          # Core language, structs, enums, pattern matching
-│   └── users_api.kora      # Models, DI service classes, interfaces, HTTP routes
-└── .agent/                 # Multi-agent engineering rules, standards & specialist roles
+```kora
+model User {
+    @unique
+    @required
+    id: Int
+
+    @unique
+    @index
+    @required
+    @email
+    email: String
+
+    @default("customer")
+    role: String
+
+    @min(0)
+    balance: Int
+}
+
+interface UserRepository {
+    fn findByEmail(email: String) -> Option<User>
+    fn save(user: User) -> Result<User, String>
+}
+
+class UserService implements UserRepository {
+    repo: UserRepository
+
+    init(repo: UserRepository) {
+        this.repo = repo
+    }
+
+    fn findByEmail(email: String) -> Option<User> {
+        if email == "" {
+            return null
+        }
+        return this.repo.findByEmail(email)
+    }
+
+    fn save(user: User) -> Result<User, String> {
+        return this.repo.save(user)
+    }
+}
+```
+
+### 2. First-Class `null` & Strict Exclusion of `undefined`
+Kora introduces **`null`** as the universal representation of value absence (`Option<T>`).
+- Writing `undefined` generates a compile error (`E2005`), eliminating dual-null ambiguity.
+- Works seamlessly with direct comparisons and pattern matching:
+
+```kora
+let authHeader = req.header("authorization")
+
+if authHeader == null {
+    return Err("Missing required authorization header")
+}
+
+return match authHeader {
+    Some(token) => Ok(token),
+    null => Err("Header was empty"),
+}
+```
+
+### 3. Automatic Constructor & Visibility Modifiers
+Classes support `public`, `private`, `protected`, and `readonly` field modifiers, as well as automatic parameter promotion inside `init(...)`.
+
+### 4. Enforced `kebab-case` API Serialization
+All API payloads, route responses, and DTOs automatically serialize with `kebab-case` keys (`user-id`, `status-code`, `total-amount`), guaranteeing API consistency across client integrations.
+
+### 5. Architectural Purity Enforcement (Compiler Diagnostics)
+The Kora compiler (`kora check`) guards directory boundaries at build time:
+- **`E5001`**: Files in `enums/` cannot contain functions or routes.
+- **`E5002`**: Files in `models/` or `interfaces/` cannot contain executable server logic or routes.
+- **`E5003`**: Controllers and services cannot define inline enums or models; they must be imported.
+- **`E5004`**: `main.kora` cannot define inline models or enums.
+
+---
+
+## 🏛️ Compiler Pipeline & Architecture
+
+```mermaid
+flowchart LR
+    A["Kora Source Code (.kora)"] --> B["kora-lexer\nToken Stream"]
+    B --> C["kora-parser\nAbstract Syntax Tree"]
+    C --> D["kora-hir\nName & Scope Resolution"]
+    D --> E["kora-ty\nType & Purity Checker"]
+    E --> F["kora-codegen\nSafe Native Rust"]
+    F --> G["Native Binary\n(Zero GC, High Throughput)"]
 ```
 
 ---
 
-## Quick Start
+## 📦 Workspace Architecture
 
+All components live in a modular Cargo workspace under `crates/`:
+
+| Crate | Role |
+|:---|:---|
+| `kora-lexer` | High-speed tokenizer with keyword and attribute scanning. |
+| `kora-ast` | Abstract Syntax Tree node definitions. |
+| `kora-parser` | Recursive-descent parser with diagnostics. |
+| `kora-hir` | High-level Intermediate Representation and symbol resolution. |
+| `kora-ty` | Static type system, interface verification, and purity checker. |
+| `kora-codegen` | Transpilation from Kora AST to safe native Rust code. |
+| `kora-http` | Async HTTP engine powered by Axum and Tokio. |
+| `kora-orm` | Compile-time query and schema integration. |
+| `kora-realtime`| WebSocket channels and domain event streaming. |
+| `kora-cli` | Command-line interface (`check`, `build`, `run`, `codegen`). |
+
+---
+
+## 🛠️ Quickstart Guide
+
+### Prerequisites
+- [Rust](https://rustup.rs/) (stable toolchain)
+- Cargo
+
+### Building the Toolchain
 ```bash
-# Type-check a Kora source file
-cargo run -p kora-cli -- check examples/hello.kora
-cargo run -p kora-cli -- check examples/users_api.kora
+# Clone the repository
+git clone https://github.com/kora-lang/kora.git
+cd kora
 
-# Inspect inferred symbol types and verified declarations
-cargo run -p kora-cli -- types examples/users_api.kora
+# Build Kora CLI
+cargo build --bin kora
 
-# Inspect the parsed AST or lexical token stream
-cargo run -p kora-cli -- ast examples/hello.kora
-cargo run -p kora-cli -- tokens examples/hello.kora
+# Verify installation
+./target/debug/kora --help
+```
 
-# Initialize a new Kora project scaffold
-cargo run -p kora-cli -- init my-api
+### Checking and Compiling Files
+```bash
+# Type check a Kora file
+./target/debug/kora check examples/hello.kora
+
+# Generate native Rust code
+./target/debug/kora codegen examples/hello.kora
+```
+
+### Running the Clean Architecture Showcase
+```bash
+# Verify all 40 architectural files in the real-world showcase
+for f in $(find examples/realworld_clean_architecture/src -name "*.kora"); do
+  ./target/debug/kora check "$f"
+done
 ```
 
 ---
 
-## Development Roadmap
+## 🤖 Continuous Quality & Automation
 
-| Phase | Milestone | Status |
-| :--- | :--- | :--- |
-| **Phase 1** | **Language Foundation** (`span`, `diagnostics`, `lexer`, `ast`, `parser`, `hir`, `ty`, `cli`) | **Active / Implemented (`v0.1-alpha.1`)** |
-| **Phase 2** | **Compiler Backend & Runtime** (`ownership`, `codegen` -> Rust/Cargo, `tokio` runtime) | Planned |
-| **Phase 3** | **Backend Core** (`kora-http` on Axum, routing, middleware, JSON validation, OpenAPI) | Planned |
-| **Phase 4** | **Database & ORM** (`kora-orm` on SQLx/PostgreSQL, query builder, transactions, migrations) | Planned |
-| **Phase 5** | **Advanced Language** (Generics on user types, extension methods, modules, async/channels) | Planned |
-| **Phase 6** | **Production Features** (Auth/RBAC, queues, cache, WebSockets/SSE, OpenTelemetry) | Planned |
-| **Phase 7** | **Developer Ecosystem** (Package manager, `kora-lsp`, formatter, debugger, profiler) | Planned |
-| **Phase 8** | **Stabilization & Release** (Reproducible benchmarks vs Rust/Go/Fastify/Laravel, audit) | Planned |
+Kora includes an enterprise GitHub Actions workflow suite:
+- **CI Pipeline (`ci.yml`)**: Automated formatting (`rustfmt`), linting (`clippy`), unit tests, and compiler verification on every pull request.
+- **PR Conventions (`pr-validation.yml`)**: Conventional Commits validation for titles and branches.
+- **Native Auto-Merge (`auto-merge.yml`)**: Automated merge queue for approved pull requests passing all checks.
+- **Automated Contributor Recognition (`contributors.yml`)**: Automatically updates the contributors gallery upon pull request merge.
+- **AI Code Review Agent (`ai-code-review.yml`)**: Automated senior technical reviewer evaluating diffs for Rust correctness, compiler safety, performance, and security.
 
+---
+
+## 👥 Contributors
+
+A huge thank you to everyone helping build Kora into the next-generation backend language and framework!
+
+<!-- CONTRIBUTORS:START -->
+<!-- Automatically maintained by GitHub Actions -->
+<a href="https://github.com/ahmet"><img src="https://avatars.githubusercontent.com/u/1?v=4&s=64" width="48" height="48" alt="ahmet" title="ahmet" style="border-radius: 50%; margin: 4px;" /></a>
+<!-- CONTRIBUTORS:END -->
+
+---
+
+## 📄 License
+
+Kora is open-source software licensed under the [MIT License](LICENSE).

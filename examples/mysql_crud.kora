@@ -10,7 +10,7 @@ model Customer {
     active: Bool
 }
 
-struct CustomerSignupInput {
+model CustomerSignupInput {
     fullName: String
     email: String
     initialCredit: Int

@@ -1,0 +1,137 @@
+// ============================================================================
+// Enterprise Universal Validation Service
+// Ultra-Fast Dynamic Schema & DTO Constraint Validator
+// ============================================================================
+
+import { ValidationError, ValidationResult } from "models/service_models";
+
+class ValidationService {
+    public fn validateRequired(field: String, value: String) -> Option<ValidationError> {
+        if value == "" {
+            return Some(ValidationError {
+                field: field,
+                rule: "required",
+                message: "This field is required and cannot be empty",
+            })
+        }
+        return null
+    }
+
+    public fn validateEmail(field: String, email: String) -> Option<ValidationError> {
+        if email == "" {
+            return Some(ValidationError {
+                field: field,
+                rule: "email",
+                message: "Email address cannot be empty",
+            })
+        }
+        if !email.contains("@") {
+            return Some(ValidationError {
+                field: field,
+                rule: "email",
+                message: "Email address is missing required '@' domain separator",
+            })
+        }
+        return null
+    }
+
+    public fn validateMinLength(field: String, value: String, minChars: Int) -> Option<ValidationError> {
+        if value.len() < minChars {
+            return Some(ValidationError {
+                field: field,
+                rule: "min_length",
+                message: "String length falls below the required minimum of " + minChars.toString() + " characters",
+            })
+        }
+        return null
+    }
+
+    public fn validateMaxLength(field: String, value: String, maxChars: Int) -> Option<ValidationError> {
+        if value.len() > maxChars {
+            return Some(ValidationError {
+                field: field,
+                rule: "max_length",
+                message: "String length exceeds the maximum permitted limit of " + maxChars.toString() + " characters",
+            })
+        }
+        return null
+    }
+
+    public fn validatePositive(field: String, amount: Int) -> Option<ValidationError> {
+        if amount < 0 {
+            return Some(ValidationError {
+                field: field,
+                rule: "positive",
+                message: "Value must be positive and non-negative",
+            })
+        }
+        return null
+    }
+
+    public fn validateRange(field: String, amount: Int, minVal: Int, maxVal: Int) -> Option<ValidationError> {
+        if amount < minVal {
+            return Some(ValidationError {
+                field: field,
+                rule: "min",
+                message: "Value falls below the minimum required boundary",
+            })
+        }
+        if amount > maxVal {
+            return Some(ValidationError {
+                field: field,
+                rule: "max",
+                message: "Value exceeds the maximum permitted boundary",
+            })
+        }
+        return null
+    }
+
+    public fn validateUuid(field: String, uuidStr: String) -> Option<ValidationError> {
+        if uuidStr == "" {
+            return Some(ValidationError {
+                field: field,
+                rule: "uuid",
+                message: "UUID string cannot be empty",
+            })
+        }
+        if uuidStr.len() != 36 {
+            return Some(ValidationError {
+                field: field,
+                rule: "uuid",
+                message: "UUIDv4 string must be exactly 36 characters with standard hyphen delimiters",
+            })
+        }
+        return null
+    }
+
+    public fn validateUrl(field: String, urlStr: String) -> Option<ValidationError> {
+        if urlStr == "" {
+            return Some(ValidationError {
+                field: field,
+                rule: "url",
+                message: "URL address cannot be empty",
+            })
+        }
+        if !urlStr.startsWith("http://") && !urlStr.startsWith("https://") {
+            return Some(ValidationError {
+                field: field,
+                rule: "url",
+                message: "URL address must start with 'http://' or 'https://' protocol scheme",
+            })
+        }
+        return null
+    }
+
+    public fn createResult(isValid: Bool, message: String) -> ValidationResult {
+        return ValidationResult {
+            isValid: isValid,
+            errorCount: 0,
+            errorMessage: message,
+        }
+    }
+
+    public fn destroy() -> Bool {
+        return true
+    }
+}
+

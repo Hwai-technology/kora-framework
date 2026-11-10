@@ -25,6 +25,7 @@ pub enum Ty {
     App,
     Request,
     Response,
+    Headers,
     List(Box<Ty>),
     Option(Box<Ty>),
     Result(Box<Ty>, Box<Ty>),
@@ -58,6 +59,7 @@ impl fmt::Display for Ty {
             Self::App => write!(f, "App"),
             Self::Request => write!(f, "Request"),
             Self::Response => write!(f, "Response"),
+            Self::Headers => write!(f, "Headers"),
             Self::List(inner) => write!(f, "List<{inner}>"),
             Self::Option(inner) => write!(f, "Option<{inner}>"),
             Self::Result(ok, err) => write!(f, "Result<{ok}, {err}>"),
@@ -366,6 +368,10 @@ impl<'a> TypeChecker<'a> {
                 "Response" => {
                     self.expect_arity(&name.name, args, 0, *span);
                     Ty::Response
+                }
+                "Headers" => {
+                    self.expect_arity(&name.name, args, 0, *span);
+                    Ty::Headers
                 }
                 "List" => {
                     if self.expect_arity("List", args, 1, *span) {
@@ -717,6 +723,13 @@ impl<'a> TypeChecker<'a> {
             Expr::FloatLit { .. } => Ty::Float,
             Expr::StringLit { .. } => Ty::String,
             Expr::BoolLit { .. } => Ty::Bool,
+            Expr::Null { .. } => {
+                if let Some(Ty::Option(inner)) = expected {
+                    Ty::Option(inner.clone())
+                } else {
+                    Ty::Option(Box::new(Ty::Unknown))
+                }
+            }
             Expr::This { .. } => self
                 .current_class
                 .as_ref()
@@ -1070,7 +1083,105 @@ impl<'a> TypeChecker<'a> {
                 self.emit_unknown_member(recv_ty, field, span)
             }
             Ty::Request => match field {
-                "path" | "body" | "method" => Ty::String,
+                "path" | "body" | "method" | "ip" | "url" => Ty::String,
+                "headers" => Ty::Headers,
+                "header" => Ty::Fn {
+                    params: vec![Ty::String],
+                    ret: Box::new(Ty::Option(Box::new(Ty::String))),
+                    is_async: false,
+                },
+                "query" | "param" => Ty::Fn {
+                    params: vec![Ty::String],
+                    ret: Box::new(Ty::Option(Box::new(Ty::String))),
+                    is_async: false,
+                },
+                _ => self.emit_unknown_member(recv_ty, field, span),
+            },
+            Ty::Headers => match field {
+                "get" => Ty::Fn {
+                    params: vec![Ty::String],
+                    ret: Box::new(Ty::Option(Box::new(Ty::String))),
+                    is_async: false,
+                },
+                "has" => Ty::Fn {
+                    params: vec![Ty::String],
+                    ret: Box::new(Ty::Bool),
+                    is_async: false,
+                },
+                "set" => Ty::Fn {
+                    params: vec![Ty::String, Ty::String],
+                    ret: Box::new(Ty::Unit),
+                    is_async: false,
+                },
+                _ => self.emit_unknown_member(recv_ty, field, span),
+            },
+            Ty::Response => match field {
+                "statusCode" => Ty::Int,
+                "body" => Ty::String,
+                "status" => Ty::Fn {
+                    params: vec![Ty::Int],
+                    ret: Box::new(Ty::Response),
+                    is_async: false,
+                },
+                "json" | "text" => Ty::Fn {
+                    params: vec![Ty::Unknown],
+                    ret: Box::new(Ty::Response),
+                    is_async: false,
+                },
+                "header" => Ty::Fn {
+                    params: vec![Ty::String, Ty::String],
+                    ret: Box::new(Ty::Response),
+                    is_async: false,
+                },
+                _ => self.emit_unknown_member(recv_ty, field, span),
+            },
+            Ty::Database => match field {
+                "query" | "execute" => Ty::Fn {
+                    params: vec![Ty::String],
+                    ret: Box::new(Ty::Result(Box::new(Ty::Int), Box::new(Ty::String))),
+                    is_async: false,
+                },
+                "findUnique" => Ty::Fn {
+                    params: vec![Ty::String, Ty::String],
+                    ret: Box::new(Ty::Option(Box::new(Ty::Unknown))),
+                    is_async: false,
+                },
+                "isConnected" => Ty::Fn {
+                    params: Vec::new(),
+                    ret: Box::new(Ty::Bool),
+                    is_async: false,
+                },
+                "begin" | "commit" | "rollback" | "close" => Ty::Fn {
+                    params: Vec::new(),
+                    ret: Box::new(Ty::Bool),
+                    is_async: false,
+                },
+                _ => self.emit_unknown_member(recv_ty, field, span),
+            },
+            Ty::String => match field {
+                "len" | "length" => Ty::Fn {
+                    params: Vec::new(),
+                    ret: Box::new(Ty::Int),
+                    is_async: false,
+                },
+                "contains" | "startsWith" | "endsWith" => Ty::Fn {
+                    params: vec![Ty::String],
+                    ret: Box::new(Ty::Bool),
+                    is_async: false,
+                },
+                "trim" | "toLower" | "toUpper" => Ty::Fn {
+                    params: Vec::new(),
+                    ret: Box::new(Ty::String),
+                    is_async: false,
+                },
+                _ => self.emit_unknown_member(recv_ty, field, span),
+            },
+            Ty::Int => match field {
+                "toString" => Ty::Fn {
+                    params: Vec::new(),
+                    ret: Box::new(Ty::String),
+                    is_async: false,
+                },
                 _ => self.emit_unknown_member(recv_ty, field, span),
             },
             _ => self.emit_unknown_member(recv_ty, field, span),
@@ -1526,6 +1637,19 @@ impl<'a> TypeChecker<'a> {
                     self.emit_type_mismatch(scrut_ty, &Ty::Bool, *sp);
                 }
                 covered.insert(b.to_string());
+            }
+            Pattern::Null(sp) => {
+                if !matches!(scrut_ty, Ty::Option(_) | Ty::Unknown) {
+                    self.diagnostics.emit(
+                        Diagnostic::error(
+                            "E4001",
+                            format!("pattern `null` cannot match `{scrut_ty}`"),
+                        )
+                        .with_primary_label(*sp, "expected `Option<T>` scrutinee"),
+                    );
+                }
+                covered.insert("None".to_string());
+                covered.insert("null".to_string());
             }
             Pattern::Binding(id) => {
                 if id.name == "None" {

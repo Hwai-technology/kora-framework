@@ -1,0 +1,47 @@
+// ============================================================================
+// Orders Module: Presentation Controller
+// Dispatches Actions and Emits Standard One-Line Responses
+// ============================================================================
+
+import { Order } from "models/order_model";
+import { SecureApiResponse } from "models/response_envelope";
+import { OrderService } from "modules/orders/order_service";
+import { ApiResponse } from "middleware/api_response_factory";
+
+class OrderController {
+    service: OrderService
+    response: ApiResponse
+
+    init(service: OrderService, response: ApiResponse) {
+        this.service = service
+        this.response = response
+    }
+
+    fn handleGet(id: Int) -> SecureApiResponse {
+        let orderOpt = this.service.getOrder(id)
+        let res = match orderOpt {
+            Some(o) => this.response.ok("Order fetched successfully", 1),
+            None => this.response.notFound("Order not found in database"),
+        }
+        return res
+    }
+
+    fn handleCreate(userId: Int, itemsCount: Int, amount: Int) -> SecureApiResponse {
+        if userId <= 0 {
+            return this.response.badRequest("Invalid customer ID")
+        }
+        let orderRes = this.service.placeOrder(userId, itemsCount, amount)
+        return this.response.created("Order placed successfully with applied discounts", 1)
+    }
+
+    fn handleCancel(id: Int) -> SecureApiResponse {
+        let cancelRes = this.service.cancelOrder(id)
+        return this.response.ok("Order cancelled successfully", 1)
+    }
+
+    fn destroy() -> Bool {
+        let d1 = this.service.destroy()
+        let d2 = this.response.destroy()
+        return true
+    }
+}

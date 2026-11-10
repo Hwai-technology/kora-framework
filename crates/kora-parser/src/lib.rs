@@ -2,10 +2,10 @@
 //! Supports Phase 1 Foundation + Phase 5 Language Features (module, import, pub, Generics, extend, await).
 
 use kora_ast::{
-    BinaryOp, Block, ClassDecl, ClosureBody, ClosureParam, ElseBranch, EnumDecl, EnumVariant, Expr,
+    Attribute, BinaryOp, Block, ClassDecl, ClosureBody, ClosureParam, ElseBranch, EnumDecl, EnumVariant, Expr,
     ExtendDecl, FieldDecl, FieldInit, FnDecl, FnSig, Ident, ImportDecl, InitDecl, InterfaceDecl,
     Item, MatchArm, ModelDecl, Module, ModulePathDecl, Param, Pattern, Stmt, StructDecl, TypeExpr,
-    UnaryOp,
+    UnaryOp, Visibility,
 };
 use kora_diagnostics::{Diagnostic, DiagnosticBag};
 use kora_lexer::{Token, TokenKind, tokenize};
@@ -70,7 +70,17 @@ impl<'a> Parser<'a> {
                 let imp = self.parse_import_decl()?;
                 Some(Item::Import(imp))
             }
-            TokenKind::Struct => self.parse_struct_decl(is_pub).map(Item::Struct),
+            TokenKind::Struct => {
+                let kw = self.peek().clone();
+                self.diagnostics.emit(
+                    Diagnostic::error(
+                        "E2003",
+                        "`struct` has been removed from Kora. Use `model` for data schemas/DTOs, or `class` for services/logic.",
+                    )
+                    .with_primary_label(kw.span, "`struct` is forbidden; use `model` or `class`"),
+                );
+                self.parse_struct_decl(is_pub).map(Item::Struct)
+            }
             TokenKind::Model => self.parse_model_decl(is_pub).map(Item::Model),
             TokenKind::Interface => self.parse_interface_decl(is_pub).map(Item::Interface),
             TokenKind::Class => self.parse_class_decl(is_pub).map(Item::Class),
@@ -112,12 +122,73 @@ impl<'a> Parser<'a> {
 
     fn parse_import_decl(&mut self) -> Option<ImportDecl> {
         let kw = self.expect(&TokenKind::Import, "expected `import`")?;
-        let segments = self.parse_path_segments()?;
-        let end_span = segments.last().map(|s| s.span).unwrap_or(kw.span);
+        let mut symbols = Vec::new();
+        let mut path_str: Option<String> = None;
+        let mut segments = Vec::new();
+        let end_span;
+
+        if self.consume(&TokenKind::LBrace) {
+            // import { A, B, C } from ...
+            while !self.check(&TokenKind::RBrace) && !self.is_at_end() {
+                symbols.push(self.expect_ident("expected imported symbol name")?);
+                if !self.consume(&TokenKind::Comma) {
+                    break;
+                }
+            }
+            self.expect(&TokenKind::RBrace, "expected `}` to close import list")?;
+            self.expect(&TokenKind::From, "expected `from` after import symbol list")?;
+
+            if let TokenKind::StringLit(s) = &self.peek().kind {
+                let s_clone = s.clone();
+                let tok = self.advance();
+                end_span = tok.span;
+                path_str = Some(s_clone);
+            } else {
+                segments = self.parse_path_segments()?;
+                end_span = segments.last().map(|s| s.span).unwrap_or(kw.span);
+            }
+        } else if let TokenKind::StringLit(s) = &self.peek().kind {
+            // import "path/to/file"
+            let s_clone = s.clone();
+            let tok = self.advance();
+            end_span = tok.span;
+            path_str = Some(s_clone);
+        } else if matches!(self.peek().kind, TokenKind::Ident(_)) {
+            let first_ident = self.expect_ident("expected identifier")?;
+            if self.consume(&TokenKind::From) {
+                // import A from "path"
+                symbols.push(first_ident);
+                if let TokenKind::StringLit(s) = &self.peek().kind {
+                    let s_clone = s.clone();
+                    let tok = self.advance();
+                    end_span = tok.span;
+                    path_str = Some(s_clone);
+                } else {
+                    segments = self.parse_path_segments()?;
+                    end_span = segments.last().map(|s| s.span).unwrap_or(kw.span);
+                }
+            } else {
+                // import path.to.module
+                segments.push(first_ident);
+                while self.consume(&TokenKind::Dot) {
+                    segments.push(self.expect_ident("expected path segment after `.`")?);
+                }
+                end_span = segments.last().map(|s| s.span).unwrap_or(kw.span);
+            }
+        } else {
+            self.diagnostics.emit(
+                Diagnostic::error("E2001", "expected module path or `{ symbols }` after `import`")
+                    .with_primary_label(kw.span, "invalid import syntax"),
+            );
+            return None;
+        }
+
         let _ = self.consume(&TokenKind::Semicolon);
         Some(ImportDecl {
-            span: kw.span.merge(end_span),
+            symbols,
+            path_str,
             segments,
+            span: kw.span.merge(end_span),
         })
     }
 
@@ -177,16 +248,59 @@ impl<'a> Parser<'a> {
         })
     }
 
+    fn parse_attributes_opt(&mut self) -> Vec<Attribute> {
+        let mut attrs = Vec::new();
+        while self.consume(&TokenKind::At) {
+            if let Some(ident) = self.expect_ident("expected attribute name after `@`") {
+                let mut args = Vec::new();
+                let mut end_span = ident.span;
+                if self.consume(&TokenKind::LParen) {
+                    while !self.check(&TokenKind::RParen) && !self.is_at_end() {
+                        if let Some(expr) = self.parse_expr() {
+                            args.push(expr);
+                        }
+                        if !self.consume(&TokenKind::Comma) {
+                            break;
+                        }
+                    }
+                    if let Some(r) = self.expect(&TokenKind::RParen, "expected `)` after attribute arguments") {
+                        end_span = r.span;
+                    }
+                }
+                attrs.push(Attribute {
+                    name: ident.clone(),
+                    args,
+                    span: ident.span.merge(end_span),
+                });
+            }
+        }
+        attrs
+    }
+
     fn parse_field_block(&mut self) -> Option<(Span, Vec<FieldDecl>, Span)> {
         let open = self.expect(&TokenKind::LBrace, "expected `{` to open field body")?;
         let mut fields = Vec::new();
         while !self.check(&TokenKind::RBrace) && !self.is_at_end() {
+            let attributes = self.parse_attributes_opt();
+            let mut visibility = Visibility::Public;
+            if self.consume(&TokenKind::Private) {
+                visibility = Visibility::Private;
+            } else if self.consume(&TokenKind::Protected) {
+                visibility = Visibility::Protected;
+            } else {
+                let _ = self.consume(&TokenKind::Public) || self.consume(&TokenKind::Pub);
+            }
+            let is_readonly = self.consume(&TokenKind::Readonly);
+
             let fname = self.expect_ident("expected field name")?;
             self.expect(&TokenKind::Colon, "expected `:` after field name")?;
             let ty = self.parse_type_expr()?;
             let fspan = fname.span.merge(ty.span());
             let _ = self.consume(&TokenKind::Comma) || self.consume(&TokenKind::Semicolon);
             fields.push(FieldDecl {
+                visibility,
+                is_readonly,
+                attributes,
                 name: fname,
                 ty,
                 span: fspan,
@@ -239,7 +353,19 @@ impl<'a> Parser<'a> {
         let mut methods = Vec::new();
 
         while !self.check(&TokenKind::RBrace) && !self.is_at_end() {
-            let m_pub = self.consume(&TokenKind::Pub);
+            let attributes = self.parse_attributes_opt();
+            let mut visibility = Visibility::Public;
+            let mut is_pub_token = false;
+            if self.consume(&TokenKind::Private) {
+                visibility = Visibility::Private;
+            } else if self.consume(&TokenKind::Protected) {
+                visibility = Visibility::Protected;
+            } else if self.consume(&TokenKind::Public) || self.consume(&TokenKind::Pub) {
+                visibility = Visibility::Public;
+                is_pub_token = true;
+            }
+            let is_readonly = self.consume(&TokenKind::Readonly);
+
             match &self.peek().kind {
                 TokenKind::Init => {
                     let init_decl = self.parse_init_decl()?;
@@ -256,11 +382,11 @@ impl<'a> Parser<'a> {
                     }
                 }
                 TokenKind::Fn => {
-                    methods.push(self.parse_fn_decl(m_pub, false)?);
+                    methods.push(self.parse_fn_decl(is_pub_token, false)?);
                 }
                 TokenKind::Async if self.peek_n(1).kind == TokenKind::Fn => {
                     let async_tok = self.advance();
-                    let mut m = self.parse_fn_decl(m_pub, true)?;
+                    let mut m = self.parse_fn_decl(is_pub_token, true)?;
                     m.sig.span = async_tok.span.merge(m.sig.span);
                     m.span = async_tok.span.merge(m.span);
                     methods.push(m);
@@ -272,6 +398,9 @@ impl<'a> Parser<'a> {
                     let fspan = fname.span.merge(ty.span());
                     let _ = self.consume(&TokenKind::Comma) || self.consume(&TokenKind::Semicolon);
                     fields.push(FieldDecl {
+                        visibility,
+                        is_readonly,
+                        attributes,
                         name: fname,
                         ty,
                         span: fspan,
@@ -292,6 +421,59 @@ impl<'a> Parser<'a> {
                 }
             }
         }
+
+        // Auto-constructor parameter property promotion:
+        if let Some(init_decl) = &init {
+            for param in &init_decl.params {
+                if !fields.iter().any(|f| f.name.name == param.name.name) {
+                    fields.push(FieldDecl {
+                        visibility: Visibility::Public,
+                        is_readonly: false,
+                        attributes: Vec::new(),
+                        name: param.name.clone(),
+                        ty: param.ty.clone(),
+                        span: param.span,
+                    });
+                }
+            }
+        }
+
+        // Auto-constructor synthesis if fields are declared but init is omitted:
+        let init = if init.is_none() && !fields.is_empty() {
+            let params = fields
+                .iter()
+                .map(|f| Param {
+                    name: f.name.clone(),
+                    ty: f.ty.clone(),
+                    span: f.span,
+                })
+                .collect();
+            let mut stmts = Vec::new();
+            for f in &fields {
+                stmts.push(Stmt::Expr {
+                    expr: Expr::Assign {
+                        target: Box::new(Expr::FieldAccess {
+                            receiver: Box::new(Expr::This { span: f.span }),
+                            field: f.name.clone(),
+                            span: f.span,
+                        }),
+                        value: Box::new(Expr::Ident(f.name.clone())),
+                        span: f.span,
+                    },
+                    span: f.span,
+                });
+            }
+            Some(InitDecl {
+                params,
+                body: Block {
+                    stmts,
+                    span: kw.span,
+                },
+                span: kw.span,
+            })
+        } else {
+            init
+        };
 
         let close = self.expect(&TokenKind::RBrace, "expected `}` to close class body")?;
         Some(ClassDecl {
@@ -413,6 +595,11 @@ impl<'a> Parser<'a> {
     fn parse_param_list(&mut self) -> Option<Vec<Param>> {
         let mut params = Vec::new();
         while !self.check(&TokenKind::RParen) && !self.is_at_end() {
+            let _ = self.consume(&TokenKind::Pub)
+                || self.consume(&TokenKind::Public)
+                || self.consume(&TokenKind::Private)
+                || self.consume(&TokenKind::Protected);
+            let _ = self.consume(&TokenKind::Readonly);
             let pname = self.expect_ident("expected parameter name")?;
             self.expect(&TokenKind::Colon, "expected `:` after parameter name")?;
             let ty = self.parse_type_expr()?;
@@ -448,6 +635,18 @@ impl<'a> Parser<'a> {
                 ret: Box::new(ret),
                 span,
             });
+        }
+
+        if self.check(&TokenKind::Undefined) {
+            let tok = self.advance();
+            self.diagnostics.emit(
+                Diagnostic::error(
+                    "E2005",
+                    "`undefined` is not permitted in Kora; use `Option<T>` or `null` exclusively.",
+                )
+                .with_primary_label(tok.span, "`undefined` is forbidden; use `null`"),
+            );
+            return None;
         }
 
         let name = self.expect_ident("expected type name")?;
@@ -761,6 +960,21 @@ impl<'a> Parser<'a> {
                     span: tok.span,
                 })
             }
+            TokenKind::Null => {
+                self.advance();
+                Some(Expr::Null { span: tok.span })
+            }
+            TokenKind::Undefined => {
+                let tok = self.advance();
+                self.diagnostics.emit(
+                    Diagnostic::error(
+                        "E2005",
+                        "`undefined` is not permitted in Kora; use `null` exclusively to represent absence of value.",
+                    )
+                    .with_primary_label(tok.span, "`undefined` is forbidden; use `null`"),
+                );
+                Some(Expr::Null { span: tok.span })
+            }
             TokenKind::This => {
                 self.advance();
                 Some(Expr::This { span: tok.span })
@@ -948,6 +1162,21 @@ impl<'a> Parser<'a> {
             TokenKind::False => {
                 self.advance();
                 Some(Pattern::BoolLit(false, tok.span))
+            }
+            TokenKind::Null => {
+                self.advance();
+                Some(Pattern::Null(tok.span))
+            }
+            TokenKind::Undefined => {
+                let tok = self.advance();
+                self.diagnostics.emit(
+                    Diagnostic::error(
+                        "E2005",
+                        "`undefined` is not permitted in Kora; use `null` exclusively to represent absence of value.",
+                    )
+                    .with_primary_label(tok.span, "`undefined` is forbidden; use `null`"),
+                );
+                Some(Pattern::Null(tok.span))
             }
             TokenKind::Ident(first_name) => {
                 self.advance();
@@ -1224,7 +1453,7 @@ get("/users/{id}", (id: Int, svc: UserService) => {
 module core.users
 import core.db
 
-pub struct Page<T> {
+pub model Page<T> {
     items: List<T>
 }
 
@@ -1247,5 +1476,97 @@ async fn fetch() -> Int {
             bag.items()
         );
         assert_eq!(module.items.len(), 5);
+    }
+
+    #[test]
+    fn parses_import_from_and_destructuring() {
+        let src = r#"
+import { User, HttpStatus } from "models/user_model";
+import OrderService from "services/order_service";
+import "middleware/cors";
+"#;
+        let mut bag = DiagnosticBag::new();
+        let module = parse_module(FileId(0), src, &mut bag);
+        assert!(!bag.has_errors(), "unexpected parse errors: {:?}", bag.items());
+        assert_eq!(module.items.len(), 3);
+        if let Item::Import(imp) = &module.items[0] {
+            assert_eq!(imp.symbols.len(), 2);
+            assert_eq!(imp.symbols[0].name, "User");
+            assert_eq!(imp.symbols[1].name, "HttpStatus");
+            assert_eq!(imp.path_str.as_deref(), Some("models/user_model"));
+        } else {
+            panic!("expected Import");
+        }
+    }
+
+    #[test]
+    fn parses_visibility_attributes_and_auto_constructor() {
+        let src = r#"
+model Account {
+    @unique
+    @required
+    id: Int
+
+    @unique
+    @email
+    email: String
+
+    @min(0)
+    balance: Int
+}
+
+class AuthService {
+    public repo: String
+    private readonly secret: String
+    protected counter: Int
+
+    public fn verify() -> Bool {
+        return true
+    }
+}
+
+class AutoService {
+    init(public pool: String, private token: String) {
+    }
+}
+"#;
+        let mut bag = DiagnosticBag::new();
+        let module = parse_module(FileId(0), src, &mut bag);
+        assert!(!bag.has_errors(), "unexpected parse errors: {:?}", bag.items());
+        assert_eq!(module.items.len(), 3);
+
+        // Check Account attributes
+        if let Item::Model(m) = &module.items[0] {
+            assert_eq!(m.fields[0].attributes.len(), 2);
+            assert_eq!(m.fields[0].attributes[0].name.name, "unique");
+            assert_eq!(m.fields[0].attributes[1].name.name, "required");
+            assert_eq!(m.fields[1].attributes.len(), 2);
+            assert_eq!(m.fields[1].attributes[1].name.name, "email");
+            assert_eq!(m.fields[2].attributes.len(), 1);
+            assert_eq!(m.fields[2].attributes[0].name.name, "min");
+        } else {
+            panic!("expected Model");
+        }
+
+        // Check AuthService visibility and auto-constructor synthesis
+        if let Item::Class(c) = &module.items[1] {
+            assert_eq!(c.fields[0].visibility, Visibility::Public);
+            assert_eq!(c.fields[1].visibility, Visibility::Private);
+            assert!(c.fields[1].is_readonly);
+            assert_eq!(c.fields[2].visibility, Visibility::Protected);
+            assert!(c.init.is_some(), "auto-constructor should be synthesized");
+            assert_eq!(c.init.as_ref().unwrap().params.len(), 3);
+        } else {
+            panic!("expected Class");
+        }
+
+        // Check AutoService parameter property promotion
+        if let Item::Class(c) = &module.items[2] {
+            assert_eq!(c.fields.len(), 2, "params in init should be promoted to fields");
+            assert_eq!(c.fields[0].name.name, "pool");
+            assert_eq!(c.fields[1].name.name, "token");
+        } else {
+            panic!("expected Class");
+        }
     }
 }

@@ -1,0 +1,37 @@
+name: PR Validation
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: read
+  contents: read
+
+jobs:
+  validate-metadata:
+    name: Validate PR Conventions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate PR Title Format
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+          REGEX="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-zA-Z0-9_-]+\))?: .+$"
+          if [[ ! "$TITLE" =~ $REGEX ]]; then
+            echo "::error::PR title '$TITLE' does not match conventional commit pattern."
+            echo "Expected format: '<type>(<scope>): <summary>' (e.g., 'feat(parser): add null literal')"
+            exit 1
+          fi
+          echo "PR title is valid: $TITLE"
+
+      - name: Verify Branch Name
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          echo "Inspecting branch: $BRANCH"
+          if [[ "$BRANCH" == "main" || "$BRANCH" == "master" ]]; then
+            echo "::warning::Direct PR from main/master is discouraged. Use a feature branch."
+          fi
+

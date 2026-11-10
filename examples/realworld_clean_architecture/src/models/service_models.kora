@@ -1,0 +1,57 @@
+// ============================================================================
+// Enterprise Service Domain Models & DTOs
+// Dedicated Pure Architectural Models for Shared Enterprise Services
+// ============================================================================
+
+model EmailMessage {
+    recipientEmail: String
+    subject: String
+    htmlBody: String
+}
+
+model SmsMessage {
+    recipientPhoneNumber: String
+    messageBody: String
+}
+
+model JwtClaims {
+    userId: Int
+    role: String
+    expiresAtEpoch: Int
+}
+
+model StoredFileMetadata {
+    fileKey: String
+    fileName: String
+    contentType: String
+    sizeBytes: Int
+    publicUrl: String
+}
+
+model SessionRecord {
+    sessionId: String
+    userId: Int
+    createdAtEpoch: Int
+    expiresAtEpoch: Int
+    isActive: Bool
+}
+
+model ValidationError {
+    field: String
+    rule: String
+    message: String
+}
+
+model ValidationResult {
+    isValid: Bool
+    errorCount: Int
+    errorMessage: String
+}
+
+model R2BucketConfig {
+    accountId: String
+    bucketName: String
+    accessKeyId: String
+    endpointUrl: String
+}
+

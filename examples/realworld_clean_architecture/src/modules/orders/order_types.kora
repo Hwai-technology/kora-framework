@@ -1,0 +1,18 @@
+// ============================================================================
+// Orders Module: DTOs & Command Inputs
+// ============================================================================
+
+model PlaceOrderCommand {
+    userId: Int
+    productId: Int
+    quantity: Int
+    unitPrice: Int
+}
+
+model OrderSummaryDto {
+    orderId: Int
+    orderNumber: String
+    totalAmount: Int
+    status: String
+}
+

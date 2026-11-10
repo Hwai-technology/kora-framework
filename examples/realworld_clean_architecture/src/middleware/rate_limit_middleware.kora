@@ -1,0 +1,35 @@
+// ============================================================================
+// Rate Limiting Protection Middleware
+// ============================================================================
+
+class RateLimiterService {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn checkLimit(clientIp: String, currentUsage: Int) -> Result<Bool, String> {
+        if clientIp == "" {
+            return Err("Unable to resolve client IP address")
+        }
+        if currentUsage >= 120 {
+            return Err("HTTP 429: Rate limit exceeded. Maximum 120 requests per minute.")
+        }
+        let q = this.db.query("SELECT COUNT(*) FROM rate_limits WHERE ip = ?")
+        return match q {
+            Ok(hits) => {
+                if (currentUsage + hits) >= 120 {
+                    return Err("HTTP 429: Rate limit threshold reached for IP: " + clientIp)
+                }
+                return Ok(true)
+            },
+            Err(err) => Err("Database rate limiter query failed: " + err),
+        }
+    }
+
+    fn destroy() -> Bool {
+        return this.db.close()
+    }
+}
+

@@ -51,12 +51,32 @@ pub struct ModulePathDecl {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ImportDecl {
+    pub symbols: Vec<Ident>,
+    pub path_str: Option<String>,
     pub segments: Vec<Ident>,
+    pub span: Span,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Visibility {
+    #[default]
+    Public,
+    Private,
+    Protected,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Attribute {
+    pub name: Ident,
+    pub args: Vec<Expr>,
     pub span: Span,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct FieldDecl {
+    pub visibility: Visibility,
+    pub is_readonly: bool,
+    pub attributes: Vec<Attribute>,
     pub name: Ident,
     pub ty: TypeExpr,
     pub span: Span,
@@ -310,6 +330,7 @@ pub enum Pattern {
     IntLit(i64, Span),
     StringLit(String, Span),
     BoolLit(bool, Span),
+    Null(Span),
     Binding(Ident),
     Variant {
         enum_name: Option<Ident>,
@@ -325,7 +346,8 @@ impl Pattern {
             Self::Wildcard(s)
             | Self::IntLit(_, s)
             | Self::StringLit(_, s)
-            | Self::BoolLit(_, s) => *s,
+            | Self::BoolLit(_, s)
+            | Self::Null(s) => *s,
             Self::Binding(id) => id.span,
             Self::Variant { span, .. } => *span,
         }
@@ -348,6 +370,9 @@ pub enum Expr {
     },
     BoolLit {
         value: bool,
+        span: Span,
+    },
+    Null {
         span: Span,
     },
     This {
@@ -418,6 +443,7 @@ impl Expr {
             | Self::FloatLit { span, .. }
             | Self::StringLit { span, .. }
             | Self::BoolLit { span, .. }
+            | Self::Null { span }
             | Self::This { span }
             | Self::Await { span, .. }
             | Self::Unary { span, .. }

@@ -1,0 +1,32 @@
+name: Auto Merge
+
+on:
+  pull_request_target:
+    types: [opened, labeled, synchronize]
+  check_suite:
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    name: Enable Auto-Merge for Pull Requests
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]'
+    steps:
+      - name: Enable GitHub Native Auto-Merge
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          if [ -z "$PR_NUMBER" ]; then
+            echo "No PR number in event payload, skipping."
+            exit 0
+          fi
+          echo "Attempting to enable auto-merge for PR #$PR_NUMBER"
+          gh pr merge "$PR_NUMBER" --auto --squash --repo "${{ github.repository }}" || {
+            echo "Auto-merge could not be automatically set (check repository auto-merge settings)."
+          }
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

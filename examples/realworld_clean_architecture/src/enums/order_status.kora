@@ -1,0 +1,19 @@
+// ============================================================================
+// Order & Payment Lifecycle Status Enums
+// ============================================================================
+
+enum OrderStatus {
+    Pending,
+    Paid,
+    Shipped,
+    Delivered,
+    Cancelled
+}
+
+enum PaymentStatus {
+    Unpaid,
+    Authorized,
+    Captured,
+    Refunded
+}
+

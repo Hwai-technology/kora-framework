@@ -1,27 +1,39 @@
 # Contributing to Kora
 
-Thank you for contributing to **Kora** — *Write Less. Build Faster. Run Smarter.*
+Thank you for helping build Kora into a world-class backend programming language.
 
-## Golden Rule of Language Evolution
+## Getting Started
 
-No language construct or syntax change may be merged unless **all** layers are updated atomically in the same change:
-
-1. **Formal Grammar**: `docs/grammar.ebnf`
-2. **AST & Span Coverage**: `crates/kora-ast`
-3. **Lexer & Parser**: `crates/kora-lexer` and `crates/kora-parser`
-4. **HIR & Name Resolution**: `crates/kora-hir`
-5. **Type System & Inference**: `crates/kora-ty`
-6. **Code Generation (Phase 2+)**: `crates/kora-codegen`
-7. **Automated Tests**: Positive, negative (diagnostic), and edge-case tests
-8. **Documentation**: `docs/language-tour.md` and `CHANGELOG.md`
+1. Ensure you have Rust stable installed (`rustup update stable`).
+2. Fork the repository and create your feature branch:
+   ```bash
+   git checkout -b feat/your-feature-name
+   ```
 
 ## Pre-Commit Verification Checklist
 
-Every pull request must pass cleanly with zero warnings:
-
+Before submitting a Pull Request, run:
 ```bash
-cargo fmt --all -- --check
+# 1. Format code
+cargo fmt --all
+
+# 2. Run Clippy
 cargo clippy --workspace --all-targets -- -D warnings
+
+# 3. Run workspace test suite
 cargo test --workspace
+
+# 4. Check all Kora real-world examples
+for f in $(find examples/realworld_clean_architecture/src -name "*.kora"); do
+  ./target/debug/kora check "$f"
+done
 ```
 
+## Architectural Guidelines
+- Preserve the Struct-Free model: Use `model` for data schemas and `class` for services.
+- Never use `undefined`: Use `null` exclusively for optional values.
+- Adhere to directory purity: Never define inline enums or models inside services or controllers.
+- Use `kebab-case` for public API contract fields.
+
+## Automatic Contributor Recognition
+Whenever your pull request is merged into `main`, our GitHub Actions automation dynamically updates the Contributors gallery in `README.md` with your profile and avatar.

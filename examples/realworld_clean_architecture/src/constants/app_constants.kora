@@ -1,0 +1,40 @@
+// ============================================================================
+// System Constants & Configuration Limits
+// ============================================================================
+
+model AppLimits {
+    maxRateLimitRpm: Int
+    maxBurstCapacity: Int
+    compressionThresholdBytes: Int
+    defaultPageSize: Int
+    maxPageSize: Int
+}
+
+model SecurityConstants {
+    headerAuthorization: String
+    headerNonce: String
+    headerTraceId: String
+    tokenExpirySeconds: Int
+}
+
+class SystemConfig {
+    fn getLimits() -> AppLimits {
+        return AppLimits {
+            maxRateLimitRpm: 120,
+            maxBurstCapacity: 30,
+            compressionThresholdBytes: 1024,
+            defaultPageSize: 10,
+            maxPageSize: 100,
+        }
+    }
+
+    fn getSecurity() -> SecurityConstants {
+        return SecurityConstants {
+            headerAuthorization: "Authorization",
+            headerNonce: "X-Nonce",
+            headerTraceId: "X-Trace-Id",
+            tokenExpirySeconds: 86400,
+        }
+    }
+}
+

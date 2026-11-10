@@ -1,0 +1,24 @@
+// ============================================================================
+// HTTP Compression Middleware (Gzip Streamer)
+// ============================================================================
+
+class CompressionService {
+    fn shouldCompress(acceptEncoding: String, bodySize: Int) -> Bool {
+        if bodySize < 1024 {
+            return false
+        }
+        if acceptEncoding == "gzip" {
+            return true
+        }
+        return false
+    }
+
+    fn getEncodingHeader() -> String {
+        return "Content-Encoding: gzip"
+    }
+
+    fn destroy() -> Bool {
+        return true
+    }
+}
+

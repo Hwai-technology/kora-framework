@@ -17,7 +17,12 @@ pub enum TokenKind {
     // Keywords (Phase 1 + Phase 5)
     Module,
     Import,
+    From,
     Pub,
+    Public,
+    Private,
+    Protected,
+    Readonly,
     Extend,
     Await,
     Struct,
@@ -38,6 +43,8 @@ pub enum TokenKind {
     Match,
     True,
     False,
+    Null,
+    Undefined,
     This,
 
     // Punctuation & Delimiters
@@ -52,6 +59,7 @@ pub enum TokenKind {
     Comma,
     Dot,
     Underscore,
+    At,        // @
     ThinArrow, // ->
     FatArrow,  // =>
 
@@ -84,7 +92,13 @@ impl TokenKind {
             Self::StringLit(_) => "string literal",
             Self::Module => "`module`",
             Self::Import => "`import`",
+            Self::From => "`from`",
             Self::Pub => "`pub`",
+            Self::Public => "`public`",
+            Self::Private => "`private`",
+            Self::Protected => "`protected`",
+            Self::Readonly => "`readonly`",
+            Self::At => "`@`",
             Self::Extend => "`extend`",
             Self::Await => "`await`",
             Self::Struct => "`struct`",
@@ -105,6 +119,8 @@ impl TokenKind {
             Self::Match => "`match`",
             Self::True => "`true`",
             Self::False => "`false`",
+            Self::Null => "`null`",
+            Self::Undefined => "`undefined`",
             Self::This => "`this`",
             Self::LParen => "`(`",
             Self::RParen => "`)`",
@@ -282,6 +298,7 @@ impl<'a> Lexer<'a> {
             ';' => Some(TokenKind::Semicolon),
             ',' => Some(TokenKind::Comma),
             '.' => Some(TokenKind::Dot),
+            '@' => Some(TokenKind::At),
             '+' => Some(TokenKind::Plus),
             '-' => {
                 if self.consume_byte(b'>') {
@@ -375,7 +392,12 @@ impl<'a> Lexer<'a> {
             "_" => TokenKind::Underscore,
             "module" => TokenKind::Module,
             "import" => TokenKind::Import,
+            "from" => TokenKind::From,
             "pub" => TokenKind::Pub,
+            "public" => TokenKind::Public,
+            "private" => TokenKind::Private,
+            "protected" => TokenKind::Protected,
+            "readonly" => TokenKind::Readonly,
             "extend" => TokenKind::Extend,
             "await" => TokenKind::Await,
             "struct" => TokenKind::Struct,
@@ -396,6 +418,8 @@ impl<'a> Lexer<'a> {
             "match" => TokenKind::Match,
             "true" => TokenKind::True,
             "false" => TokenKind::False,
+            "null" => TokenKind::Null,
+            "undefined" => TokenKind::Undefined,
             "this" => TokenKind::This,
             _ => TokenKind::Ident(text.to_string()),
         }
