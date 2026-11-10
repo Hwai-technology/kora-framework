@@ -3,7 +3,11 @@
 // Decorated with Schema Indexing, Uniqueness & DTO Constraints
 // ============================================================================
 
+@entity
+@table("orders")
 model Order {
+    @primary
+    @autoIncrement
     @unique
     @required
     id: Int
@@ -28,7 +32,11 @@ model Order {
     paymentStatus: String
 }
 
+@entity
+@table("order_items")
 model OrderItem {
+    @primary
+    @autoIncrement
     @unique
     @required
     id: Int

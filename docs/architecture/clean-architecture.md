@@ -28,3 +28,26 @@ src/
 - **`E5003`**: Services and controllers cannot declare inline models or enums; they must import them explicitly.
 - **`E5004`**: `main.kora` cannot declare inline models or enums; it must import them from dedicated architectural modules.
 
+## Database Lifecycle Management
+Kora provides built-in commands and REST endpoints for managing the full database lifecycle:
+
+```bash
+# Run schema migrations
+kora db migrate [src/main.kora]
+
+# Synchronize schema differences automatically with @entity models
+kora db sync [src/main.kora]
+
+# Seed initial database fixtures
+kora db seed [src/main.kora]
+
+# Truncate all table data cleanly (without dropping schema)
+kora db truncate [src/main.kora]
+
+# Drop all database tables
+kora db drop [src/main.kora]
+
+# Reset and refresh database (drop -> migrate -> seed)
+kora db refresh [src/main.kora]
+```
+

@@ -200,7 +200,8 @@ A huge thank you to everyone helping build Kora into the next-generation backend
 
 <!-- CONTRIBUTORS:START -->
 <!-- Automatically maintained by GitHub Actions -->
-<a href="https://github.com/ahmet"><img src="https://avatars.githubusercontent.com/u/1?v=4&s=64" width="48" height="48" alt="ahmet" title="ahmet" style="border-radius: 50%; margin: 4px;" /></a>
+<a href="https://github.com/Eng-Ahmet/Eng-Ahmet"><img src="https://avatars.githubusercontent.com/Eng-Ahmet?v=4&s=64" width="48" height="48" alt="Eng-Ahmet" title="Eng-Ahmet" style="border-radius: 50%; margin: 4px;" /></a>
+<p><a href="https://github.com/Eng-Ahmet/Eng-Ahmet"><strong>Eng-Ahmet</strong></a></p>
 <!-- CONTRIBUTORS:END -->
 
 ---

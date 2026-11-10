@@ -94,6 +94,7 @@ pub struct StructDecl {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ModelDecl {
     pub is_pub: bool,
+    pub attributes: Vec<Attribute>,
     pub name: Ident,
     pub type_params: Vec<Ident>,
     pub fields: Vec<FieldDecl>,
@@ -137,6 +138,7 @@ pub struct InitDecl {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ClassDecl {
     pub is_pub: bool,
+    pub attributes: Vec<Attribute>,
     pub name: Ident,
     pub type_params: Vec<Ident>,
     pub implements: Vec<Ident>,

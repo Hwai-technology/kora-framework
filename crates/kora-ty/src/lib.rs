@@ -142,6 +142,8 @@ pub struct InferredBinding {
 pub struct TypeCheckOutput {
     pub structs: HashMap<String, HashMap<String, Ty>>,
     pub models: HashMap<String, HashMap<String, Ty>>,
+    pub entity_models: HashSet<String>,
+    pub model_tables: HashMap<String, String>,
     pub interfaces: HashMap<String, HashMap<String, FunctionTypeInfo>>,
     pub classes: HashMap<String, ClassTypeInfo>,
     pub enums: HashMap<String, Vec<(String, Vec<Ty>)>>,
@@ -159,6 +161,8 @@ pub fn check_module(hir: &HirModule, diagnostics: &mut DiagnosticBag) -> TypeChe
     TypeCheckOutput {
         structs: checker.structs,
         models: checker.models,
+        entity_models: checker.entity_models,
+        model_tables: checker.model_tables,
         interfaces: checker.interfaces,
         classes: checker.classes,
         enums: checker.enums,
@@ -170,6 +174,8 @@ pub fn check_module(hir: &HirModule, diagnostics: &mut DiagnosticBag) -> TypeChe
 struct TypeChecker<'a> {
     structs: HashMap<String, HashMap<String, Ty>>,
     models: HashMap<String, HashMap<String, Ty>>,
+    entity_models: HashSet<String>,
+    model_tables: HashMap<String, String>,
     interfaces: HashMap<String, HashMap<String, FunctionTypeInfo>>,
     classes: HashMap<String, ClassTypeInfo>,
     enums: HashMap<String, Vec<(String, Vec<Ty>)>>,
@@ -187,6 +193,8 @@ impl<'a> TypeChecker<'a> {
         Self {
             structs: HashMap::new(),
             models: HashMap::new(),
+            entity_models: HashSet::new(),
+            model_tables: HashMap::new(),
             interfaces: HashMap::new(),
             classes: HashMap::new(),
             enums: HashMap::new(),
@@ -242,6 +250,27 @@ impl<'a> TypeChecker<'a> {
                 Item::Model(m) => {
                     let map = self.lower_fields(&m.fields);
                     self.models.insert(m.name.name.clone(), map);
+
+                    let has_entity_attr = m.attributes.iter().any(|a| a.name.name == "entity" || a.name.name == "table");
+                    let has_field_primary = m.fields.iter().any(|f| f.attributes.iter().any(|a| a.name.name == "primary" || a.name.name == "autoIncrement"));
+                    let is_entity_name = m.name.name.ends_with("Entity");
+
+                    if has_entity_attr || has_field_primary || is_entity_name {
+                        self.entity_models.insert(m.name.name.clone());
+                        let mut custom_table = None;
+                        for attr in &m.attributes {
+                            if attr.name.name == "table" {
+                                if let Some(kora_ast::Expr::StringLit { value, .. }) = attr.args.first() {
+                                    custom_table = Some(value.clone());
+                                }
+                            }
+                        }
+                        let tbl = custom_table.unwrap_or_else(|| {
+                            let base = m.name.name.trim_end_matches("Entity");
+                            format!("{}s", base.to_lowercase())
+                        });
+                        self.model_tables.insert(m.name.name.clone(), tbl);
+                    }
                 }
                 Item::Interface(iface) => {
                     let mut methods = HashMap::new();

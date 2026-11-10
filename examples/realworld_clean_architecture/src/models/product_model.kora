@@ -2,7 +2,11 @@
 // Product Domain Model & Inventory Data
 // ============================================================================
 
+@entity
+@table("products")
 model Product {
+    @primary
+    @autoIncrement
     id: Int
     sku: String
     title: String

@@ -59,7 +59,11 @@ impl<'a> Parser<'a> {
     }
 
     fn parse_item(&mut self) -> Option<Item> {
+        let mut item_attrs = self.parse_attributes_opt();
         let is_pub = self.consume(&TokenKind::Pub);
+        if item_attrs.is_empty() {
+            item_attrs = self.parse_attributes_opt();
+        }
 
         match &self.peek().kind {
             TokenKind::Module => {
@@ -81,9 +85,9 @@ impl<'a> Parser<'a> {
                 );
                 self.parse_struct_decl(is_pub).map(Item::Struct)
             }
-            TokenKind::Model => self.parse_model_decl(is_pub).map(Item::Model),
+            TokenKind::Model => self.parse_model_decl(is_pub, item_attrs).map(Item::Model),
             TokenKind::Interface => self.parse_interface_decl(is_pub).map(Item::Interface),
-            TokenKind::Class => self.parse_class_decl(is_pub).map(Item::Class),
+            TokenKind::Class => self.parse_class_decl(is_pub, item_attrs).map(Item::Class),
             TokenKind::Enum => self.parse_enum_decl(is_pub).map(Item::Enum),
             TokenKind::Extend => self.parse_extend_decl(is_pub).map(Item::Extend),
             TokenKind::Fn => self.parse_fn_decl(is_pub, false).map(Item::Fn),
@@ -95,6 +99,13 @@ impl<'a> Parser<'a> {
                 Some(Item::Fn(decl))
             }
             _ => {
+                if !item_attrs.is_empty() {
+                    self.diagnostics.emit(
+                        Diagnostic::error("E2001", "attributes are only valid on model, class, function, or field declarations")
+                            .with_primary_label(item_attrs[0].span, "unexpected attribute before statement"),
+                    );
+                    return None;
+                }
                 if is_pub {
                     self.diagnostics.emit(
                         Diagnostic::error("E2001", "`pub` modifier is only valid on declarations")
@@ -234,17 +245,23 @@ impl<'a> Parser<'a> {
         })
     }
 
-    fn parse_model_decl(&mut self, is_pub: bool) -> Option<ModelDecl> {
+    fn parse_model_decl(&mut self, is_pub: bool, attributes: Vec<Attribute>) -> Option<ModelDecl> {
         let kw = self.expect(&TokenKind::Model, "expected `model`")?;
         let name = self.expect_ident("expected model name after `model`")?;
         let type_params = self.parse_type_params_opt()?;
         let (_, fields, close_span) = self.parse_field_block()?;
+        let span = if let Some(first_attr) = attributes.first() {
+            first_attr.span.merge(close_span)
+        } else {
+            kw.span.merge(close_span)
+        };
         Some(ModelDecl {
             is_pub,
+            attributes,
             name,
             type_params,
             fields,
-            span: kw.span.merge(close_span),
+            span,
         })
     }
 
@@ -333,7 +350,7 @@ impl<'a> Parser<'a> {
         })
     }
 
-    fn parse_class_decl(&mut self, is_pub: bool) -> Option<ClassDecl> {
+    fn parse_class_decl(&mut self, is_pub: bool, attributes: Vec<Attribute>) -> Option<ClassDecl> {
         let kw = self.expect(&TokenKind::Class, "expected `class`")?;
         let name = self.expect_ident("expected class name after `class`")?;
         let type_params = self.parse_type_params_opt()?;
@@ -476,15 +493,21 @@ impl<'a> Parser<'a> {
         };
 
         let close = self.expect(&TokenKind::RBrace, "expected `}` to close class body")?;
+        let span = if let Some(first_attr) = attributes.first() {
+            first_attr.span.merge(close.span)
+        } else {
+            kw.span.merge(close.span)
+        };
         Some(ClassDecl {
             is_pub,
+            attributes,
             name,
             type_params,
             implements,
             fields,
             init,
             methods,
-            span: kw.span.merge(close.span),
+            span,
         })
     }
 

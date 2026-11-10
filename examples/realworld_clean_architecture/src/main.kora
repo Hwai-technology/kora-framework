@@ -7,6 +7,7 @@
 import { HttpStatus } from "enums/http_status";
 import { User, UserProfileDto } from "models/user_model";
 import { Order, OrderItem, CreateOrderInput } from "models/order_model";
+import { Product } from "models/product_model";
 import { SecureApiResponse, LogEntry } from "models/response_envelope";
 import { AuthSessionDto } from "modules/auth/auth_types";
 import { Logger } from "shared/services/logger_service";
@@ -50,9 +51,40 @@ class Application {
 
     fn migrateDatabase() -> SecureApiResponse {
         let mig = this.migrator.runAllMigrations()
+        let l = this.logger.info("db", "Schema migrations executed", "trace_mig_01")
+        return this.response.ok("Database schema migrations executed successfully", 4)
+    }
+
+    fn syncDatabaseSchema() -> SecureApiResponse {
+        let sync = this.migrator.syncSchemaWithEntities()
+        let l = this.logger.info("db", "Database schema synchronized with Entity models", "trace_sync_01")
+        return this.response.ok("Database schema synchronized with Entity models successfully", 5)
+    }
+
+    fn seedDatabase() -> SecureApiResponse {
         let seed = this.seeder.seedInitialData()
-        let l = this.logger.info("db", "Migration and seeding completed", "trace_mig_01")
-        return this.response.ok("Auto-migration and database seeding completed successfully", 6)
+        let l = this.logger.info("db", "Database seeded with initial enterprise records", "trace_seed_01")
+        return this.response.ok("Database seeded with initial records successfully", 4)
+    }
+
+    fn truncateDatabase() -> SecureApiResponse {
+        let trunc = this.migrator.truncateAllData()
+        let l = this.logger.warn("db", "Database tables truncated cleanly", "trace_trunc_01")
+        return this.response.ok("Database table records wiped successfully", 4)
+    }
+
+    fn dropDatabaseTables() -> SecureApiResponse {
+        let drop = this.migrator.dropAllTables()
+        let l = this.logger.warn("db", "All database tables dropped", "trace_drop_01")
+        return this.response.ok("All database tables dropped successfully", 4)
+    }
+
+    fn refreshDatabase() -> SecureApiResponse {
+        let d = this.migrator.dropAllTables()
+        let m = this.migrator.runAllMigrations()
+        let s = this.seeder.seedInitialData()
+        let l = this.logger.info("db", "Database refreshed (drop, migrate, seed)", "trace_refresh_01")
+        return this.response.ok("Database refreshed completely (drop + migrate + seed)", 12)
     }
 
     fn destroy() -> Bool {
@@ -77,9 +109,29 @@ get("/health", (server: Application) => {
     return server.health()
 })
 
-// 2. Database Auto-Migration Trigger
+// 2. Database Management & Schema Auto-Sync Endpoints
 get("/api/v1/database/migrate", (server: Application) => {
     return server.migrateDatabase()
+})
+
+post("/api/v1/database/sync", (server: Application) => {
+    return server.syncDatabaseSchema()
+})
+
+post("/api/v1/database/seed", (server: Application) => {
+    return server.seedDatabase()
+})
+
+post("/api/v1/database/truncate", (server: Application) => {
+    return server.truncateDatabase()
+})
+
+post("/api/v1/database/drop", (server: Application) => {
+    return server.dropDatabaseTables()
+})
+
+post("/api/v1/database/refresh", (server: Application) => {
+    return server.refreshDatabase()
 })
 
 // 3. Auth Routes

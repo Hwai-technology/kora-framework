@@ -3,7 +3,11 @@
 // Decorated with Schema Indexing, Uniqueness & DTO Constraints
 // ============================================================================
 
+@entity
+@table("users")
 model User {
+    @primary
+    @autoIncrement
     @unique
     @required
     id: Int

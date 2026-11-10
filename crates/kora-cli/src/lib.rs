@@ -88,7 +88,13 @@ pub fn format_type_report(types: &TypeCheckOutput) -> String {
                 .into_iter()
                 .map(|f| format!("{f}: {}", fields[f]))
                 .collect();
-            let _ = writeln!(out, "  model {name} {{ {} }}", summary.join(", "));
+            let kind = if types.entity_models.contains(name) {
+                let tbl = types.model_tables.get(name).map(|t| format!(" (table: \"{t}\")")).unwrap_or_default();
+                format!("@entity model {name}{tbl}")
+            } else {
+                format!("model {name} [DTO]")
+            };
+            let _ = writeln!(out, "  {kind} {{ {} }}", summary.join(", "));
         }
     }
 

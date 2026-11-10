@@ -17,11 +17,18 @@ var activeSessions = 0
 activeSessions = activeSessions + 1
 ```
 
-## Models (Data Entities & DTOs)
-Models represent pure data structures and API schemas. They support declarative field attributes:
+## Models: Database Entities vs. Data Transfer DTOs
+Kora strictly distinguishes between **Database Entity Models** (persisted tables) and **Data Transfer DTO Models** (API requests, responses, inputs):
+
+### Database Entity Models
+Decorated with `@entity` and `@table("table_name")` with primary keys and database column indexes:
 
 ```kora
-model Account {
+@entity
+@table("users")
+model UserEntity {
+    @primary
+    @autoIncrement
     @unique
     @required
     id: Int
@@ -32,12 +39,49 @@ model Account {
     @email
     email: String
 
+    @required
+    fullName: String
+
+    @default("customer")
+    role: String
+
     @min(0)
     balance: Int
 
     @default(true)
     isActive: Bool
 }
+```
+
+### Data Transfer DTO Models
+Used for HTTP payloads, request validations, and response envelopes without database table bindings:
+
+```kora
+model UserRegisterInput {
+    @required
+    @email
+    email: String
+
+    @required
+    fullName: String
+
+    @min(0)
+    initialBalance: Int
+}
+
+model UserProfileDto {
+    id: Int
+    email: String
+    fullName: String
+    role: String
+}
+```
+
+When running `kora types <file.kora>`, the type checker explicitly categorizes and reports:
+```text
+  [Database Entity Model] UserEntity -> table: `users` (6 field(s))
+  [Data Transfer DTO Model] UserRegisterInput (3 field(s))
+  [Data Transfer DTO Model] UserProfileDto (4 field(s))
 ```
 
 ## Classes & Auto-Constructors
