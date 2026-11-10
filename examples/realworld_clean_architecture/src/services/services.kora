@@ -1,6 +1,6 @@
 // ============================================================================
-// Service Layer: Application & Business Logic with Dependency Injection
-// Clean Architecture Core: Orchestrates Repositories & Cross-Cutting Policies
+// Service Layer: Application & Business Logic with Lifecycle Destructors
+// Emits Domain Events & Orchestrates Calculations and Data Stores
 // ============================================================================
 
 model User {
@@ -27,13 +27,15 @@ struct CreateOrderInput {
     totalAmount: Int
 }
 
+struct DomainEvent {
+    eventId: String
+    eventType: String
+    aggregateId: Int
+    payloadSummary: String
+    emittedAt: Int
+}
+
 class MySqlOrderRepository {
-    db: Database
-
-    init(db: Database) {
-        this.db = db
-    }
-
     fn findById(id: Int) -> Option<Order> {
         if id <= 0 {
             return None
@@ -65,15 +67,13 @@ class MySqlOrderRepository {
         }
         return Ok(true)
     }
+
+    fn destroy() -> Bool {
+        return true
+    }
 }
 
 class MySqlUserRepository {
-    db: Database
-
-    init(db: Database) {
-        this.db = db
-    }
-
     fn findById(id: Int) -> Option<User> {
         if id <= 0 {
             return None
@@ -87,58 +87,71 @@ class MySqlUserRepository {
             isActive: true,
         })
     }
+
+    fn destroy() -> Bool {
+        return true
+    }
 }
 
-class RateLimiterService {
-    db: Database
-
-    init(db: Database) {
-        this.db = db
+class DomainEventEmitter {
+    fn publish(eventType: String, aggregateId: Int, summary: String) -> Result<DomainEvent, String> {
+        return Ok(DomainEvent {
+            eventId: "EVT-2026-9001",
+            eventType: eventType,
+            aggregateId: aggregateId,
+            payloadSummary: summary,
+            emittedAt: 1773000000,
+        })
     }
 
-    fn checkLimit(clientIp: String, currentUsage: Int) -> Result<Bool, String> {
-        if currentUsage >= 120 {
-            return Err("Rate limit exceeded")
-        }
-        return Ok(true)
+    fn destroy() -> Bool {
+        return true
     }
 }
 
 class CheckoutService {
     orderRepo: MySqlOrderRepository
     userRepo: MySqlUserRepository
-    rateLimiter: RateLimiterService
+    events: DomainEventEmitter
 
-    init(orderRepo: MySqlOrderRepository, userRepo: MySqlUserRepository, rateLimiter: RateLimiterService) {
+    init(orderRepo: MySqlOrderRepository, userRepo: MySqlUserRepository, events: DomainEventEmitter) {
         this.orderRepo = orderRepo
         this.userRepo = userRepo
-        this.rateLimiter = rateLimiter
+        this.events = events
     }
 
-    fn processCheckout(userId: Int, itemsCount: Int, amount: Int, clientIp: String) -> Result<Order, String> {
-        // 1. Rate limit verification
-        let limitCheck = this.rateLimiter.checkLimit(clientIp, 10)
-        let orderRes = match limitCheck {
-            Ok(allowed) => {
-                if userId <= 0 {
-                    return Err("Invalid customer ID")
-                }
-                if itemsCount <= 0 {
-                    return Err("Cart must contain at least one product")
-                }
-                if amount <= 0 {
-                    return Err("Invalid checkout amount")
-                }
-                let input = CreateOrderInput {
-                    userId: userId,
-                    itemsCount: itemsCount,
-                    totalAmount: amount,
-                }
-                return this.orderRepo.createOrder(input)
-            },
-            Err(e) => Err(e),
+    fn processCheckout(userId: Int, itemsCount: Int, amount: Int) -> Result<Order, String> {
+        if userId <= 0 {
+            return Err("Invalid customer ID")
         }
-        return orderRes
+        if itemsCount <= 0 {
+            return Err("Cart must contain at least one product")
+        }
+        if amount <= 0 {
+            return Err("Invalid checkout amount")
+        }
+
+        // Apply discount for bulk orders
+        if itemsCount >= 5 {
+            let discountedAmount = (amount * 85) / 100
+            let bulkInput = CreateOrderInput {
+                userId: userId,
+                itemsCount: itemsCount,
+                totalAmount: discountedAmount,
+            }
+            let bulkOrder = this.orderRepo.createOrder(bulkInput)
+            let evt1 = this.events.publish("OrderPlacedEvent", 8801, "Bulk order placed")
+            return bulkOrder
+        }
+
+        let regularInput = CreateOrderInput {
+            userId: userId,
+            itemsCount: itemsCount,
+            totalAmount: amount,
+        }
+        let regularOrder = this.orderRepo.createOrder(regularInput)
+        let evt2 = this.events.publish("OrderPlacedEvent", 8801, "Regular order placed")
+        return regularOrder
     }
 
     fn getOrder(orderId: Int) -> Option<Order> {
@@ -147,5 +160,12 @@ class CheckoutService {
 
     fn cancelOrder(orderId: Int) -> Result<Bool, String> {
         return this.orderRepo.cancelOrder(orderId)
+    }
+
+    fn destroy() -> Bool {
+        let d1 = this.orderRepo.destroy()
+        let d2 = this.userRepo.destroy()
+        let d3 = this.events.destroy()
+        return true
     }
 }

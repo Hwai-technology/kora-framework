@@ -1,6 +1,6 @@
 // ============================================================================
-// Domain Layer: Models, Enums, DTOs & Interfaces
-// Clean Architecture Core (Pure Domain Rules - Zero External Dependencies)
+// Domain Layer: Models, Enums, Value Objects & Secure Envelopes
+// Zero-Cost Domain Invariants & Type-Safe Schema Definitions
 // ============================================================================
 
 enum UserRole {
@@ -22,6 +22,12 @@ enum PaymentStatus {
     Authorized,
     Captured,
     Refunded
+}
+
+enum ExitCodeStatus {
+    Success,
+    HandledError,
+    PanicRecovered
 }
 
 model User {
@@ -60,10 +66,38 @@ model Order {
     paymentStatus: String
 }
 
-struct OrderItemInput {
-    productId: Int
-    quantity: Int
-    unitPrice: Int
+struct PaginationMeta {
+    currentPage: Int
+    perPage: Int
+    totalItems: Int
+    totalPages: Int
+}
+
+struct SecureApiResponse {
+    success: Bool
+    statusCode: Int
+    nonce: String
+    securityToken: String
+    message: String
+    executionTimeMs: Int
+    dataCount: Int
+}
+
+struct TelemetryTrace {
+    traceId: String
+    methodName: String
+    clientIp: String
+    durationMs: Int
+    exitCode: Int
+    status: String
+}
+
+struct DomainEvent {
+    eventId: String
+    eventType: String
+    aggregateId: Int
+    payloadSummary: String
+    emittedAt: Int
 }
 
 struct CreateOrderInput {
@@ -78,13 +112,6 @@ struct UserRegisterInput {
     initialBalance: Int
 }
 
-struct ApiResponse {
-    success: Bool
-    statusCode: Int
-    message: String
-    dataCount: Int
-}
-
 interface IOrderRepository {
     fn findById(id: Int) -> Option<Order>
     fn createOrder(input: CreateOrderInput) -> Result<Order, String>
@@ -96,4 +123,3 @@ interface IUserRepository {
     fn findByEmail(email: String) -> Option<User>
     fn createUser(input: UserRegisterInput) -> Result<User, String>
 }
-

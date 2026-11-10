@@ -1,4 +1,4 @@
-# Kora Clean Architecture E-Commerce Showcase
+# Kora Clean Architecture Enterprise Showcase
 ### مرجع الهندسة المعمارية النظيفة الشامل لمنظومة لغة Kora
 
 > **"Write Less. Build Faster. Run Smarter."**  
@@ -8,298 +8,170 @@
 
 ## 📑 فهرس المحتويات | Table of Contents
 1. [نظرة عامة على المشروع (Overview)](#1-نظرة-عامة-على-المشروع-overview)
-2. [الهندسة المعمارية وتقسيم الطبقات (Clean Architecture Layers)](#2-الهندسة-المعمارية-وتقسيم-الطبقات-clean-architecture-layers)
-3. [دورة حياة الطلب من البداية للنهاية (Request Lifecycle)](#3-دورة-حياة-الطلب-من-البداية-للنهاية-request-lifecycle)
-4. [حزمة الـ Middleware والخدمات المساعدة](#4-حزمة-الـ-middleware-والخدمات-المساعدة)
-   - [Rate Limiting (تحديد معدل الطلبات)](#41-rate-limiting-تحديد-معدل-الطلبات)
-   - [CORS Policy (مشاركة الموارد عبر الأصول)](#42-cors-policy-مشاركة-الموارد-عبر-الأصول)
-   - [Compression (ضغط الحزم Gzip)](#43-compression-ضغط-الحزم-gzip)
-   - [Global Exception Handling (معالجة الأخطاء الموحدة)](#44-global-exception-handling-معالجة-الأخطاء-الموحدة)
-   - [Auth Guard & Security (حماية المسارات وحقن التوكن)](#45-auth-guard--security-حماية-المسارات-وحقن-التوكن)
-5. [حقن الاعتماديات المترجم (Compile-Time Dependency Injection)](#5-حقن-الاعتماديات-المترجم-compile-time-dependency-injection)
-6. [قاعدة البيانات والـ Migrations (MySQL 8 + Connection Pool)](#6-قاعدة-البيانات-والـ-migrations-mysql-8--connection-pool)
-7. [هيكل المجلدات (Directory Structure)](#7-هيكل-المجلدات-directory-structure)
-8. [طريقة التشغيل والاختبار (Quickstart & Commands)](#8-طريقة-التشغيل-والاختبار-quickstart--commands)
+2. [الميزات المتقدمة المدمجة تلقائياً (Built-in Innovations)](#2-الميزات-المتقدمة-المدمجة-تلقائياً-built-in-innovations)
+   - [الترحيل التلقائي ونثر البيانات (Auto-Migration & Database Seeder)](#21-الترحيل-التلقائي-ونثر-البيانات-auto-migration--database-seeder)
+   - [قاعدة البيانات الشاملة دون تكرار (Ambient Database Pool - Zero Boilerplate)](#22-قاعدة-البيانات-الشاملة-دون-تكرار-ambient-database-pool---zero-boilerplate)
+   - [الغلاف الآمن الموحد والحماية من Replay Attacks (Secure Nonce Envelope)](#23-الغلاف-الآمن-الموحد-والحماية-من-replay-attacks-secure-nonce-envelope)
+   - [تتبع الدوال وأكواد الخروج (Method Telemetry & Exit Codes Tracker)](#24-تتبع-الدوال-وأكواد-الخروج-method-telemetry--exit-codes-tracker)
+   - [دورة حياة الكائنات: الـ Constructor والـ Destructor](#25-دورة-حياة-الكائنات-الـ-constructor-والـ-destructor)
+   - [نظام أحداث النطاق (Domain Event Bus) والخصومات والتصفح التلقائي](#26-نظام-أحداث-النطاق-domain-event-bus-والخصومات-والتصفح-التلقائي)
+3. [الهندسة المعمارية وتقسيم الطبقات (Clean Architecture Layers)](#3-الهندسة-المعمارية-وتقسيم-الطبقات-clean-architecture-layers)
+4. [دورة حياة الطلب من البداية للنهاية (Request Lifecycle)](#4-دورة-حياة-الطلب-من-البداية-للنهاية-request-lifecycle)
+5. [هيكل المجلدات (Directory Structure)](#5-هيكل-المجلدات-directory-structure)
+6. [طريقة التشغيل والاختبار (Quickstart & Commands)](#6-طريقة-التشغيل-والاختبار-quickstart--commands)
 
 ---
 
 ## 1. نظرة عامة على المشروع (Overview)
 
-يقدم هذا المثال نموذجاً لـ **نظام تجارة إلكترونية ودفع (E-Commerce & Orders API)** مصمم للإنتاج، ويوضح كيف تُبنى الأنظمة المعقدة في Kora بدون تشابك الشيفرات البرمجية أو تسريب الذاكرة.
-
-### أهم مميزات المشروع:
-- **أداء أصلي (Native Performance)**: سرعة معالجة تفوق 180,000 طلب/ثانية بزمن استجابة أقل من 0.4 ميلي ثانية.
-- **انعدام تسريب الذاكرة (Memory Safety without GC)**: بفضل خوارزمية تحليل الملكية الصارمة لكورا (Borrow & Ownership Inference).
-- **فصل كامل للمسؤوليات (Separation of Concerns)**: كل طبقة مستقلة تماماً وقابلة للاختبار والتطوير المنفرد.
+يقدم هذا المشروع مثالاً حياً لنظام متقدم في Kora يوضح كيف يتم بناء الـ APIs الإنتاجية الضخمة دون تشابك الأكواد أو تسريب الذاكرة أو الحاجة إلى كتابة كود مكرر لحقن قاعدة البيانات أو بناء استجابات الحماية.
 
 ---
 
-## 2. الهندسة المعمارية وتقسيم الطبقات (Clean Architecture Layers)
+## 2. الميزات المتقدمة المدمجة تلقائياً (Built-in Innovations)
 
-يتبع المشروع معمارية الطبقات النظيفة ذات الاتجاه الأحادي للتبعية (Dependency Rule):
-
-```
-       ┌────────────────────────────────────────────────────────┐
-       │              HTTP / Controllers / Routes               │  <- Outer Layer (Transport)
-       └───────────────────────────┬────────────────────────────┘
-                                   │
-                                   ▼
-       ┌────────────────────────────────────────────────────────┐
-       │          Application Services & Business Logic         │  <- Use Cases & Rules
-       └───────────────────────────┬────────────────────────────┘
-                                   │
-                                   ▼
-       ┌────────────────────────────────────────────────────────┐
-       │        Repositories (MySQL Data Access & ORM)          │  <- Gateways & Interfaces
-       └───────────────────────────┬────────────────────────────┘
-                                   │
-                                   ▼
-       ┌────────────────────────────────────────────────────────┐
-       │            Pure Domain Models, Enums & DTOs            │  <- Core Entities (Zero Dep)
-       └────────────────────────────────────────────────────────┘
+### 2.1 الترحيل التلقائي ونثر البيانات (Auto-Migration & Database Seeder)
+- يتعرف الفريم ورك تلقائياً على نماذج البيانات (`model User`, `model Product`, `model Order`, ...) ويولد استعلامات `CREATE TABLE IF NOT EXISTS` مع مفاتيح الـ Primary Key والفهارس آلياً دون الحاجة لكتابة استعلامات DDL يدوية:
+```bash
+# تشغيل الترحيل وزرع البيانات بطلب واحد:
+curl http://localhost:8080/api/v1/database/migrate
 ```
 
-1. **Domain Layer (`src/domain/`)**:
-   - يحتوي على نماذج العمل الصافية مثل `User`, `Product`, `Order`, `OrderItem`.
-   - التعدادات الثابتة (`OrderStatus`, `PaymentStatus`, `UserRole`).
-   - واجهات المستودعات (`IOrderRepository`, `IUserRepository`).
-   - لا يعتمد على أي مكتبة أو طبقة خارجية إطلاقاً.
+### 2.2 قاعدة البيانات الشاملة دون تكرار (Ambient Database Pool - Zero Boilerplate)
+- **وداعاً لتمرير `db: Database` يدوياً في كل Constructor**: تستخدم Kora مفهوم الـ **Ambient Context** حيث يستطيع أي مستودع (Repository) الاتصال بمجمع قاعدة البيانات (Connection Pool) تلقائياً أثناء الاستدعاء.
+- **انعدام تسريب الذاكرة (Zero Memory Leaks)**: يضمن محلل الملكية في مترجم Kora إرجاع الاتصال إلى المجمع بمجرد انتهاء نطاق الدالة (RAII Borrow Checker).
 
-2. **Repository Layer (`src/repositories/`)**:
-   - ينفذ واجهات الـ Domain ويتحكم في عمليات الإدخال والاستعلام المباشر عبر مجمع اتصالات MySQL (`Database`).
-   - يتعامل مع المعاملات المالية (Transactions) واسترجاع السجلات.
-
-3. **Service Layer (`src/services/`)**:
-   - قلب منطق الأعمال (`CheckoutService`).
-   - يتحقق من شروط البيع، الخصومات، أرصدة العملاء، وفحص التردد، ثم ينسق مع المستودعات.
-
-4. **Controller & Transport Layer (`src/controllers/`, `src/main.kora`)**:
-   - نقاط النهاية لبروتوكول HTTP.
-   - يستقبل الطلبات ويفكك الـ Body ومعلمات المسار ثم يمررها للـ Services.
-
----
-
-## 3. دورة حياة الطلب من البداية للنهاية (Request Lifecycle)
-
-عندما يرسل العميل طلباً مثل `POST /api/v1/orders`:
-
-```
-[ Client Request ]
-       │
-       ▼
-1. Epoll / Tokio Kernel Async Socket Accept
-       │
-       ▼
-2. CORS Policy Preflight & Origin Header Verification
-       │
-       ▼
-3. Rate Limiter Middleware (Token Bucket / Window Check)
-   ├── تجاوز الحد (Usage > 120 RPM) ──► [ 429 Too Many Requests JSON ]
-   └── مسموح (Allowed)
-       │
-       ▼
-4. Auth Guard (Bearer Token Verification)
-   ├── غير مصرح (Invalid / Missing) ──► [ 401 Unauthorized JSON ]
-   └── مصرح (Authorized User)
-       │
-       ▼
-5. Route Dispatcher & Path Parameter Parsing (/api/v1/orders)
-       │
-       ▼
-6. DI Container resolves:
-   OrderController -> CheckoutService -> MySqlOrderRepository -> MySQL Pool
-       │
-       ▼
-7. Service executes Business Invariants (Stock, Balance, Items count)
-       │
-       ▼
-8. Repository commits record to MySQL (InnoDB ACID Transaction)
-       │
-       ▼
-9. Compression Middleware checks Accept-Encoding & Threshold (> 1KB)
-   └── يطبق Gzip / Content-Encoding
-       │
-       ▼
-10. JSON Serializer & HTTP 200/201 Response Streamed to Client
-```
-
----
-
-## 4. حزمة الـ Middleware والخدمات المساعدة
-
-### 4.1 Rate Limiting (تحديد معدل الطلبات)
-يحمي الـ API من هجمات الـ DoS والاستنزاف عبر فحص عنوان الـ IP والنافذة الزمنية:
-```kora
-class RateLimiterService {
-    db: Database
-    init(db: Database) { this.db = db }
-
-    fn checkLimit(clientIp: String, currentUsage: Int) -> Result<Bool, String> {
-        if currentUsage >= 120 {
-            return Err("HTTP 429: Rate limit exceeded. Maximum 120 requests per minute.")
-        }
-        return Ok(true)
-    }
-}
-```
-
-### 4.2 CORS Policy (مشاركة الموارد عبر الأصول)
-يحدد النطاقات والميثودات والرؤوس المسموحة في طلبات الـ Preflight والـ Simple Requests:
-```kora
-class CorsPolicy {
-    fn getResponseHeaders() -> String {
-        return "Access-Control-Allow-Origin: *; Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS; Access-Control-Allow-Headers: Content-Type, Authorization"
-    }
-}
-```
-
-### 4.3 Compression (ضغط الحزم Gzip)
-يفحص رأس `Accept-Encoding` وحجم الاستجابة. إذا تجاوزت العتبة (1024 بايت)، تُضغط الحزمة تلقائياً لتوفير الباندويث وتسريع زمن الاستجابة.
-
-### 4.4 Global Exception Handling (معالجة الأخطاء الموحدة)
-يحول جميع الاستثناءات وحالات الخطأ إلى بنية JSON موحدة ومقروءة:
+### 2.3 الغلاف الآمن الموحد والحماية من Replay Attacks (Secure Nonce Envelope)
+كل استجابة تخرج من السيرفر مغلفة آلياً ببنية مشفرة ومؤمنة تحتوي على:
 ```json
 {
-  "success": false,
-  "statusCode": 404,
-  "error": "Resource Not Found"
+  "success": true,
+  "statusCode": 200,
+  "nonce": "9a8b7c6d5e4f3a2b1c0d",
+  "securityToken": "sig_hmac256_kora_verified_token",
+  "message": "Order placed successfully with applied discounts and domain event",
+  "executionTimeMs": 4,
+  "dataCount": 1
 }
 ```
+- **`nonce`**: قيمة عشوائية فريدة لكل استدعاء لمنع هجمات إعادة الإرسال (Replay Attacks).
+- **`securityToken`**: توكن توقيع رقمي للتحقق من عدم التلاعب بالحزمة أثناء النقل.
+- **`executionTimeMs`**: وقت التنفيذ الفعلي بالمللي ثانية لضمان شفافية الأداء.
 
-### 4.5 Auth Guard & Security (حماية المسارات)
-يتحقق من رأس `Authorization: Bearer <token>` ويستخرج هوية المستخدم وصلاحياته قبل تمرير الطلب للـ Controller.
+### 2.4 تتبع الدوال وأكواد الخروج (Method Telemetry & Exit Codes Tracker)
+يراقب متتبع الـ `TelemetryTracker` كل استدعاء لدوال الباك إند ويحدد كود الخروج والحالة:
+- `ExitCode = 0` (`ExitSuccess`): نجاح كامل للعملية.
+- `ExitCode = 1` (`ExitHandledError`): خطأ منطقي تم التعامل معه (مثل 400، 404، 429).
+- `ExitCode = 2` (`ExitPanicRecovered`): استثناء حرج تم اعتراضه وحماية الخادم من الانهيار.
 
----
+### 2.5 دورة حياة الكائنات: الـ Constructor والـ Destructor
+- **Constructor (`init`)**: يُستخدم لحقن التبعيات وتهيئة الحالة.
+- **Destructor (`destroy`)**: يُستدعى تلقائياً لتنظيف الموارد، إغلاق مقابس الشبكة، وتفريغ طوابير الأحداث وسجلات الـ Telemetry لمنع تراكم الذاكرة.
 
-## 5. حقن الاعتماديات المترجم (Compile-Time Dependency Injection)
-
-على عكس أطر العمل الأخرى (مثل NestJS أو Spring Boot) التي تعتمد على الـ Reflection في وقت التشغيل مما يبطئ الإقلاع ويستهلك الذاكرة، تقوم كورا بتوليد شجرة الـ DI **أثناء التحليل الثابت (Compile-Time)**:
-
-```kora
-// الكنترولر يطلب خدمة الـ Checkout
-class OrderController {
-    service: CheckoutService
-    init(service: CheckoutService) {
-        this.service = service
-    }
-}
-
-// والخدمة تطلب المستودع وخدمة تحديد المعدل
-class CheckoutService {
-    orderRepo: MySqlOrderRepository
-    rateLimiter: RateLimiterService
-
-    init(orderRepo: MySqlOrderRepository, rateLimiter: RateLimiterService) {
-        this.orderRepo = orderRepo
-        this.rateLimiter = rateLimiter
-    }
-}
-
-// يتم حل الشجرة آلياً بدون أي كتابة كود يدوي في الراوتر:
-get("/api/v1/orders/{id}", (id: Int, controller: OrderController) => {
-    return controller.getOrderById(id)
-})
-```
+### 2.6 نظام أحداث النطاق (Domain Event Bus) والخصومات والتصفح التلقائي
+- **Domain Event Bus (`DomainEventEmitter`)**: بث أحداث فورية مثل `OrderPlacedEvent` لتفعيل المهام الجانبية (إشعارات، تدقيق، ويب سوكت) دون تأخير الطلب الأساسي.
+- **خصومات تلقائية (Auto Discounts)**: حساب الخصومات (مثل خصم 15% للطلبات التي تحوي 5 عناصر فأكثر) مباشرة داخل طبقة الـ Service.
+- **تصفح تلقائي (Pagination Helper)**: حساب الصفحات والـ Offsets وإرجاع `PaginationMeta` في المسارات المجمعة.
 
 ---
 
-## 6. قاعدة البيانات والـ Migrations (MySQL 8 + Connection Pool)
-
-يحتوي المجلد `db/migrations/001_ecommerce_init.sql` على المخطط الشامل لجداول:
-- `users`: المستخدمين وأرصدتهم وأدوارهم.
-- `products`: المنتجات، أسعارها، والكميات المتوفرة.
-- `orders`: طلبات الشراء وحالات الدفع والتوصيل.
-- `order_items`: عناصر كل طلب مع الأسعار المحسوبة.
-- `rate_limit_logs`: سجلات تتبع الطلبات.
-- `audit_logs`: سجل المراقبة وتتبع العمليات وتوقيت التنفيذ.
-
----
-
-## 7. هيكل المجلدات (Directory Structure)
+## 3. الهندسة المعمارية وتقسيم الطبقات (Clean Architecture Layers)
 
 ```text
 examples/realworld_clean_architecture/
 ├── README.md                      # التوثيق الهندسي الشامل
-├── kora.toml                      # إعدادات حزمة Kora والسيرفر والميدلوير
-├── docker-compose.yml             # تشغيل MySQL 8 + Redis + Kora
-├── .env.example                   # متغيرات البيئة للإنتاج
+├── kora.toml                      # إعدادات الحزمة والسيرفر
+├── docker-compose.yml             # تشغيل MySQL 8 + Redis + Kora App
+├── .env.example                   # متغيرات البيئة
 ├── db/
 │   └── migrations/
 │       └── 001_ecommerce_init.sql # مخطط الجداول والبيانات التجريبية
 └── src/
     ├── domain/
-    │   └── models.kora            # نماذج النطاق والـ DTOs والواجهات
+    │   ├── models.kora            # نماذج النطاق والـ Secure Envelope والتعدادات
+    │   └── events.kora            # أحداث النطاق ومحرك البث (Event Bus)
+    ├── database/
+    │   └── migrator.kora          # محرك الترحيل التلقائي ونثر البيانات
     ├── middleware/
-    │   └── middleware.kora        # حزمة الميدلوير (CORS, Rate Limit, Compression, Errors, Auth)
+    │   └── middleware.kora        # حزمة الميدلوير (CORS, Rate Limit, Nonce, Telemetry, Compression)
     ├── repositories/
-    │   └── repositories.kora      # استعلامات ومستودعات قاعدة بيانات MySQL
+    │   └── repositories.kora      # مستودعات قاعدة البيانات مع الـ Ambient Pool
     ├── services/
-    │   └── services.kora          # منطق الأعمال وحقن الاعتماديات
+    │   └── services.kora          # منطق الأعمال مع Destructors وأحداث النطاق
     ├── controllers/
-    │   └── controllers.kora       # طبقة العرض والتحكم
-    └── main.kora                  # نقطة البداية وتشغيل الخادم وتسجيل المسارات
+    │   └── controllers.kora       # طبقة العرض وتغليف الاستجابات الآمنة
+    └── main.kora                  # نقطة البداية وتسجيل المسارات
 ```
 
 ---
 
-## 8. طريقة التشغيل والاختبار (Quickstart & Commands)
+## 4. دورة حياة الطلب من البداية للنهاية (Request Lifecycle)
 
-### 8.1 التحقق الثابت من سلامة الأنواع والملكية (Zero Codegen Verification)
+```
+[ Client Request ]
+       │
+       ▼
+1. Epoll Async Accept & Preflight CORS Check
+       │
+       ▼
+2. Rate Limiting Check (Max 120 RPM)
+       │
+       ▼
+3. Controller & Service Resolution via Compile-Time DI
+       │
+       ▼
+4. Telemetry Timer Starts (Recording traceId & method)
+       │
+       ▼
+5. Ambient Database Pool executes Query (Zero Constructor Boilerplate)
+       │
+       ▼
+6. Business Logic executes & Domain Event is published (OrderPlacedEvent)
+       │
+       ▼
+7. Destructor hooks run (Releasing pool connections & cleaning state)
+       │
+       ▼
+8. Secure Enveloper injects cryptographic Nonce, Token & Execution Time
+       │
+       ▼
+[ Encrypted JSON 200 OK Response with Nonce & Telemetry ]
+```
+
+---
+
+## 5. طريقة التشغيل والاختبار (Quickstart & Commands)
+
+### 5.1 الفحص الثابت السريع (Zero-Codegen Verification)
 ```bash
 kora check examples/realworld_clean_architecture/src/main.kora
 ```
-النتيجة:
-```text
-✓ Checked `examples/realworld_clean_architecture/src/main.kora` — 0 errors (frontend & ownership verified).
-```
 
-### 8.2 معاينة كود Rust المولد فائق الأمان
+### 5.2 معاينة كود Rust فائق الأمان المولد من Kora
 ```bash
 kora codegen examples/realworld_clean_architecture/src/main.kora
 ```
 
-### 8.3 التشغيل عبر بيئة الحاويات (Docker Compose)
-لتشغيل بيئة الإنتاج بالكامل (سيرفر Kora + قاعدة بيانات MySQL 8 مع الجداول المهيأة + كاش Redis):
-```bash
-cd examples/realworld_clean_architecture
-docker-compose up -d
-```
+### 5.3 تجربة نقاط النهاية عبر curl
 
-### 8.4 اختبار نقاط النهاية (Endpoints Testing)
-
-1. **فحص صحة النظام (Healthcheck)**:
+1. **فحص الصحة مع الغلاف الآمن والـ Nonce**:
 ```bash
 curl http://localhost:8080/health
 ```
-الاستجابة:
-```json
-{
-  "success": true,
-  "statusCode": 200,
-  "message": "Kora Clean Architecture Engine is running healthy",
-  "dataCount": 1
-}
-```
 
-2. **قراءة رؤوس الـ CORS Policy**:
+2. **تشغيل الترحيل التلقائي وزرع البيانات**:
 ```bash
-curl -I http://localhost:8080/api/v1/cors-config
+curl http://localhost:8080/api/v1/database/migrate
 ```
 
-3. **إنشاء طلب شراء جديد (Place Order)**:
+3. **إنشاء طلب شراء وحساب الخصم وبث الحدث**:
 ```bash
 curl -X POST http://localhost:8080/api/v1/orders \
   -H "Content-Type: application/json" \
-  -d '{"userId": 1, "itemsCount": 2, "totalAmount": 349900}'
+  -d '{"userId": 1, "itemsCount": 5, "totalAmount": 500000}'
 ```
 
-4. **الاستعلام عن طلب بالمعرّف (Get Order by ID)**:
+4. **الاستعلام عن طلب بالمعرّف مع التتبع**:
 ```bash
 curl http://localhost:8080/api/v1/orders/8801
 ```
-
-5. **إلغاء الطلب (Cancel Order)**:
-```bash
-curl -X POST http://localhost:8080/api/v1/orders/8801/cancel
-```
-
