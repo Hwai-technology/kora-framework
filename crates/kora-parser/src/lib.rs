@@ -2,10 +2,10 @@
 //! Supports Phase 1 Foundation + Phase 5 Language Features (module, import, pub, Generics, extend, await).
 
 use kora_ast::{
-    Attribute, BinaryOp, Block, ClassDecl, ClosureBody, ClosureParam, ElseBranch, EnumDecl, EnumVariant, Expr,
-    ExtendDecl, FieldDecl, FieldInit, FnDecl, FnSig, Ident, ImportDecl, InitDecl, InterfaceDecl,
-    Item, MatchArm, ModelDecl, Module, ModulePathDecl, Param, Pattern, Stmt, StructDecl, TypeExpr,
-    UnaryOp, Visibility,
+    Attribute, BinaryOp, Block, ClassDecl, ClosureBody, ClosureParam, ElseBranch, EnumDecl,
+    EnumVariant, Expr, ExtendDecl, FieldDecl, FieldInit, FnDecl, FnSig, Ident, ImportDecl,
+    InitDecl, InterfaceDecl, Item, MatchArm, ModelDecl, Module, ModulePathDecl, Param, Pattern,
+    Stmt, StructDecl, TypeExpr, UnaryOp, Visibility,
 };
 use kora_diagnostics::{Diagnostic, DiagnosticBag};
 use kora_lexer::{Token, TokenKind, tokenize};
@@ -188,8 +188,11 @@ impl<'a> Parser<'a> {
             }
         } else {
             self.diagnostics.emit(
-                Diagnostic::error("E2001", "expected module path or `{ symbols }` after `import`")
-                    .with_primary_label(kw.span, "invalid import syntax"),
+                Diagnostic::error(
+                    "E2001",
+                    "expected module path or `{ symbols }` after `import`",
+                )
+                .with_primary_label(kw.span, "invalid import syntax"),
             );
             return None;
         }
@@ -280,7 +283,9 @@ impl<'a> Parser<'a> {
                             break;
                         }
                     }
-                    if let Some(r) = self.expect(&TokenKind::RParen, "expected `)` after attribute arguments") {
+                    if let Some(r) =
+                        self.expect(&TokenKind::RParen, "expected `)` after attribute arguments")
+                    {
                         end_span = r.span;
                     }
                 }
@@ -1510,7 +1515,11 @@ import "middleware/cors";
 "#;
         let mut bag = DiagnosticBag::new();
         let module = parse_module(FileId(0), src, &mut bag);
-        assert!(!bag.has_errors(), "unexpected parse errors: {:?}", bag.items());
+        assert!(
+            !bag.has_errors(),
+            "unexpected parse errors: {:?}",
+            bag.items()
+        );
         assert_eq!(module.items.len(), 3);
         if let Item::Import(imp) = &module.items[0] {
             assert_eq!(imp.symbols.len(), 2);
@@ -1555,7 +1564,11 @@ class AutoService {
 "#;
         let mut bag = DiagnosticBag::new();
         let module = parse_module(FileId(0), src, &mut bag);
-        assert!(!bag.has_errors(), "unexpected parse errors: {:?}", bag.items());
+        assert!(
+            !bag.has_errors(),
+            "unexpected parse errors: {:?}",
+            bag.items()
+        );
         assert_eq!(module.items.len(), 3);
 
         // Check Account attributes
@@ -1585,7 +1598,11 @@ class AutoService {
 
         // Check AutoService parameter property promotion
         if let Item::Class(c) = &module.items[2] {
-            assert_eq!(c.fields.len(), 2, "params in init should be promoted to fields");
+            assert_eq!(
+                c.fields.len(),
+                2,
+                "params in init should be promoted to fields"
+            );
             assert_eq!(c.fields[0].name.name, "pool");
             assert_eq!(c.fields[1].name.name, "token");
         } else {

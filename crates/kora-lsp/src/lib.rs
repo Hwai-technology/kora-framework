@@ -47,4 +47,3 @@ impl LanguageServer {
         serde_json::to_string(&resp).ok()
     }
 }
-

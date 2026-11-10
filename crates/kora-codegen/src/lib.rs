@@ -385,7 +385,10 @@ fn emit_expr(expr: &Expr) -> String {
             format!("{} = {}", emit_expr(target), emit_expr(value))
         }
         Expr::Call { callee, args, .. } => {
-            if let Expr::FieldAccess { receiver, field, .. } = callee.as_ref() {
+            if let Expr::FieldAccess {
+                receiver, field, ..
+            } = callee.as_ref()
+            {
                 match field.name.as_str() {
                     "len" | "length" => return format!("({}.len() as i64)", emit_expr(receiver)),
                     "contains" => {
@@ -408,7 +411,10 @@ fn emit_expr(expr: &Expr) -> String {
             if let Expr::Ident(id) = callee.as_ref() {
                 match id.name.as_str() {
                     "Some" => {
-                        return format!("Some({})", args.first().map(emit_expr).unwrap_or_default());
+                        return format!(
+                            "Some({})",
+                            args.first().map(emit_expr).unwrap_or_default()
+                        );
                     }
                     "Ok" => {
                         return format!("Ok({})", args.first().map(emit_expr).unwrap_or_default());

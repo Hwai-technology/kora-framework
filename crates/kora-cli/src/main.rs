@@ -18,14 +18,21 @@ use kora_span::SourceMap;
 use kora_ty::{TypeCheckOutput, check_module};
 
 fn verify_architectural_purity(path_str: &str, ast: &Module, bag: &mut DiagnosticBag) {
-    let canonical = Path::new(path_str).canonicalize().unwrap_or_else(|_| PathBuf::from(path_str));
+    let canonical = Path::new(path_str)
+        .canonicalize()
+        .unwrap_or_else(|_| PathBuf::from(path_str));
     let p = canonical.to_string_lossy().replace('\\', "/");
     let is_enum_file = p.contains("/enums/") || p.ends_with("_enum.kora");
-    let is_model_or_iface_file = p.contains("/models/") || p.contains("/interfaces/") || p.ends_with("_model.kora") || p.ends_with("_interface.kora");
-    let is_controller_or_service = !is_model_or_iface_file && !is_enum_file && (p.contains("controller")
-        || p.contains("service")
-        || p.contains("/controllers/")
-        || p.contains("/services/"));
+    let is_model_or_iface_file = p.contains("/models/")
+        || p.contains("/interfaces/")
+        || p.ends_with("_model.kora")
+        || p.ends_with("_interface.kora");
+    let is_controller_or_service = !is_model_or_iface_file
+        && !is_enum_file
+        && (p.contains("controller")
+            || p.contains("service")
+            || p.contains("/controllers/")
+            || p.contains("/services/"));
     let is_main_kora = p.ends_with("main.kora");
 
     for item in &ast.items {
@@ -198,7 +205,8 @@ fn load_module_with_imports(
                 candidate_paths.push(PathBuf::from(format!("{rel_str}.kora")));
             }
 
-            let _symbol_names: HashSet<String> = imp.symbols.iter().map(|s| s.name.clone()).collect();
+            let _symbol_names: HashSet<String> =
+                imp.symbols.iter().map(|s| s.name.clone()).collect();
 
             for cand in candidate_paths {
                 if cand.exists() {
@@ -284,7 +292,8 @@ fn cmd_check(path: Option<&String>) -> ExitCode {
     let mut bag = DiagnosticBag::new();
     let mut visited = HashSet::new();
 
-    let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited) else {
+    let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited)
+    else {
         eprintln!("error: failed to read `{path}`");
         return ExitCode::FAILURE;
     };
@@ -313,7 +322,8 @@ fn cmd_types(path: Option<&String>) -> ExitCode {
     let mut bag = DiagnosticBag::new();
     let mut visited = HashSet::new();
 
-    let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited) else {
+    let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited)
+    else {
         eprintln!("error: failed to read `{path}`");
         return ExitCode::FAILURE;
     };
@@ -329,10 +339,20 @@ fn cmd_types(path: Option<&String>) -> ExitCode {
     println!("=== Verified Kora Types in `{path}` ===");
     for (m, fields) in &types.models {
         if types.entity_models.contains(m) {
-            let tbl = types.model_tables.get(m).map(|t| format!(" -> table: `{t}`")).unwrap_or_default();
-            println!("  [Database Entity Model] {m}{tbl} ({} field(s))", fields.len());
+            let tbl = types
+                .model_tables
+                .get(m)
+                .map(|t| format!(" -> table: `{t}`"))
+                .unwrap_or_default();
+            println!(
+                "  [Database Entity Model] {m}{tbl} ({} field(s))",
+                fields.len()
+            );
         } else {
-            println!("  [Data Transfer DTO Model] {m} ({} field(s))", fields.len());
+            println!(
+                "  [Data Transfer DTO Model] {m} ({} field(s))",
+                fields.len()
+            );
         }
     }
     for (c, info) in &types.classes {
@@ -386,7 +406,8 @@ fn cmd_codegen(path: Option<&String>) -> ExitCode {
     let mut bag = DiagnosticBag::new();
     let mut visited = HashSet::new();
 
-    let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited) else {
+    let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited)
+    else {
         eprintln!("error: failed to read `{path}`");
         return ExitCode::FAILURE;
     };
@@ -414,7 +435,8 @@ fn cmd_build(path: Option<&String>) -> ExitCode {
     let mut bag = DiagnosticBag::new();
     let mut visited = HashSet::new();
 
-    let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited) else {
+    let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited)
+    else {
         eprintln!("error: failed to read `{path}`");
         return ExitCode::FAILURE;
     };
@@ -452,7 +474,8 @@ fn cmd_run(path: Option<&String>) -> ExitCode {
     let mut bag = DiagnosticBag::new();
     let mut visited = HashSet::new();
 
-    let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited) else {
+    let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited)
+    else {
         eprintln!("error: failed to read `{path}`");
         return ExitCode::FAILURE;
     };
@@ -529,7 +552,9 @@ fn cmd_init(dir: Option<&String>) -> ExitCode {
 
 fn cmd_db(action: Option<&String>, path: Option<&String>) -> ExitCode {
     let Some(action) = action else {
-        eprintln!("error: missing database action.\nUsage: kora db <migrate|sync|seed|truncate|drop|refresh> [file.kora]");
+        eprintln!(
+            "error: missing database action.\nUsage: kora db <migrate|sync|seed|truncate|drop|refresh> [file.kora]"
+        );
         return ExitCode::FAILURE;
     };
 
@@ -566,22 +591,33 @@ fn cmd_db(action: Option<&String>, path: Option<&String>) -> ExitCode {
         return ExitCode::FAILURE;
     }
 
-    let mut tables: Vec<String> = types.entity_models.iter().map(|m| {
-        types.model_tables.get(m).cloned().unwrap_or_else(|| {
-            let base = m.trim_end_matches("Entity");
-            format!("{}s", base.to_lowercase())
+    let mut tables: Vec<String> = types
+        .entity_models
+        .iter()
+        .map(|m| {
+            types.model_tables.get(m).cloned().unwrap_or_else(|| {
+                let base = m.trim_end_matches("Entity");
+                format!("{}s", base.to_lowercase())
+            })
         })
-    }).collect();
+        .collect();
     tables.sort();
 
     println!("=== Kora Enterprise Database Management Engine ===");
     println!("Target Entrypoint: `{target_path}`");
-    println!("Discovered Entity Tables ({}): {}", tables.len(), tables.join(", "));
+    println!(
+        "Discovered Entity Tables ({}): {}",
+        tables.len(),
+        tables.join(", ")
+    );
     println!("Action: `{action}`\n");
 
     match action.as_str() {
         "migrate" => {
-            println!("⚡ [DB:MIGRATE] Running schema migrations for tables: {:?}", tables);
+            println!(
+                "⚡ [DB:MIGRATE] Running schema migrations for tables: {:?}",
+                tables
+            );
             for t in &tables {
                 println!("  ✓ Table `{t}` DDL schema verified & created (IF NOT EXISTS).");
             }
@@ -589,9 +625,13 @@ fn cmd_db(action: Option<&String>, path: Option<&String>) -> ExitCode {
             ExitCode::SUCCESS
         }
         "sync" => {
-            println!("⚡ [DB:SYNC] Synchronizing schema differences between @entity models and database tables...");
+            println!(
+                "⚡ [DB:SYNC] Synchronizing schema differences between @entity models and database tables..."
+            );
             for t in &tables {
-                println!("  ✓ Reconciled table `{t}`: checked columns, defaults, unique keys, and indexes.");
+                println!(
+                    "  ✓ Reconciled table `{t}`: checked columns, defaults, unique keys, and indexes."
+                );
             }
             println!("  ✓ Auto-applied schema alterations (0 errors).");
             println!("\n✓ Database schema synchronized with @entity models.");
@@ -606,7 +646,10 @@ fn cmd_db(action: Option<&String>, path: Option<&String>) -> ExitCode {
             ExitCode::SUCCESS
         }
         "truncate" => {
-            println!("⚠ [DB:TRUNCATE] Purging all records from tables: {:?}", tables);
+            println!(
+                "⚠ [DB:TRUNCATE] Purging all records from tables: {:?}",
+                tables
+            );
             for t in &tables {
                 println!("  ✓ Truncated table `{t}` (foreign keys disabled temporarily).");
             }
@@ -614,7 +657,10 @@ fn cmd_db(action: Option<&String>, path: Option<&String>) -> ExitCode {
             ExitCode::SUCCESS
         }
         "drop" => {
-            println!("⚠ [DB:DROP] Dropping application database tables: {:?}", tables);
+            println!(
+                "⚠ [DB:DROP] Dropping application database tables: {:?}",
+                tables
+            );
             for t in &tables {
                 println!("  ✓ Dropped table `{t}` (IF EXISTS).");
             }
@@ -622,7 +668,9 @@ fn cmd_db(action: Option<&String>, path: Option<&String>) -> ExitCode {
             ExitCode::SUCCESS
         }
         "refresh" => {
-            println!("⚡ [DB:REFRESH] Executing complete reset pipeline (DROP -> MIGRATE -> SEED)...");
+            println!(
+                "⚡ [DB:REFRESH] Executing complete reset pipeline (DROP -> MIGRATE -> SEED)..."
+            );
             for t in &tables {
                 println!("  ✓ Dropped table `{t}`");
             }

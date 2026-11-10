@@ -7,6 +7,7 @@
   "engines": {
     "vscode": "^1.80.0"
   },
+  "icon": "./icons/kora-file.svg",
   "main": "./client/extension.js",
   "activationEvents": [
     "onLanguage:kora"
@@ -32,9 +33,14 @@
           "kora"
         ],
         "extensions": [
-          ".kora"
+          ".kora",
+          ".kr"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icons/kora-file.svg",
+          "dark": "./icons/kora-file.svg"
+        }
       }
     ],
     "grammars": [

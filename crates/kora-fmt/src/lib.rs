@@ -46,4 +46,3 @@ fn format_type(t: &kora_ast::TypeExpr) -> String {
         kora_ast::TypeExpr::Function { .. } => "(...) -> ...".to_string(),
     }
 }
-

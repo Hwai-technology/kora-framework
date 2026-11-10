@@ -105,7 +105,9 @@ class NullCheck {
     assert!(
         !valid_session.diagnostics.has_errors(),
         "null_check failed check:\n{}",
-        valid_session.diagnostics.render_all(&valid_session.source_map, false)
+        valid_session
+            .diagnostics
+            .render_all(&valid_session.source_map, false)
     );
 
     let bad_undef_src = r#"
@@ -115,7 +117,12 @@ fn bad() {
 "#;
     let bad_session = FrontendSession::check_source("bad_undef.kora", bad_undef_src);
     assert!(bad_session.diagnostics.has_errors());
-    let codes: Vec<&str> = bad_session.diagnostics.items().iter().map(|d| d.code).collect();
+    let codes: Vec<&str> = bad_session
+        .diagnostics
+        .items()
+        .iter()
+        .map(|d| d.code)
+        .collect();
     assert!(
         codes.contains(&"E2005"),
         "expected E2005 for undefined, got {codes:?}"

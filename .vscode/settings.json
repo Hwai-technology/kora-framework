@@ -6,7 +6,7 @@
   "material-icon-theme.files.associations": {
     "*.kora": "kora",
     "*.kr": "kora",
-    "kora.toml": "tune"
+    "kora.toml": "kora"
   },
   "editor.formatOnSave": true,
   "[kora]": {

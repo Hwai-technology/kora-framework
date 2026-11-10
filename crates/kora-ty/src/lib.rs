@@ -251,8 +251,15 @@ impl<'a> TypeChecker<'a> {
                     let map = self.lower_fields(&m.fields);
                     self.models.insert(m.name.name.clone(), map);
 
-                    let has_entity_attr = m.attributes.iter().any(|a| a.name.name == "entity" || a.name.name == "table");
-                    let has_field_primary = m.fields.iter().any(|f| f.attributes.iter().any(|a| a.name.name == "primary" || a.name.name == "autoIncrement"));
+                    let has_entity_attr = m
+                        .attributes
+                        .iter()
+                        .any(|a| a.name.name == "entity" || a.name.name == "table");
+                    let has_field_primary = m.fields.iter().any(|f| {
+                        f.attributes
+                            .iter()
+                            .any(|a| a.name.name == "primary" || a.name.name == "autoIncrement")
+                    });
                     let is_entity_name = m.name.name.ends_with("Entity");
 
                     if has_entity_attr || has_field_primary || is_entity_name {
@@ -260,7 +267,9 @@ impl<'a> TypeChecker<'a> {
                         let mut custom_table = None;
                         for attr in &m.attributes {
                             if attr.name.name == "table" {
-                                if let Some(kora_ast::Expr::StringLit { value, .. }) = attr.args.first() {
+                                if let Some(kora_ast::Expr::StringLit { value, .. }) =
+                                    attr.args.first()
+                                {
                                     custom_table = Some(value.clone());
                                 }
                             }

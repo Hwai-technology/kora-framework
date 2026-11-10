@@ -89,7 +89,11 @@ pub fn format_type_report(types: &TypeCheckOutput) -> String {
                 .map(|f| format!("{f}: {}", fields[f]))
                 .collect();
             let kind = if types.entity_models.contains(name) {
-                let tbl = types.model_tables.get(name).map(|t| format!(" (table: \"{t}\")")).unwrap_or_default();
+                let tbl = types
+                    .model_tables
+                    .get(name)
+                    .map(|t| format!(" (table: \"{t}\")"))
+                    .unwrap_or_default();
                 format!("@entity model {name}{tbl}")
             } else {
                 format!("model {name} [DTO]")

@@ -13,4 +13,3 @@ impl Profiler {
         (result, elapsed)
     }
 }
-
