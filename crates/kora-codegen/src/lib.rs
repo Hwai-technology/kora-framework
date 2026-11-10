@@ -226,6 +226,7 @@ tokio = {{ version = "1.40", features = ["full"] }}
 
 fn has_http_routes(ast: &Module) -> bool {
     for item in &ast.items {
+        #[allow(clippy::collapsible_match, clippy::collapsible_if)]
         if let Item::Stmt(Stmt::Expr { expr, .. }) = item {
             if let Expr::Call { callee, .. } = expr {
                 if let Expr::Ident(id) = callee.as_ref() {

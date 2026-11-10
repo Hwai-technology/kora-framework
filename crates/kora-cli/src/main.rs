@@ -492,7 +492,7 @@ fn cmd_run(path: Option<&String>) -> ExitCode {
     let out = generate_rust(&hir, &types, &ownership, "kora_app");
     let target_dir = Path::new(".kora-build");
     println!("Compiling and running `{path}` ...");
-    if let Ok(_) = compile_native(&out, target_dir) {
+    if compile_native(&out, target_dir).is_ok() {
         let exe = target_dir.join("target/release/kora_app");
         let _ = std::process::Command::new(exe).status();
         ExitCode::SUCCESS
