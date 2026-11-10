@@ -3,8 +3,11 @@ name: Auto Merge
 on:
   pull_request_target:
     types: [opened, labeled, synchronize]
+  pull_request:
+    types: [opened, labeled, synchronize]
   check_suite:
     types: [completed]
+  workflow_dispatch:
 
 permissions:
   contents: write

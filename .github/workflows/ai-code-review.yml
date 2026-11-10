@@ -3,6 +3,7 @@ name: AI Code Review Agent
 on:
   pull_request:
     types: [opened, synchronize]
+  workflow_dispatch:
 
 permissions:
   pull-requests: write

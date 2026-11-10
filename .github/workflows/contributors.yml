@@ -3,6 +3,9 @@ name: Contributor Recognition
 on:
   pull_request_target:
     types: [closed]
+  pull_request:
+    types: [closed]
+  workflow_dispatch:
 
 permissions:
   contents: write
