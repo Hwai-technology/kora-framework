@@ -266,12 +266,10 @@ impl<'a> TypeChecker<'a> {
                         self.entity_models.insert(m.name.name.clone());
                         let mut custom_table = None;
                         for attr in &m.attributes {
-                            if attr.name.name == "table" {
-                                if let Some(kora_ast::Expr::StringLit { value, .. }) =
-                                    attr.args.first()
-                                {
-                                    custom_table = Some(value.clone());
-                                }
+                            if let ("table", Some(kora_ast::Expr::StringLit { value, .. })) =
+                                (attr.name.name.as_str(), attr.args.first())
+                            {
+                                custom_table = Some(value.clone());
                             }
                         }
                         let tbl = custom_table.unwrap_or_else(|| {

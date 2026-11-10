@@ -3,8 +3,6 @@
 //! Zero SQL injection via 100% prepared query builder, relations, migrations & caching.
 
 use sqlx::{Pool, Sqlite, SqlitePool};
-use std::collections::HashMap;
-use std::sync::Arc;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum SqlValue {

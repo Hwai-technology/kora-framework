@@ -10,12 +10,12 @@ use std::process::ExitCode;
 use kora_ast::{Item, Module};
 use kora_codegen::{compile_native, generate_rust};
 use kora_diagnostics::DiagnosticBag;
-use kora_hir::{HirModule, lower_and_resolve};
-use kora_lexer::{Token, tokenize};
+use kora_hir::lower_and_resolve;
+use kora_lexer::tokenize;
 use kora_ownership::analyze_ownership;
 use kora_parser::parse_module;
 use kora_span::SourceMap;
-use kora_ty::{TypeCheckOutput, check_module};
+use kora_ty::check_module;
 
 fn verify_architectural_purity(path_str: &str, ast: &Module, bag: &mut DiagnosticBag) {
     let canonical = Path::new(path_str)

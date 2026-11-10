@@ -1,12 +1,9 @@
 //! High-Performance HTTP Engine for Kora built atop Axum, Tower, and Hyper.
 //! Supports Zero-Config routing, route groups, validation, and automatic OpenAPI 3.1 generation.
 
-use std::collections::HashMap;
 use std::net::SocketAddr;
-use std::sync::Arc;
 
 use axum::Router;
-use axum::response::IntoResponse;
 use axum::routing::{delete, get, post, put};
 use serde::{Deserialize, Serialize};
 

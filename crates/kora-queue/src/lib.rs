@@ -71,7 +71,7 @@ mod tests {
         let q = QueueEngine::new();
         q.push("send_email", r#"{"to":"user@kora.dev"}"#, 2).await;
 
-        let mut job = q.pop().await.expect("job exists");
+        let job = q.pop().await.expect("job exists");
         assert_eq!(job.name, "send_email");
 
         // Fail once -> retry

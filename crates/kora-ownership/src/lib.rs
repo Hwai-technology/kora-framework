@@ -42,7 +42,7 @@ pub fn analyze_ownership(
     let mut plan = OwnershipPlan::default();
 
     // 1. Mark all service classes & interfaces as Arc-promoted across async boundaries
-    for (cname, _) in &types.classes {
+    for cname in types.classes.keys() {
         plan.promoted_services.insert(cname.clone());
     }
 

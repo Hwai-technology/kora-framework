@@ -42,13 +42,19 @@ impl KoraRuntime {
 
 /// MPSC Bounded Typed Message Channel for Kora
 pub struct Channel<T> {
-    tx: mpsc::Sender<T>,
-    rx: mpsc::Receiver<T>,
+    pub tx: mpsc::Sender<T>,
+    pub rx: mpsc::Receiver<T>,
 }
 
 impl<T> Channel<T> {
+    #[allow(clippy::new_ret_no_self)]
     pub fn new(capacity: usize) -> (mpsc::Sender<T>, mpsc::Receiver<T>) {
         mpsc::channel(capacity)
+    }
+
+    pub fn pair(capacity: usize) -> Self {
+        let (tx, rx) = mpsc::channel(capacity);
+        Self { tx, rx }
     }
 }
 

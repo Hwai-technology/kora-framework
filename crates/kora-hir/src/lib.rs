@@ -4,8 +4,8 @@
 use std::collections::{HashMap, HashSet};
 
 use kora_ast::{
-    ClassDecl, ClosureBody, ElseBranch, EnumDecl, Expr, ExtendDecl, FieldDecl, FnDecl, FnSig,
-    Ident, InterfaceDecl, Item, ModelDecl, Module, Pattern, Stmt, StructDecl, TypeExpr,
+    ClassDecl, ClosureBody, ElseBranch, EnumDecl, Expr, FieldDecl, FnDecl, FnSig, Ident,
+    InterfaceDecl, Item, ModelDecl, Module, Pattern, Stmt, StructDecl, TypeExpr,
 };
 use kora_diagnostics::{Diagnostic, DiagnosticBag};
 use kora_span::Span;

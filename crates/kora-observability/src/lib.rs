@@ -75,7 +75,7 @@ mod parking_lot_sim {
     #[derive(Default)]
     pub struct SimMutex<T>(Mutex<T>);
     impl<T> SimMutex<T> {
-        pub fn lock(&self) -> MutexGuard<T> {
+        pub fn lock(&self) -> MutexGuard<'_, T> {
             self.0.lock().unwrap()
         }
     }
