@@ -4,7 +4,7 @@ _kora_completions() {
     local cur prev words cword
     _init_completion || return
 
-    local commands="check types ast tokens codegen build run bench db pkg create new init g generate help version --version --help"
+    local commands="check types ast tokens codegen build run watch w fmt lsp bench db pkg create new init g generate help version --version --help"
     local db_actions="migrate sync seed truncate drop refresh"
     local pkg_actions="install add remove list publish"
     local gen_actions="feature f"
@@ -15,7 +15,7 @@ _kora_completions() {
     fi
 
     case "${words[1]}" in
-        check|types|ast|tokens|codegen|build|run)
+        check|types|ast|tokens|codegen|build|run|watch|w|fmt)
             # Complete .kora and .kr source files
             COMPREPLY=($(compgen -f -X '!*.kora' -- "$cur") $(compgen -f -X '!*.kr' -- "$cur"))
             return 0

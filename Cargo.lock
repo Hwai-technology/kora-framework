@@ -900,6 +900,7 @@ name = "kora-lsp"
 version = "0.1.0-alpha.1"
 dependencies = [
  "kora-diagnostics",
+ "kora-fmt",
  "kora-hir",
  "kora-span",
  "kora-ty",

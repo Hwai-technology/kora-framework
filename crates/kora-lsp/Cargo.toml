@@ -11,6 +11,7 @@ kora-span.workspace = true
 kora-diagnostics.workspace = true
 kora-hir.workspace = true
 kora-ty.workspace = true
+kora-fmt.workspace = true
 
 [lints]
 workspace = true

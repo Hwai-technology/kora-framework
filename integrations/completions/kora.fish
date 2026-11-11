@@ -9,6 +9,8 @@ complete -c kora -s v -l version -d "Display Kora version"
 
 # Top-level commands
 complete -c kora -n "__fish_use_subcommand" -a run -d "Compile and execute a Kora program directly or project entrypoint"
+complete -c kora -n "__fish_use_subcommand" -a watch -d "Watch for file modifications and re-compile instantaneously"
+complete -c kora -n "__fish_use_subcommand" -a w -d "Short alias for watch"
 complete -c kora -n "__fish_use_subcommand" -a check -d "Parse and verify architectural purity without codegen"
 complete -c kora -n "__fish_use_subcommand" -a build -d "Compile Kora source to an optimized native binary"
 complete -c kora -n "__fish_use_subcommand" -a types -d "Run static type inference and interface verification"

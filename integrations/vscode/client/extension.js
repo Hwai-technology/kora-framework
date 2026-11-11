@@ -1,5 +1,7 @@
 const vscode = require('vscode');
 const { exec } = require('child_process');
+const path = require('path');
+const fs = require('fs');
 
 let diagnosticCollection;
 let validationTimeouts = new Map();
@@ -7,7 +9,8 @@ let validationTimeouts = new Map();
 /**
  * Activates the Kora Language Extension.
  * Provides real-time compiler diagnostics, intelligent autocompletion,
- * and contextual hover documentation for `.kora` and `.kr` files.
+ * contextual hover documentation, document formatting, Go To Definition,
+ * Document Symbols (Outline), and CodeLens execution for `.kora` and `.kr` files.
  */
 function activate(context) {
     diagnosticCollection = vscode.languages.createDiagnosticCollection('kora');
@@ -28,7 +31,7 @@ function activate(context) {
         scheduleValidation(vscode.window.activeTextEditor.document, 0);
     }
 
-    // 2. Intelligent Autocompletion Provider (Ctrl+Space, typing, and trigger characters)
+    // 2. Intelligent Autocompletion Provider
     const completionProvider = vscode.languages.registerCompletionItemProvider(
         'kora',
         {
@@ -141,7 +144,7 @@ function activate(context) {
                 return completions;
             }
         },
-        '.', '@' // Trigger characters
+        '.', '@'
     );
     context.subscriptions.push(completionProvider);
 
@@ -149,12 +152,13 @@ function activate(context) {
     const hoverProvider = vscode.languages.registerHoverProvider('kora', {
         provideHover(document, position, token) {
             const range = document.getWordRangeAtPosition(position);
+            if (!range) return null;
             const word = document.getText(range);
 
             const docs = {
                 model: '**Kora `model`**\n\nPure, immutable Data Transfer Object (DTO) or database entity. Models never hold behavior or stateful methods and are compiled with zero-GC overhead.',
                 class: '**Kora `class`**\n\nService or Controller class with compile-time Dependency Injection (DI). All parameters in `init(...)` are resolved automatically.',
-                interface: '**Kora `interface`**\n\nPure behavioral contract defining method signatures. Enforced statically by the Kora compiler.',
+                interface: '**Kora `interface`**\n\nBehavioral contract defining method signatures. Enforced statically by the Kora compiler.',
                 actor: '**Kora `actor`**\n\nIsolated stateful concurrency unit executing on Tokio worker threads with non-blocking mailboxes (`tell` / `ask`).',
                 channel: '**Kora `channel<T>(capacity)`**\n\nNon-blocking MPSC channel for asynchronous message passing.',
                 broadcast: '**Kora `broadcast<T>(capacity)`**\n\nMulti-producer, multi-consumer broadcast channel for pub/sub events.',
@@ -169,6 +173,207 @@ function activate(context) {
         }
     });
     context.subscriptions.push(hoverProvider);
+
+    // 4. Document Formatting Provider (`Shift+Alt+F` & `formatOnSave`)
+    const formattingProvider = vscode.languages.registerDocumentFormattingEditProvider('kora', {
+        provideDocumentFormattingEdits(document, options, token) {
+            return new Promise((resolve) => {
+                const filePath = document.fileName;
+                exec(`kora fmt "${filePath}"`, (err, stdout, stderr) => {
+                    if (err) {
+                        vscode.window.showErrorMessage(`Kora format error: ${stderr || err.message}`);
+                        return resolve([]);
+                    }
+
+                    // Read the updated file content and replace document range
+                    try {
+                        const formattedText = fs.readFileSync(filePath, 'utf-8');
+                        const fullRange = new vscode.Range(
+                            document.positionAt(0),
+                            document.positionAt(document.getText().length)
+                        );
+                        resolve([vscode.TextEdit.replace(fullRange, formattedText)]);
+                    } catch (readErr) {
+                        resolve([]);
+                    }
+                });
+            });
+        }
+    });
+    context.subscriptions.push(formattingProvider);
+
+    // 5. Go To Definition Provider (`F12` / `Ctrl+Click`)
+    const definitionProvider = vscode.languages.registerDefinitionProvider('kora', {
+        provideDefinition(document, position, token) {
+            const range = document.getWordRangeAtPosition(position);
+            if (!range) return null;
+            const word = document.getText(range);
+
+            const docText = document.getText();
+            const lines = docText.split('\n');
+
+            // 1. Search for definitions in the current file: (class|model|interface|enum|fn|let|var) <word>
+            const declRegex = new RegExp(`\\b(class|model|interface|enum|fn|let|var)\\s+${word}\\b`);
+            for (let i = 0; i < lines.length; i++) {
+                const match = declRegex.exec(lines[i]);
+                if (match) {
+                    const col = match.index + match[1].length + 1;
+                    return new vscode.Location(
+                        document.uri,
+                        new vscode.Position(i, col)
+                    );
+                }
+            }
+
+            // 2. Check if the word is imported: import { ... word ... } from "path"
+            const importRegex = /import\s*\{\s*([^}]+)\s*\}\s*from\s*["']([^"']+)["']/g;
+            let impMatch;
+            while ((impMatch = importRegex.exec(docText)) !== null) {
+                const importedNames = impMatch[1].split(',').map(s => s.trim());
+                if (importedNames.includes(word)) {
+                    const relPath = impMatch[2];
+                    const dir = path.dirname(document.fileName);
+                    const candidates = [
+                        path.resolve(dir, relPath),
+                        path.resolve(dir, `${relPath}.kora`),
+                        path.resolve(dir, `${relPath}.kr`),
+                        path.resolve(dir, relPath, 'index.kora'),
+                        path.resolve(dir, relPath, 'index.kr')
+                    ];
+
+                    for (const cand of candidates) {
+                        if (fs.existsSync(cand) && fs.statSync(cand).isFile()) {
+                            const importedContent = fs.readFileSync(cand, 'utf-8');
+                            const impLines = importedContent.split('\n');
+                            for (let j = 0; j < impLines.length; j++) {
+                                if (declRegex.test(impLines[j])) {
+                                    return new vscode.Location(
+                                        vscode.Uri.file(cand),
+                                        new vscode.Position(j, 0)
+                                    );
+                                }
+                            }
+                            return new vscode.Location(
+                                vscode.Uri.file(cand),
+                                new vscode.Position(0, 0)
+                            );
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+    });
+    context.subscriptions.push(definitionProvider);
+
+    // 6. Document Symbols Provider (Outline View & Breadcrumbs)
+    const symbolProvider = vscode.languages.registerDocumentSymbolProvider('kora', {
+        provideDocumentSymbols(document, token) {
+            const symbols = [];
+            const docText = document.getText();
+            const lines = docText.split('\n');
+
+            const itemRegex = /^\s*(pub\s+)?(model|class|interface|enum|fn)\s+([A-Za-z0-9_]+)/;
+
+            for (let i = 0; i < lines.length; i++) {
+                const match = itemRegex.exec(lines[i]);
+                if (match) {
+                    const kindStr = match[2];
+                    const name = match[3];
+                    let kind = vscode.SymbolKind.Class;
+                    if (kindStr === 'fn') kind = vscode.SymbolKind.Function;
+                    else if (kindStr === 'interface') kind = vscode.SymbolKind.Interface;
+                    else if (kindStr === 'enum') kind = vscode.SymbolKind.Enum;
+                    else if (kindStr === 'model') kind = vscode.SymbolKind.Struct;
+
+                    const lineRange = new vscode.Range(new vscode.Position(i, 0), new vscode.Position(i, lines[i].length));
+                    const sym = new vscode.DocumentSymbol(
+                        name,
+                        kindStr,
+                        kind,
+                        lineRange,
+                        lineRange
+                    );
+                    symbols.push(sym);
+                }
+            }
+            return symbols;
+        }
+    });
+    context.subscriptions.push(symbolProvider);
+
+    // 7. CodeLens Provider ("▶ Run File" & "⚡ Check File")
+    const codeLensProvider = vscode.languages.registerCodeLensProvider('kora', {
+        provideCodeLenses(document, token) {
+            const codeLenses = [];
+            const docText = document.getText();
+            const lines = docText.split('\n');
+
+            // Find `fn main` or top entrypoint
+            for (let i = 0; i < lines.length; i++) {
+                if (/fn\s+main\s*\(/.test(lines[i])) {
+                    const range = new vscode.Range(new vscode.Position(i, 0), new vscode.Position(i, 0));
+                    codeLenses.push(
+                        new vscode.CodeLens(range, {
+                            title: '▶ Run File',
+                            command: 'kora.runFile',
+                            arguments: [document.fileName]
+                        }),
+                        new vscode.CodeLens(range, {
+                            title: '⚡ Check File',
+                            command: 'kora.checkFile',
+                            arguments: [document.fileName]
+                        })
+                    );
+                    break;
+                }
+            }
+
+            // If no main() exists, place Run/Check at the top of the file
+            if (codeLenses.length === 0 && lines.length > 0) {
+                const topRange = new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0));
+                codeLenses.push(
+                    new vscode.CodeLens(topRange, {
+                        title: '▶ Run File',
+                        command: 'kora.runFile',
+                        arguments: [document.fileName]
+                    }),
+                    new vscode.CodeLens(topRange, {
+                        title: '⚡ Check File',
+                        command: 'kora.checkFile',
+                        arguments: [document.fileName]
+                    })
+                );
+            }
+
+            return codeLenses;
+        }
+    });
+    context.subscriptions.push(codeLensProvider);
+
+    // 8. Register VS Code Commands
+    context.subscriptions.push(
+        vscode.commands.registerCommand('kora.runFile', (filePath) => {
+            const activeFile = filePath || (vscode.window.activeTextEditor && vscode.window.activeTextEditor.document.fileName);
+            if (!activeFile) return;
+
+            let terminal = vscode.window.terminals.find(t => t.name === 'Kora Run') || vscode.window.createTerminal('Kora Run');
+            terminal.show();
+            terminal.sendText(`kora "${activeFile}"`);
+        }),
+        vscode.commands.registerCommand('kora.checkFile', (filePath) => {
+            const activeFile = filePath || (vscode.window.activeTextEditor && vscode.window.activeTextEditor.document.fileName);
+            if (!activeFile) return;
+
+            let terminal = vscode.window.terminals.find(t => t.name === 'Kora Check') || vscode.window.createTerminal('Kora Check');
+            terminal.show();
+            terminal.sendText(`kora check "${activeFile}"`);
+        }),
+        vscode.commands.registerCommand('kora.formatFile', () => {
+            vscode.commands.executeCommand('editor.action.formatDocument');
+        })
+    );
 }
 
 /**

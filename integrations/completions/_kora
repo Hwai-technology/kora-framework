@@ -4,6 +4,8 @@ _kora() {
     local -a commands
     commands=(
         'run:Compile and execute a Kora program directly or project entrypoint'
+        'watch:Watch for file modifications and re-compile instantaneously'
+        'w:Short alias for watch'
         'check:Parse and verify architectural purity without codegen'
         'build:Compile Kora source to an optimized native binary'
         'types:Run static type inference and interface verification'

@@ -274,6 +274,13 @@ fn main() -> ExitCode {
         "codegen" => cmd_codegen(args.get(1)),
         "build" => cmd_build(args.get(1)),
         "run" => cmd_run(args.get(1)),
+        "watch" | "w" => cmd_watch(args.get(1)),
+        "fmt" => {
+            let check_flag = args.iter().any(|a| a == "--check");
+            let target = args.get(1).filter(|a| *a != "--check");
+            cmd_fmt(target, check_flag)
+        }
+        "lsp" => cmd_lsp(),
         "bench" => cmd_bench(),
         "init" | "create" | "new" => cmd_create(args.get(1)),
         "g" | "generate" => cmd_generate(args.get(1), args.get(2)),
@@ -301,6 +308,9 @@ fn print_usage() {
          \x20 codegen <file.kora|file.kr>  Emit verified safe Rust code without compiling\n\
          \x20 build <file.kora|file.kr>    Compile to a native release binary inside .kora-build/\n\
          \x20 run <file.kora|file.kr>      Compile and execute the native binary\n\
+         \x20 watch [file.kora]            Watch for file changes and auto-reload instantaneously\n\
+         \x20 fmt [path] [--check]         Canonicalize source code formatting and style\n\
+         \x20 lsp                          Start the JSON-RPC Language Server Protocol daemon\n\
          \x20 bench                        Run reproducible benchmark comparing Kora, Rust, Go, Node, Laravel\n\
          \x20 db <action> [file]           Manage database lifecycle (migrate, sync, seed, truncate, drop, refresh)\n\
          \x20 pkg <action> [args]          Manage distributed packages and modules (install, add, remove, list, publish)\n\
@@ -1445,6 +1455,169 @@ fn cmd_pkg(action: Option<&String>, arg1: Option<&String>, arg2: Option<&String>
             eprintln!("error: unknown package action `{unknown}`");
             eprintln!("Available actions: install, add, remove, list, publish");
             ExitCode::FAILURE
+        }
+    }
+}
+
+fn collect_kora_files(dir: &Path, files: &mut Vec<PathBuf>) {
+    if let Ok(entries) = fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
+                if name != "target"
+                    && name != ".git"
+                    && name != ".kora-build"
+                    && name != "node_modules"
+                {
+                    collect_kora_files(&path, files);
+                }
+            } else if path.is_file() {
+                let is_kora = path
+                    .extension()
+                    .and_then(|e| e.to_str())
+                    .is_some_and(|ext| ext == "kora" || ext == "kr");
+                if is_kora {
+                    files.push(path);
+                }
+            }
+        }
+    }
+}
+
+fn get_latest_mtime(dir: &Path) -> std::time::SystemTime {
+    let mut files = Vec::new();
+    if dir.is_file() {
+        files.push(dir.to_path_buf());
+    } else {
+        collect_kora_files(dir, &mut files);
+    }
+    let mut max_time = std::time::SystemTime::UNIX_EPOCH;
+    for f in files {
+        if let Ok(mtime) = fs::metadata(&f).and_then(|m| m.modified()) {
+            max_time = max_time.max(mtime);
+        }
+    }
+    max_time
+}
+
+fn cmd_fmt(path_arg: Option<&String>, check_only: bool) -> ExitCode {
+    let target = match path_arg {
+        Some(s) => PathBuf::from(s),
+        None => PathBuf::from("."),
+    };
+
+    let mut files_to_format = Vec::new();
+    if target.is_file() {
+        files_to_format.push(target);
+    } else if target.is_dir() {
+        collect_kora_files(&target, &mut files_to_format);
+    } else {
+        eprintln!("error: target path `{}` does not exist", target.display());
+        return ExitCode::FAILURE;
+    }
+
+    if files_to_format.is_empty() {
+        println!("No Kora files (*.kora, *.kr) found to format.");
+        return ExitCode::SUCCESS;
+    }
+
+    let mut unformatted_count = 0;
+    for file in &files_to_format {
+        match fs::read_to_string(file) {
+            Ok(content) => {
+                let formatted = kora_fmt::Formatter::format_source(&content);
+                if formatted != content {
+                    if check_only {
+                        println!("Would reformat: {}", file.display());
+                        unformatted_count += 1;
+                    } else if let Err(e) = fs::write(file, &formatted) {
+                        eprintln!("error: failed writing `{}`: {e}", file.display());
+                        return ExitCode::FAILURE;
+                    } else {
+                        println!("Formatted: {}", file.display());
+                    }
+                }
+            }
+            Err(e) => {
+                eprintln!("error: failed reading `{}`: {e}", file.display());
+                return ExitCode::FAILURE;
+            }
+        }
+    }
+
+    if check_only && unformatted_count > 0 {
+        eprintln!(
+            "\n{} file(s) require formatting. Run `kora fmt` to fix.",
+            unformatted_count
+        );
+        return ExitCode::FAILURE;
+    }
+
+    println!(
+        "✓ All {} Kora source file(s) formatted canonically.",
+        files_to_format.len()
+    );
+    ExitCode::SUCCESS
+}
+
+fn cmd_lsp() -> ExitCode {
+    use std::io::{self, BufRead, Write};
+    let stdin = io::stdin();
+    let mut stdout = io::stdout();
+
+    let mut reader = stdin.lock();
+    let mut line = String::new();
+
+    while reader.read_line(&mut line).unwrap_or(0) > 0 {
+        let trimmed = line.trim();
+        if !trimmed.is_empty() {
+            let json_start = trimmed.find('{');
+            if let Some(idx) = json_start {
+                let json_slice = &trimmed[idx..];
+                if let Some(resp) = kora_lsp::LanguageServer::handle_message(json_slice) {
+                    let msg = format!("Content-Length: {}\r\n\r\n{}", resp.len(), resp);
+                    let _ = stdout.write_all(msg.as_bytes());
+                    let _ = stdout.flush();
+                }
+            }
+        }
+        line.clear();
+    }
+
+    ExitCode::SUCCESS
+}
+
+fn cmd_watch(path: Option<&String>) -> ExitCode {
+    let entrypoint = match resolve_entrypoint_or_default(path, true) {
+        Ok(ep) => ep,
+        Err(e) => {
+            eprintln!("error: {e}");
+            return ExitCode::FAILURE;
+        }
+    };
+
+    println!("🔭 Kora Watcher active: monitoring project files for changes...");
+    println!("Target entrypoint: {entrypoint}\n");
+
+    let root_dir = Path::new(&entrypoint)
+        .parent()
+        .filter(|p| !p.as_os_str().is_empty())
+        .unwrap_or_else(|| Path::new("."));
+
+    let mut last_mtime = get_latest_mtime(root_dir);
+
+    // Initial run
+    let _ = cmd_run(Some(&entrypoint));
+
+    loop {
+        std::thread::sleep(std::time::Duration::from_millis(500));
+        let current_mtime = get_latest_mtime(root_dir);
+        if current_mtime > last_mtime {
+            last_mtime = current_mtime;
+            print!("\x1B[2J\x1B[1;1H");
+            println!("🔄 [kora watch] Detected file modification. Re-compiling & running...");
+            let _ = cmd_run(Some(&entrypoint));
         }
     }
 }

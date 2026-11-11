@@ -56,6 +56,23 @@
         "path": "./snippets/kora.snippets.json"
       }
     ],
+    "commands": [
+      {
+        "command": "kora.runFile",
+        "title": "Kora: Run File",
+        "category": "Kora"
+      },
+      {
+        "command": "kora.checkFile",
+        "title": "Kora: Check File",
+        "category": "Kora"
+      },
+      {
+        "command": "kora.formatFile",
+        "title": "Kora: Format Document",
+        "category": "Kora"
+      }
+    ],
     "iconThemes": [
       {
         "id": "kora-icons",
