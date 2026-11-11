@@ -1,0 +1,33 @@
+{
+  "name": "@hwai-technology/kora",
+  "version": "0.1.0",
+  "description": "Kora - Clean Architecture Programming Framework CLI",
+  "main": "index.js",
+  "bin": {
+    "kora": "./bin/kora.js"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hwai-technology/kora-framework.git"
+  },
+  "keywords": [
+    "kora",
+    "clean-architecture",
+    "framework",
+    "compiler",
+    "rust",
+    "backend",
+    "api",
+    "openapi",
+    "swagger"
+  ],
+  "author": "Hwai Technology",
+  "license": "AGPL-3.0-only",
+  "bugs": {
+    "url": "https://github.com/Hwai-technology/kora-framework/issues"
+  },
+  "homepage": "https://github.com/Hwai-technology/kora-framework#readme"
+}

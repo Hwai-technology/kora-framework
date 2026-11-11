@@ -1,0 +1,11 @@
+target/
+.git/
+.github/
+.agent/
+.kora-build/
+*.tar.gz
+*.zip
+*.log
+docs/
+node_modules/
+dist/
