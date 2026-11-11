@@ -228,6 +228,26 @@ cargo build --bin kora
 ./target/debug/kora --help
 ```
 
+### Automated System Setup
+```bash
+# Run one-step setup (installs CLI, Linux MIME types, completions & editor extension)
+./scripts/setup.sh
+```
+
+### Creating a Clean Architecture Project
+```bash
+# Scaffold an ultra-clean, production-ready project
+kora create my-service
+cd my-service
+
+# Generate an entire CRUD domain feature in seconds
+kora g feature products
+
+# Verify architecture & compile
+kora check src/main.kora
+kora run src/main.kora
+```
+
 ### Checking and Compiling Files
 ```bash
 # Type check a Kora file

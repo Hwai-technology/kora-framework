@@ -36,7 +36,13 @@ fn verify_architectural_purity(path_str: &str, ast: &Module, bag: &mut Diagnosti
             || p.contains("service")
             || p.contains("/controllers/")
             || p.contains("/services/"));
-    let is_main_kora = p.ends_with("main.kora") || p.ends_with("main.kr");
+    let has_structured_project = p.contains("/src/")
+        || canonical
+            .parent()
+            .map(|d| d.join("models").exists() || d.join("src/models").exists())
+            .unwrap_or(false);
+    let is_main_kora =
+        (p.ends_with("main.kora") || p.ends_with("main.kr")) && has_structured_project;
 
     for item in &ast.items {
         match item {
@@ -255,6 +261,11 @@ fn main() -> ExitCode {
         return ExitCode::SUCCESS;
     }
 
+    // Python-like direct execution: `kora script.kora` or `kora script.kr`
+    if args[0].ends_with(".kora") || args[0].ends_with(".kr") {
+        return cmd_run(Some(&args[0]));
+    }
+
     match args[0].as_str() {
         "check" => cmd_check(args.get(1)),
         "types" => cmd_types(args.get(1)),
@@ -264,7 +275,8 @@ fn main() -> ExitCode {
         "build" => cmd_build(args.get(1)),
         "run" => cmd_run(args.get(1)),
         "bench" => cmd_bench(),
-        "init" => cmd_init(args.get(1)),
+        "init" | "create" | "new" => cmd_create(args.get(1)),
+        "g" | "generate" => cmd_generate(args.get(1), args.get(2)),
         "db" => cmd_db(args.get(1), args.get(2)),
         "pkg" => cmd_pkg(args.get(1), args.get(2), args.get(3)),
         unknown => {
@@ -292,16 +304,99 @@ fn print_usage() {
          \x20 bench                        Run reproducible benchmark comparing Kora, Rust, Go, Node, Laravel\n\
          \x20 db <action> [file]           Manage database lifecycle (migrate, sync, seed, truncate, drop, refresh)\n\
          \x20 pkg <action> [args]          Manage distributed packages and modules (install, add, remove, list, publish)\n\
-         \x20 init <dir>                   Scaffold a new production-ready Kora application project",
+         \x20 create <dir>                 Scaffold an ultra-clean, production-ready Clean Architecture project\n\
+         \x20 g feature <name>             Generate a complete CRUD feature (controller, service, models, interfaces, events)\n\
+         \x20 version                      Display toolchain version",
         env!("CARGO_PKG_VERSION")
     );
 }
 
+fn resolve_entrypoint_or_default(
+    path: Option<&String>,
+    auto_create: bool,
+) -> Result<String, String> {
+    if let Some(p) = path {
+        return Ok(p.clone());
+    }
+
+    // 1. Check kora.toml for entry
+    if let Ok(content) = fs::read_to_string("kora.toml") {
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if let Some(val) = trimmed.strip_prefix("entry") {
+                let clean = val
+                    .trim_start_matches(['=', ' ', '"'])
+                    .trim_end_matches('"')
+                    .trim();
+                if Path::new(clean).exists() {
+                    return Ok(clean.to_string());
+                }
+            }
+        }
+    }
+
+    // 2. Standard convention locations
+    let candidates = [
+        "src/main.kora",
+        "src/main.kr",
+        "main.kora",
+        "main.kr",
+        "app.kora",
+        "app.kr",
+    ];
+
+    for c in candidates {
+        if Path::new(c).exists() {
+            return Ok(c.to_string());
+        }
+    }
+
+    // 3. Any single .kora or .kr file in current directory
+    if let Ok(entries) = fs::read_dir(".") {
+        for entry in entries.flatten() {
+            let p = entry.path();
+            let is_kora_file = p
+                .extension()
+                .and_then(|s| s.to_str())
+                .is_some_and(|ext| (ext == "kora" || ext == "kr") && p.is_file());
+            if is_kora_file {
+                return Ok(p.to_string_lossy().to_string());
+            }
+        }
+    }
+
+    // 4. Auto-create starter main.kora if requested (e.g. for `kora run`)
+    if auto_create {
+        let default_content = "// Instant runnable Kora script\n\
+             model AppStatus {\n\
+             \x20   status: String,\n\
+             \x20   message: String,\n\
+             }\n\n\
+             let app = run()\n\n\
+             get(\"/\", () => {\n\
+             \x20   return AppStatus {\n\
+             \x20       status: \"running\",\n\
+             \x20       message: \"Hello from Kora! 🚀\",\n\
+             \x20   }\n\
+             })\n";
+        if fs::write("main.kora", default_content).is_ok() {
+            println!("⚡ [STARTER] No entrypoint found. Generated starter template `main.kora`.");
+            return Ok("main.kora".to_string());
+        }
+    }
+
+    Err("no entrypoint found (looked for src/main.kora, main.kora, app.kora, or *.kr)".to_string())
+}
+
 fn cmd_check(path: Option<&String>) -> ExitCode {
-    let Some(path) = path else {
-        eprintln!("error: missing <file.kora>");
-        return ExitCode::FAILURE;
+    let resolved_path = match resolve_entrypoint_or_default(path, false) {
+        Ok(p) => p,
+        Err(e) => {
+            eprintln!("error: {e}");
+            return ExitCode::FAILURE;
+        }
     };
+    let path = &resolved_path;
 
     let mut sm = SourceMap::new();
     let mut bag = DiagnosticBag::new();
@@ -328,10 +423,14 @@ fn cmd_check(path: Option<&String>) -> ExitCode {
 }
 
 fn cmd_types(path: Option<&String>) -> ExitCode {
-    let Some(path) = path else {
-        eprintln!("error: missing <file.kora>");
-        return ExitCode::FAILURE;
+    let resolved_path = match resolve_entrypoint_or_default(path, false) {
+        Ok(p) => p,
+        Err(e) => {
+            eprintln!("error: {e}");
+            return ExitCode::FAILURE;
+        }
     };
+    let path = &resolved_path;
 
     let mut sm = SourceMap::new();
     let mut bag = DiagnosticBag::new();
@@ -413,9 +512,14 @@ fn cmd_tokens(path: Option<&String>) -> ExitCode {
 }
 
 fn cmd_codegen(path: Option<&String>) -> ExitCode {
-    let Some(path) = path else {
-        return ExitCode::FAILURE;
+    let resolved_path = match resolve_entrypoint_or_default(path, false) {
+        Ok(p) => p,
+        Err(e) => {
+            eprintln!("error: {e}");
+            return ExitCode::FAILURE;
+        }
     };
+    let path = &resolved_path;
 
     let mut sm = SourceMap::new();
     let mut bag = DiagnosticBag::new();
@@ -442,9 +546,14 @@ fn cmd_codegen(path: Option<&String>) -> ExitCode {
 }
 
 fn cmd_build(path: Option<&String>) -> ExitCode {
-    let Some(path) = path else {
-        return ExitCode::FAILURE;
+    let resolved_path = match resolve_entrypoint_or_default(path, false) {
+        Ok(p) => p,
+        Err(e) => {
+            eprintln!("error: {e}");
+            return ExitCode::FAILURE;
+        }
     };
+    let path = &resolved_path;
 
     let mut sm = SourceMap::new();
     let mut bag = DiagnosticBag::new();
@@ -481,9 +590,14 @@ fn cmd_build(path: Option<&String>) -> ExitCode {
 }
 
 fn cmd_run(path: Option<&String>) -> ExitCode {
-    let Some(path) = path else {
-        return ExitCode::FAILURE;
+    let resolved_path = match resolve_entrypoint_or_default(path, true) {
+        Ok(p) => p,
+        Err(e) => {
+            eprintln!("error: {e}");
+            return ExitCode::FAILURE;
+        }
     };
+    let path = &resolved_path;
 
     let mut sm = SourceMap::new();
     let mut bag = DiagnosticBag::new();
@@ -542,26 +656,528 @@ fn cmd_bench() -> ExitCode {
     ExitCode::SUCCESS
 }
 
-fn cmd_init(dir: Option<&String>) -> ExitCode {
-    let Some(dir) = dir else {
-        eprintln!("error: missing target directory");
-        return ExitCode::FAILURE;
-    };
-    let p = Path::new(dir);
+fn to_pascal_case(s: &str) -> String {
+    let mut res = String::new();
+    let mut capitalize_next = true;
+    for c in s.chars() {
+        if c == '_' || c == '-' {
+            capitalize_next = true;
+        } else if capitalize_next {
+            res.extend(c.to_uppercase());
+            capitalize_next = false;
+        } else {
+            res.push(c);
+        }
+    }
+    res
+}
+
+fn singularize(s: &str) -> String {
+    if s.len() > 3 && s.ends_with('s') {
+        s[..s.len() - 1].to_string()
+    } else {
+        s.to_string()
+    }
+}
+
+fn cmd_create(dir: Option<&String>) -> ExitCode {
+    let target_dir = dir.map(|s| s.as_str()).unwrap_or("kora-app");
+    let p = Path::new(target_dir);
     if p.exists() {
-        eprintln!("error: `{dir}` already exists");
+        eprintln!("error: `{target_dir}` already exists");
         return ExitCode::FAILURE;
     }
-    fs::create_dir_all(p.join("src")).unwrap();
+
+    println!("⚡ [SCAFFOLD] Creating ultra-clean Kora project `{target_dir}`...");
+
+    // Create directories for Clean Architecture
+    let src = p.join("src");
+    fs::create_dir_all(src.join("enums")).unwrap();
+    fs::create_dir_all(src.join("models")).unwrap();
+    fs::create_dir_all(src.join("shared/services")).unwrap();
+    fs::create_dir_all(src.join("features/users/models")).unwrap();
+    fs::create_dir_all(src.join("features/users/interfaces")).unwrap();
+    fs::create_dir_all(src.join("features/users/events")).unwrap();
+
+    // 1. kora.toml
     fs::write(
         p.join("kora.toml"),
-        format!("[package]\nname = \"{dir}\"\nversion = \"0.1.0\"\nedition = \"2026\"\nentry = \"src/main.kora\"\n"),
-    ).unwrap();
+        format!(
+            "[package]\n\
+             name = \"{target_dir}\"\n\
+             version = \"0.1.0\"\n\
+             edition = \"2026\"\n\
+             entry = \"src/main.kora\"\n\
+             description = \"Clean Architecture backend service powered by Kora\"\n\n\
+             [server]\n\
+             host = \"127.0.0.1\"\n\
+             port = 8080\n\
+             workers = 4\n\n\
+             [dependencies]\n"
+        ),
+    )
+    .unwrap();
+
+    // 2. .gitignore
     fs::write(
-        p.join("src/main.kora"),
-        "model User { id: Int, name: String }\nlet app = run()\nget(\"/users\", () => { return User { id: 1, name: \"Ahmet\" } })\n",
-    ).unwrap();
-    println!("✓ Initialized new Kora application in `{dir}`");
+        p.join(".gitignore"),
+        "/.kora-build/\n/.kora-packages/\n/dist/\n/target/\n*.log\n.DS_Store\n",
+    )
+    .unwrap();
+
+    // 3. README.md
+    fs::write(
+        p.join("README.md"),
+        format!(
+            "# {target_dir}\n\n\
+             A high-performance, clean architecture backend application built with **Kora**.\n\n\
+             ## 🚀 Quickstart\n\n\
+             ```bash\n\
+             # Verify code & architectural purity\n\
+             kora check src/main.kora\n\n\
+             # Run database migration & seeding\n\
+             kora db sync\n\
+             kora db seed\n\n\
+             # Run local development server\n\
+             kora run src/main.kora\n\
+             ```\n\n\
+             ## 🏛️ Clean Architecture Structure\n\n\
+             - `src/features/users/`: Modular user domain feature (controller, service, DTOs, interfaces, events)\n\
+             - `src/enums/`: Pure type-safe enums (HttpStatus, UserRole)\n\
+             - `src/models/`: Global DTO envelopes (ResponseEnvelope)\n\
+             - `src/shared/`: Shared cross-cutting services (LoggerService)\n"
+        ),
+    )
+    .unwrap();
+
+    // 4. src/enums/http_status.kora
+    fs::write(
+        src.join("enums/http_status.kora"),
+        "pub enum HttpStatus {\n\
+         \x20   Ok,\n\
+         \x20   Created,\n\
+         \x20   Accepted,\n\
+         \x20   BadRequest,\n\
+         \x20   Unauthorized,\n\
+         \x20   Forbidden,\n\
+         \x20   NotFound,\n\
+         \x20   Conflict,\n\
+         \x20   InternalError,\n\
+         }\n",
+    )
+    .unwrap();
+
+    // 5. src/enums/user_role.kora
+    fs::write(
+        src.join("enums/user_role.kora"),
+        "pub enum UserRole {\n\
+         \x20   Admin,\n\
+         \x20   Member,\n\
+         \x20   Guest,\n\
+         }\n",
+    )
+    .unwrap();
+
+    // 6. src/models/response_envelope.kora
+    fs::write(
+        src.join("models/response_envelope.kora"),
+        "model ResponseEnvelope<T> {\n\
+         \x20   success: Bool,\n\
+         \x20   message: String,\n\
+         \x20   data: Option<T>,\n\
+         \x20   status_code: Int,\n\
+         }\n",
+    )
+    .unwrap();
+
+    // 7. src/shared/services/logger_service.kora
+    fs::write(
+        src.join("shared/services/logger_service.kora"),
+        "class LoggerService {\n\
+         \x20   prefix: String,\n\n\
+         \x20   init() {\n\
+         \x20       this.prefix = \"[APP]\"\n\
+         \x20   }\n\n\
+         \x20   fn info(msg: String) -> Unit {\n\
+         \x20       print(this.prefix)\n\
+         \x20       print(msg)\n\
+         \x20   }\n\n\
+         \x20   fn error(msg: String) -> Unit {\n\
+         \x20       print(\"[ERROR]\")\n\
+         \x20       print(msg)\n\
+         \x20   }\n\
+         }\n",
+    )
+    .unwrap();
+
+    // 8. src/features/users/models/user_entity.kora
+    fs::write(
+        src.join("features/users/models/user_entity.kora"),
+        "@entity\n\
+         @table(\"users\")\n\
+         model UserEntity {\n\
+         \x20   @primary\n\
+         \x20   @autoIncrement\n\
+         \x20   id: Int,\n\
+         \x20   @required\n\
+         \x20   name: String,\n\
+         \x20   @unique\n\
+         \x20   @email\n\
+         \x20   email: String,\n\
+         \x20   active: Bool,\n\
+         }\n",
+    )
+    .unwrap();
+
+    // 9. src/features/users/models/user_dto.kora
+    fs::write(
+        src.join("features/users/models/user_dto.kora"),
+        "model CreateUserDto {\n\
+         \x20   name: String,\n\
+         \x20   email: String,\n\
+         }\n\n\
+         model UpdateUserDto {\n\
+         \x20   name: Option<String>,\n\
+         \x20   email: Option<String>,\n\
+         \x20   active: Option<Bool>,\n\
+         }\n\n\
+         model UserResponseDto {\n\
+         \x20   id: Int,\n\
+         \x20   name: String,\n\
+         \x20   email: String,\n\
+         \x20   active: Bool,\n\
+         }\n",
+    )
+    .unwrap();
+
+    // 10. src/features/users/interfaces/user_service_interface.kora
+    fs::write(
+        src.join("features/users/interfaces/user_service_interface.kora"),
+        "import { UserResponseDto, CreateUserDto } from \"../models/user_dto\"\n\n\
+         interface UserServiceInterface {\n\
+         \x20   fn create_user(dto: CreateUserDto) -> UserResponseDto\n\
+         \x20   fn get_user_by_id(id: Int) -> Option<UserResponseDto>\n\
+         \x20   fn get_all_users() -> List<UserResponseDto>\n\
+         \x20   fn delete_user(id: Int) -> Bool\n\
+         }\n",
+    )
+    .unwrap();
+
+    // 11. src/features/users/events/user_events.kora
+    fs::write(
+        src.join("features/users/events/user_events.kora"),
+        "model UserCreatedEvent {\n\
+         \x20   user_id: Int,\n\
+         \x20   email: String,\n\
+         \x20   timestamp: Int,\n\
+         }\n\n\
+         model UserDeletedEvent {\n\
+         \x20   user_id: Int,\n\
+         \x20   timestamp: Int,\n\
+         }\n",
+    )
+    .unwrap();
+
+    // 12. src/features/users/users.service.kora
+    fs::write(
+        src.join("features/users/users.service.kora"),
+        "import { UserResponseDto, CreateUserDto } from \"./models/user_dto\"\n\
+         import { UserServiceInterface } from \"./interfaces/user_service_interface\"\n\n\
+         class UsersService implements UserServiceInterface {\n\
+         \x20   db: Database,\n\n\
+         \x20   init(db: Database) {\n\
+         \x20       this.db = db\n\
+         \x20   }\n\n\
+         \x20   fn create_user(dto: CreateUserDto) -> UserResponseDto {\n\
+         \x20       return UserResponseDto {\n\
+         \x20           id: 1,\n\
+         \x20           name: dto.name,\n\
+         \x20           email: dto.email,\n\
+         \x20           active: true,\n\
+         \x20       }\n\
+         \x20   }\n\n\
+         \x20   fn get_user_by_id(id: Int) -> Option<UserResponseDto> {\n\
+         \x20       if id <= 0 {\n\
+         \x20           return None\n\
+         \x20       }\n\
+         \x20       return Some(UserResponseDto {\n\
+         \x20           id: id,\n\
+         \x20           name: \"Ahmet\",\n\
+         \x20           email: \"ahmet@kora.dev\",\n\
+         \x20           active: true,\n\
+         \x20       })\n\
+         \x20   }\n\n\
+         \x20   fn get_all_users() -> List<UserResponseDto> {\n\
+         \x20       return [\n\
+         \x20           UserResponseDto { id: 1, name: \"Ahmet\", email: \"ahmet@kora.dev\", active: true },\n\
+         \x20           UserResponseDto { id: 2, name: \"Sara\", email: \"sara@kora.dev\", active: true },\n\
+         \x20       ]\n\
+         \x20   }\n\n\
+         \x20   fn delete_user(id: Int) -> Bool {\n\
+         \x20       return id > 0\n\
+         \x20   }\n\
+         }\n",
+    )
+    .unwrap();
+
+    // 13. src/features/users/users.controller.kora
+    fs::write(
+        src.join("features/users/users.controller.kora"),
+        "import { UsersService } from \"./users.service\"\n\
+         import { CreateUserDto, UserResponseDto } from \"./models/user_dto\"\n\n\
+         class UsersController {\n\
+         \x20   service: UsersService,\n\n\
+         \x20   init(service: UsersService) {\n\
+         \x20       this.service = service\n\
+         \x20   }\n\n\
+         \x20   fn list() -> List<UserResponseDto> {\n\
+         \x20       return this.service.get_all_users()\n\
+         \x20   }\n\n\
+         \x20   fn get_by_id(id: Int) -> Option<UserResponseDto> {\n\
+         \x20       return this.service.get_user_by_id(id)\n\
+         \x20   }\n\n\
+         \x20   fn create(dto: CreateUserDto) -> UserResponseDto {\n\
+         \x20       return this.service.create_user(dto)\n\
+         \x20   }\n\
+         }\n",
+    )
+    .unwrap();
+
+    // 14. src/main.kora
+    fs::write(
+        src.join("main.kora"),
+        "import { UsersController } from \"./features/users/users.controller\"\n\
+         import { CreateUserDto } from \"./features/users/models/user_dto\"\n\
+         import { LoggerService } from \"./shared/services/logger_service\"\n\n\
+         let app = run()\n\n\
+         get(\"/api/users\", (ctrl: UsersController) => {\n\
+         \x20   return ctrl.list()\n\
+         })\n\n\
+         get(\"/api/users/:id\", (ctrl: UsersController) => {\n\
+         \x20   return ctrl.get_by_id(1)\n\
+         })\n\n\
+         post(\"/api/users\", (req: Request, ctrl: UsersController) => {\n\
+         \x20   let dto = CreateUserDto {\n\
+         \x20       name: \"New User\",\n\
+         \x20       email: \"user@kora.dev\",\n\
+         \x20   }\n\
+         \x20   return ctrl.create(dto)\n\
+         })\n",
+    )
+    .unwrap();
+
+    println!("✓ Initialized Clean Architecture Kora application in `{target_dir}`:");
+    println!("  ├── kora.toml, .gitignore, README.md");
+    println!("  ├── src/main.kora (Application Entrypoint & Routing)");
+    println!("  ├── src/enums/ (HttpStatus, UserRole)");
+    println!("  ├── src/models/ (ResponseEnvelope<T>)");
+    println!("  ├── src/shared/services/ (LoggerService)");
+    println!("  └── src/features/users/ (Controller, Service, Models, Interfaces, Events)");
+    println!("\nNext steps:");
+    println!("  cd {target_dir}");
+    println!("  kora check src/main.kora");
+    println!("  kora run src/main.kora");
+    ExitCode::SUCCESS
+}
+
+fn cmd_generate(subcmd: Option<&String>, name: Option<&String>) -> ExitCode {
+    let Some(subcmd_str) = subcmd else {
+        eprintln!("error: usage: kora g <feature> <name>");
+        return ExitCode::FAILURE;
+    };
+
+    if subcmd_str != "feature" && subcmd_str != "f" {
+        eprintln!("error: unknown generator `{subcmd_str}`. Available generators: feature (or f)");
+        return ExitCode::FAILURE;
+    }
+
+    let Some(raw_name) = name else {
+        eprintln!("error: missing feature name. Example: kora g feature products");
+        return ExitCode::FAILURE;
+    };
+
+    let feat_lower = raw_name.to_lowercase();
+    let singular_lower = singularize(&feat_lower);
+    let feat_pascal = to_pascal_case(&feat_lower);
+    let singular_pascal = to_pascal_case(&singular_lower);
+
+    // Locate src directory
+    let src_dir = if Path::new("src").exists() || Path::new("kora.toml").exists() {
+        PathBuf::from("src")
+    } else {
+        eprintln!("error: cannot find `src/` directory. Make sure you are inside a Kora project.");
+        return ExitCode::FAILURE;
+    };
+
+    let feat_dir = src_dir.join("features").join(&feat_lower);
+    if feat_dir.exists() {
+        eprintln!(
+            "error: feature `{feat_lower}` already exists in `{}`",
+            feat_dir.display()
+        );
+        return ExitCode::FAILURE;
+    }
+
+    fs::create_dir_all(feat_dir.join("models")).unwrap();
+    fs::create_dir_all(feat_dir.join("interfaces")).unwrap();
+    fs::create_dir_all(feat_dir.join("events")).unwrap();
+
+    println!(
+        "⚡ [GENERATE] Creating clean feature `{feat_lower}` in `{}`...",
+        feat_dir.display()
+    );
+
+    // 1. Entity Model: models/<feature>_entity.kora
+    fs::write(
+        feat_dir.join(format!("models/{singular_lower}_entity.kora")),
+        format!(
+            "@entity\n\
+             @table(\"{feat_lower}\")\n\
+             model {singular_pascal}Entity {{\n\
+             \x20   @primary\n\
+             \x20   @autoIncrement\n\
+             \x20   id: Int,\n\
+             \x20   @required\n\
+             \x20   name: String,\n\
+             \x20   active: Bool,\n\
+             }}\n"
+        ),
+    )
+    .unwrap();
+
+    // 2. DTO Models: models/<feature>_dto.kora
+    fs::write(
+        feat_dir.join(format!("models/{singular_lower}_dto.kora")),
+        format!(
+            "model Create{singular_pascal}Dto {{\n\
+             \x20   name: String,\n\
+             }}\n\n\
+             model Update{singular_pascal}Dto {{\n\
+             \x20   name: Option<String>,\n\
+             \x20   active: Option<Bool>,\n\
+             }}\n\n\
+             model {singular_pascal}ResponseDto {{\n\
+             \x20   id: Int,\n\
+             \x20   name: String,\n\
+             \x20   active: Bool,\n\
+             }}\n"
+        ),
+    )
+    .unwrap();
+
+    // 3. Service Interface: interfaces/<feature>_service_interface.kora
+    fs::write(
+        feat_dir.join(format!("interfaces/{singular_lower}_service_interface.kora")),
+        format!(
+            "import {{ {singular_pascal}ResponseDto, Create{singular_pascal}Dto }} from \"../models/{singular_lower}_dto\"\n\n\
+             interface {feat_pascal}ServiceInterface {{\n\
+             \x20   fn create_{singular_lower}(dto: Create{singular_pascal}Dto) -> {singular_pascal}ResponseDto\n\
+             \x20   fn get_{singular_lower}_by_id(id: Int) -> Option<{singular_pascal}ResponseDto>\n\
+             \x20   fn get_all_{feat_lower}() -> List<{singular_pascal}ResponseDto>\n\
+             \x20   fn delete_{singular_lower}(id: Int) -> Bool\n\
+             }}\n"
+        ),
+    )
+    .unwrap();
+
+    // 4. Domain Events: events/<feature>_events.kora
+    fs::write(
+        feat_dir.join(format!("events/{singular_lower}_events.kora")),
+        format!(
+            "model {singular_pascal}CreatedEvent {{\n\
+             \x20   {singular_lower}_id: Int,\n\
+             \x20   timestamp: Int,\n\
+             }}\n\n\
+             model {singular_pascal}DeletedEvent {{\n\
+             \x20   {singular_lower}_id: Int,\n\
+             \x20   timestamp: Int,\n\
+             }}\n"
+        ),
+    )
+    .unwrap();
+
+    // 5. Service: <feature>.service.kora
+    fs::write(
+        feat_dir.join(format!("{feat_lower}.service.kora")),
+        format!(
+            "import {{ {singular_pascal}ResponseDto, Create{singular_pascal}Dto }} from \"./models/{singular_lower}_dto\"\n\
+             import {{ {feat_pascal}ServiceInterface }} from \"./interfaces/{singular_lower}_service_interface\"\n\n\
+             class {feat_pascal}Service implements {feat_pascal}ServiceInterface {{\n\
+             \x20   db: Database,\n\n\
+             \x20   init(db: Database) {{\n\
+             \x20       this.db = db\n\
+             \x20   }}\n\n\
+             \x20   fn create_{singular_lower}(dto: Create{singular_pascal}Dto) -> {singular_pascal}ResponseDto {{\n\
+             \x20       return {singular_pascal}ResponseDto {{\n\
+             \x20           id: 1,\n\
+             \x20           name: dto.name,\n\
+             \x20           active: true,\n\
+             \x20       }}\n\
+             \x20   }}\n\n\
+             \x20   fn get_{singular_lower}_by_id(id: Int) -> Option<{singular_pascal}ResponseDto> {{\n\
+             \x20       if id <= 0 {{\n\
+             \x20           return None\n\
+             \x20       }}\n\
+             \x20       return Some({singular_pascal}ResponseDto {{\n\
+             \x20           id: id,\n\
+             \x20           name: \"Demo {singular_pascal}\",\n\
+             \x20           active: true,\n\
+             \x20       }})\n\
+             \x20   }}\n\n\
+             \x20   fn get_all_{feat_lower}() -> List<{singular_pascal}ResponseDto> {{\n\
+             \x20       return [\n\
+             \x20           {singular_pascal}ResponseDto {{ id: 1, name: \"First {singular_pascal}\", active: true }},\n\
+             \x20       ]\n\
+             \x20   }}\n\n\
+             \x20   fn delete_{singular_lower}(id: Int) -> Bool {{\n\
+             \x20       return id > 0\n\
+             \x20   }}\n\
+             }}\n"
+        ),
+    )
+    .unwrap();
+
+    // 6. Controller: <feature>.controller.kora
+    fs::write(
+        feat_dir.join(format!("{feat_lower}.controller.kora")),
+        format!(
+            "import {{ {feat_pascal}Service }} from \"./{feat_lower}.service\"\n\
+             import {{ Create{singular_pascal}Dto, {singular_pascal}ResponseDto }} from \"./models/{singular_lower}_dto\"\n\n\
+             class {feat_pascal}Controller {{\n\
+             \x20   service: {feat_pascal}Service,\n\n\
+             \x20   init(service: {feat_pascal}Service) {{\n\
+             \x20       this.service = service\n\
+             \x20   }}\n\n\
+             \x20   fn list() -> List<{singular_pascal}ResponseDto> {{\n\
+             \x20       return this.service.get_all_{feat_lower}()\n\
+             \x20   }}\n\n\
+             \x20   fn get_by_id(id: Int) -> Option<{singular_pascal}ResponseDto> {{\n\
+             \x20       return this.service.get_{singular_lower}_by_id(id)\n\
+             \x20   }}\n\n\
+             \x20   fn create(dto: Create{singular_pascal}Dto) -> {singular_pascal}ResponseDto {{\n\
+             \x20       return this.service.create_{singular_lower}(dto)\n\
+             \x20   }}\n\
+             }}\n"
+        ),
+    )
+    .unwrap();
+
+    println!("✓ Generated CRUD Clean Architecture feature `{feat_lower}`:");
+    println!("  ├── {feat_lower}.controller.kora (HTTP Endpoints)");
+    println!("  ├── {feat_lower}.service.kora (Domain Business Logic & DI)");
+    println!("  ├── models/{singular_lower}_entity.kora (@entity Database Model)");
+    println!("  ├── models/{singular_lower}_dto.kora (Create / Update / Response DTOs)");
+    println!("  ├── interfaces/{singular_lower}_service_interface.kora (Contract Interface)");
+    println!("  └── events/{singular_lower}_events.kora (Domain Events)");
+    println!("\nTo register routes in `src/main.kora`:");
+    println!(
+        "  import {{ {feat_pascal}Controller }} from \"./features/{feat_lower}/{feat_lower}.controller\""
+    );
+    println!("  get(\"/api/{feat_lower}\", (ctrl: {feat_pascal}Controller) => ctrl.list())");
+    println!(
+        "  get(\"/api/{feat_lower}/:id\", (ctrl: {feat_pascal}Controller) => ctrl.get_by_id(1))"
+    );
+
     ExitCode::SUCCESS
 }
 

@@ -4,9 +4,10 @@ _kora_completions() {
     local cur prev words cword
     _init_completion || return
 
-    local commands="check types ast tokens codegen build run bench db pkg init help version --version --help"
+    local commands="check types ast tokens codegen build run bench db pkg create new init g generate help version --version --help"
     local db_actions="migrate sync seed truncate drop refresh"
     local pkg_actions="install add remove list publish"
+    local gen_actions="feature f"
 
     if [[ $cword -eq 1 ]]; then
         COMPREPLY=($(compgen -W "$commands" -- "$cur"))
@@ -33,8 +34,14 @@ _kora_completions() {
             fi
             return 0
             ;;
-        init)
+        init|create|new)
             COMPREPLY=($(compgen -d -- "$cur"))
+            return 0
+            ;;
+        g|generate)
+            if [[ $cword -eq 2 ]]; then
+                COMPREPLY=($(compgen -W "$gen_actions" -- "$cur"))
+            fi
             return 0
             ;;
     esac
