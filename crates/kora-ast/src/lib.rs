@@ -238,6 +238,41 @@ pub enum Stmt {
         body: Block,
         span: Span,
     },
+    For {
+        var: Ident,
+        iter: Expr,
+        body: Block,
+        span: Span,
+    },
+    Break {
+        span: Span,
+    },
+    Continue {
+        span: Span,
+    },
+    Const {
+        name: Ident,
+        ty: Option<TypeExpr>,
+        value: Expr,
+        span: Span,
+    },
+    CompoundAssign {
+        target: Box<Expr>,
+        op: CompoundAssignOp,
+        value: Box<Expr>,
+        span: Span,
+    },
+    TryCatch {
+        try_block: Block,
+        catch_param: Option<Ident>,
+        catch_block: Block,
+        finally_block: Option<Block>,
+        span: Span,
+    },
+    Throw {
+        value: Expr,
+        span: Span,
+    },
     Expr {
         expr: Expr,
         span: Span,
@@ -251,7 +286,35 @@ impl Stmt {
             | Self::Return { span, .. }
             | Self::If { span, .. }
             | Self::While { span, .. }
+            | Self::For { span, .. }
+            | Self::Break { span, .. }
+            | Self::Continue { span, .. }
+            | Self::Const { span, .. }
+            | Self::CompoundAssign { span, .. }
+            | Self::TryCatch { span, .. }
+            | Self::Throw { span, .. }
             | Self::Expr { span, .. } => *span,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CompoundAssignOp {
+    AddAssign,
+    SubAssign,
+    MulAssign,
+    DivAssign,
+    ModAssign,
+}
+
+impl CompoundAssignOp {
+    pub const fn symbol(self) -> &'static str {
+        match self {
+            Self::AddAssign => "+=",
+            Self::SubAssign => "-=",
+            Self::MulAssign => "*=",
+            Self::DivAssign => "/=",
+            Self::ModAssign => "%=",
         }
     }
 }
@@ -277,6 +340,9 @@ pub enum BinaryOp {
     Gte,
     And,
     Or,
+    Coalesce,
+    Pipe,
+    Range,
 }
 
 impl BinaryOp {
@@ -295,6 +361,9 @@ impl BinaryOp {
             Self::Gte => ">=",
             Self::And => "&&",
             Self::Or => "||",
+            Self::Coalesce => "??",
+            Self::Pipe => "|>",
+            Self::Range => "..",
         }
     }
 }

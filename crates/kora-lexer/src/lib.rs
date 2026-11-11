@@ -47,6 +47,17 @@ pub enum TokenKind {
     Undefined,
     This,
 
+    // Phase 6 Keywords: Iteration, Control Flow, Error Handling, Immutability
+    For,
+    In,
+    Break,
+    Continue,
+    Const,
+    Try,
+    Catch,
+    Finally,
+    Throw,
+
     // Punctuation & Delimiters
     LParen,
     RParen,
@@ -58,6 +69,12 @@ pub enum TokenKind {
     Semicolon,
     Comma,
     Dot,
+    DotDot, // ..
+    Question, // ?
+    QuestionDot, // ?.
+    QuestionQuestion, // ??
+    Pipe, // |
+    PipeGreater, // |>
     Underscore,
     At,        // @
     ThinArrow, // ->
@@ -65,10 +82,15 @@ pub enum TokenKind {
 
     // Operators
     Plus,
+    PlusEq, // +=
     Minus,
+    MinusEq, // -=
     Star,
+    StarEq, // *=
     Slash,
+    SlashEq, // /=
     Percent,
+    PercentEq, // %=
     Eq,    // =
     EqEq,  // ==
     Bang,  // !
@@ -122,6 +144,15 @@ impl TokenKind {
             Self::Null => "`null`",
             Self::Undefined => "`undefined`",
             Self::This => "`this`",
+            Self::For => "`for`",
+            Self::In => "`in`",
+            Self::Break => "`break`",
+            Self::Continue => "`continue`",
+            Self::Const => "`const`",
+            Self::Try => "`try`",
+            Self::Catch => "`catch`",
+            Self::Finally => "`finally`",
+            Self::Throw => "`throw`",
             Self::LParen => "`(`",
             Self::RParen => "`)`",
             Self::LBrace => "`{`",
@@ -132,14 +163,25 @@ impl TokenKind {
             Self::Semicolon => "`;`",
             Self::Comma => "`,`",
             Self::Dot => "`.`",
+            Self::DotDot => "`..`",
+            Self::Question => "`?`",
+            Self::QuestionDot => "`?.`",
+            Self::QuestionQuestion => "`??`",
+            Self::Pipe => "`|`",
+            Self::PipeGreater => "`|>`",
             Self::Underscore => "`_`",
             Self::ThinArrow => "`->`",
             Self::FatArrow => "`=>`",
             Self::Plus => "`+`",
+            Self::PlusEq => "`+=`",
             Self::Minus => "`-`",
+            Self::MinusEq => "`-=`",
             Self::Star => "`*`",
+            Self::StarEq => "`*=`",
             Self::Slash => "`/`",
+            Self::SlashEq => "`/=`",
             Self::Percent => "`%`",
+            Self::PercentEq => "`%=`",
             Self::Eq => "`=`",
             Self::EqEq => "`==`",
             Self::Bang => "`!`",
@@ -297,19 +339,60 @@ impl<'a> Lexer<'a> {
             ':' => Some(TokenKind::Colon),
             ';' => Some(TokenKind::Semicolon),
             ',' => Some(TokenKind::Comma),
-            '.' => Some(TokenKind::Dot),
+            '.' => {
+                if self.consume_byte(b'.') {
+                    Some(TokenKind::DotDot)
+                } else {
+                    Some(TokenKind::Dot)
+                }
+            }
+            '?' => {
+                if self.consume_byte(b'?') {
+                    Some(TokenKind::QuestionQuestion)
+                } else if self.consume_byte(b'.') {
+                    Some(TokenKind::QuestionDot)
+                } else {
+                    Some(TokenKind::Question)
+                }
+            }
             '@' => Some(TokenKind::At),
-            '+' => Some(TokenKind::Plus),
+            '+' => {
+                if self.consume_byte(b'=') {
+                    Some(TokenKind::PlusEq)
+                } else {
+                    Some(TokenKind::Plus)
+                }
+            }
             '-' => {
                 if self.consume_byte(b'>') {
                     Some(TokenKind::ThinArrow)
+                } else if self.consume_byte(b'=') {
+                    Some(TokenKind::MinusEq)
                 } else {
                     Some(TokenKind::Minus)
                 }
             }
-            '*' => Some(TokenKind::Star),
-            '/' => Some(TokenKind::Slash),
-            '%' => Some(TokenKind::Percent),
+            '*' => {
+                if self.consume_byte(b'=') {
+                    Some(TokenKind::StarEq)
+                } else {
+                    Some(TokenKind::Star)
+                }
+            }
+            '/' => {
+                if self.consume_byte(b'=') {
+                    Some(TokenKind::SlashEq)
+                } else {
+                    Some(TokenKind::Slash)
+                }
+            }
+            '%' => {
+                if self.consume_byte(b'=') {
+                    Some(TokenKind::PercentEq)
+                } else {
+                    Some(TokenKind::Percent)
+                }
+            }
             '=' => {
                 if self.consume_byte(b'=') {
                     Some(TokenKind::EqEq)
@@ -356,14 +439,10 @@ impl<'a> Lexer<'a> {
             '|' => {
                 if self.consume_byte(b'|') {
                     Some(TokenKind::OrOr)
+                } else if self.consume_byte(b'>') {
+                    Some(TokenKind::PipeGreater)
                 } else {
-                    self.diagnostics.emit(
-                        Diagnostic::error("E1001", "unexpected single `|`").with_primary_label(
-                            self.make_span(start, self.pos),
-                            "use `||` for logical OR",
-                        ),
-                    );
-                    None
+                    Some(TokenKind::Pipe)
                 }
             }
             other => {
@@ -415,6 +494,15 @@ impl<'a> Lexer<'a> {
             "if" => TokenKind::If,
             "else" => TokenKind::Else,
             "while" => TokenKind::While,
+            "for" => TokenKind::For,
+            "in" => TokenKind::In,
+            "break" => TokenKind::Break,
+            "continue" => TokenKind::Continue,
+            "const" => TokenKind::Const,
+            "try" => TokenKind::Try,
+            "catch" => TokenKind::Catch,
+            "finally" => TokenKind::Finally,
+            "throw" => TokenKind::Throw,
             "match" => TokenKind::Match,
             "true" => TokenKind::True,
             "false" => TokenKind::False,
@@ -619,5 +707,27 @@ mod tests {
         let _ = tokenize(FileId(0), "let broken = \"hello\n", &mut bag);
         assert!(bag.has_errors());
         assert_eq!(bag.items()[0].code, "E1005");
+    }
+
+    #[test]
+    fn lexes_phase6_operators_and_control_flow_tokens() {
+        let mut bag = DiagnosticBag::new();
+        let src = "for x in 0..10 { break; continue; } const MAX = 50; try { throw err; } catch (e) {} finally {} a += 1; b -= 2; c ?? d; data |> filter";
+        let tokens = tokenize(FileId(0), src, &mut bag);
+        assert!(!bag.has_errors(), "errors: {:?}", bag.items());
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::For));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::In));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::DotDot));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::Break));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::Continue));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::Const));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::Try));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::Catch));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::Finally));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::Throw));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::PlusEq));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::MinusEq));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::QuestionQuestion));
+        assert!(tokens.iter().any(|t| t.kind == TokenKind::PipeGreater));
     }
 }

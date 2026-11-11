@@ -747,6 +747,83 @@ impl<'a> TypeChecker<'a> {
                 self.check_block(body);
                 self.pop_scope();
             }
+            Stmt::Const {
+                name,
+                ty,
+                value,
+                span: _,
+            } => {
+                let declared_ty = ty.as_ref().map(|t| self.lower_type_expr(t));
+                let inferred_rhs = self.check_expr(value, declared_ty.as_ref());
+                let final_ty = if let Some(expected) = declared_ty {
+                    if !self.is_assignable(&expected, &inferred_rhs) {
+                        self.emit_type_mismatch(&expected, &inferred_rhs, value.span());
+                    }
+                    expected
+                } else {
+                    inferred_rhs
+                };
+                self.recorded_bindings.push(InferredBinding {
+                    scope: self.current_scope_label.clone(),
+                    name: name.name.clone(),
+                    mutable: false,
+                    ty: final_ty.clone(),
+                    span: name.span,
+                });
+                self.define_local(name.name.clone(), final_ty);
+            }
+            Stmt::For {
+                var,
+                iter,
+                body,
+                ..
+            } => {
+                let iter_ty = self.check_expr(iter, None);
+                let elem_ty = match iter_ty {
+                    Ty::List(inner) => *inner,
+                    _ => Ty::Int,
+                };
+                self.push_scope();
+                self.define_local(var.name.clone(), elem_ty);
+                self.check_block(body);
+                self.pop_scope();
+            }
+            Stmt::Break { .. } | Stmt::Continue { .. } => {}
+            Stmt::CompoundAssign {
+                target,
+                value,
+                ..
+            } => {
+                let target_ty = self.check_expr(target, None);
+                let _ = self.check_expr(value, Some(&target_ty));
+            }
+            Stmt::Throw { value, .. } => {
+                let _ = self.check_expr(value, None);
+            }
+            Stmt::TryCatch {
+                try_block,
+                catch_param,
+                catch_block,
+                finally_block,
+                ..
+            } => {
+                self.push_scope();
+                self.check_block(try_block);
+                self.pop_scope();
+
+                self.push_scope();
+                if let Some(param) = catch_param {
+                    self.define_local(param.name.clone(), Ty::String);
+                }
+                self.check_block(catch_block);
+                self.pop_scope();
+
+                if let Some(fin) = finally_block {
+                    self.push_scope();
+                    self.check_block(fin);
+                    self.pop_scope();
+                }
+            }
             Stmt::Expr { expr, .. } => {
                 let _ = self.check_expr(expr, None);
             }
@@ -1042,6 +1119,29 @@ impl<'a> TypeChecker<'a> {
                     Ty::Bool
                 }
             }
+            BinaryOp::Coalesce => match lty {
+                Ty::Option(inner) => {
+                    if self.is_assignable(inner, rty) {
+                        (**inner).clone()
+                    } else {
+                        self.emit_binary_error(op, lty, rty, span);
+                        (**inner).clone()
+                    }
+                }
+                _ => lty.clone(),
+            },
+            BinaryOp::Pipe => match rty {
+                Ty::Fn { ret, .. } => (**ret).clone(),
+                _ => rty.clone(),
+            },
+            BinaryOp::Range => {
+                if *lty == Ty::Int && *rty == Ty::Int {
+                    Ty::List(Box::new(Ty::Int))
+                } else {
+                    self.emit_binary_error(op, lty, rty, span);
+                    Ty::List(Box::new(Ty::Int))
+                }
+            }
         }
     }
 
@@ -1228,7 +1328,7 @@ impl<'a> TypeChecker<'a> {
                 },
                 _ => self.emit_unknown_member(recv_ty, field, span),
             },
-            Ty::List(_) => match field {
+            Ty::List(elem) => match field {
                 "len" | "length" | "count" => Ty::Fn {
                     params: Vec::new(),
                     ret: Box::new(Ty::Int),
@@ -1237,6 +1337,16 @@ impl<'a> TypeChecker<'a> {
                 "isEmpty" => Ty::Fn {
                     params: Vec::new(),
                     ret: Box::new(Ty::Bool),
+                    is_async: false,
+                },
+                "contains" => Ty::Fn {
+                    params: vec![*elem.clone()],
+                    ret: Box::new(Ty::Bool),
+                    is_async: false,
+                },
+                "push" => Ty::Fn {
+                    params: vec![*elem.clone()],
+                    ret: Box::new(Ty::Unit),
                     is_async: false,
                 },
                 _ => self.emit_unknown_member(recv_ty, field, span),

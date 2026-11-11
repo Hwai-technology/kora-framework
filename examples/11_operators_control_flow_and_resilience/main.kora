@@ -26,3 +26,4 @@ post("/api/v1/jobs/execute", (req: Request, pipeline: ResilientPipelineService) 
 get("/api/v1/jobs/health", () => {
     return "OK: Pipeline service is healthy with automated panic and error boundaries active."
 })
+

@@ -333,6 +333,7 @@ Kora provides an organized catalog of numbered, self-contained examples in [`exa
 | **08** | [`08_openapi_swagger`](examples/08_openapi_swagger/) | **OpenAPI 3.1 & Swagger** | Zero-config spec discovery, interactive `/docs` UI | `kora run examples/08_openapi_swagger/main.kora` |
 | **09** | [`09_enterprise_clean_architecture`](examples/09_enterprise_clean_architecture/) | **Enterprise Showcase** | 40+ files, domain modules, middleware, database | `cd examples/09_enterprise_clean_architecture && kora run` |
 | **10** | [`10_dto_validation_and_types`](examples/10_dto_validation_and_types/) | **DTO Defense & Type Safety** | Robust validation, files/images, JSON, arrays, enums | `kora run examples/10_dto_validation_and_types/main.kora` |
+| **11** | [`11_operators_control_flow_and_resilience`](examples/11_operators_control_flow_and_resilience/) | **Operators & Try/Catch** | `??`, `+=`, `for..in`, `break`, `continue`, `try/catch/finally` | `kora run examples/11_operators_control_flow_and_resilience/main.kora` |
 
 Read the full catalog documentation in the [`examples/README.md`](examples/README.md).
 

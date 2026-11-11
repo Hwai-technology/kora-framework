@@ -569,6 +569,73 @@ fn emit_stmt(stmt: &Stmt) -> String {
             s.push_str("    }");
             s
         }
+        Stmt::For {
+            var,
+            iter,
+            body,
+            ..
+        } => {
+            let mut s = format!("for {} in {} {{\n", var.name, emit_expr(iter));
+            for st in &body.stmts {
+                s.push_str(&format!("        {}\n", emit_stmt(st)));
+            }
+            s.push_str("    }");
+            s
+        }
+        Stmt::Break { .. } => "break;".to_string(),
+        Stmt::Continue { .. } => "continue;".to_string(),
+        Stmt::Const {
+            name,
+            ty,
+            value,
+            ..
+        } => {
+            let ty_ann = ty
+                .as_ref()
+                .map(|t| format!(": {}", emit_type(t)))
+                .unwrap_or_default();
+            format!("const {}{} = {};", name.name, ty_ann, emit_expr(value))
+        }
+        Stmt::CompoundAssign {
+            target,
+            op,
+            value,
+            ..
+        } => format!("{} {} {};", emit_expr(target), op.symbol(), emit_expr(value)),
+        Stmt::Throw { value, .. } => format!("panic!(\"{{}}\", {});", emit_expr(value)),
+        Stmt::TryCatch {
+            try_block,
+            catch_param,
+            catch_block,
+            finally_block,
+            ..
+        } => {
+            let param_name = catch_param
+                .as_ref()
+                .map(|p| p.name.as_str())
+                .unwrap_or("_err");
+            let mut s =
+                "let __res = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {\n"
+                    .to_string();
+            for st in &try_block.stmts {
+                s.push_str(&format!("        {}\n", emit_stmt(st)));
+            }
+            s.push_str("    }));\n    if let Err(__panic) = __res {\n");
+            s.push_str(&format!(
+                "        let {} = \"Error occurred\".to_string();\n",
+                param_name
+            ));
+            for st in &catch_block.stmts {
+                s.push_str(&format!("        {}\n", emit_stmt(st)));
+            }
+            s.push_str("    }\n");
+            if let Some(fin) = finally_block {
+                for st in &fin.stmts {
+                    s.push_str(&format!("    {}\n", emit_stmt(st)));
+                }
+            }
+            s
+        }
         Stmt::Expr { expr, .. } => format!("{};", emit_expr(expr)),
     }
 }
@@ -635,6 +702,9 @@ fn emit_expr(expr: &Expr) -> String {
                     BinaryOp::Gte => ">=",
                     BinaryOp::And => "&&",
                     BinaryOp::Or => "||",
+                    BinaryOp::Coalesce => return format!("{}.unwrap_or({})", emit_expr(lhs), emit_expr(rhs)),
+                    BinaryOp::Pipe => return format!("{}({})", emit_expr(rhs), emit_expr(lhs)),
+                    BinaryOp::Range => return format!("({}..={})", emit_expr(lhs), emit_expr(rhs)),
                 };
                 format!("({} {} {})", emit_expr(lhs), sym, emit_expr(rhs))
             }

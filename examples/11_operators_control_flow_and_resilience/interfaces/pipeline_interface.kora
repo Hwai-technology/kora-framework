@@ -8,3 +8,4 @@ interface ResilientPipelineContract {
     fn executeBatchJob(request: PipelineJobRequest) -> PipelineJobSummary
     fn calculateBackoff(attempt: Int) -> Int
 }
+

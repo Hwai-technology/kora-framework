@@ -723,9 +723,15 @@ impl<'a> Parser<'a> {
         match &self.peek().kind {
             TokenKind::Let => self.parse_let_or_var_stmt(false),
             TokenKind::Var => self.parse_let_or_var_stmt(true),
+            TokenKind::Const => self.parse_const_stmt(),
             TokenKind::Return => self.parse_return_stmt(),
             TokenKind::If => self.parse_if_stmt(),
             TokenKind::While => self.parse_while_stmt(),
+            TokenKind::For => self.parse_for_stmt(),
+            TokenKind::Break => self.parse_break_stmt(),
+            TokenKind::Continue => self.parse_continue_stmt(),
+            TokenKind::Try => self.parse_try_catch_stmt(),
+            TokenKind::Throw => self.parse_throw_stmt(),
             _ => {
                 let expr = self.parse_expr()?;
                 let span = expr.span();
@@ -733,6 +739,98 @@ impl<'a> Parser<'a> {
                 Some(Stmt::Expr { expr, span })
             }
         }
+    }
+
+    fn parse_const_stmt(&mut self) -> Option<Stmt> {
+        let kw = self.expect(&TokenKind::Const, "expected `const`")?;
+        let name = self.expect_ident("expected constant name")?;
+        let ty = if self.consume(&TokenKind::Colon) {
+            Some(self.parse_type_expr()?)
+        } else {
+            None
+        };
+        self.expect(&TokenKind::Eq, "expected `=` in const declaration")?;
+        let value = self.parse_expr()?;
+        let span = kw.span.merge(value.span());
+        let _ = self.consume(&TokenKind::Semicolon);
+        Some(Stmt::Const {
+            name,
+            ty,
+            value,
+            span,
+        })
+    }
+
+    fn parse_for_stmt(&mut self) -> Option<Stmt> {
+        let kw = self.expect(&TokenKind::For, "expected `for`")?;
+        let var = self.expect_ident("expected loop variable after `for`")?;
+        self.expect(&TokenKind::In, "expected `in` after loop variable")?;
+        let iter = self.parse_expr()?;
+        let body = self.parse_block()?;
+        let span = kw.span.merge(body.span);
+        Some(Stmt::For {
+            var,
+            iter,
+            body,
+            span,
+        })
+    }
+
+    fn parse_break_stmt(&mut self) -> Option<Stmt> {
+        let kw = self.expect(&TokenKind::Break, "expected `break`")?;
+        let _ = self.consume(&TokenKind::Semicolon);
+        Some(Stmt::Break { span: kw.span })
+    }
+
+    fn parse_continue_stmt(&mut self) -> Option<Stmt> {
+        let kw = self.expect(&TokenKind::Continue, "expected `continue`")?;
+        let _ = self.consume(&TokenKind::Semicolon);
+        Some(Stmt::Continue { span: kw.span })
+    }
+
+    fn parse_throw_stmt(&mut self) -> Option<Stmt> {
+        let kw = self.expect(&TokenKind::Throw, "expected `throw`")?;
+        let value = self.parse_expr()?;
+        let span = kw.span.merge(value.span());
+        let _ = self.consume(&TokenKind::Semicolon);
+        Some(Stmt::Throw { value, span })
+    }
+
+    fn parse_try_catch_stmt(&mut self) -> Option<Stmt> {
+        let kw = self.expect(&TokenKind::Try, "expected `try`")?;
+        let try_block = self.parse_block()?;
+        let mut catch_param = None;
+        let mut catch_block = Block {
+            stmts: Vec::new(),
+            span: kw.span,
+        };
+        let mut finally_block = None;
+
+        if self.consume(&TokenKind::Catch) {
+            if self.consume(&TokenKind::LParen) {
+                catch_param = Some(self.expect_ident("expected error variable name in catch")?);
+                self.expect(&TokenKind::RParen, "expected `)` after catch variable")?;
+            }
+            catch_block = self.parse_block()?;
+        }
+
+        if self.consume(&TokenKind::Finally) {
+            finally_block = Some(self.parse_block()?);
+        }
+
+        let end_span = finally_block
+            .as_ref()
+            .map(|b| b.span)
+            .unwrap_or(catch_block.span);
+        let span = kw.span.merge(end_span);
+
+        Some(Stmt::TryCatch {
+            try_block,
+            catch_param,
+            catch_block,
+            finally_block,
+            span,
+        })
     }
 
     fn parse_let_or_var_stmt(&mut self, mutable: bool) -> Option<Stmt> {
@@ -827,6 +925,36 @@ impl<'a> Parser<'a> {
                 span,
             });
         }
+
+        let compound_op = if self.consume(&TokenKind::PlusEq) {
+            Some(BinaryOp::Add)
+        } else if self.consume(&TokenKind::MinusEq) {
+            Some(BinaryOp::Sub)
+        } else if self.consume(&TokenKind::StarEq) {
+            Some(BinaryOp::Mul)
+        } else if self.consume(&TokenKind::SlashEq) {
+            Some(BinaryOp::Div)
+        } else if self.consume(&TokenKind::PercentEq) {
+            Some(BinaryOp::Mod)
+        } else {
+            None
+        };
+
+        if let Some(op) = compound_op {
+            let rhs = self.parse_assign_expr()?;
+            let span = lhs.span().merge(rhs.span());
+            return Some(Expr::Assign {
+                target: Box::new(lhs.clone()),
+                value: Box::new(Expr::Binary {
+                    op,
+                    lhs: Box::new(lhs),
+                    rhs: Box::new(rhs),
+                    span,
+                }),
+                span,
+            });
+        }
+
         Some(lhs)
     }
 
@@ -854,6 +982,8 @@ impl<'a> Parser<'a> {
     fn current_binary_op(&self) -> Option<(BinaryOp, u8)> {
         match &self.peek().kind {
             TokenKind::OrOr => Some((BinaryOp::Or, 1)),
+            TokenKind::QuestionQuestion => Some((BinaryOp::Coalesce, 1)),
+            TokenKind::PipeGreater => Some((BinaryOp::Pipe, 1)),
             TokenKind::AndAnd => Some((BinaryOp::And, 2)),
             TokenKind::EqEq => Some((BinaryOp::Eq, 3)),
             TokenKind::NotEq => Some((BinaryOp::Neq, 3)),
@@ -861,6 +991,7 @@ impl<'a> Parser<'a> {
             TokenKind::LtEq => Some((BinaryOp::Lte, 4)),
             TokenKind::Gt => Some((BinaryOp::Gt, 4)),
             TokenKind::GtEq => Some((BinaryOp::Gte, 4)),
+            TokenKind::DotDot => Some((BinaryOp::Range, 4)),
             TokenKind::Plus => Some((BinaryOp::Add, 5)),
             TokenKind::Minus => Some((BinaryOp::Sub, 5)),
             TokenKind::Star => Some((BinaryOp::Mul, 6)),
@@ -1626,5 +1757,39 @@ class AutoService {
             bag.has_errors(),
             "Malformed unclosed string must trigger compiler diagnostic"
         );
+    }
+
+    #[test]
+    fn parses_phase6_operators_try_catch_and_for_loops() {
+        let mut bag = DiagnosticBag::new();
+        let src = r#"
+const TIMEOUT_SEC: Int = 30;
+var total = 0;
+total += 5;
+let safePort = maybePort ?? 8080;
+
+for item in items {
+    if item == 0 {
+        continue;
+    }
+    if item > 100 {
+        break;
+    }
+}
+
+try {
+    throw "Database error";
+} catch (err) {
+    print(err);
+} finally {
+    print("Done");
+}
+"#;
+        let module = parse_module(FileId(0), src, &mut bag);
+        assert!(!bag.has_errors(), "errors: {:?}", bag.items());
+        assert_eq!(module.items.len(), 6);
+        assert!(matches!(module.items[0], Item::Stmt(Stmt::Const { .. })));
+        assert!(matches!(module.items[4], Item::Stmt(Stmt::For { .. })));
+        assert!(matches!(module.items[5], Item::Stmt(Stmt::TryCatch { .. })));
     }
 }

@@ -18,6 +18,7 @@ Welcome to the official collection of Kora examples. Each example is housed in i
 | **08** | [`08_openapi_swagger`](./08_openapi_swagger/) | **OpenAPI 3.1 & Swagger UI** | Zero-config spec discovery, interactive `/docs` UI, dynamic head meta | `kora run examples/08_openapi_swagger/main.kora` |
 | **09** | [`09_enterprise_clean_architecture`](./09_enterprise_clean_architecture/) | **Full Enterprise Showcase** | 40+ source files, DDD modules, middleware, database layer | `cd examples/09_enterprise_clean_architecture && kora run` |
 | **10** | [`10_dto_validation_and_types`](./10_dto_validation_and_types/) | **DTO Defense & Type Safety** | Robust validation, files/images, JSON, arrays, enums | `kora run examples/10_dto_validation_and_types/main.kora` |
+| **11** | [`11_operators_control_flow_and_resilience`](./11_operators_control_flow_and_resilience/) | **Operators & Try/Catch Resilience** | `??`, `+=`, `for..in`, `break`, `continue`, `try/catch/finally` | `kora run examples/11_operators_control_flow_and_resilience/main.kora` |
 
 ---
 

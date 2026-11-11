@@ -17,3 +17,4 @@ model PipelineJobSummary {
     isSuccessful: Bool
     errorMessage: Option<String>
 }
+

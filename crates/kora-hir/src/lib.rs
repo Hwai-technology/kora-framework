@@ -449,6 +449,74 @@ impl<'a> Resolver<'a> {
                 }
                 self.pop_scope();
             }
+            Stmt::For {
+                var,
+                iter,
+                body,
+                ..
+            } => {
+                self.resolve_expr(iter);
+                self.push_scope();
+                self.define_local(var, false);
+                for s in &body.stmts {
+                    self.resolve_stmt(s);
+                }
+                self.pop_scope();
+            }
+            Stmt::Break { .. } | Stmt::Continue { .. } => {}
+            Stmt::Const {
+                name,
+                ty,
+                value,
+                ..
+            } => {
+                if let Some(t) = ty {
+                    self.resolve_type_expr(t);
+                }
+                self.resolve_expr(value);
+                self.define_local(name, false);
+            }
+            Stmt::CompoundAssign {
+                target,
+                value,
+                ..
+            } => {
+                self.resolve_expr(target);
+                self.resolve_expr(value);
+            }
+            Stmt::Throw { value, .. } => {
+                self.resolve_expr(value);
+            }
+            Stmt::TryCatch {
+                try_block,
+                catch_param,
+                catch_block,
+                finally_block,
+                ..
+            } => {
+                self.push_scope();
+                for s in &try_block.stmts {
+                    self.resolve_stmt(s);
+                }
+                self.pop_scope();
+
+                self.push_scope();
+                if let Some(param) = catch_param {
+                    self.define_local(param, false);
+                }
+                for s in &catch_block.stmts {
+                    self.resolve_stmt(s);
+                }
+                self.pop_scope();
+
+                if let Some(fin) = finally_block {
+                    self.push_scope();
+                    for s in &fin.stmts {
+                        self.resolve_stmt(s);
+                    }
+                    self.pop_scope();
+                }
+            }
             Stmt::Expr { expr, .. } => self.resolve_expr(expr),
         }
     }
