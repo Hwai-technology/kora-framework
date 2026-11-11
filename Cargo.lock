@@ -836,6 +836,8 @@ dependencies = [
  "kora-span",
  "kora-testing",
  "kora-ty",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

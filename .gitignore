@@ -6,6 +6,8 @@
 # Kora build cache & generated output
 /.kora-build/
 /dist/
+/openapi.json
+/swagger-ui.html
 
 # OS & Editor files
 .DS_Store

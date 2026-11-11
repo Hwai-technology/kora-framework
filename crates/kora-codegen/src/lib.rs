@@ -33,6 +33,10 @@ pub fn generate_rust(
     let _ = writeln!(out, "#![allow(warnings)]\n");
     let _ = writeln!(out, "use std::sync::Arc;");
     let _ = writeln!(out, "use serde::{{Serialize, Deserialize}};\n");
+    let _ = writeln!(
+        out,
+        "#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]\npub struct Database;\n\n#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]\npub struct Request {{\n    pub body: String,\n}}\n\n#[allow(dead_code)]\npub fn send<T>(val: T) -> T {{\n    val\n}}\n"
+    );
 
     let has_routes = has_http_routes(&hir.ast);
 
@@ -42,7 +46,7 @@ pub fn generate_rust(
             Item::Struct(s) => {
                 let _ = writeln!(
                     out,
-                    "#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]"
+                    "#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]"
                 );
                 let _ = writeln!(out, "pub struct {} {{", s.name.name);
                 for f in &s.fields {
@@ -53,7 +57,7 @@ pub fn generate_rust(
             Item::Model(m) => {
                 let _ = writeln!(
                     out,
-                    "#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]\n#[serde(rename_all = \"kebab-case\")]"
+                    "#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]\n#[serde(rename_all = \"kebab-case\")]"
                 );
                 let _ = writeln!(out, "pub struct {} {{", m.name.name);
                 for f in &m.fields {
@@ -85,7 +89,7 @@ pub fn generate_rust(
                 let _ = writeln!(out, "}}\n");
             }
             Item::Class(cls) => {
-                let _ = writeln!(out, "#[derive(Clone)]");
+                let _ = writeln!(out, "#[derive(Debug, Clone, Default)]");
                 let _ = writeln!(out, "pub struct {} {{", cls.name.name);
                 for f in &cls.fields {
                     let _ = writeln!(out, "    pub {}: {},", f.name.name, emit_type(&f.ty));
@@ -442,6 +446,14 @@ fn emit_expr(expr: &Expr) -> String {
                         );
                     }
                     "run" => return "()".to_string(),
+                    "get" | "post" | "put" | "delete" => {
+                        let path = args.first().map(emit_expr).unwrap_or_else(|| "\"\"".into());
+                        return format!(
+                            "println!(\"⚡ HTTP Route registered: {:<6} {{}}\", {})",
+                            id.name.to_uppercase(),
+                            path
+                        );
+                    }
                     _ => {}
                 }
             }

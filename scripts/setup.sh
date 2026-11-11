@@ -14,13 +14,75 @@ set -e
 COLOR_BLUE='\033[0;34m'
 COLOR_GREEN='\033[0;32m'
 COLOR_CYAN='\033[0;36m'
+COLOR_YELLOW='\033[1;33m'
 COLOR_RED='\033[0;31m'
 COLOR_RESET='\033[0m'
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Resolve root directory following symlinks
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do
+  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+ROOT_DIR="$( cd -P "$( dirname "$SOURCE" )/.." >/dev/null 2>&1 && pwd )"
+
 BIN_TARGET_DIR="$HOME/.local/bin"
 MIME_TARGET_DIR="$HOME/.local/share/mime/packages"
 COMPLETION_TARGET_DIR="$HOME/.local/share/bash-completion/completions"
+
+# Check if Kora is already installed
+if [[ -f "$BIN_TARGET_DIR/kora" ]] || command -v kora &>/dev/null; then
+    INSTALLED_VER=$("$BIN_TARGET_DIR/kora" --version 2>/dev/null || kora --version 2>/dev/null || echo "kora")
+
+    # Handle explicit command line flags
+    if [[ "$1" == "--uninstall" ]]; then
+        "$ROOT_DIR/scripts/uninstall.sh"
+        exit 0
+    elif [[ "$1" == "--clean" || "$1" == "--reinstall" ]]; then
+        echo -e "${COLOR_CYAN}Performing clean fresh reinstall...${COLOR_RESET}"
+        "$ROOT_DIR/scripts/uninstall.sh"
+    elif [[ "$1" != "--yes" && "$1" != "-y" ]]; then
+        echo -e "${COLOR_CYAN}================================================================${COLOR_RESET}"
+        echo -e "${COLOR_YELLOW}  ⚠️  Kora is already installed on this machine (${INSTALLED_VER})${COLOR_RESET}"
+        echo -e "${COLOR_CYAN}================================================================${COLOR_RESET}"
+        echo -e "Choose an option / اختر الإجراء المطلوب:"
+        echo -e "  [1] 🔄 Update / Refresh installation  (تحديث التثبيت الحالي وحزم التعريفات)"
+        echo -e "  [2] 🔨 Clean Reinstall from scratch   (تثبيت نظيف بالكامل من الصفر)"
+        echo -e "  [3] 🗑️  Uninstall Kora from system     (إلغاء تثبيت اللغة بالكامل من الجهاز)"
+        echo -e "  [4] ❌ Exit / Cancel                  (إلغاء العملية والخروج)"
+        echo ""
+        
+        CHOICE=""
+        if [ -t 0 ]; then
+            read -rp "Enter choice [1-4] (default: 1): " CHOICE
+        elif [ -r /dev/stdin ]; then
+            read -r CHOICE || CHOICE="1"
+        fi
+        CHOICE="${CHOICE:-1}"
+
+        case "$CHOICE" in
+            1)
+                echo -e "${COLOR_CYAN}Updating existing installation...${COLOR_RESET}"
+                ;;
+            2)
+                echo -e "${COLOR_CYAN}Performing clean fresh reinstall...${COLOR_RESET}"
+                "$ROOT_DIR/scripts/uninstall.sh"
+                ;;
+            3)
+                "$ROOT_DIR/scripts/uninstall.sh"
+                exit 0
+                ;;
+            4)
+                echo -e "${COLOR_CYAN}Operation cancelled by user. Exiting.${COLOR_RESET}"
+                exit 0
+                ;;
+            *)
+                echo -e "${COLOR_RED}Invalid choice. Proceeding with standard update.${COLOR_RESET}"
+                ;;
+        esac
+    fi
+fi
 
 echo -e "${COLOR_CYAN}================================================================${COLOR_RESET}"
 echo -e "${COLOR_CYAN}  ⚡ Kora Language & Framework — System Installer & Setup      ${COLOR_RESET}"

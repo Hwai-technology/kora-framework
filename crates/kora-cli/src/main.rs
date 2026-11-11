@@ -17,6 +17,8 @@ use kora_parser::parse_module;
 use kora_span::SourceMap;
 use kora_ty::check_module;
 
+mod openapi;
+
 fn verify_architectural_purity(path_str: &str, ast: &Module, bag: &mut DiagnosticBag) {
     let canonical = Path::new(path_str)
         .canonicalize()
@@ -309,6 +311,8 @@ fn main() -> ExitCode {
         "g" | "generate" => cmd_generate(args.get(1), args.get(2)),
         "db" => cmd_db(args.get(1), args.get(2)),
         "pkg" => cmd_pkg(args.get(1), args.get(2), args.get(3)),
+        "swagger" | "openapi" => cmd_swagger(args.get(1), &args),
+        "update" => cmd_update(),
         unknown => {
             eprintln!("error: unknown command `{unknown}`\n");
             print_usage();
@@ -341,8 +345,10 @@ fn print_usage() {
          \x20 bench                        Run reproducible benchmark comparing Kora, Rust, Go, Node, Laravel\n\
          \x20 db <action> [file]           Manage database lifecycle (migrate, sync, seed, truncate, drop, refresh)\n\
          \x20 pkg <action> [args]          Manage distributed packages and modules (install, add, remove, list, publish)\n\
+         \x20 swagger [file]               Auto-generate OpenAPI 3.1 & Swagger UI docs from models & routes\n\
          \x20 create <dir>                 Scaffold an ultra-clean, production-ready Clean Architecture project\n\
          \x20 g feature <name>             Generate a complete CRUD feature (controller, service, models, interfaces, events)\n\
+         \x20 update                      Update Kora toolchain and refresh all system definitions\n\
          \x20 version                      Display toolchain version\n\
          \x20 help                         Display this help message",
         env!("CARGO_PKG_VERSION")
@@ -483,14 +489,14 @@ fn report_file_read_error(path_str: &str) {
         } else {
             eprintln!("\n  No `.kora` or `.kr` files exist in this folder.");
             eprintln!("  💡 Helpful hints:");
-            eprintln!("    • To start a new Clean Architecture project: `kora create <project-name>`");
+            eprintln!(
+                "    • To start a new Clean Architecture project: `kora create <project-name>`"
+            );
             eprintln!("    • To initialize a project here: `kora init`");
             eprintln!("    • To create a quick starter file and run it immediately: `kora run`");
         }
     } else if path.is_dir() {
-        eprintln!(
-            "error[E1002]: `{path_str}` is a directory, not a Kora source file."
-        );
+        eprintln!("error[E1002]: `{path_str}` is a directory, not a Kora source file.");
         eprintln!(
             "  --> Path: {}",
             path.canonicalize()
@@ -509,9 +515,7 @@ fn report_file_read_error(path_str: &str) {
                 }
             }
             Ok(_) => {
-                eprintln!(
-                    "error[E1004]: failed to parse or resolve imports in `{path_str}`."
-                );
+                eprintln!("error[E1004]: failed to parse or resolve imports in `{path_str}`.");
             }
         }
     }
@@ -560,6 +564,21 @@ fn cmd_check(path: Option<&String>) -> ExitCode {
         return ExitCode::FAILURE;
     };
 
+    // Auto-generate OpenAPI specification & Swagger UI
+    let app_name = Path::new(path)
+        .parent()
+        .and_then(|p| p.file_name())
+        .and_then(|n| n.to_str())
+        .unwrap_or("Kora Application");
+    let openapi_doc = openapi::generate_openapi(&ast, app_name);
+    let openapi_json = serde_json::to_string_pretty(&openapi_doc.spec).unwrap_or_default();
+    let _ = fs::create_dir_all(".kora-build");
+    let _ = fs::write(".kora-build/openapi.json", &openapi_json);
+    let _ = fs::write(
+        ".kora-build/swagger-ui.html",
+        openapi::generate_swagger_ui_html(&openapi_doc.spec, app_name),
+    );
+
     let hir = lower_and_resolve(ast, &mut bag);
     let types = check_module(&hir, &mut bag);
     let _ = analyze_ownership(&hir, &types, &mut bag);
@@ -593,6 +612,21 @@ fn cmd_types(path: Option<&String>) -> ExitCode {
         report_file_read_error(path);
         return ExitCode::FAILURE;
     };
+
+    // Auto-generate OpenAPI specification & Swagger UI
+    let app_name = Path::new(path)
+        .parent()
+        .and_then(|p| p.file_name())
+        .and_then(|n| n.to_str())
+        .unwrap_or("Kora Application");
+    let openapi_doc = openapi::generate_openapi(&ast, app_name);
+    let openapi_json = serde_json::to_string_pretty(&openapi_doc.spec).unwrap_or_default();
+    let _ = fs::create_dir_all(".kora-build");
+    let _ = fs::write(".kora-build/openapi.json", &openapi_json);
+    let _ = fs::write(
+        ".kora-build/swagger-ui.html",
+        openapi::generate_swagger_ui_html(&openapi_doc.spec, app_name),
+    );
 
     let hir = lower_and_resolve(ast, &mut bag);
     let types = check_module(&hir, &mut bag);
@@ -683,6 +717,21 @@ fn cmd_codegen(path: Option<&String>) -> ExitCode {
         return ExitCode::FAILURE;
     };
 
+    // Auto-generate OpenAPI specification & Swagger UI
+    let app_name = Path::new(path)
+        .parent()
+        .and_then(|p| p.file_name())
+        .and_then(|n| n.to_str())
+        .unwrap_or("Kora Application");
+    let openapi_doc = openapi::generate_openapi(&ast, app_name);
+    let openapi_json = serde_json::to_string_pretty(&openapi_doc.spec).unwrap_or_default();
+    let _ = fs::create_dir_all(".kora-build");
+    let _ = fs::write(".kora-build/openapi.json", &openapi_json);
+    let _ = fs::write(
+        ".kora-build/swagger-ui.html",
+        openapi::generate_swagger_ui_html(&openapi_doc.spec, app_name),
+    );
+
     let hir = lower_and_resolve(ast, &mut bag);
     let types = check_module(&hir, &mut bag);
     let ownership = analyze_ownership(&hir, &types, &mut bag);
@@ -716,6 +765,21 @@ fn cmd_build(path: Option<&String>) -> ExitCode {
         report_file_read_error(path);
         return ExitCode::FAILURE;
     };
+
+    // Auto-generate OpenAPI specification & Swagger UI
+    let app_name = Path::new(path)
+        .parent()
+        .and_then(|p| p.file_name())
+        .and_then(|n| n.to_str())
+        .unwrap_or("Kora Application");
+    let openapi_doc = openapi::generate_openapi(&ast, app_name);
+    let openapi_json = serde_json::to_string_pretty(&openapi_doc.spec).unwrap_or_default();
+    let _ = fs::create_dir_all(".kora-build");
+    let _ = fs::write(".kora-build/openapi.json", &openapi_json);
+    let _ = fs::write(
+        ".kora-build/swagger-ui.html",
+        openapi::generate_swagger_ui_html(&openapi_doc.spec, app_name),
+    );
 
     let hir = lower_and_resolve(ast, &mut bag);
     let types = check_module(&hir, &mut bag);
@@ -762,6 +826,21 @@ fn cmd_run(path: Option<&String>) -> ExitCode {
         return ExitCode::FAILURE;
     };
 
+    // Auto-generate OpenAPI specification & Swagger UI
+    let app_name = Path::new(path)
+        .parent()
+        .and_then(|p| p.file_name())
+        .and_then(|n| n.to_str())
+        .unwrap_or("Kora Application");
+    let openapi_doc = openapi::generate_openapi(&ast, app_name);
+    let openapi_json = serde_json::to_string_pretty(&openapi_doc.spec).unwrap_or_default();
+    let _ = fs::create_dir_all(".kora-build");
+    let _ = fs::write(".kora-build/openapi.json", &openapi_json);
+    let _ = fs::write(
+        ".kora-build/swagger-ui.html",
+        openapi::generate_swagger_ui_html(&openapi_doc.spec, app_name),
+    );
+
     let hir = lower_and_resolve(ast, &mut bag);
     let types = check_module(&hir, &mut bag);
     let ownership = analyze_ownership(&hir, &types, &mut bag);
@@ -781,6 +860,69 @@ fn cmd_run(path: Option<&String>) -> ExitCode {
     } else {
         ExitCode::FAILURE
     }
+}
+
+fn cmd_swagger(path: Option<&String>, args: &[String]) -> ExitCode {
+    let resolved_path = match resolve_entrypoint_or_default(path, false) {
+        Ok(p) => p,
+        Err(e) => {
+            report_file_read_error(path.map(|s| s.as_str()).unwrap_or(&e));
+            return ExitCode::FAILURE;
+        }
+    };
+    let path = &resolved_path;
+
+    let mut sm = SourceMap::new();
+    let mut bag = DiagnosticBag::new();
+    let mut visited = HashSet::new();
+
+    let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited)
+    else {
+        report_file_read_error(path);
+        return ExitCode::FAILURE;
+    };
+
+    let app_name = Path::new(path)
+        .parent()
+        .and_then(|p| p.file_name())
+        .and_then(|n| n.to_str())
+        .unwrap_or("Kora Application");
+
+    let doc = openapi::generate_openapi(&ast, app_name);
+
+    let out_json_path = args
+        .iter()
+        .position(|a| a == "--out" || a == "-o")
+        .and_then(|i| args.get(i + 1))
+        .map(|s| s.as_str())
+        .unwrap_or("openapi.json");
+
+    let json_str = serde_json::to_string_pretty(&doc.spec).unwrap_or_default();
+    if let Err(e) = fs::write(out_json_path, &json_str) {
+        eprintln!("error: failed to write OpenAPI spec to `{out_json_path}`: {e}");
+        return ExitCode::FAILURE;
+    }
+
+    let html_path = "swagger-ui.html";
+    let html_str = openapi::generate_swagger_ui_html(&doc.spec, app_name);
+    let _ = fs::write(html_path, html_str);
+
+    println!("✓ Auto-discovered and synthesized OpenAPI 3.1.0 & Swagger UI documentation:");
+    println!(
+        "  ├── Endpoints: {} route operations discovered",
+        doc.endpoint_count
+    );
+    println!(
+        "  ├── Schemas:   {} models, entities, and enums synthesized",
+        doc.schema_count
+    );
+    println!("  ├── OpenAPI:   {}", out_json_path);
+    println!(
+        "  └── Swagger UI: {} (open directly in your browser)",
+        html_path
+    );
+
+    ExitCode::SUCCESS
 }
 
 fn cmd_bench() -> ExitCode {
@@ -833,6 +975,23 @@ fn singularize(s: &str) -> String {
     }
 }
 
+fn cmd_update() -> ExitCode {
+    println!("⚡ Updating Kora Framework & Toolchain to the latest version...");
+    let home = env::var("HOME").unwrap_or_else(|_| ".".to_string());
+    let script = Path::new(&home).join("Desktop/Projects/Kora/scripts/update.sh");
+    if script.exists() {
+        let status = std::process::Command::new("bash").arg(&script).status();
+        if status.map(|s| s.success()).unwrap_or(false) {
+            return ExitCode::SUCCESS;
+        }
+    }
+    eprintln!(
+        "error: could not locate update script at `{}`",
+        script.display()
+    );
+    ExitCode::FAILURE
+}
+
 fn cmd_init(dir: Option<&String>) -> ExitCode {
     let target = dir.map(|s| s.as_str()).unwrap_or(".");
     if target == "." {
@@ -859,7 +1018,9 @@ fn scaffold_project(p: &Path, pkg_name: &str, is_current_dir: bool) -> ExitCode 
     }
 
     if is_current_dir {
-        println!("⚡ [SCAFFOLD] Initializing Clean Architecture Kora project in current directory (`{pkg_name}`)...");
+        println!(
+            "⚡ [SCAFFOLD] Initializing Clean Architecture Kora project in current directory (`{pkg_name}`)..."
+        );
     } else {
         println!("⚡ [SCAFFOLD] Creating ultra-clean Kora project `{pkg_name}`...");
     }
@@ -1171,7 +1332,11 @@ fn scaffold_project(p: &Path, pkg_name: &str, is_current_dir: bool) -> ExitCode 
         );
     }
 
-    let display_dir = if is_current_dir { "current directory" } else { pkg_name };
+    let display_dir = if is_current_dir {
+        "current directory"
+    } else {
+        pkg_name
+    };
     println!("✓ Clean Architecture Kora application ready in {display_dir}:");
     println!("  ├── kora.toml, .gitignore, README.md");
     println!("  ├── src/main.kora (Application Entrypoint & Routing)");
