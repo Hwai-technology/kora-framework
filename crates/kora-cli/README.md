@@ -28,6 +28,8 @@ The unified developer toolchain providing `run`, `watch`, `fmt`, `lsp`, `check`,
 | **`create` / `init`** | `kora create <name>` | Scaffolds a production-grade Clean Architecture project. |
 | **`g feature`** | `kora g feature <name>` | Generates a complete CRUD feature with models, DTOs, service, controller, and events. |
 | **`bench`** | `kora bench` | Executes benchmark against Rust, Go, Node, and Laravel. |
+| **`version`** | `kora --version` / `-v` | Prints current Kora compiler version string. |
+| **`help`** | `kora --help` / `-h` | Prints toolchain usage, available flags, and commands. |
 
 ---
 

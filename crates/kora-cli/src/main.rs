@@ -251,13 +251,21 @@ fn load_module_with_imports(
 
 fn main() -> ExitCode {
     let args: Vec<String> = env::args().skip(1).collect();
-    if args.is_empty() || args[0] == "--help" || args[0] == "-h" || args[0] == "help" {
-        print_usage();
+
+    if args
+        .iter()
+        .any(|a| a == "--version" || a == "-V" || a == "-v" || a == "version")
+    {
+        println!("kora {}", env!("CARGO_PKG_VERSION"));
         return ExitCode::SUCCESS;
     }
 
-    if args[0] == "--version" || args[0] == "-V" || args[0] == "version" {
-        println!("kora {}", env!("CARGO_PKG_VERSION"));
+    if args.is_empty()
+        || args
+            .iter()
+            .any(|a| a == "--help" || a == "-h" || a == "help")
+    {
+        print_usage();
         return ExitCode::SUCCESS;
     }
 
@@ -299,7 +307,11 @@ fn print_usage() {
         "Kora Backend Language & Framework Toolchain ({})\n\
          Write Less. Build Faster. Run Smarter.\n\n\
          USAGE:\n\
-         \x20 kora <COMMAND> [OPTIONS]\n\n\
+         \x20 kora <COMMAND> [OPTIONS]\n\
+         \x20 kora <file.kora|file.kr>      Direct Python-style script execution\n\n\
+         FLAGS:\n\
+         \x20 -h, --help                   Display this help message\n\
+         \x20 -v, -V, --version            Display Kora toolchain version\n\n\
          COMMANDS:\n\
          \x20 check <file.kora|file.kr>    Run syntax, type, and ownership analysis (zero codegen)\n\
          \x20 types <file.kora|file.kr>    Inspect inferred models, DI classes, and typed symbols\n\
@@ -316,7 +328,8 @@ fn print_usage() {
          \x20 pkg <action> [args]          Manage distributed packages and modules (install, add, remove, list, publish)\n\
          \x20 create <dir>                 Scaffold an ultra-clean, production-ready Clean Architecture project\n\
          \x20 g feature <name>             Generate a complete CRUD feature (controller, service, models, interfaces, events)\n\
-         \x20 version                      Display toolchain version",
+         \x20 version                      Display toolchain version\n\
+         \x20 help                         Display this help message",
         env!("CARGO_PKG_VERSION")
     );
 }

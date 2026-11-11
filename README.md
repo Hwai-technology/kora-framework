@@ -263,6 +263,7 @@ cd kora-framework
 cargo build --bin kora
 
 # Verify installation
+./target/debug/kora --version
 ./target/debug/kora --help
 ```
 
@@ -270,6 +271,11 @@ cargo build --bin kora
 ```bash
 # Run one-step setup (installs CLI, Linux MIME types, completions & editor extension)
 ./scripts/setup.sh
+
+# Verify globally installed toolchain
+kora --version
+kora help
+```
 ```
 
 ### Creating a Clean Architecture Project
