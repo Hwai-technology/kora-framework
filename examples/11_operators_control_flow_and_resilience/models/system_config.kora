@@ -1,0 +1,19 @@
+// ============================================================================
+// Models: Pipeline & Resilience Configuration (Pure Models - E5002 Enforced)
+// ============================================================================
+
+model PipelineJobRequest {
+    jobName: String
+    batchSize: Int
+    timeoutSeconds: Option<Int>
+    payloads: List<String>
+    retryAttempts: Option<Int>
+}
+
+model PipelineJobSummary {
+    jobName: String
+    processedItems: Int
+    totalDurationMs: Int
+    isSuccessful: Bool
+    errorMessage: Option<String>
+}

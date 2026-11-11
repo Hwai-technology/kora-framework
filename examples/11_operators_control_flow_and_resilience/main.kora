@@ -1,0 +1,28 @@
+// ============================================================================
+// Example 11: Operators, Control Flow & Resilient Try/Catch Error Handling
+// Demonstrates Phase 6 features: ??, +=, -=, for-in, break, continue, try/catch/finally
+// ============================================================================
+
+import { PipelineJobRequest, PipelineJobSummary } from "./models/system_config"
+import { ResilientPipelineService } from "./services/resilient_pipeline_service"
+
+let app = run()
+
+// 1. Resilient Job Execution Endpoint with Automatic Error Guarding
+post("/api/v1/jobs/execute", (req: Request, pipeline: ResilientPipelineService) => {
+    let sampleJob = PipelineJobRequest {
+        jobName: "NightlyDataIngestion",
+        batchSize: 50,
+        timeoutSeconds: null, // Null value safely handled by ?? coalescing
+        payloads: ["RECORD_101", "SKIP", "RECORD_102", "RECORD_103"],
+        retryAttempts: Some(3),
+    }
+
+    let summary = pipeline.executeBatchJob(sampleJob)
+    return send(summary)
+})
+
+// 2. Health & Resilience Diagnostics Endpoint
+get("/api/v1/jobs/health", () => {
+    return "OK: Pipeline service is healthy with automated panic and error boundaries active."
+})
