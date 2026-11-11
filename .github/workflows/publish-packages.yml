@@ -132,3 +132,4 @@ jobs:
             ${{ steps.package.outputs.archive_name }}.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
