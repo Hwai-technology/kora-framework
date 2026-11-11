@@ -567,7 +567,13 @@ pub fn compile_native(output: &CodegenOutput, target_dir: &Path) -> Result<PathB
         .arg("--release")
         .current_dir(target_dir)
         .status()
-        .map_err(|e| format!("cargo build failed to run: {e}"))?;
+        .map_err(|e| {
+            if e.kind() == std::io::ErrorKind::NotFound {
+                "error[E1005]: Rust compiler (`cargo`) not found on PATH.\n  --> Kora compiles native code via Cargo.\n  💡 Please install Rust toolchain: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh".to_string()
+            } else {
+                format!("cargo build failed to run: {e}")
+            }
+        })?;
 
     if !status.success() {
         return Err("native compilation failed".to_string());

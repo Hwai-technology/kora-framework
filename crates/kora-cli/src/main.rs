@@ -227,9 +227,11 @@ fn load_module_with_imports(
             let _symbol_names: HashSet<String> =
                 imp.symbols.iter().map(|s| s.name.clone()).collect();
 
-            for cand in candidate_paths {
+            let mut resolved = false;
+            for cand in &candidate_paths {
                 if cand.exists() {
-                    if let Some(sub_mod) = load_module_with_imports(&cand, sm, bag, visited) {
+                    resolved = true;
+                    if let Some(sub_mod) = load_module_with_imports(cand, sm, bag, visited) {
                         for sub_item in sub_mod.items {
                             if !matches!(sub_item, Item::ModuleDecl(_) | Item::Import(_)) {
                                 imported_items.push(sub_item);
@@ -238,6 +240,18 @@ fn load_module_with_imports(
                     }
                     break;
                 }
+            }
+
+            if !resolved && !candidate_paths.is_empty() {
+                let target_name = imp.path_str.as_deref().unwrap_or("module");
+                bag.emit(
+                    kora_diagnostics::Diagnostic::error(
+                        "E1004",
+                        format!("module not found: cannot resolve import {target_name}"),
+                    )
+                    .with_primary_label(imp.span, "imported file does not exist")
+                    .with_help("check the relative file path, or run `kora pkg install` if this is an external package"),
+                );
             }
         }
     }
@@ -412,11 +426,125 @@ fn resolve_entrypoint_or_default(
     Err("no entrypoint found (looked for src/main.kora, main.kora, app.kora, or *.kr)".to_string())
 }
 
+fn report_file_read_error(path_str: &str) {
+    let path = Path::new(path_str);
+    let cwd = env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+
+    if !path.exists() {
+        eprintln!("error[E1001]: file not found: `{path_str}`");
+        eprintln!("  --> Current working directory: {}", cwd.display());
+
+        // 1. Did the user mean a file inside `src/`? (e.g. `main.kora` -> `src/main.kora`)
+        let src_candidate = Path::new("src").join(path_str);
+        if src_candidate.exists() {
+            eprintln!("\n  💡 Found matching file in `src/`. Did you mean:");
+            eprintln!("     kora {}", src_candidate.display());
+            return;
+        }
+
+        // 2. Did the user try to run repo examples from outside the Kora repository?
+        if path_str.starts_with("examples/")
+            || path_str == "hello.kora"
+            || path_str == "users_api.kora"
+        {
+            let home = env::var("HOME").unwrap_or_default();
+            let repo_candidates = [
+                Path::new(&home).join("Desktop/Projects/Kora"),
+                Path::new(&home).join("Projects/Kora"),
+                Path::new(&home).join("kora"),
+            ];
+            for repo in repo_candidates {
+                let candidate = if path_str.starts_with("examples/") {
+                    repo.join(path_str)
+                } else {
+                    repo.join("examples").join(path_str)
+                };
+                if candidate.exists() {
+                    eprintln!("\n  💡 The example file was found in the Kora repository at:");
+                    eprintln!("     {}", candidate.display());
+                    eprintln!("\n  You can run it directly with its full path:");
+                    eprintln!("     kora {}", candidate.display());
+                    eprintln!("  Or navigate to the repository directory first:");
+                    eprintln!("     cd {} && kora {path_str}", repo.display());
+                    return;
+                }
+            }
+        }
+
+        // 3. Search for existing .kora or .kr files in current directory or src/
+        let mut available = Vec::new();
+        collect_kora_files(Path::new("."), &mut available);
+        if !available.is_empty() {
+            eprintln!("\n  Available Kora source files in this folder:");
+            for f in available.iter().take(5) {
+                eprintln!("    • {}", f.display());
+            }
+            eprintln!("\n  Run one with: `kora <filename>`");
+        } else {
+            eprintln!("\n  No `.kora` or `.kr` files exist in this folder.");
+            eprintln!("  💡 Helpful hints:");
+            eprintln!("    • To start a new Clean Architecture project: `kora create <project-name>`");
+            eprintln!("    • To initialize a project here: `kora init`");
+            eprintln!("    • To create a quick starter file and run it immediately: `kora run`");
+        }
+    } else if path.is_dir() {
+        eprintln!(
+            "error[E1002]: `{path_str}` is a directory, not a Kora source file."
+        );
+        eprintln!(
+            "  --> Path: {}",
+            path.canonicalize()
+                .unwrap_or_else(|_| path.to_path_buf())
+                .display()
+        );
+        eprintln!("\n  💡 Run `kora run` to execute the project entrypoint in that directory.");
+    } else {
+        match fs::read_to_string(path) {
+            Err(e) => {
+                eprintln!("error[E1003]: failed to read file `{path_str}`: {e}");
+                if e.kind() == std::io::ErrorKind::PermissionDenied {
+                    eprintln!(
+                        "  💡 Permission denied. Please check your read permissions on this file."
+                    );
+                }
+            }
+            Ok(_) => {
+                eprintln!(
+                    "error[E1004]: failed to parse or resolve imports in `{path_str}`."
+                );
+            }
+        }
+    }
+}
+
+fn check_and_warn_missing_dependencies() {
+    if !Path::new("kora.toml").exists() || Path::new("kora.lock").exists() {
+        return;
+    }
+    if let Ok(content) = fs::read_to_string("kora.toml") {
+        let mut in_deps = false;
+        let mut has_deps = false;
+        for line in content.lines() {
+            let trimmed = line.trim();
+            if trimmed.starts_with('[') {
+                in_deps = trimmed == "[dependencies]";
+            } else if in_deps && !trimmed.is_empty() && !trimmed.starts_with('#') {
+                has_deps = true;
+                break;
+            }
+        }
+        if has_deps {
+            println!("💡 Notice: Found dependencies in `kora.toml` without `kora.lock`.");
+            println!("   Run `kora pkg install` to resolve and download dependencies.\n");
+        }
+    }
+}
+
 fn cmd_check(path: Option<&String>) -> ExitCode {
     let resolved_path = match resolve_entrypoint_or_default(path, false) {
         Ok(p) => p,
         Err(e) => {
-            eprintln!("error: {e}");
+            report_file_read_error(path.map(|s| s.as_str()).unwrap_or(&e));
             return ExitCode::FAILURE;
         }
     };
@@ -428,7 +556,7 @@ fn cmd_check(path: Option<&String>) -> ExitCode {
 
     let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited)
     else {
-        eprintln!("error: failed to read `{path}`");
+        report_file_read_error(path);
         return ExitCode::FAILURE;
     };
 
@@ -450,7 +578,7 @@ fn cmd_types(path: Option<&String>) -> ExitCode {
     let resolved_path = match resolve_entrypoint_or_default(path, false) {
         Ok(p) => p,
         Err(e) => {
-            eprintln!("error: {e}");
+            report_file_read_error(path.map(|s| s.as_str()).unwrap_or(&e));
             return ExitCode::FAILURE;
         }
     };
@@ -462,7 +590,7 @@ fn cmd_types(path: Option<&String>) -> ExitCode {
 
     let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited)
     else {
-        eprintln!("error: failed to read `{path}`");
+        report_file_read_error(path);
         return ExitCode::FAILURE;
     };
 
@@ -539,7 +667,7 @@ fn cmd_codegen(path: Option<&String>) -> ExitCode {
     let resolved_path = match resolve_entrypoint_or_default(path, false) {
         Ok(p) => p,
         Err(e) => {
-            eprintln!("error: {e}");
+            report_file_read_error(path.map(|s| s.as_str()).unwrap_or(&e));
             return ExitCode::FAILURE;
         }
     };
@@ -551,7 +679,7 @@ fn cmd_codegen(path: Option<&String>) -> ExitCode {
 
     let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited)
     else {
-        eprintln!("error: failed to read `{path}`");
+        report_file_read_error(path);
         return ExitCode::FAILURE;
     };
 
@@ -573,7 +701,7 @@ fn cmd_build(path: Option<&String>) -> ExitCode {
     let resolved_path = match resolve_entrypoint_or_default(path, false) {
         Ok(p) => p,
         Err(e) => {
-            eprintln!("error: {e}");
+            report_file_read_error(path.map(|s| s.as_str()).unwrap_or(&e));
             return ExitCode::FAILURE;
         }
     };
@@ -585,7 +713,7 @@ fn cmd_build(path: Option<&String>) -> ExitCode {
 
     let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited)
     else {
-        eprintln!("error: failed to read `{path}`");
+        report_file_read_error(path);
         return ExitCode::FAILURE;
     };
 
@@ -614,10 +742,11 @@ fn cmd_build(path: Option<&String>) -> ExitCode {
 }
 
 fn cmd_run(path: Option<&String>) -> ExitCode {
+    check_and_warn_missing_dependencies();
     let resolved_path = match resolve_entrypoint_or_default(path, true) {
         Ok(p) => p,
         Err(e) => {
-            eprintln!("error: {e}");
+            report_file_read_error(path.map(|s| s.as_str()).unwrap_or(&e));
             return ExitCode::FAILURE;
         }
     };
@@ -629,7 +758,7 @@ fn cmd_run(path: Option<&String>) -> ExitCode {
 
     let Some(ast) = load_module_with_imports(Path::new(path), &mut sm, &mut bag, &mut visited)
     else {
-        eprintln!("error: failed to read `{path}`");
+        report_file_read_error(path);
         return ExitCode::FAILURE;
     };
 
@@ -1287,7 +1416,7 @@ fn cmd_db(action: Option<&String>, path: Option<&String>) -> ExitCode {
 
     let p = Path::new(&target_path);
     if !p.exists() {
-        eprintln!("error: entrypoint `{target_path}` not found");
+        report_file_read_error(&target_path);
         return ExitCode::FAILURE;
     }
 
@@ -1296,7 +1425,7 @@ fn cmd_db(action: Option<&String>, path: Option<&String>) -> ExitCode {
     let mut visited = HashSet::new();
 
     let Some(ast) = load_module_with_imports(p, &mut sm, &mut bag, &mut visited) else {
-        eprintln!("error: failed to read `{target_path}`");
+        report_file_read_error(&target_path);
         return ExitCode::FAILURE;
     };
 
