@@ -15,8 +15,5 @@
   <!-- Sleek White 'K' Emblem -->
   <path d="M 40 32 L 52 32 L 52 96 L 40 96 Z" fill="#FFFFFF"/>
   <path d="M 52 64 L 80 32 L 95 32 L 64 67 L 96 96 L 80 96 L 52 70 Z" fill="#FFFFFF"/>
-  
-  <!-- Center Glow Dot for Compiler Speed -->
-  <circle cx="64" cy="67" r="4.5" fill="#00D2FF"/>
 </svg>
 
