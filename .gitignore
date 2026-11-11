@@ -8,6 +8,7 @@
 /dist/
 /openapi.json
 /swagger-ui.html
+/RELEASE_NOTES.md
 
 # OS & Editor files
 .DS_Store

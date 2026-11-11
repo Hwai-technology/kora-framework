@@ -196,6 +196,35 @@ def render_release_notes(version: str, previous_tag: str, categories: Dict[str, 
     return "\n".join(lines)
 
 
+def update_project_files(tag_name: str, raw_version: str):
+    """Synchronizes version across Cargo.toml and README.md with the real release version."""
+    # 1. Update root Cargo.toml workspace package version
+    if os.path.exists("Cargo.toml"):
+        with open("Cargo.toml", "r", encoding="utf-8") as f:
+            content = f.read()
+        new_content = re.sub(
+            r'(\[workspace\.package\][\s\S]*?version\s*=\s*")[^"]+(")',
+            rf'\g<1>{raw_version}\g<2>',
+            content,
+        )
+        if new_content != content:
+            with open("Cargo.toml", "w", encoding="utf-8") as f:
+                f.write(new_content)
+
+    # 2. Update README.md
+    if os.path.exists("README.md"):
+        with open("README.md", "r", encoding="utf-8") as f:
+            content = f.read()
+        new_content = re.sub(
+            r'(\*\*Public Beta Release \(`)[^`]+(`)',
+            rf'\g<1>{tag_name}\g<2>',
+            content,
+        )
+        if new_content != content:
+            with open("README.md", "w", encoding="utf-8") as f:
+                f.write(new_content)
+
+
 def main():
     # If GitHub ref is an explicit tag push (e.g. refs/tags/v0.2.0), use it
     ref = os.environ.get("GITHUB_REF", "")
@@ -218,6 +247,9 @@ def main():
     out_file = "RELEASE_NOTES.md"
     with open(out_file, "w", encoding="utf-8") as f:
         f.write(notes)
+
+    # Synchronize dynamic real version into project manifests and README
+    update_project_files(tag_name, raw_version)
 
     print(f"Calculated Version: {tag_name} (bump: {bump})")
     print(f"Release notes written to {out_file}")

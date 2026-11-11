@@ -1,4 +1,4 @@
-# Kora Language Tour (`v0.1-alpha`)
+# Kora Language Tour (`v0.1.0`)
 
 Kora combines clean, expressive syntax with **strong static typing** and **automatic type inference**.
 

@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # Kora Programming Language & Framework — Windows PowerShell Automated Installer
 # Usage:
 #   irm https://raw.githubusercontent.com/Hwai-technology/kora-framework/main/install.ps1 | iex
@@ -124,3 +124,4 @@ Write-Host "  kora --version" -ForegroundColor Cyan
 Write-Host "  kora doctor" -ForegroundColor Cyan
 Write-Host "`nTo start a new project:" -ForegroundColor Yellow
 Write-Host "  kora init my-api" -ForegroundColor Cyan
+

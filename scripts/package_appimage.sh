@@ -77,3 +77,4 @@ if [[ ! -f "$OUTPUT_DIR/$APPIMAGE_NAME" ]]; then
 fi
 
 echo "✓ AppImage packaging completed in $OUTPUT_DIR"
+
