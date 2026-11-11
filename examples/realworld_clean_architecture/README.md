@@ -1,170 +1,178 @@
 # Kora Strict Modular Clean Architecture Enterprise Showcase
-### مرجع الهندسة المعمارية النظيفة الصارمة لمنظومة لغة Kora
+### The Definitive Clean Architecture Reference for the Kora Language Ecosystem
 
 > **"Write Less. Build Faster. Run Smarter."**  
-> تطبيق إنتاجي متكامل عالي الأداء مقسم وفق معايير **Strict Modular Clean Architecture** باستخدام لغة الفريم ورك **Kora** المترجمة إلى كود Rust الأصلي بدون Garbage Collector (Zero-Cost Abstractions).
+> A high-performance, fully featured, enterprise-grade application structured according to **Strict Modular Clean Architecture** principles using the **Kora** programming framework—compiled directly to native Rust with zero-cost abstractions and no garbage collection overhead.
 
 ---
 
-## 📑 فهرس المحتويات | Table of Contents
-1. [الهيكل المعماري الصارم وتقسيم المجلدات (Directory Structure)](#1-الهيكل-المعماري-الصارم-وتقسيم-المجلدات-directory-structure)
-2. [تقسيم الطبقات والأنواع المستقلة (Domain Segregation)](#2-تقسيم-الطبقات-والأنواع-المستقلة-domain-segregation)
-   - [`src/enums/`: مجلد التعدادات المستقل](#21-srcenums-مجلد-التعدادات-المستقل)
-   - [`src/constants/`: مجلد الثوابت والتكوينات](#22-srcconstants-مجلد-الثوابت-والتكوينات)
-   - [`src/interfaces/`: مجلد واجهات العقود (IoC Interfaces)](#23-srcinterfaces-مجلد-واجهات-العقود-ioc-interfaces)
-   - [`src/models/`: مجلد نماذج النطاق والـ DTOs](#24-srcmodels-مجلد-نماذج-النطاق-والـ-dtos)
-   - [`src/database/`: إدارة قاعدة البيانات والترحيل التلقائي](#25-srcdatabase-إدارة-قاعدة-البيانات-والترحيل-التلقائي)
-   - [`src/middleware/`: حزمة الميدلوير ومصنع الاستجابة الجاهز](#26-srcmiddleware-حزمة-الميدلوير-ومصنع-الاستجابة-الجاهز)
-   - [`src/shared/services/`: حزمة الخدمات المؤسسية (Enterprise Services)](#27-srcsharedservices-حزمة-الخدمات-المؤسسية-enterprise-services)
-3. [فرض النقاء المعماري من الكومبايلر (Compiler Architectural Purity Diagnostics)](#3-فرض-النقاء-المعماري-من-الكومبايلر-compiler-architectural-purity-diagnostics)
-4. [هيكلة الوحدات الموديلار (Feature Modules)](#4-هيكلة-الوحدات-الموديلار-feature-modules)
-   - [وحدة المصادقة والأمان (`src/modules/auth/`) — 6 ملفات متخصصة](#41-وحدة-المصادقة-والأمان-srcmodulesauth--6-ملفات-متخصصة)
-   - [وحدة التجارة والطلبات (`src/modules/orders/`)](#42-وحدة-التجارة-والطلبات-srcmodulesorders)
-5. [طريقة التشغيل والاختبار السريع (Quickstart & Commands)](#5-طريقة-التشغيل-والاختبار-السريع-quickstart--commands)
+## 📑 Table of Contents
+1. [Strict Modular Directory Structure](#1-strict-modular-directory-structure)
+2. [Domain Segregation & Layer Responsibilities](#2-domain-segregation--layer-responsibilities)
+   - [`src/enums/`: Independent Enumerations](#21-srcenums-independent-enumerations)
+   - [`src/constants/`: Application Constants & Configurations](#22-srcconstants-application-constants--configurations)
+   - [`src/interfaces/`: Inversion of Control Contracts](#23-srcinterfaces-inversion-of-control-contracts)
+   - [`src/models/`: Domain Entities & DTOs](#24-srcmodels-domain-entities--dtos)
+   - [`src/database/`: Database Management & Auto-Migration](#25-srcdatabase-database-management--auto-migration)
+   - [`src/middleware/`: Pipeline Middleware & Response Factory](#26-srcmiddleware-pipeline-middleware--response-factory)
+   - [`src/shared/services/`: Enterprise Reusable Services](#27-srcsharedservices-enterprise-reusable-services)
+   - [Access Modifiers & Auto-Constructor](#28-access-modifiers--auto-constructor)
+   - [Schema Attributes & Decorators](#29-schema-attributes--decorators)
+   - [Strict `kebab-case` Wire Formatting](#210-strict-kebab-case-wire-formatting)
+   - [Struct-Free Architecture (`model` & `class`)](#211-struct-free-architecture-model--class)
+   - [Named Import Syntax (`import { ... } from "..."`)](#212-named-import-syntax)
+   - [First-Class Backend Types (`Request`, `Response`, `Headers`)](#213-first-class-backend-types)
+   - [Exclusive `null` Semantics (`E2005`)](#214-exclusive-null-semantics-e2005)
+   - [Dynamic Request-Bound Security Guards (`AuthGuard`)](#215-dynamic-request-bound-security-guards)
+   - [Connection Pooling via `AmbientDatabasePool`](#216-connection-pooling-via-ambientdatabasepool)
+3. [Compiler Architectural Purity Diagnostics](#3-compiler-architectural-purity-diagnostics)
+4. [Feature Modules Architecture](#4-feature-modules-architecture)
+   - [Authentication & Identity Module (`src/modules/auth/`)](#41-authentication--identity-module-srcmodulesauth)
+   - [Orders & Commerce Module (`src/modules/orders/`)](#42-orders--commerce-module-srcmodulesorders)
+5. [Quickstart & Verification Commands](#5-quickstart--verification-commands)
 
 ---
 
-## 1. الهيكل المعماري الصارم وتقسيم المجلدات (Directory Structure)
+## 1. Strict Modular Directory Structure
 
-تم تنظيم المشروع ليكون نموذجاً مرجعياً معيارياً للمشاريع الكبرى:
+The project serves as an authoritative enterprise template demonstrating full domain layer segregation:
 
 ```text
 examples/realworld_clean_architecture/src/
-├── constants/                            # 1. مجلد الثوابت وإعدادات الأمان
-│   └── app_constants.kora                # ثوابت الحدود، الرؤوس، ومفاتيح التشفير
+├── constants/                            # 1. Security configurations & boundary constants
+│   └── app_constants.kora                # Rate limits, headers, and crypto salt keys
 │
-├── enums/                                # 2. مجلد التعدادات المستقل
-│   ├── http_status.kora                  # رموز الحالة (HttpStatus: Ok, Created, NotFound, ...)
-│   ├── order_status.kora                 # حالات الطلب والدفع (OrderStatus, PaymentStatus)
-│   └── user_role.kora                    # أدوار المستخدمين (UserRole: Admin, Customer)
+├── enums/                                # 2. Isolated enumeration definitions
+│   ├── http_status.kora                  # HTTP status codes (HttpStatus: Ok, Created, NotFound, ...)
+│   ├── order_status.kora                 # Workflow states (OrderStatus, PaymentStatus)
+│   └── user_role.kora                    # Authorization roles (UserRole: Admin, Customer)
 │
-├── interfaces/                           # 3. مجلد واجهات العقود (Contracts & Interfaces)
+├── interfaces/                           # 3. Contract definitions (IoC Interfaces)
 │   ├── order_repository_interface.kora   # IOrderRepository
 │   ├── user_repository_interface.kora    # IUserRepository
 │   └── event_emitter_interface.kora      # IDomainEventEmitter
 │
-├── models/                               # 4. مجلد نماذج النطاق وغلاف الاستجابة
+├── models/                               # 4. Domain entities & envelope models
 │   ├── user_model.kora                   # User, UserRegisterInput
 │   ├── product_model.kora                # Product model
 │   ├── order_model.kora                  # Order, OrderItem, CreateOrderInput
 │   └── response_envelope.kora            # SecureApiResponse, RequestContext, TelemetryTrace
 │
-├── database/                             # 5. مكتبات وإدارة قاعدة البيانات الشاملة
-│   ├── database_pool.kora                # مجمع الاتصالات الشامل (Ambient DB Pool)
-│   └── auto_migrator.kora                # محرك الترحيل التلقائي وزرع البيانات الأولية
+├── database/                             # 5. Database engine & automatic schema migrator
+│   ├── database_pool.kora                # Ambient DB connection pool with zero memory leaks
+│   └── auto_migrator.kora                # Automatic table provisioner & baseline seeder
 │
-├── middleware/                           # 6. حزمة الميدلوير ومصانع الاستجابة
-│   ├── api_response_factory.kora         # مصنع ApiResponse (ok, created, notFound, badRequest)
-│   ├── cors_middleware.kora              # سياسة CORS Preflight
-│   ├── rate_limit_middleware.kora        # حماية التردد (RateLimiterService)
-│   ├── compression_middleware.kora       # ضغط البيانات (CompressionService)
-│   └── telemetry_middleware.kora         # متتبع الدوال وأكواد الخروج (TelemetryTracker)
+├── middleware/                           # 6. Pipeline middleware & response factories
+│   ├── api_response_factory.kora         # Standardized envelope builder (ok, created, notFound, badRequest)
+│   ├── cors_middleware.kora              # Strict CORS preflight policy enforcement
+│   ├── rate_limit_middleware.kora        # Token bucket rate limiting (RateLimiterService)
+│   ├── compression_middleware.kora       # Payload compression pipeline (CompressionService)
+│   └── telemetry_middleware.kora         # Latency profiler & status inspector (TelemetryTracker)
 │
-├── shared/                               # 7. الخدمات والبنى المؤسسية المشتركة (Enterprise Services)
-│   └── services/                         # خدمات قياسية جاهزة للإنتاج
-│       ├── email_service.kora            # خدمة البريد الإلكتروني (SMTP / SES)
-│       ├── sms_service.kora              # خدمة الرسائل النصية القصيرة ورمز OTP
-│       ├── jwt_service.kora              # خدمة توليد وفك تشفير توكنات JWT
-│       ├── crypto_service.kora           # تشفير AES-256-GCM وتجزئة Argon2id و HMAC
-│       ├── storage_service.kora          # تخزين الملفات (Local Disk + Cloudflare R2 / S3)
-│       ├── cache_service.kora            # نظام كاش متعدد المستويات (In-Memory + Redis)
-│       ├── session_service.kora          # إدارة الجلسات، التجديد التلقائي، والإلغاء
-│       ├── logger_service.kora           # سجلات الـ JSON الهيكلية والتتبع السياقي
-│       └── validation_service.kora       # محرك التحقق الشامل من قيود الحقول والـ DTOs
+├── shared/                               # 7. Shared enterprise utilities & infrastructure
+│   └── services/                         # Production-grade shared services
+│       ├── email_service.kora            # Transactional email dispatcher (SMTP & AWS SES)
+│       ├── sms_service.kora              # OTP token generator & SMS transmitter (Twilio)
+│       ├── jwt_service.kora              # Signed JWT encoder/decoder with claims verification
+│       ├── crypto_service.kora           # Argon2id password hashing & AES-256-GCM encryption
+│       ├── storage_service.kora          # Multi-backend file storage (Local Disk & Cloudflare R2 / S3)
+│       ├── cache_service.kora            # Dual-tier cache engine (L1 In-Memory + L2 Redis)
+│       ├── session_service.kora          # Session lifecycle manager with sliding expiration
+│       ├── logger_service.kora           # Structured JSON logger with contextual trace IDs
+│       └── validation_service.kora       # Field constraint validation engine
 │
-├── modules/                              # 8. وحدات العمل الموديلار الصارمة (Feature Modules)
-│   ├── auth/                             # وحدة المصادقة الكاملة (6 ملفات متخصصة)
-│   │   ├── auth_controller.kora          # وحدة التحكم بنقاط دخول الـ Auth
-│   │   ├── auth_service.kora             # منطق أعمال التوثيق والتحقق
-│   │   ├── auth_types.kora               # الـ DTOs الخاصة بتسجيل الدخول والتوكن
-│   │   ├── auth_repository.kora          # مستودع بيانات حسابات المستخدمين
-│   │   ├── auth_cache.kora               # كاش الجلسات والتوكن في Redis
-│   │   └── auth_guard.kora               # حارس التوثيق وفحص Bearer Token
+├── modules/                              # 8. Decoupled feature domain modules
+│   ├── auth/                             # Complete authentication domain (6 specialized files)
+│   │   ├── auth_controller.kora          # Ingestion routing & response formatting
+│   │   ├── auth_service.kora             # Identity business logic & credential validation
+│   │   ├── auth_types.kora               # LoginInput, RegisterInput, AuthSession DTOs
+│   │   ├── auth_repository.kora          # Database queries & account persistence
+│   │   ├── auth_cache.kora               # Session store & token revocation registry
+│   │   └── auth_guard.kora               # Bearer token extractor & security evaluator
 │   │
-│   └── orders/                           # وحدة إدارة الطلبات والتجارة
-│       ├── order_controller.kora         # معالجة طلبات الـ HTTP للطلبات
-│       ├── order_service.kora            # حساب الخصومات ومنطق الشراء
-│       ├── order_repository.kora         # استعلامات أوامر الشراء في MySQL
-│       ├── order_types.kora              # الـ DTOs والمدخلات
-│       └── order_events.kora             # أحداث الشراء وتفريغ الطوابير
+│   └── orders/                           # Order lifecycle & commerce domain
+│       ├── order_controller.kora         # HTTP handlers for order placement
+│       ├── order_service.kora            # Volume discount rules & checkout logic
+│       ├── order_repository.kora         # Relational database persistence
+│       ├── order_types.kora              # Input parameters & checkout DTOs
+│       └── order_events.kora             # Domain events & async event queues
 │
-└── main.kora                             # ملف الإقلاع الرئيسي النظيف جداً (يربط المسارات فقط)
+└── main.kora                             # Minimal application entrypoint & routing setup
 ```
 
 ---
 
-## 2. تقسيم الطبقات والأنواع المستقلة (Domain Segregation)
+## 2. Domain Segregation & Layer Responsibilities
 
-### 2.1 `src/enums/`: مجلد التعدادات المستقل
-- تم فصل جميع التعدادات (`HttpStatus`, `OrderStatus`, `PaymentStatus`, `UserRole`) داخل ملفات مخصصة لضمان إعادة استخدامها في كامل طبقات النظام دون تبعيات دائرية.
+### 2.1 `src/enums/`: Independent Enumerations
+- All enumerations (`HttpStatus`, `OrderStatus`, `PaymentStatus`, `UserRole`) reside in their own dedicated files within `src/enums/`. This prevents circular dependency chains across controllers, services, and models.
 
-### 2.2 `src/constants/`: مجلد الثوابت والتكوينات
-- ملف [`app_constants.kora`](file:///home/ahmet/Desktop/Projects/Kora/examples/realworld_clean_architecture/src/constants/app_constants.kora) يحتوي على إعدادات الحدود القياسية (Rate limits, Page sizes, Security headers) لتوحيد التكوينات.
+### 2.2 `src/constants/`: Application Constants & Configurations
+- [`app_constants.kora`](file:///home/ahmet/Desktop/Projects/Kora/examples/realworld_clean_architecture/src/constants/app_constants.kora) declares standard boundary limits, pagination thresholds, token lifetimes, and security header definitions.
 
-### 2.3 `src/interfaces/`: مجلد واجهات العقود (IoC Interfaces)
-- يحتوي على عقود المستودعات وبث الأحداث (`IOrderRepository`, `IUserRepository`, `IDomainEventEmitter`) لعزل منطق الأعمال عن تفاصيل التخزين والاتصال الخارجي.
+### 2.3 `src/interfaces/`: Inversion of Control Contracts
+- Declares decoupled interfaces (`IOrderRepository`, `IUserRepository`, `IDomainEventEmitter`) allowing business services to execute domain logic independent of storage engines or external drivers.
 
-### 2.4 `src/models/`: مجلد نماذج النطاق والـ DTOs
-- الكيانات النقية (`User`, `Product`, `Order`, `OrderItem`) ونماذج الاستجابة الموحدة (`SecureApiResponse`, `RequestContext`, `TelemetryTrace`).
+### 2.4 `src/models/`: Domain Entities & DTOs
+- Contains clean domain entities (`User`, `Product`, `Order`, `OrderItem`) and envelope models (`SecureApiResponse`, `RequestContext`, `TelemetryTrace`).
 
-### 2.5 `src/database/`: إدارة قاعدة البيانات والترحيل التلقائي
-- **Ambient Pool**: الاتصال بقاعدة البيانات دون الحاجة لتمرير `db: Database` يدوياً في كل Constructor، مع انعدام تسريب الذاكرة بفضل فحص الملكية الصارم في Kora.
-- **Auto-Migration & Seeding**: التعرف الآلي على الجداول ونثر البيانات التجريبية الأولية بنقرة واحدة.
+### 2.5 `src/database/`: Database Management & Auto-Migration
+- **Ambient Pool**: Provides thread-safe, RAII-governed connection pooling with zero memory leaks verified by Kora's compiler ownership rules.
+- **Auto-Migration & Seeding**: Inspects defined entities and automatically aligns relational schemas while seeding default development data.
 
-### 2.6 `src/middleware/`: حزمة الميدلوير ومصنع الاستجابة الجاهز
-- مصنع [`ApiResponse`](file:///home/ahmet/Desktop/Projects/Kora/examples/realworld_clean_architecture/src/middleware/api_response_factory.kora) يتيح إرجاع الردود بسطر واحد:
+### 2.6 `src/middleware/`: Pipeline Middleware & Response Factory
+- The [`ApiResponse`](file:///home/ahmet/Desktop/Projects/Kora/examples/realworld_clean_architecture/src/middleware/api_response_factory.kora) factory standardizes API outputs into unified JSON structures:
 ```kora
 return this.response.ok("Order fetched successfully", 1)
 return this.response.created("Order placed successfully", 1)
 return this.response.notFound("Order not found")
 return this.response.badRequest("Invalid input")
 ```
-حيث يُحقن الـ `nonce` وتوقيع الـ HMAC ووقت التنفيذ `executionTimeMs` آلياً.
+Every response automatically injects cryptographic nonces, HMAC signatures, and execution latency benchmarks (`execution-time-ms`).
 
 ---
 
-### 2.7 `src/shared/services/`: حزمة الخدمات المؤسسية (Enterprise Services)
-توفر المنظومة 7 خدمات قياسية مدمجة تغطي كافة متطلبات المشاريع الكبرى:
-1. **Email Service (`email_service.kora`)**: إرسال رسائل التفعيل والقوالب عبر خوادم SMTP وخدمة AWS SES مع استراتيجيات إعادة المحاولة.
-2. **SMS Service (`sms_service.kora`)**: إرسال وتوليد رموز التحقق الثنائي (OTP) والرسائل النصية عبر مزودي الاتصالات مثل Twilio.
-3. **JWT Service (`jwt_service.kora`)**: توقيع والتحقق من رموز الـ Access Token و Refresh Token مع دعم خوارزميات التشفير وفحص فترات الانتهاء.
-4. **Crypto Service (`crypto_service.kora`)**: تجزئة كلمات المرور باستخدام خوارزمية Argon2id المقاومة لهجمات القوة الغاشمة، وتشفير الحقول الحساسة بتقنية AES-256-GCM مع توقيع HMAC-SHA256.
-5. **Storage Service (`storage_service.kora`)**: رفع وحذف وتوليد الروابط الموقعة (Signed URLs) للملفات عبر التخزين السحابي (Amazon S3 / MinIO) والتخزين المحلي.
-6. **Multi-tier Cache Service (`cache_service.kora`)**: إدارة الذاكرة المخبئية ثنائية المستويات (ذاكرة محلية سريعة L1 + كاش موزع Redis L2) مع مدة صلاحية دقيقة (TTL).
-7. **Session Service (`session_service.kora`)**: حفظ واسترجاع جلسات المستخدمين، دعم التمديد التلقائي (Sliding Expiration)، وإلغاء الجلسات فورياً عند تسجيل الخروج.
-8. **Structured Logger Service (`logger_service.kora`)**: تسجيل أحداث النظام في صيغة JSON القياسية مع مستويات الخطورة (`INFO`, `WARN`, `ERROR`) والتوقيت ومعرّفات التتبع `traceId`.
-9. **Universal Validation Service (`validation_service.kora`)**: التحقق الديناميكي عالي السرعة من صحة الحقول (Required, Email, Range, UUID, Phone, URL) مع خرائط أخطاء تفصيلية.
-10. **Cloudflare R2 & Local Storage (`storage_service.kora`)**: رفع وحذف وتوليد الروابط الموقعة للملفات عبر Cloudflare R2 والتخزين المحلي.
+### 2.7 `src/shared/services/`: Enterprise Reusable Services
+Ten specialized enterprise services handle cross-cutting platform concerns:
+1. **Email Service (`email_service.kora`)**: Transactional email dispatch over SMTP and AWS SES with automated retry strategies.
+2. **SMS Service (`sms_service.kora`)**: 2FA token generation and SMS delivery integration.
+3. **JWT Service (`jwt_service.kora`)**: High-speed HMAC-SHA256 token signing, claims verification, and expiration enforcement.
+4. **Crypto Service (`crypto_service.kora`)**: Password hashing via Argon2id, and symmetric payload encryption using AES-256-GCM.
+5. **Storage Service (`storage_service.kora`)**: Unified file persistence layer supporting local filesystem storage alongside S3 and Cloudflare R2 signed URLs.
+6. **Multi-tier Cache Service (`cache_service.kora`)**: Two-layer caching architecture (L1 Local Memory + L2 Redis) with granular TTL expiration.
+7. **Session Service (`session_service.kora`)**: Sliding session expiration, user agent fingerprinting, and instant revocation upon logout.
+8. **Structured Logger Service (`logger_service.kora`)**: Structured JSON logging emitting standard log levels (`INFO`, `WARN`, `ERROR`) tagged with correlation `traceId`.
+9. **Universal Validation Service (`validation_service.kora`)**: High-performance validation for email, UUID, range, phone, and custom regex patterns.
 
 ---
 
-### 2.8 محددات الوصول والبناء التلقائي في الكلاسات (Access Modifiers & Auto-Constructor)
-- تدعم كلاسات Kora محددات الوصول الصريحة:
-  - `public`, `private`, `protected`, `readonly` للحقول والدوال.
-  - **Auto-Constructor (حقن المعاملات)**: في حال عدم تعريف دالة `init`، يقوم المترجم تلقائياً بتوليد Constructor كامل يسند جميع الحقول إلى `this.field = field`.
-  - **Parameter Properties**: عند تعريف محدد وصول داخل معاملات `init` (مثل `init(public repo: Repo, private cache: Cache)`)، يتم تحويلها تلقائياً إلى حقول في الكلاس دون الحاجة لتكرار تعريفها!
+### 2.8 Access Modifiers & Auto-Constructor
+Kora classes support strict member accessibility and boilerplate-free parameter properties:
+- Explicit modifiers: `public`, `private`, `protected`, and `readonly`.
+- **Auto-Constructor**: If an `init()` method is omitted, the compiler synthesizes a full constructor initializing each declared field.
+- **Parameter Properties**: Modifiers declared inside constructor signatures (e.g., `init(public repo: Repo, private cache: Cache)`) automatically declare and bind the corresponding instance properties.
 
-### 2.9 خصائص وسمات الـ Model المتقدمة (Schema Attributes & Decorators)
-- تدعم الـ `model` سمات القيود والـ Indexing مباشرة:
-  - `@unique`: تحديد فرادة الحقل.
-  - `@index`: إنشاء فهرس لقاعدة البيانات لتسريع الاستعلام.
-  - `@required`: حقل إلزامي لا يقبل الفراغ.
-  - `@email`: التحقق من نسق البريد الإلكتروني.
-  - `@min(n)`, `@max(n)`: قيود الحدود الدنيا والقصوى.
-  - `@default(val)`: تعيين القيمة الافتراضية.
+### 2.9 Schema Attributes & Decorators
+Domain models support rich declarative validation and indexing attributes:
+- `@unique`: Enforces unique index constraints on the database and DTO layers.
+- `@index`: Configures database performance indexes on high-frequency query fields.
+- `@required`: Enforces non-null, non-empty validation invariants.
+- `@email`: Validates conforming RFC email address formats.
+- `@min(n)`, `@max(n)`: Sets numeric range or string length bounds.
+- `@default(val)`: Assigns fallback default expressions.
 
-### 2.10 تنسيق الردود والبيانات حصراً بأسلوب `kebab-case`
-- تفرض المنظومة توليد وتنسيق كافة مفاتيح الـ JSON في الردود والطلبات والـ DTOs بأسلوب **`kebab-case`** تلقائياً عبر `#[serde(rename_all = "kebab-case")]`:
-  - `status-code`, `security-token`, `execution-time-ms`, `order-number`, `total-amount`, `user-id`.
-  - ترويسات HTTP: `content-type`, `authorization`, `x-request-id`, `x-kora-trace`.
+### 2.10 Strict `kebab-case` Wire Formatting
+All JSON payloads, query parameters, and DTO serializations strictly follow **`kebab-case`** conventions via compile-time attribute transformation:
+- Field naming: `status-code`, `security-token`, `execution-time-ms`, `order-number`, `total-amount`, `user-id`.
+- HTTP headers: `content-type`, `authorization`, `x-request-id`, `x-kora-trace`.
 
-### 2.11 إلغاء `struct` واعتماد `model` و `class` حصراً (Struct-Free Architecture)
-- تم إزالة الكلمة المفتاحية `struct` من لغة Kora لصالح البنية النظيفة:
-  - **`model`**: يُستخدم لتعريف كائنات البيانات، الجداول، والـ DTOs فقط (مثل `model User`, `model SecureApiResponse`).
-  - **`class`**: يُستخدم لتعريف الخدمات، المتحكمات، والحاويات التي تحتوي على منطق أعمال وحقن تبعيات `init(...)`.
+### 2.11 Struct-Free Architecture (`model` & `class`)
+The `struct` keyword has been removed in favor of intentional semantic primitives:
+- **`model`**: Declares immutable data schemas, DTOs, and relational entities (`model User`, `model SecureApiResponse`).
+- **`class`**: Declares stateful services, controllers, and dependency-injected containers featuring behavior and lifecycle hooks.
 
-### 2.9 نمط الاستيراد المتقدم `import { ... } from "..."`
-- تدعم Kora استيراد الرموز المحددة بدقة تامة لتسهيل التنقل البرمجي (Go to Definition) ومعرفة مصدر كل عنصر:
+### 2.12 Named Import Syntax
+Kora provides explicit symbol imports to maintain clean dependency trees and eliminate namespace pollution:
 ```kora
 import { HttpStatus } from "enums/http_status";
 import { User, UserProfileDto } from "models/user_model";
@@ -173,22 +181,19 @@ import { SecureApiResponse, LogEntry } from "models/response_envelope";
 import { Logger } from "shared/services/logger_service";
 ```
 
-### 2.10 هيكل تشغيل المشروع الكائني `class Application`
-- لا يعمل المشروع من دوال سائبة، بل يُنظّم بالكامل داخل حاوية تطبيق موحدة `class Application` تحقن كافة المتحكمات والميدلوير والخدمات عبر الـ DI المترجم في وقت البناء (Zero Runtime Overhead).
+### 2.13 First-Class Backend Types
+Standard backend types are natively available without requiring third-party library imports:
+- **`Request`**: Exposes `path`, `method`, `body`, `ip`, `url`, `headers`, along with `header(name)`, `query(key)`, and `param(key)`.
+- **`Headers`**: Offers `get(name)`, `set(name, value)`, and `has(name)`.
+- **`Response`**: Provides fluent chainable methods: `status(code)`, `json(payload)`, `text(msg)`, and `header(k, v)`.
 
-### 2.11 أنواع الويب الخلفية الأساسية (Backend First-Class Types)
-- تتضمن منظومة الأنواع في Kora دعماً أصيلاً لعناصر الـ Backend:
-  - **`Request`**: يوفر الحقول `path`, `method`, `body`, `ip`, `url`, `headers`، والدوال `header(name)`, `query(key)`, `param(key)`.
-  - **`Headers`**: يوفر `get(name)`, `set(name, value)`, `has(name)`.
-  - **`Response`**: يوفر `status(code)`, `json(payload)`, `text(msg)`, `header(k, v)`.
-
-### 2.12 دعم `null` الحصري ومنع `undefined` قطعياً (`E2005`)
-- في لغة Kora، تم اعتماد الكلمة المفتاحية **`null`** كقيمة أصيلة أولى لتمثيل غياب القيمة (`Option<T>`).
-- يُمنع منعاً باتاً استخدام كلمة `undefined` في أي مكان في الكود؛ وفي حال محاولة كتابة `undefined` يُطلق المترجم خطأ تشخيصياً صريحاً:
+### 2.14 Exclusive `null` Semantics (`E2005`)
+Kora eliminates JavaScript-style `undefined` in favor of a single unified `null` representation mapped directly to `Option<T>`:
+- Attempting to use `undefined` results in compiler diagnostic `E2005`:
   ```text
   error[E2005]: `undefined` is not permitted in Kora; use `null` exclusively to represent absence of value.
   ```
-- يمكن استخدام `null` في المقارنات المباشرة ومطابقة الأنماط (Pattern Matching):
+- Pattern matching and equality checks operate seamlessly over `null`:
   ```kora
   if req.header("authorization") == null {
       return Err("Authorization header is missing")
@@ -200,80 +205,77 @@ import { Logger } from "shared/services/logger_service";
   }
   ```
 
-### 2.13 حراس الأمان الديناميكيون المتصلون بالطلب (`AuthGuard`)
-- تم بناء حارس الأمان `AuthGuard` ليتعامل مع الطلبات الحقيقية `req: Request` بشكل ديناميكي كامل بدون قيم وهمية ثابتة:
-  - استخراج الترويسة ديناميكياً: `req.header("authorization")`.
-  - التحقق من `null` وفراغ القيمة.
-  - التحقق التشفيري عبر `JwtService` وإصدار توكنات موقعة حقيقية.
-  - تسجيل محاولات الوصول والرفض عبر خدمة السجلات المنظمة `Logger`.
+### 2.15 Dynamic Request-Bound Security Guards
+`AuthGuard` inspects inbound requests dynamically without hardcoded mock data:
+- Dynamically extracts headers via `req.header("authorization")`.
+- Evaluates token validity through `JwtService` and asserts expiration claims.
+- Records all authorization passes and security rejections through structured `Logger` channels.
 
-### 2.14 مستودعات البيانات المتصلة بالمجمع الديناميكي (`AmbientDatabasePool`)
-- تم التخلص بالكامل من البيانات الثابتة في `AuthRepository` و `AuthService`:
-  - حجز وإطلاق الاتصالات ديناميكياً عبر مجمع الاتصالات التلقائي `AmbientDatabasePool`.
-  - تنفيذ الاستعلامات الحقيقية عبر `pool.executeQuery(...)` ومعالجة نتائج الـ `Result` والـ `Option`.
-  - توليد توكنات الجلسات المشفرة ديناميكياً مع ختم زمني حقيقي وتخزينها في الكاش.
+### 2.16 Connection Pooling via `AmbientDatabasePool`
+- Eliminates hardcoded mock datasets across repositories and services.
+- Acquires and releases pooled connections transparently via `AmbientDatabasePool`.
+- Dispatches parameterized queries through `pool.executeQuery(...)` returning strongly typed `Result<T, E>` values.
 
 ---
 
-## 3. فرض النقاء المعماري من الكومبايلر (Compiler Architectural Purity Diagnostics)
+## 3. Compiler Architectural Purity Diagnostics
 
-لأول مرة في لغات الويب الحديثة، تم تضمين قواعد صارمة داخل مترجم Kora (`kora-cli`) لمنع التداخل المعماري وإجبار المطور على الالتزام بالكود النظيف:
+The Kora compiler (`kora-cli`) enforces clean architecture boundaries directly during static analysis:
 
-| رمز الخطأ | القاعدة المعمارية المفروضة | السلوك الممنوع |
+| Error Code | Architectural Rule | Prohibited Pattern |
 |:---|:---|:---|
-| `E5001` | **Purity of `enums/`** | يُمنع منعاً باتاً وجود دوال أو مسارات أو أصناف برمجية داخل أي ملف ضمن مجلد `enums/`. |
-| `E5002` | **Purity of `models/` & `interfaces/`** | يُمنع احتواء ملفات النماذج أو الواجهات على منطق تنفيذي، مسارات HTTP، أو دالة تشغيل الخادم `run()`. |
-| `E5003` | **Segregation in Controllers & Services** | يُمنع تعريف `enum` أو `model` مضمّن في ملفات الـ Controllers والـ Services، بل يجب استيرادها حصراً عبر `import`. |
-| `E5004` | **Clean Root Entry (`main.kora`)** | يُمنع تعريف أي كائن `model` أو `enum` أو `interface` داخل `main.kora`؛ يجب أن يقتصر الملف على الربط والتشغيل. |
+| `E5001` | **Purity of `enums/`** | Declaring functions, controllers, classes, or routes inside `enums/`. |
+| `E5002` | **Purity of `models/` & `interfaces/`** | Embedding procedural execution logic, route handlers, or server startup calls inside models or interfaces. |
+| `E5003` | **Segregation in Controllers & Services** | Inline declarations of `enum` or `model` definitions inside controllers or services (must use explicit `import`). |
+| `E5004` | **Clean Root Entry (`main.kora`)** | Declaring inline `model`, `enum`, or `interface` types inside `main.kora`; the entrypoint must focus strictly on composition and startup. |
 
-أي خرق لهذه القواعد يُنتج خطأ 컴بايلر فوري يمنع بناء التطبيق أو تشغيله.
-
----
-
-## 4. هيكلة الوحدات الموديلار (Feature Modules)
-
-### 4.1 وحدة المصادقة والأمان (`src/modules/auth/`) — 6 ملفات متخصصة
-تحتوي على بنية متكاملة مغلقة:
-1. **`auth_controller.kora`**: استلام طلبات الدخول والتسجيل وإرجاع الاستجابات المغلفة.
-2. **`auth_service.kora`**: التحقق من بيانات الدخول وتوليد التوكن واستدعاء الكاش.
-3. **`auth_types.kora`**: كائنات الـ DTOs (`LoginInput`, `RegisterInput`, `AuthSessionDto`).
-4. **`auth_repository.kora`**: مستودع البحث عن الحسابات وإنشائها.
-5. **`auth_cache.kora`**: تخزين جلسات المستخدمين في Redis والتحقق من التوكنات الملغاة.
-6. **`auth_guard.kora`**: فحص ترويسة `Authorization: Bearer <token>` وتفويض الصلاحيات.
-
-### 4.2 وحدة التجارة والطلبات (`src/modules/orders/`)
-تحتوي على معالجة الطلبات، تطبيق الخصومات التلقائية (15% للطلبات التي تحوي 5 عناصر فأكثر)، وبث أحداث النطاق `OrderPlacedEvent`.
+Violations immediately halt the compilation pipeline with detailed diagnostic pointers.
 
 ---
 
-## 5. طريقة التشغيل والاختبار السريع (Quickstart & Commands)
+## 4. Feature Modules Architecture
 
-### 5.1 الفحص الثابت الشامل لجميع الملفات
+### 4.1 Authentication & Identity Module (`src/modules/auth/`)
+Structured into six specialized responsibility layers:
+1. **`auth_controller.kora`**: Handles HTTP endpoints for registration and login, wrapping responses in standardized envelopes.
+2. **`auth_service.kora`**: Validates credentials, dispatches cryptographic hashes, and coordinates cache writes.
+3. **`auth_types.kora`**: DTO schemas (`LoginInput`, `RegisterInput`, `AuthSessionDto`).
+4. **`auth_repository.kora`**: Executes relational user storage operations.
+5. **`auth_cache.kora`**: Manages Redis session tokens and revoked token blacklists.
+6. **`auth_guard.kora`**: Extracts `Authorization: Bearer <token>` and enforces role-based access control.
+
+### 4.2 Orders & Commerce Module (`src/modules/orders/`)
+Manages the commerce workflow, applies volume-based pricing policies (e.g., 15% discount for orders containing 5 or more line items), and dispatches asynchronous `OrderPlacedEvent` domain events.
+
+---
+
+## 5. Quickstart & Verification Commands
+
+### 5.1 Static Verification Across All Files
 ```bash
 for f in $(find src -name "*.kora"); do kora check "$f"; done
 ```
-جميع ملفات النظام الـ 30 تجتاز الفحص بنجاح:
+All system files pass with zero errors:
 ```text
 ✓ Checked `src/...` — 0 errors (frontend & ownership verified).
 ```
 
-### 5.2 توليد كود Rust الأصلي
+### 5.2 Generate Native Rust Code
 ```bash
 kora codegen src/main.kora
 ```
 
-### 5.3 اختبار نقاط النهاية عبر curl
-
+### 5.3 Test System Endpoints via curl
 ```bash
-# 1. فحص الصحة
+# 1. Health check probe
 curl http://localhost:7582/health
 
-# 2. تشغيل الترحيل التلقائي
+# 2. Trigger schema auto-migration
 curl http://localhost:7582/api/v1/database/migrate
 
-# 3. تسجيل الدخول عبر وحدة الـ Auth
+# 3. Authenticate user
 curl -X POST http://localhost:7582/api/v1/auth/login
 
-# 4. إنشاء طلب شراء وحساب الخصم وبث الحدث
+# 4. Place order, compute volume discounts, and broadcast event
 curl -X POST http://localhost:7582/api/v1/orders
 ```
