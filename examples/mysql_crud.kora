@@ -2,78 +2,8 @@
 // Kora Example 4: MySQL Database Connection & ORM Repository
 // ============================================================================
 
-model Customer {
-    id: Int
-    fullName: String
-    email: String
-    creditBalance: Int
-    active: Bool
-}
-
-model CustomerSignupInput {
-    fullName: String
-    email: String
-    initialCredit: Int
-}
-
-interface CustomerDatabaseRepository {
-    fn findByEmail(email: String) -> Option<Customer>
-    fn insertCustomer(input: CustomerSignupInput) -> Result<Customer, String>
-    fn addCredit(id: Int, amount: Int) -> Result<Customer, String>
-}
-
-class MySqlCustomerRepository implements CustomerDatabaseRepository {
-    db: Database
-
-    init(db: Database) {
-        this.db = db
-    }
-
-    fn findByEmail(email: String) -> Option<Customer> {
-        if email == "" {
-            return None
-        }
-        return Some(Customer {
-            id: 1,
-            fullName: "Ahmed Ali",
-            email: email,
-            creditBalance: 5000,
-            active: true,
-        })
-    }
-
-    fn insertCustomer(input: CustomerSignupInput) -> Result<Customer, String> {
-        if input.fullName == "" {
-            return Err("Full name cannot be empty")
-        }
-        if input.email == "" {
-            return Err("Email address is required")
-        }
-        return Ok(Customer {
-            id: 101,
-            fullName: input.fullName,
-            email: input.email,
-            creditBalance: input.initialCredit,
-            active: true,
-        })
-    }
-
-    fn addCredit(id: Int, amount: Int) -> Result<Customer, String> {
-        if id <= 0 {
-            return Err("Customer record not found in MySQL")
-        }
-        if amount <= 0 {
-            return Err("Credit amount must be positive")
-        }
-        return Ok(Customer {
-            id: id,
-            fullName: "Ahmed Ali",
-            email: "ahmed@example.com",
-            creditBalance: 5000 + amount,
-            active: true,
-        })
-    }
-}
+import { Customer, CustomerSignupInput } from "./mysql/models/customer_models"
+import { MySqlCustomerRepository } from "./mysql/services/mysql_customer_service"
 
 // REST Endpoints connected to MySQL Repository
 let app = run()
@@ -94,4 +24,3 @@ post("/customers", (request: Request, repo: MySqlCustomerRepository) => {
 post("/customers/{id}/credit", (id: Int, request: Request, repo: MySqlCustomerRepository) => {
     return repo.addCredit(id, 250)
 })
-

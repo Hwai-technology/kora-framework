@@ -22,9 +22,11 @@ pub struct FrontendSession {
 }
 
 impl FrontendSession {
+    #[allow(clippy::collapsible_if)]
     pub fn check_source(name: impl Into<String>, src: impl Into<String>) -> Self {
+        let name_str = name.into();
         let mut source_map = SourceMap::new();
-        let file_id = source_map.add_file(name, src);
+        let file_id = source_map.add_file(&name_str, src);
         let src_ref = source_map
             .get_file(file_id)
             .expect("source file registered")
@@ -33,7 +35,90 @@ impl FrontendSession {
 
         let mut diagnostics = DiagnosticBag::new();
         let ast = parse_module(file_id, &src_ref, &mut diagnostics);
-        let hir = lower_and_resolve(ast.clone(), &mut diagnostics);
+
+        // Resolve imports recursively relative to source file directory
+        let current_dir = std::path::Path::new(&name_str)
+            .parent()
+            .unwrap_or_else(|| std::path::Path::new("."));
+        let mut imported_items = Vec::new();
+        let mut worklist: Vec<(std::path::PathBuf, kora_ast::ImportDecl)> = Vec::new();
+        let mut visited = std::collections::HashSet::new();
+
+        for item in &ast.items {
+            if let kora_ast::Item::Import(imp) = item {
+                worklist.push((current_dir.to_path_buf(), imp.clone()));
+            }
+        }
+
+        while let Some((base_dir, imp)) = worklist.pop() {
+            if let Some(path_str) = &imp.path_str {
+                let clean_p = path_str.trim_matches('"');
+                let mut candidates = vec![
+                    base_dir.join(clean_p),
+                    base_dir.join(format!("{clean_p}.kora")),
+                    base_dir.join(format!("{clean_p}.kr")),
+                    std::path::PathBuf::from(clean_p),
+                    std::path::PathBuf::from(format!("{clean_p}.kora")),
+                ];
+                if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+                    let ws_root = std::path::Path::new(&manifest_dir)
+                        .parent()
+                        .and_then(|p| p.parent())
+                        .unwrap_or_else(|| std::path::Path::new("."));
+                    candidates.push(ws_root.join(clean_p));
+                    candidates.push(ws_root.join(format!("{clean_p}.kora")));
+                    candidates.push(ws_root.join("examples").join(clean_p));
+                    candidates.push(ws_root.join("examples").join(format!("{clean_p}.kora")));
+                }
+                if let Some(parent) = std::env::current_dir()
+                    .ok()
+                    .and_then(|d| d.parent().map(|p| p.to_path_buf()))
+                {
+                    if let Some(grandparent) = parent.parent() {
+                        candidates.push(grandparent.join(clean_p));
+                        candidates.push(grandparent.join(format!("{clean_p}.kora")));
+                        candidates.push(grandparent.join("examples").join(clean_p));
+                        candidates
+                            .push(grandparent.join("examples").join(format!("{clean_p}.kora")));
+                    }
+                }
+
+                for c in candidates {
+                    if c.exists() {
+                        let canonical = c.canonicalize().unwrap_or_else(|_| c.clone());
+                        if visited.insert(canonical) {
+                            if let Ok(c_src) = fs::read_to_string(&c) {
+                                let c_fid =
+                                    source_map.add_file(c.to_string_lossy().as_ref(), &c_src);
+                                let c_mod = parse_module(c_fid, &c_src, &mut diagnostics);
+                                let next_base = c
+                                    .parent()
+                                    .unwrap_or_else(|| std::path::Path::new("."))
+                                    .to_path_buf();
+                                for ci in c_mod.items {
+                                    if let kora_ast::Item::Import(child_imp) = ci {
+                                        worklist.push((next_base.clone(), child_imp));
+                                    } else {
+                                        imported_items.push(ci);
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        let mut full_items = imported_items;
+        full_items.extend(ast.items.clone());
+        let full_ast = kora_ast::Module {
+            file_id: ast.file_id,
+            items: full_items,
+            span: ast.span,
+        };
+
+        let hir = lower_and_resolve(full_ast.clone(), &mut diagnostics);
         let types = check_module(&hir, &mut diagnostics);
 
         Self {

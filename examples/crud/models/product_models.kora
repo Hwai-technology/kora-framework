@@ -1,0 +1,52 @@
+// ============================================================================
+// Product Domain Models, DTOs & Telemetry Envelopes
+// ============================================================================
+
+model SeoMetadata {
+    title: String
+    description: String
+    canonicalUrl: String
+    ogTitle: String
+    ogDescription: String
+}
+
+model GeoLocation {
+    clientIp: String
+    country: String
+    city: String
+    region: String
+    timezone: String
+}
+
+model Product {
+    id: Int
+    sku: String
+    title: String
+    priceCents: Int
+    inStock: Bool
+}
+
+model ProductDetailsResponse {
+    product: Product
+    seo: SeoMetadata
+    geo: GeoLocation
+}
+
+model ProductCatalogResponse {
+    products: List<Product>
+    total: Int
+    seo: SeoMetadata
+    geo: GeoLocation
+}
+
+model CreateProductRequest {
+    sku: String
+    title: String
+    priceCents: Int
+}
+
+model UpdateProductRequest {
+    title: String
+    priceCents: Int
+    inStock: Bool
+}

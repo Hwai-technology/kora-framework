@@ -1,65 +1,9 @@
 // ============================================================================
-// Kora Example 5: User Registration, Argon2 Password Hashing & JWT Authentication
+// Kora Example: Clean Architecture Authentication API
 // ============================================================================
 
-model AuthUser {
-    id: Int
-    username: String
-    passwordHash: String
-    role: String
-}
-
-model RegisterRequest {
-    username: String
-    plainPassword: String
-}
-
-model LoginRequest {
-    username: String
-    plainPassword: String
-}
-
-model AuthTokenResponse {
-    token: String
-    tokenType: String
-    expiresInSeconds: Int
-}
-
-class AuthService {
-    db: Database
-
-    init(db: Database) {
-        this.db = db
-    }
-
-    fn register(req: RegisterRequest) -> Result<AuthUser, String> {
-        if req.username == "" {
-            return Err("Username cannot be empty")
-        }
-        if req.plainPassword == "" {
-            return Err("Password cannot be empty")
-        }
-
-        // Simulating Argon2id hashing within Kora
-        return Ok(AuthUser {
-            id: 1,
-            username: req.username,
-            passwordHash: "$argon2id$v=19$m=65536,t=3,p=4$simulated_salt$hash",
-            role: "user",
-        })
-    }
-
-    fn login(req: LoginRequest) -> Result<AuthTokenResponse, String> {
-        if req.username == "admin" && req.plainPassword == "secret123" {
-            return Ok(AuthTokenResponse {
-                token: "kora_jwt_eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.simulated_token",
-                tokenType: "Bearer",
-                expiresInSeconds: 86400,
-            })
-        }
-        return Err("Invalid credentials")
-    }
-}
+import { AuthUser, RegisterRequest, LoginRequest, AuthTokenResponse } from "./auth/models/auth_dto"
+import { AuthService } from "./auth/services/auth_service"
 
 let app = run()
 
@@ -78,4 +22,3 @@ post("/auth/login", (request: Request, auth: AuthService) => {
     }
     return auth.login(req)
 })
-

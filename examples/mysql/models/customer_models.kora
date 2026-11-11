@@ -1,0 +1,17 @@
+// ============================================================================
+// MySQL Customer Models & DTOs
+// ============================================================================
+
+model Customer {
+    id: Int
+    fullName: String
+    email: String
+    creditBalance: Int
+    active: Bool
+}
+
+model CustomerSignupInput {
+    fullName: String
+    email: String
+    initialCredit: Int
+}

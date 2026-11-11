@@ -1,0 +1,18 @@
+// ============================================================================
+// System Limits & Security Configuration Models
+// ============================================================================
+
+model AppLimits {
+    maxRateLimitRpm: Int
+    maxBurstCapacity: Int
+    compressionThresholdBytes: Int
+    defaultPageSize: Int
+    maxPageSize: Int
+}
+
+model SecurityConstants {
+    headerAuthorization: String
+    headerNonce: String
+    headerTraceId: String
+    tokenExpirySeconds: Int
+}

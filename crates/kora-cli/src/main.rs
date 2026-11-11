@@ -46,10 +46,27 @@ fn verify_architectural_purity(path_str: &str, ast: &Module, bag: &mut Diagnosti
     let is_main_kora =
         (p.ends_with("main.kora") || p.ends_with("main.kr")) && has_structured_project;
 
+    let has_classes = ast.items.iter().any(|i| matches!(i, Item::Class(_)));
+
     for item in &ast.items {
         match item {
             Item::Enum(en) => {
-                if is_controller_or_service {
+                if has_classes {
+                    bag.emit(
+                        kora_diagnostics::Diagnostic::error(
+                            "E5003",
+                            format!(
+                                "architectural violation: cannot define enum `{}` and class in the same file",
+                                en.name.name
+                            ),
+                        )
+                        .with_primary_label(
+                            en.span,
+                            "inline enum definition forbidden alongside class; extract enums into `enums/`",
+                        )
+                        .with_help("Clean Architecture enforces strict layer segregation: enums must reside in dedicated enum files, and classes in dedicated service/controller files."),
+                    );
+                } else if is_controller_or_service {
                     bag.emit(
                         kora_diagnostics::Diagnostic::error(
                             "E5003",
@@ -80,7 +97,22 @@ fn verify_architectural_purity(path_str: &str, ast: &Module, bag: &mut Diagnosti
                 }
             }
             Item::Model(m) => {
-                if is_controller_or_service {
+                if has_classes {
+                    bag.emit(
+                        kora_diagnostics::Diagnostic::error(
+                            "E5003",
+                            format!(
+                                "architectural violation: cannot define model `{}` and class in the same file",
+                                m.name.name
+                            ),
+                        )
+                        .with_primary_label(
+                            m.span,
+                            "inline model definition forbidden alongside class; extract models into `models/`",
+                        )
+                        .with_help("Clean Architecture enforces strict layer segregation: models (DTOs/entities) must reside in dedicated model files and classes (services/controllers) in dedicated service files."),
+                    );
+                } else if is_controller_or_service {
                     bag.emit(
                         kora_diagnostics::Diagnostic::error(
                             "E5003",
@@ -409,23 +441,31 @@ fn resolve_entrypoint_or_default(
         }
     }
 
-    // 4. Auto-create starter main.kora if requested (e.g. for `kora run`)
+    // 4. Auto-create Clean Architecture starter if requested (e.g. for `kora run` in empty directory)
     if auto_create {
-        let default_content = "// Instant runnable Kora script\n\
-             model AppStatus {\n\
-             \x20   status: String,\n\
-             \x20   message: String,\n\
-             }\n\n\
-             let app = run()\n\n\
-             get(\"/\", () => {\n\
-             \x20   return AppStatus {\n\
-             \x20       status: \"running\",\n\
-             \x20       message: \"Hello from Kora! 🚀\",\n\
-             \x20   }\n\
-             })\n";
-        if fs::write("main.kora", default_content).is_ok() {
-            println!("⚡ [STARTER] No entrypoint found. Generated starter template `main.kora`.");
-            return Ok("main.kora".to_string());
+        let src_models = Path::new("src/models");
+        let _ = fs::create_dir_all(src_models);
+        let model_content = "// AppStatus domain data model\n\
+            model AppStatus {\n\
+            \x20   status: String,\n\
+            \x20   message: String,\n\
+            }\n";
+        let _ = fs::write("src/models/app_status.kora", model_content);
+
+        let default_content = "// Clean Architecture composition entrypoint\n\
+            import { AppStatus } from \"./models/app_status\"\n\n\
+            let app = run()\n\n\
+            get(\"/\", () => {\n\
+            \x20   return AppStatus {\n\
+            \x20       status: \"running\",\n\
+            \x20       message: \"Hello from Kora! 🚀\",\n\
+            \x20   }\n\
+            })\n";
+        if fs::write("src/main.kora", default_content).is_ok() {
+            println!(
+                "⚡ [STARTER] No entrypoint found. Generated Clean Architecture starter project in `src/`."
+            );
+            return Ok("src/main.kora".to_string());
         }
     }
 

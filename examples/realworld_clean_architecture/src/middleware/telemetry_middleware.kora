@@ -2,14 +2,7 @@
 // Method-Level Telemetry & Request Lifecycle Tracker
 // ============================================================================
 
-model TelemetryTrace {
-    traceId: String
-    methodName: String
-    clientIp: String
-    durationMs: Int
-    exitCode: Int
-    status: String
-}
+import { TelemetryTrace } from "../models/response_envelope"
 
 class TelemetryTracker {
     fn recordExecution(traceId: String, method: String, clientIp: String, durationMs: Int, exitCode: Int) -> TelemetryTrace {

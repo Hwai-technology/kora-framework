@@ -1,21 +1,8 @@
 // ============================================================================
-// System Constants & Configuration Limits
+// System Constants & Configuration Provider
 // ============================================================================
 
-model AppLimits {
-    maxRateLimitRpm: Int
-    maxBurstCapacity: Int
-    compressionThresholdBytes: Int
-    defaultPageSize: Int
-    maxPageSize: Int
-}
-
-model SecurityConstants {
-    headerAuthorization: String
-    headerNonce: String
-    headerTraceId: String
-    tokenExpirySeconds: Int
-}
+import { AppLimits, SecurityConstants } from "../models/config_models"
 
 class SystemConfig {
     fn getLimits() -> AppLimits {
@@ -37,4 +24,3 @@ class SystemConfig {
         }
     }
 }
-

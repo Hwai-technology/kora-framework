@@ -1,0 +1,10 @@
+// ============================================================================
+// Authentication Service Contract Interface
+// ============================================================================
+
+import { AuthUser, RegisterRequest, LoginRequest, AuthTokenResponse } from "../models/auth_dto"
+
+interface AuthServiceInterface {
+    fn register(req: RegisterRequest) -> Result<AuthUser, String>
+    fn login(req: LoginRequest) -> Result<AuthTokenResponse, String>
+}
