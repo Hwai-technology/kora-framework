@@ -3,6 +3,8 @@
 //! Hover type documentation, Find References, Document Symbols (Outline),
 //! intelligent Autocompletion, and Code Formatting via JSON-RPC 2.0.
 
+#![allow(clippy::collapsible_if)]
+
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
@@ -82,7 +84,10 @@ impl LanguageServer {
             "textDocument/didOpen" => {
                 if let Some(params) = req.params {
                     if let Some(doc) = params.get("textDocument") {
-                        if let (Some(uri), Some(text)) = (doc.get("uri").and_then(|u| u.as_str()), doc.get("text").and_then(|t| t.as_str())) {
+                        if let (Some(uri), Some(text)) = (
+                            doc.get("uri").and_then(|u| u.as_str()),
+                            doc.get("text").and_then(|t| t.as_str()),
+                        ) {
                             with_cache(|cache| {
                                 cache.insert(uri.to_string(), text.to_string());
                             });
@@ -93,8 +98,15 @@ impl LanguageServer {
             }
             "textDocument/didChange" => {
                 if let Some(params) = req.params {
-                    let uri = params.get("textDocument").and_then(|d| d.get("uri")).and_then(|u| u.as_str());
-                    let text = params.get("contentChanges").and_then(|c| c.get(0)).and_then(|ch| ch.get("text")).and_then(|t| t.as_str());
+                    let uri = params
+                        .get("textDocument")
+                        .and_then(|d| d.get("uri"))
+                        .and_then(|u| u.as_str());
+                    let text = params
+                        .get("contentChanges")
+                        .and_then(|c| c.get(0))
+                        .and_then(|ch| ch.get("text"))
+                        .and_then(|t| t.as_str());
                     if let (Some(uri), Some(text)) = (uri, text) {
                         with_cache(|cache| {
                             cache.insert(uri.to_string(), text.to_string());
@@ -108,7 +120,11 @@ impl LanguageServer {
 
                 // Dynamic completion: add symbols declared in this document
                 if let Some(params) = &req.params {
-                    if let Some(uri) = params.get("textDocument").and_then(|d| d.get("uri")).and_then(|u| u.as_str()) {
+                    if let Some(uri) = params
+                        .get("textDocument")
+                        .and_then(|d| d.get("uri"))
+                        .and_then(|u| u.as_str())
+                    {
                         let doc_text = get_doc_text(uri);
                         if let Some(src) = doc_text {
                             let mut diags = DiagnosticBag::new();
@@ -129,11 +145,15 @@ impl LanguageServer {
                 let mut hover_val = serde_json::Value::Null;
                 if let Some(params) = &req.params {
                     if let (Some(uri), Some(pos)) = (
-                        params.get("textDocument").and_then(|d| d.get("uri")).and_then(|u| u.as_str()),
-                        params.get("position")
+                        params
+                            .get("textDocument")
+                            .and_then(|d| d.get("uri"))
+                            .and_then(|u| u.as_str()),
+                        params.get("position"),
                     ) {
                         let line = pos.get("line").and_then(|l| l.as_u64()).unwrap_or(0) as usize;
-                        let character = pos.get("character").and_then(|c| c.as_u64()).unwrap_or(0) as usize;
+                        let character =
+                            pos.get("character").and_then(|c| c.as_u64()).unwrap_or(0) as usize;
                         if let Some(src) = get_doc_text(uri) {
                             if let Some(markdown) = compute_hover(&src, line, character) {
                                 hover_val = serde_json::json!({
@@ -158,11 +178,15 @@ impl LanguageServer {
                 let mut location = serde_json::Value::Null;
                 if let Some(params) = &req.params {
                     if let (Some(uri), Some(pos)) = (
-                        params.get("textDocument").and_then(|d| d.get("uri")).and_then(|u| u.as_str()),
-                        params.get("position")
+                        params
+                            .get("textDocument")
+                            .and_then(|d| d.get("uri"))
+                            .and_then(|u| u.as_str()),
+                        params.get("position"),
                     ) {
                         let line = pos.get("line").and_then(|l| l.as_u64()).unwrap_or(0) as usize;
-                        let character = pos.get("character").and_then(|c| c.as_u64()).unwrap_or(0) as usize;
+                        let character =
+                            pos.get("character").and_then(|c| c.as_u64()).unwrap_or(0) as usize;
                         if let Some(src) = get_doc_text(uri) {
                             if let Some(loc) = find_definition(uri, &src, line, character) {
                                 location = loc;
@@ -182,11 +206,15 @@ impl LanguageServer {
                 let mut refs = Vec::new();
                 if let Some(params) = &req.params {
                     if let (Some(uri), Some(pos)) = (
-                        params.get("textDocument").and_then(|d| d.get("uri")).and_then(|u| u.as_str()),
-                        params.get("position")
+                        params
+                            .get("textDocument")
+                            .and_then(|d| d.get("uri"))
+                            .and_then(|u| u.as_str()),
+                        params.get("position"),
                     ) {
                         let line = pos.get("line").and_then(|l| l.as_u64()).unwrap_or(0) as usize;
-                        let character = pos.get("character").and_then(|c| c.as_u64()).unwrap_or(0) as usize;
+                        let character =
+                            pos.get("character").and_then(|c| c.as_u64()).unwrap_or(0) as usize;
                         if let Some(src) = get_doc_text(uri) {
                             refs = find_references(uri, &src, line, character);
                         }
@@ -203,7 +231,11 @@ impl LanguageServer {
             "textDocument/documentSymbol" => {
                 let mut symbols = Vec::new();
                 if let Some(params) = &req.params {
-                    if let Some(uri) = params.get("textDocument").and_then(|d| d.get("uri")).and_then(|u| u.as_str()) {
+                    if let Some(uri) = params
+                        .get("textDocument")
+                        .and_then(|d| d.get("uri"))
+                        .and_then(|u| u.as_str())
+                    {
                         if let Some(src) = get_doc_text(uri) {
                             let source_file = SourceFile::new(FileId(0), uri, &src);
                             let mut diags = DiagnosticBag::new();
@@ -223,7 +255,11 @@ impl LanguageServer {
             "textDocument/formatting" => {
                 let mut edits = Vec::new();
                 if let Some(params) = &req.params {
-                    if let Some(uri) = params.get("textDocument").and_then(|d| d.get("uri")).and_then(|u| u.as_str()) {
+                    if let Some(uri) = params
+                        .get("textDocument")
+                        .and_then(|d| d.get("uri"))
+                        .and_then(|u| u.as_str())
+                    {
                         if let Some(src) = get_doc_text(uri) {
                             let formatted = Formatter::format_source(&src);
                             if formatted != src {
@@ -435,31 +471,77 @@ fn compute_hover(src: &str, line: usize, char_idx: usize) -> Option<String> {
     let word = extract_word_at_pos(src, line, char_idx)?;
 
     let doc = match word.as_str() {
-        "model" => "**Kora `model` Declaration**\n\nPure, immutable Data Transfer Object (DTO) or database entity. Models never hold behavior or stateful methods and compile to memory-efficient native Rust structs with zero GC overhead.",
-        "class" => "**Kora `class` Declaration**\n\nService, Controller, or Repository class with compile-time Dependency Injection (DI). All parameters in `init(...)` are resolved automatically at compile time.",
-        "interface" => "**Kora `interface` Declaration**\n\nBehavioral contract defining method signatures. Enforced strictly at compile time; classes declare conformance using `implements`.",
-        "enum" => "**Kora `enum` Declaration**\n\nType-safe enumerated type or algebraic data type. Variants can carry typed payloads and are checked exhaustively in `match` expressions.",
-        "actor" => "**Kora `actor` Concurrency**\n\nIsolated stateful concurrency unit with a non-blocking mailbox. State mutations occur sequentially in an isolated Tokio worker thread via `tell` and `ask`.",
-        "channel" => "**Kora `channel<T>(capacity)`**\n\nNon-blocking MPSC channel for asynchronous message passing between concurrent tasks.",
-        "broadcast" => "**Kora `broadcast<T>(capacity)`**\n\nMulti-producer, multi-consumer broadcast channel for pub/sub domain events.",
-        "spawn" => "**Kora `spawn(async () => { ... })`**\n\nSpawns an asynchronous concurrent task executed on high-performance native OS worker threads.",
-        "try" | "catch" | "finally" | "throw" => "**Kora Error Resilience**\n\nStructured error handling syntax. `try { ... } catch (err) { ... } finally { ... }` ensures reliable resource cleanup and controlled error propagation.",
-        "for" | "in" => "**Kora `for .. in` Loop**\n\nIterate over collections, arrays, or numeric ranges (e.g. `for i in 1..10`). Supports `break` and `continue` control flow.",
-        "const" => "**Kora `const` Declaration**\n\nImmutable compile-time constant evaluated during compilation.",
+        "model" => {
+            "**Kora `model` Declaration**\n\nPure, immutable Data Transfer Object (DTO) or database entity. Models never hold behavior or stateful methods and compile to memory-efficient native Rust structs with zero GC overhead."
+        }
+        "class" => {
+            "**Kora `class` Declaration**\n\nService, Controller, or Repository class with compile-time Dependency Injection (DI). All parameters in `init(...)` are resolved automatically at compile time."
+        }
+        "interface" => {
+            "**Kora `interface` Declaration**\n\nBehavioral contract defining method signatures. Enforced strictly at compile time; classes declare conformance using `implements`."
+        }
+        "enum" => {
+            "**Kora `enum` Declaration**\n\nType-safe enumerated type or algebraic data type. Variants can carry typed payloads and are checked exhaustively in `match` expressions."
+        }
+        "actor" => {
+            "**Kora `actor` Concurrency**\n\nIsolated stateful concurrency unit with a non-blocking mailbox. State mutations occur sequentially in an isolated Tokio worker thread via `tell` and `ask`."
+        }
+        "channel" => {
+            "**Kora `channel<T>(capacity)`**\n\nNon-blocking MPSC channel for asynchronous message passing between concurrent tasks."
+        }
+        "broadcast" => {
+            "**Kora `broadcast<T>(capacity)`**\n\nMulti-producer, multi-consumer broadcast channel for pub/sub domain events."
+        }
+        "spawn" => {
+            "**Kora `spawn(async () => { ... })`**\n\nSpawns an asynchronous concurrent task executed on high-performance native OS worker threads."
+        }
+        "try" | "catch" | "finally" | "throw" => {
+            "**Kora Error Resilience**\n\nStructured error handling syntax. `try { ... } catch (err) { ... } finally { ... }` ensures reliable resource cleanup and controlled error propagation."
+        }
+        "for" | "in" => {
+            "**Kora `for .. in` Loop**\n\nIterate over collections, arrays, or numeric ranges (e.g. `for i in 1..10`). Supports `break` and `continue` control flow."
+        }
+        "const" => {
+            "**Kora `const` Declaration**\n\nImmutable compile-time constant evaluated during compilation."
+        }
         "let" => "**Kora `let` Declaration**\n\nDeclares an immutable variable binding.",
         "var" => "**Kora `var` Declaration**\n\nDeclares a mutable variable binding.",
-        "match" => "**Kora `match` Expression**\n\nExhaustive pattern matching construct. Evaluates variants and ensures 100% case coverage at compile time.",
-        "null" => "**Kora `null`**\n\nSingle-null design: represents absent optional values (`Option<T>`). Note: `undefined` is strictly forbidden in Kora (`E2005`).",
-        "@entity" => "**Kora `@entity` Decorator**\n\nMarks a model as a persistent database entity managed by Kora ORM.",
-        "@table" => "**Kora `@table(\"name\")` Decorator**\n\nMaps a model to a specific SQL table name in PostgreSQL, MySQL, or SQLite.",
-        "@primary" => "**Kora `@primary` Decorator**\n\nMarks a model field as the primary key of the database table.",
-        "@autoIncrement" => "**Kora `@autoIncrement` Decorator**\n\nConfigures integer primary key to automatically sequence upon insert.",
-        "@unique" => "**Kora `@unique` Decorator**\n\nEnforces a unique database constraint on this column.",
-        "@index" => "**Kora `@index` Decorator**\n\nGenerates a database B-Tree index for accelerated query lookups.",
-        "@required" => "**Kora `@required` Decorator**\n\nEnforces non-empty, non-null validation on incoming API requests.",
-        "@email" => "**Kora `@email` Decorator**\n\nValidates that the string matches standard RFC email formatting.",
-        "@min" => "**Kora `@min(value)` Decorator**\n\nValidates minimum numeric value or minimum string length constraint.",
-        "@max" => "**Kora `@max(value)` Decorator**\n\nValidates maximum numeric value or maximum string length constraint.",
+        "match" => {
+            "**Kora `match` Expression**\n\nExhaustive pattern matching construct. Evaluates variants and ensures 100% case coverage at compile time."
+        }
+        "null" => {
+            "**Kora `null`**\n\nSingle-null design: represents absent optional values (`Option<T>`). Note: `undefined` is strictly forbidden in Kora (`E2005`)."
+        }
+        "@entity" => {
+            "**Kora `@entity` Decorator**\n\nMarks a model as a persistent database entity managed by Kora ORM."
+        }
+        "@table" => {
+            "**Kora `@table(\"name\")` Decorator**\n\nMaps a model to a specific SQL table name in PostgreSQL, MySQL, or SQLite."
+        }
+        "@primary" => {
+            "**Kora `@primary` Decorator**\n\nMarks a model field as the primary key of the database table."
+        }
+        "@autoIncrement" => {
+            "**Kora `@autoIncrement` Decorator**\n\nConfigures integer primary key to automatically sequence upon insert."
+        }
+        "@unique" => {
+            "**Kora `@unique` Decorator**\n\nEnforces a unique database constraint on this column."
+        }
+        "@index" => {
+            "**Kora `@index` Decorator**\n\nGenerates a database B-Tree index for accelerated query lookups."
+        }
+        "@required" => {
+            "**Kora `@required` Decorator**\n\nEnforces non-empty, non-null validation on incoming API requests."
+        }
+        "@email" => {
+            "**Kora `@email` Decorator**\n\nValidates that the string matches standard RFC email formatting."
+        }
+        "@min" => {
+            "**Kora `@min(value)` Decorator**\n\nValidates minimum numeric value or minimum string length constraint."
+        }
+        "@max" => {
+            "**Kora `@max(value)` Decorator**\n\nValidates maximum numeric value or maximum string length constraint."
+        }
         _ => {
             // Check if it's a declared symbol in this source file
             let search_patterns = [
@@ -488,7 +570,12 @@ fn compute_hover(src: &str, line: usize, char_idx: usize) -> Option<String> {
 }
 
 /// Resolves Go To Definition for symbol under cursor.
-fn find_definition(current_uri: &str, src: &str, line_idx: usize, char_idx: usize) -> Option<serde_json::Value> {
+fn find_definition(
+    current_uri: &str,
+    src: &str,
+    line_idx: usize,
+    char_idx: usize,
+) -> Option<serde_json::Value> {
     let word = extract_word_at_pos(src, line_idx, char_idx)?;
 
     // 1. Check local file declarations
@@ -541,7 +628,8 @@ fn find_definition(current_uri: &str, src: &str, line_idx: usize, char_idx: usiz
                     for cand in &candidate_paths {
                         if cand.is_file() {
                             if let Ok(imported_content) = fs::read_to_string(cand) {
-                                for (target_line, imp_line) in imported_content.lines().enumerate() {
+                                for (target_line, imp_line) in imported_content.lines().enumerate()
+                                {
                                     for pat in &search_patterns {
                                         if let Some(col) = imp_line.find(pat) {
                                             return Some(serde_json::json!({
@@ -566,7 +654,12 @@ fn find_definition(current_uri: &str, src: &str, line_idx: usize, char_idx: usiz
 }
 
 /// Finds all references to word under cursor in current file.
-fn find_references(current_uri: &str, src: &str, line_idx: usize, char_idx: usize) -> Vec<serde_json::Value> {
+fn find_references(
+    current_uri: &str,
+    src: &str,
+    line_idx: usize,
+    char_idx: usize,
+) -> Vec<serde_json::Value> {
     let mut refs = Vec::new();
     let Some(word) = extract_word_at_pos(src, line_idx, char_idx) else {
         return refs;
@@ -653,7 +746,6 @@ fn get_static_completions() -> Vec<serde_json::Value> {
         serde_json::json!({ "label": "spawn", "kind": 3, "detail": "Spawn a concurrent task", "insertText": "spawn(async () => {\n    ${0}\n})" }),
         serde_json::json!({ "label": "channel", "kind": 3, "detail": "Create non-blocking MPSC channel", "insertText": "channel<${1:Type}>(${2:100})" }),
         serde_json::json!({ "label": "broadcast", "kind": 3, "detail": "Create pub/sub broadcast channel", "insertText": "broadcast<${1:Type}>(${2:100})" }),
-
         // Built-in Types
         serde_json::json!({ "label": "Int", "kind": 25, "detail": "64-bit signed integer" }),
         serde_json::json!({ "label": "Float", "kind": 25, "detail": "64-bit IEEE floating-point number" }),
@@ -664,7 +756,6 @@ fn get_static_completions() -> Vec<serde_json::Value> {
         serde_json::json!({ "label": "Result", "kind": 25, "detail": "Result wrapper: Ok(T) | Err(E)" }),
         serde_json::json!({ "label": "List", "kind": 25, "detail": "Dynamic array list: List<T>" }),
         serde_json::json!({ "label": "null", "kind": 21, "detail": "Absence of value (Option::None)" }),
-
         // Decorators
         serde_json::json!({ "label": "@entity", "kind": 5, "detail": "Database persistent entity" }),
         serde_json::json!({ "label": "@table", "kind": 5, "detail": "Map model to SQL table name", "insertText": "@table(\"${1:table_name}\")" }),
@@ -676,7 +767,7 @@ fn get_static_completions() -> Vec<serde_json::Value> {
         serde_json::json!({ "label": "@email", "kind": 5, "detail": "RFC email format validation" }),
         serde_json::json!({ "label": "@min", "kind": 5, "detail": "Minimum value or length constraint", "insertText": "@min(${1:1})" }),
         serde_json::json!({ "label": "@max", "kind": 5, "detail": "Maximum value or length constraint", "insertText": "@max(${1:100})" }),
-        serde_json::json!({ "label": "@default", "kind": 5, "detail": "Default database column value", "insertText": "@default(\"${1:val}\")" })
+        serde_json::json!({ "label": "@default", "kind": 5, "detail": "Default database column value", "insertText": "@default(\"${1:val}\")" }),
     ]
 }
 

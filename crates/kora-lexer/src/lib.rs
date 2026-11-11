@@ -69,12 +69,12 @@ pub enum TokenKind {
     Semicolon,
     Comma,
     Dot,
-    DotDot, // ..
-    Question, // ?
-    QuestionDot, // ?.
+    DotDot,           // ..
+    Question,         // ?
+    QuestionDot,      // ?.
     QuestionQuestion, // ??
-    Pipe, // |
-    PipeGreater, // |>
+    Pipe,             // |
+    PipeGreater,      // |>
     Underscore,
     At,        // @
     ThinArrow, // ->
@@ -91,14 +91,14 @@ pub enum TokenKind {
     SlashEq, // /=
     Percent,
     PercentEq, // %=
-    Eq,    // =
-    EqEq,  // ==
-    Bang,  // !
-    NotEq, // !=
-    Lt,    // <
-    LtEq,  // <=
-    Gt,    // >
-    GtEq,  // >=
+    Eq,        // =
+    EqEq,      // ==
+    Bang,      // !
+    NotEq,     // !=
+    Lt,        // <
+    LtEq,      // <=
+    Gt,        // >
+    GtEq,      // >=
     AndAnd,
     OrOr,
 

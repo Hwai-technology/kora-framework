@@ -1,6 +1,8 @@
 //! Comprehensive Command-Line Interface (CLI) for Kora.
 //! Supports all Phase 1–8 workflows: check, types, ast, tokens, codegen, build, run, fmt, bench, and init.
 
+#![allow(clippy::collapsible_if, clippy::redundant_guards)]
+
 use std::collections::HashSet;
 use std::env;
 use std::fs;
@@ -1931,7 +1933,9 @@ fn cmd_generate(subcmd: Option<&String>, name: Option<&String>) -> ExitCode {
     println!("  ├── repositories/{singular_lower}_repository.kora (Database Data Access)");
     println!("  ├── validators/{singular_lower}_validator.kora (Input Validation & RFC rules)");
     println!("  ├── models/{singular_lower}_entity.kora (@entity Database Model)");
-    println!("  ├── models/{singular_lower}_dto.kora (Create / Update / Response / Paginated DTOs)");
+    println!(
+        "  ├── models/{singular_lower}_dto.kora (Create / Update / Response / Paginated DTOs)"
+    );
     println!("  ├── interfaces/{singular_lower}_service_interface.kora (Service Contract)");
     println!("  ├── interfaces/{singular_lower}_repository_interface.kora (Repository Contract)");
     println!("  ├── errors/{singular_lower}_errors.kora (Type-Safe Domain Errors)");
@@ -2445,7 +2449,10 @@ fn collect_all_test_files(dir: &Path, files: &mut Vec<PathBuf>) {
 }
 
 fn cmd_test(path_arg: Option<&String>) -> ExitCode {
-    println!("🧪 Kora Automated Test Runner (v{})\n", env!("CARGO_PKG_VERSION"));
+    println!(
+        "🧪 Kora Automated Test Runner (v{})\n",
+        env!("CARGO_PKG_VERSION")
+    );
     let mut files_to_test = Vec::new();
 
     if let Some(target) = path_arg {
@@ -2508,7 +2515,12 @@ fn cmd_test(path_arg: Option<&String>) -> ExitCode {
         }
     }
 
-    println!("\nTest Results: {} passed; {} failed; {} total", passed, failed, passed + failed);
+    println!(
+        "\nTest Results: {} passed; {} failed; {} total",
+        passed,
+        failed,
+        passed + failed
+    );
     if failed > 0 {
         ExitCode::FAILURE
     } else {
@@ -2538,7 +2550,10 @@ fn cmd_clean() -> ExitCode {
 }
 
 fn cmd_doctor() -> ExitCode {
-    println!("🩺 Kora Environment & Toolchain Diagnostics (v{})\n", env!("CARGO_PKG_VERSION"));
+    println!(
+        "🩺 Kora Environment & Toolchain Diagnostics (v{})\n",
+        env!("CARGO_PKG_VERSION")
+    );
 
     // 1. Toolchain & Rust Check
     println!("  [OK] Kora Toolchain: v{}", env!("CARGO_PKG_VERSION"));
@@ -2558,7 +2573,9 @@ fn cmd_doctor() -> ExitCode {
 
     // 2. Database Driver Capability
     println!("  [OK] Database Engines Supported: PostgreSQL, MySQL 8.x, SQLite, Spanner");
-    println!("  [OK] Security Engine: Argon2id (OWASP 2026), HMAC-SHA256 JWT, Memory-Safe Sandboxing");
+    println!(
+        "  [OK] Security Engine: Argon2id (OWASP 2026), HMAC-SHA256 JWT, Memory-Safe Sandboxing"
+    );
     println!("  [OK] Realtime Engine: Native WebSocket Pub/Sub & High-Throughput Actors");
 
     // 3. Project & Workspace Status

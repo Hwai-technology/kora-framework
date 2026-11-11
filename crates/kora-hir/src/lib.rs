@@ -450,10 +450,7 @@ impl<'a> Resolver<'a> {
                 self.pop_scope();
             }
             Stmt::For {
-                var,
-                iter,
-                body,
-                ..
+                var, iter, body, ..
             } => {
                 self.resolve_expr(iter);
                 self.push_scope();
@@ -465,10 +462,7 @@ impl<'a> Resolver<'a> {
             }
             Stmt::Break { .. } | Stmt::Continue { .. } => {}
             Stmt::Const {
-                name,
-                ty,
-                value,
-                ..
+                name, ty, value, ..
             } => {
                 if let Some(t) = ty {
                     self.resolve_type_expr(t);
@@ -476,11 +470,7 @@ impl<'a> Resolver<'a> {
                 self.resolve_expr(value);
                 self.define_local(name, false);
             }
-            Stmt::CompoundAssign {
-                target,
-                value,
-                ..
-            } => {
+            Stmt::CompoundAssign { target, value, .. } => {
                 self.resolve_expr(target);
                 self.resolve_expr(value);
             }

@@ -154,5 +154,8 @@ fn verifies_all_numbered_catalog_examples_pass_frontend_check() {
         }
     }
 
-    assert!(checked_count >= 8, "Expected at least 8 catalog examples, checked {checked_count}");
+    assert!(
+        checked_count >= 8,
+        "Expected at least 8 catalog examples, checked {checked_count}"
+    );
 }

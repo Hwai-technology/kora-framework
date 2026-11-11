@@ -773,10 +773,7 @@ impl<'a> TypeChecker<'a> {
                 self.define_local(name.name.clone(), final_ty);
             }
             Stmt::For {
-                var,
-                iter,
-                body,
-                ..
+                var, iter, body, ..
             } => {
                 let iter_ty = self.check_expr(iter, None);
                 let elem_ty = match iter_ty {
@@ -789,11 +786,7 @@ impl<'a> TypeChecker<'a> {
                 self.pop_scope();
             }
             Stmt::Break { .. } | Stmt::Continue { .. } => {}
-            Stmt::CompoundAssign {
-                target,
-                value,
-                ..
-            } => {
+            Stmt::CompoundAssign { target, value, .. } => {
                 let target_ty = self.check_expr(target, None);
                 let _ = self.check_expr(value, Some(&target_ty));
             }

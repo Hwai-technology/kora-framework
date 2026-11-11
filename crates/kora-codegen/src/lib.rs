@@ -570,10 +570,7 @@ fn emit_stmt(stmt: &Stmt) -> String {
             s
         }
         Stmt::For {
-            var,
-            iter,
-            body,
-            ..
+            var, iter, body, ..
         } => {
             let mut s = format!("for {} in {} {{\n", var.name, emit_expr(iter));
             for st in &body.stmts {
@@ -585,10 +582,7 @@ fn emit_stmt(stmt: &Stmt) -> String {
         Stmt::Break { .. } => "break;".to_string(),
         Stmt::Continue { .. } => "continue;".to_string(),
         Stmt::Const {
-            name,
-            ty,
-            value,
-            ..
+            name, ty, value, ..
         } => {
             let ty_ann = ty
                 .as_ref()
@@ -597,11 +591,13 @@ fn emit_stmt(stmt: &Stmt) -> String {
             format!("const {}{} = {};", name.name, ty_ann, emit_expr(value))
         }
         Stmt::CompoundAssign {
-            target,
-            op,
-            value,
-            ..
-        } => format!("{} {} {};", emit_expr(target), op.symbol(), emit_expr(value)),
+            target, op, value, ..
+        } => format!(
+            "{} {} {};",
+            emit_expr(target),
+            op.symbol(),
+            emit_expr(value)
+        ),
         Stmt::Throw { value, .. } => format!("panic!(\"{{}}\", {});", emit_expr(value)),
         Stmt::TryCatch {
             try_block,
@@ -614,9 +610,8 @@ fn emit_stmt(stmt: &Stmt) -> String {
                 .as_ref()
                 .map(|p| p.name.as_str())
                 .unwrap_or("_err");
-            let mut s =
-                "let __res = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {\n"
-                    .to_string();
+            let mut s = "let __res = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {\n"
+                .to_string();
             for st in &try_block.stmts {
                 s.push_str(&format!("        {}\n", emit_stmt(st)));
             }
@@ -702,7 +697,9 @@ fn emit_expr(expr: &Expr) -> String {
                     BinaryOp::Gte => ">=",
                     BinaryOp::And => "&&",
                     BinaryOp::Or => "||",
-                    BinaryOp::Coalesce => return format!("{}.unwrap_or({})", emit_expr(lhs), emit_expr(rhs)),
+                    BinaryOp::Coalesce => {
+                        return format!("{}.unwrap_or({})", emit_expr(lhs), emit_expr(rhs));
+                    }
                     BinaryOp::Pipe => return format!("{}({})", emit_expr(rhs), emit_expr(lhs)),
                     BinaryOp::Range => return format!("({}..={})", emit_expr(lhs), emit_expr(rhs)),
                 };
