@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# Kora Programming Language & Framework — Automated Setup & System Installer
+#
+# Installs:
+#  1. `kora` release binary into ~/.local/bin (and /usr/local/bin if available)
+#  2. Linux FreeDesktop Shared MIME database (text/x-kora for *.kora & *.kr)
+#  3. Shell Auto-Completions (Bash & Zsh)
+#  4. Editor tooling for Antigravity IDE and Visual Studio Code
+# ==============================================================================
+
+set -e
+
+COLOR_BLUE='\033[0;34m'
+COLOR_GREEN='\033[0;32m'
+COLOR_CYAN='\033[0;36m'
+COLOR_RED='\033[0;31m'
+COLOR_RESET='\033[0m'
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BIN_TARGET_DIR="$HOME/.local/bin"
+MIME_TARGET_DIR="$HOME/.local/share/mime/packages"
+COMPLETION_TARGET_DIR="$HOME/.local/share/bash-completion/completions"
+
+echo -e "${COLOR_CYAN}================================================================${COLOR_RESET}"
+echo -e "${COLOR_CYAN}  ⚡ Kora Language & Framework — System Installer & Setup      ${COLOR_RESET}"
+echo -e "${COLOR_CYAN}================================================================${COLOR_RESET}"
+
+# 1. Compile Release Binary
+echo -e "\n${COLOR_BLUE}[1/5] Compiling Kora release binary with Cargo...${COLOR_RESET}"
+cd "$ROOT_DIR"
+cargo build --release -p kora-cli
+
+RELEASE_BIN="$ROOT_DIR/target/release/kora"
+if [[ ! -f "$RELEASE_BIN" ]]; then
+    echo -e "${COLOR_RED}error: build failed, $RELEASE_BIN not found${COLOR_RESET}"
+    exit 1
+fi
+echo -e "${COLOR_GREEN}✓ Release binary built successfully.${COLOR_RESET}"
+
+# 2. Install Binary into ~/.local/bin
+echo -e "\n${COLOR_BLUE}[2/5] Installing 'kora' into user path ($BIN_TARGET_DIR)...${COLOR_RESET}"
+mkdir -p "$BIN_TARGET_DIR"
+cp -f "$RELEASE_BIN" "$BIN_TARGET_DIR/kora"
+chmod +x "$BIN_TARGET_DIR/kora"
+
+# Ensure ~/.local/bin is in PATH in ~/.bashrc if missing
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    echo -e "${COLOR_CYAN}  Adding ~/.local/bin to PATH in ~/.bashrc...${COLOR_RESET}"
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+echo -e "${COLOR_GREEN}✓ Binary installed at: $BIN_TARGET_DIR/kora${COLOR_RESET}"
+
+# Optional /usr/local/bin copy if root or passwordless sudo
+if [[ $EUID -eq 0 ]]; then
+    cp -f "$RELEASE_BIN" /usr/local/bin/kora
+    chmod +x /usr/local/bin/kora
+    echo -e "${COLOR_GREEN}✓ Global system binary installed at: /usr/local/bin/kora${COLOR_RESET}"
+fi
+
+# 3. Register Linux Shared MIME Database for .kora & .kr
+echo -e "\n${COLOR_BLUE}[3/5] Registering Linux Shared-MIME type for .kora & .kr...${COLOR_RESET}"
+mkdir -p "$MIME_TARGET_DIR"
+if [[ -f "$ROOT_DIR/integrations/linux/kora.xml" ]]; then
+    cp -f "$ROOT_DIR/integrations/linux/kora.xml" "$MIME_TARGET_DIR/kora.xml"
+    if command -v update-mime-database &>/dev/null; then
+        update-mime-database "$HOME/.local/share/mime" &>/dev/null || true
+        echo -e "${COLOR_GREEN}✓ MIME database updated: text/x-kora (*.kora, *.kr).${COLOR_RESET}"
+    fi
+fi
+
+# 4. Install Shell Completions
+echo -e "\n${COLOR_BLUE}[4/5] Installing Bash completions...${COLOR_RESET}"
+mkdir -p "$COMPLETION_TARGET_DIR"
+if [[ -f "$ROOT_DIR/integrations/completions/kora.bash" ]]; then
+    cp -f "$ROOT_DIR/integrations/completions/kora.bash" "$COMPLETION_TARGET_DIR/kora"
+    echo -e "${COLOR_GREEN}✓ Bash completion installed.${COLOR_RESET}"
+fi
+
+# 5. Install / Update Antigravity IDE and VS Code Extensions
+echo -e "\n${COLOR_BLUE}[5/5] Synchronizing editor extensions for Antigravity IDE and VS Code...${COLOR_RESET}"
+ANTIGRAVITY_EXT="$HOME/.antigravity-ide/extensions/kora-lang.kora-vscode-0.1.0"
+VSCODE_EXT="$HOME/.vscode/extensions/kora-vscode"
+
+for EXT_PATH in "$ANTIGRAVITY_EXT" "$VSCODE_EXT"; do
+    mkdir -p "$EXT_PATH/client" "$EXT_PATH/icons" "$EXT_PATH/snippets" "$EXT_PATH/syntaxes"
+    cp -f "$ROOT_DIR/integrations/vscode/package.json" "$EXT_PATH/package.json"
+    cp -f "$ROOT_DIR/integrations/vscode/kora-icons.json" "$EXT_PATH/kora-icons.json"
+    cp -f "$ROOT_DIR/integrations/vscode/language-configuration.json" "$EXT_PATH/language-configuration.json"
+    cp -f "$ROOT_DIR/integrations/vscode/client/extension.js" "$EXT_PATH/client/extension.js"
+    cp -rf "$ROOT_DIR/integrations/vscode/icons/"* "$EXT_PATH/icons/"
+    cp -rf "$ROOT_DIR/integrations/vscode/snippets/"* "$EXT_PATH/snippets/"
+    cp -rf "$ROOT_DIR/integrations/vscode/syntaxes/"* "$EXT_PATH/syntaxes/"
+done
+echo -e "${COLOR_GREEN}✓ Editor extension synced to Antigravity IDE and VS Code.${COLOR_RESET}"
+
+# Verification
+echo -e "\n${COLOR_CYAN}================================================================${COLOR_RESET}"
+echo -e "${COLOR_GREEN}  🎉 Kora Environment Setup Completed Successfully!            ${COLOR_RESET}"
+echo -e "${COLOR_CYAN}================================================================${COLOR_RESET}"
+echo -e "Installed Version: $(${BIN_TARGET_DIR}/kora version)"
+echo -e "Available Commands: check, types, ast, tokens, codegen, build, run, bench, db, pkg, init, version"
+echo -e "File Extensions: .kora and .kr are now recognized system-wide."
+echo -e "\nRun 'kora help' or 'kora version' in your terminal."

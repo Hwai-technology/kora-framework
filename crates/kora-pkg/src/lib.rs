@@ -188,8 +188,30 @@ impl PackageManager {
         fs::write(path, serialized).map_err(|e| format!("failed to write {}: {e}", path.display()))
     }
 
+    /// Validates package name against path traversal and malicious characters.
+    pub fn validate_package_name(name: &str) -> Result<(), String> {
+        if name.trim().is_empty() {
+            return Err("package name cannot be empty".to_string());
+        }
+        if name.contains("..") || name.contains('/') || name.contains('\\') || name.contains('\0') {
+            return Err(format!(
+                "security violation: illegal path traversal characters in package name `{name}`"
+            ));
+        }
+        if !name
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '@')
+        {
+            return Err(format!(
+                "invalid package name `{name}`: only alphanumeric, '-', '_', '@' allowed"
+            ));
+        }
+        Ok(())
+    }
+
     /// Adds a new dependency to `kora.toml`.
     pub fn add_dependency(manifest_path: &Path, name: &str, req: &str) -> Result<(), String> {
+        Self::validate_package_name(name)?;
         let mut manifest = Self::parse_manifest(manifest_path)?;
         manifest
             .dependencies
@@ -402,5 +424,44 @@ mod tests {
         assert_eq!(locked.package.len(), 1);
         assert_eq!(locked.package[0].name, "kora-crypto");
         assert_eq!(locked.package[0].version, "1.2.0");
+    }
+
+    #[test]
+    fn security_rejects_path_traversal_in_package_names() {
+        let malicious_names = [
+            "../../etc/passwd",
+            "../bad-pkg",
+            "kora/../../root",
+            "kora\\windows\\system32",
+            "pkg\0nullbyte",
+            "package; rm -rf /",
+            "",
+        ];
+
+        for name in malicious_names {
+            let res = PackageManager::validate_package_name(name);
+            assert!(
+                res.is_err(),
+                "Malicious package name `{name}` was not rejected by security validation!"
+            );
+        }
+
+        // Legitimate package names must pass
+        assert!(PackageManager::validate_package_name("kora-crypto").is_ok());
+        assert!(PackageManager::validate_package_name("auth_provider").is_ok());
+        assert!(PackageManager::validate_package_name("@kora/core").is_err()); // slash rejected for safety
+    }
+
+    #[test]
+    fn security_verifies_sha256_cryptographic_integrity() {
+        let data = b"kora-framework-verified-source-code";
+        let hash = PackageManager::calculate_sha256(data);
+        assert_eq!(hash.len(), 64); // Valid 256-bit hexadecimal string
+
+        // Any single bit alteration produces completely different hash (avalanche effect)
+        let mut tampered_data = data.to_vec();
+        tampered_data[0] ^= 1;
+        let tampered_hash = PackageManager::calculate_sha256(&tampered_data);
+        assert_ne!(hash, tampered_hash);
     }
 }

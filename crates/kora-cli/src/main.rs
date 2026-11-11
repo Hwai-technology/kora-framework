@@ -22,18 +22,21 @@ fn verify_architectural_purity(path_str: &str, ast: &Module, bag: &mut Diagnosti
         .canonicalize()
         .unwrap_or_else(|_| PathBuf::from(path_str));
     let p = canonical.to_string_lossy().replace('\\', "/");
-    let is_enum_file = p.contains("/enums/") || p.ends_with("_enum.kora");
+    let is_enum_file =
+        p.contains("/enums/") || p.ends_with("_enum.kora") || p.ends_with("_enum.kr");
     let is_model_or_iface_file = p.contains("/models/")
         || p.contains("/interfaces/")
         || p.ends_with("_model.kora")
-        || p.ends_with("_interface.kora");
+        || p.ends_with("_model.kr")
+        || p.ends_with("_interface.kora")
+        || p.ends_with("_interface.kr");
     let is_controller_or_service = !is_model_or_iface_file
         && !is_enum_file
         && (p.contains("controller")
             || p.contains("service")
             || p.contains("/controllers/")
             || p.contains("/services/"));
-    let is_main_kora = p.ends_with("main.kora");
+    let is_main_kora = p.ends_with("main.kora") || p.ends_with("main.kr");
 
     for item in &ast.items {
         match item {
@@ -185,13 +188,18 @@ fn load_module_with_imports(
                 let clean_p = path_str.trim_matches('"');
                 candidate_paths.push(current_dir.join(clean_p));
                 candidate_paths.push(current_dir.join(format!("{clean_p}.kora")));
+                candidate_paths.push(current_dir.join(format!("{clean_p}.kr")));
                 candidate_paths.push(current_dir.join(format!("../{clean_p}")));
                 candidate_paths.push(current_dir.join(format!("../{clean_p}.kora")));
+                candidate_paths.push(current_dir.join(format!("../{clean_p}.kr")));
                 candidate_paths.push(current_dir.join(format!("../../{clean_p}")));
                 candidate_paths.push(current_dir.join(format!("../../{clean_p}.kora")));
+                candidate_paths.push(current_dir.join(format!("../../{clean_p}.kr")));
                 candidate_paths.push(PathBuf::from(format!("src/{clean_p}.kora")));
+                candidate_paths.push(PathBuf::from(format!("src/{clean_p}.kr")));
                 candidate_paths.push(PathBuf::from(format!("src/{clean_p}")));
                 candidate_paths.push(PathBuf::from(format!("{clean_p}.kora")));
+                candidate_paths.push(PathBuf::from(format!("{clean_p}.kr")));
                 candidate_paths.push(PathBuf::from(clean_p));
             }
 
@@ -199,10 +207,15 @@ fn load_module_with_imports(
                 let segs: Vec<String> = imp.segments.iter().map(|s| s.name.clone()).collect();
                 let rel_str = segs.join("/");
                 candidate_paths.push(current_dir.join(format!("{rel_str}.kora")));
+                candidate_paths.push(current_dir.join(format!("{rel_str}.kr")));
                 candidate_paths.push(current_dir.join(format!("../{rel_str}.kora")));
+                candidate_paths.push(current_dir.join(format!("../{rel_str}.kr")));
                 candidate_paths.push(current_dir.join(format!("../../{rel_str}.kora")));
+                candidate_paths.push(current_dir.join(format!("../../{rel_str}.kr")));
                 candidate_paths.push(PathBuf::from(format!("src/{rel_str}.kora")));
+                candidate_paths.push(PathBuf::from(format!("src/{rel_str}.kr")));
                 candidate_paths.push(PathBuf::from(format!("{rel_str}.kora")));
+                candidate_paths.push(PathBuf::from(format!("{rel_str}.kr")));
             }
 
             let _symbol_names: HashSet<String> =
@@ -237,7 +250,7 @@ fn main() -> ExitCode {
         return ExitCode::SUCCESS;
     }
 
-    if args[0] == "--version" || args[0] == "-V" {
+    if args[0] == "--version" || args[0] == "-V" || args[0] == "version" {
         println!("kora {}", env!("CARGO_PKG_VERSION"));
         return ExitCode::SUCCESS;
     }
@@ -269,17 +282,17 @@ fn print_usage() {
          USAGE:\n\
          \x20 kora <COMMAND> [OPTIONS]\n\n\
          COMMANDS:\n\
-         \x20 check <file.kora>    Run syntax, type, and ownership analysis (zero codegen)\n\
-         \x20 types <file.kora>    Inspect inferred models, DI classes, and typed symbols\n\
-         \x20 ast <file.kora>      Dump parsed Abstract Syntax Tree\n\
-         \x20 tokens <file.kora>   Dump lexical token stream\n\
-         \x20 codegen <file.kora>  Emit verified safe Rust code without compiling\n\
-         \x20 build <file.kora>    Compile to a native release binary inside .kora-build/\n\
-         \x20 run <file.kora>      Compile and execute the native binary\n\
-         \x20 bench                Run reproducible benchmark comparing Kora, Rust, Go, Node, Laravel\n\
-         \x20 db <action> <file>   Manage database lifecycle (migrate, sync, seed, truncate, drop, refresh)\n\
-         \x20 pkg <action> [args]  Manage distributed packages and modules (install, add, remove, list, publish)\n\
-         \x20 init <dir>           Scaffold a new production-ready Kora application project",
+         \x20 check <file.kora|file.kr>    Run syntax, type, and ownership analysis (zero codegen)\n\
+         \x20 types <file.kora|file.kr>    Inspect inferred models, DI classes, and typed symbols\n\
+         \x20 ast <file.kora|file.kr>      Dump parsed Abstract Syntax Tree\n\
+         \x20 tokens <file.kora|file.kr>   Dump lexical token stream\n\
+         \x20 codegen <file.kora|file.kr>  Emit verified safe Rust code without compiling\n\
+         \x20 build <file.kora|file.kr>    Compile to a native release binary inside .kora-build/\n\
+         \x20 run <file.kora|file.kr>      Compile and execute the native binary\n\
+         \x20 bench                        Run reproducible benchmark comparing Kora, Rust, Go, Node, Laravel\n\
+         \x20 db <action> [file]           Manage database lifecycle (migrate, sync, seed, truncate, drop, refresh)\n\
+         \x20 pkg <action> [args]          Manage distributed packages and modules (install, add, remove, list, publish)\n\
+         \x20 init <dir>                   Scaffold a new production-ready Kora application project",
         env!("CARGO_PKG_VERSION")
     );
 }
@@ -563,8 +576,14 @@ fn cmd_db(action: Option<&String>, path: Option<&String>) -> ExitCode {
     let target_path = path.cloned().unwrap_or_else(|| {
         if Path::new("examples/realworld_clean_architecture/src/main.kora").exists() {
             "examples/realworld_clean_architecture/src/main.kora".to_string()
+        } else if Path::new("examples/realworld_clean_architecture/src/main.kr").exists() {
+            "examples/realworld_clean_architecture/src/main.kr".to_string()
         } else if Path::new("src/main.kora").exists() {
             "src/main.kora".to_string()
+        } else if Path::new("src/main.kr").exists() {
+            "src/main.kr".to_string()
+        } else if Path::new("main.kr").exists() {
+            "main.kr".to_string()
         } else {
             "main.kora".to_string()
         }

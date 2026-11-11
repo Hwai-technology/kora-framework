@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="text/x-kora">
+    <comment>Kora Programming Language Source</comment>
+    <comment xml:lang="ar">ملف لغة البرمجة كورا (Kora)</comment>
+    <icon name="kora-file"/>
+    <glob pattern="*.kora"/>
+    <glob pattern="*.kr"/>
+    <sub-class-of type="text/plain"/>
+  </mime-type>
+</mime-info>
+

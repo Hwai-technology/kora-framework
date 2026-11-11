@@ -194,4 +194,33 @@ mod tests {
         );
         assert_eq!(binds.len(), 1);
     }
+
+    #[tokio::test]
+    async fn security_verifies_sql_injection_immunity_with_malicious_payloads() {
+        let malicious_payloads = [
+            "' OR '1'='1' --",
+            "admin'; DROP TABLE users; --",
+            "' UNION SELECT * FROM sqlite_master --",
+            "1; UPDATE users SET role='admin' WHERE id=1; --",
+            "'); EXEC xp_cmdshell('dir'); --",
+        ];
+
+        for payload in malicious_payloads {
+            let (sql, binds) = QueryBuilder::table("users")
+                .where_eq("name", SqlValue::String(payload.to_string()))
+                .to_sql_sqlite();
+
+            // SQL must contain parameterized placeholder, NEVER raw unescaped input string
+            assert!(
+                sql.contains("WHERE name = ?1"),
+                "Generated SQL must parameterize the value placeholder"
+            );
+            assert!(
+                !sql.contains(payload),
+                "Raw malicious payload leaked directly into SQL query string!"
+            );
+            assert_eq!(binds.len(), 1);
+            assert_eq!(binds[0], SqlValue::String(payload.to_string()));
+        }
+    }
 }

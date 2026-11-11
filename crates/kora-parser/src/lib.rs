@@ -1609,4 +1609,22 @@ class AutoService {
             panic!("expected Class");
         }
     }
+
+    #[test]
+    fn security_verifies_parser_resilience_under_malformed_and_deep_nesting() {
+        let mut bag = DiagnosticBag::new();
+
+        // 1. Extreme nested parentheses must not stack overflow or crash
+        let deep_nested = format!("let x = {}(42){};", "(".repeat(50), ")".repeat(50));
+        let module = parse_module(FileId(0), &deep_nested, &mut bag);
+        assert!(!module.items.is_empty() || bag.has_errors());
+
+        // 2. Unclosed string literals and truncated symbols must gracefully record diagnostics
+        let malformed = "model Broken { id: Int, name: \"unclosed string let x = ";
+        let _ = parse_module(FileId(0), malformed, &mut bag);
+        assert!(
+            bag.has_errors(),
+            "Malformed unclosed string must trigger compiler diagnostic"
+        );
+    }
 }

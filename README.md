@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="#vision"><img src="https://img.shields.io/badge/vision-TS%20%2B%20Rust%20%2B%20Go-00D2FF" alt="Vision" /></a>
-  <a href="#license"><img src="https://img.shields.io/badge/license-MIT-0047FF" alt="License" /></a>
+  <a href="#license"><img src="https://img.shields.io/badge/license-AGPL--3.0-0047FF" alt="License" /></a>
   <a href="#status"><img src="https://img.shields.io/badge/status-active%20development-00FFA3" alt="Status" /></a>
 </p>
 
@@ -284,4 +284,4 @@ A huge thank you to everyone helping build Kora into the next-generation backend
 
 ## 📄 License
 
-Kora is open-source software licensed under the [MIT License](LICENSE).
+Kora is open-source software licensed under the [GNU Affero General Public License v3 (AGPL-3.0)](LICENSE).

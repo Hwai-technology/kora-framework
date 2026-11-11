@@ -304,4 +304,26 @@ mod tests {
         results.sort();
         assert_eq!(results, vec![10, 20, 30, 40, 50]);
     }
+
+    #[tokio::test]
+    async fn security_verifies_bounded_channel_prevents_memory_exhaustion() {
+        // Enforce hard bound on capacity to prevent denial-of-service / memory leaks
+        let ch = Channel::<i32>::pair(2);
+        assert!(ch.try_send(1).is_ok());
+        assert!(ch.try_send(2).is_ok());
+        // 3rd item must be rejected immediately because buffer is full (bounded backpressure)
+        assert!(ch.try_send(3).is_err());
+    }
+
+    #[tokio::test]
+    async fn security_verifies_actor_ask_timeout_protection() {
+        let actor: ActorRef<(), ()> = spawn_actor((), 4, |_state, _msg| {
+            // Intentionally return None without responding to test timeout protection
+            None
+        });
+
+        // Querying an unresponsive actor must timeout safely without hanging forever
+        let timeout_res = actor.ask((), Duration::from_millis(50)).await;
+        assert!(timeout_res.is_err());
+    }
 }
