@@ -136,7 +136,33 @@ The Kora compiler (`kora check`) guards directory boundaries at build time:
 - **`E5001`**: Files in `enums/` cannot contain functions or routes.
 - **`E5002`**: Files in `models/` or `interfaces/` cannot contain executable server logic or routes.
 - **`E5003`**: Controllers and services cannot define inline enums or models; they must be imported.
-- **`E5004`**: `main.kora` cannot define inline models or enums.
+- **`E5004`**: `main.kora` cannot define inline models or enums in structured projects.
+
+### 6. Python-Style Direct Execution & Smart Entrypoint Discovery
+Execute any single script with zero ceremony:
+```bash
+# Run standalone files directly
+kora script.kora
+kora app.kr
+
+# Auto-discover entrypoint or scaffold starter main.kora in current folder
+kora run
+```
+
+### 7. Instant Live Watch Mode & Hot Reloading
+Rapid feedback loop during development:
+```bash
+kora watch
+# or target a specific file:
+kora watch src/main.kora
+```
+
+### 8. Canonical Code Formatter & Linter
+Unified code layout across teams:
+```bash
+kora fmt                # Format all project files
+kora fmt --check        # CI verify mode
+```
 
 ---
 
@@ -183,7 +209,10 @@ flowchart TD
 | **Database Engine** | Schema Auto-Sync, Migrations, Seeders | ✅ **Ready** | CLI commands (`kora db <migrate\|sync\|seed\|truncate\|drop\|refresh>`). |
 | **Code Generation** | Verified Native Rust Generation | ✅ **Ready** | Compiles to zero-GC native binary via `.kora-build/`. |
 | **Async Concurrency** | Non-blocking I/O & Actor/Channels | ✅ **Ready** | MPSC typed channels, broadcast pub/sub, actors (`ask`/`tell`) & `TaskGroup`. |
-| **Tooling & Ecosystem**| VS Code / Antigravity IDE Extension | ✅ **Ready** | Syntax grammar, modern snippets, language config & dot-free custom icons. |
+| **Tooling & Ecosystem**| VS Code / Antigravity IDE Extension | ✅ **Ready** | CodeLens (`▶ Run`), formatOnSave, Go-To-Definition (`F12`), Outline view. |
+| **Language Server (LSP)**| JSON-RPC 2.0 Language Server Daemon | ✅ **Ready** | Powers Neovim, Helix, Emacs, and VS Code with completion and hover. |
+| **Code Formatter** | Canonical Source Formatter (`kora-fmt`)| ✅ **Ready** | Automatic 4-space indentation, spacing, and CI `--check` verification. |
+| **Live Hot-Reload** | Instant Watch Mode (`kora watch`) | ✅ **Ready** | Instant sub-second re-compilation and execution on file change. |
 | **Package Registry** | Distributed Package Manager (`kora-pkg`) | ✅ **Ready** | SemVer solver, SHA-256 lockfile (`kora.lock`) & CLI commands (`kora pkg`). |
 
 ---
@@ -196,16 +225,25 @@ All components live in a modular Cargo workspace under `crates/`:
 |:---|:---|
 | `kora-lexer` | High-speed tokenizer with keyword and attribute scanning. |
 | `kora-ast` | Abstract Syntax Tree node definitions. |
-| `kora-parser` | Recursive-descent parser with diagnostics. |
+| `kora-parser` | Recursive-descent parser with rich diagnostics. |
 | `kora-hir` | High-level Intermediate Representation and symbol resolution. |
 | `kora-ty` | Static type system, interface verification, and purity checker. |
+| `kora-ownership` | Lifetime & concurrency planner: Arc promotion and cycle detection. |
 | `kora-codegen` | Transpilation from Kora AST to safe native Rust code. |
 | `kora-runtime` | Async concurrency runtime: MPSC channels, broadcast pub/sub, actors & task groups. |
-| `kora-pkg` | Distributed package manager, SemVer solver, and SHA-256 lockfile engine. |
 | `kora-http` | Async HTTP engine powered by Axum and Tokio. |
-| `kora-orm` | Compile-time query and schema integration. |
+| `kora-orm` | Compile-time query and schema integration with SQL injection immunity. |
+| `kora-auth` | Enterprise security: Argon2id password hashing and HMAC-SHA256 JWT tokens. |
 | `kora-realtime`| WebSocket channels and domain event streaming. |
-| `kora-cli` | Command-line interface (`check`, `build`, `run`, `codegen`, `db`, `pkg`). |
+| `kora-queue` | Bounded asynchronous task queue engine. |
+| `kora-observability` | Structured JSON logging and atomic performance metrics. |
+| `kora-fmt` | Canonical code formatting and indentation engine. |
+| `kora-lsp` | Language Server Protocol daemon for editor integrations. |
+| `kora-bench` | Concurrency and throughput benchmarking suite. |
+| `kora-profiler` | High-precision execution profiling and timeline analysis. |
+| `kora-testing` | Native unit and integration testing harness. |
+| `kora-pkg` | Distributed package manager, SemVer solver, and SHA-256 lockfile engine. |
+| `kora-cli` | Primary command-line interface (`run`, `watch`, `fmt`, `check`, `create`, `g`). |
 
 ---
 
@@ -245,7 +283,15 @@ kora g feature products
 
 # Verify architecture & compile
 kora check src/main.kora
-kora run src/main.kora
+
+# Run directly
+kora run
+
+# Or launch instant live hot-reloading
+kora watch
+
+# Canonicalize code style
+kora fmt
 ```
 
 ### Checking and Compiling Files
