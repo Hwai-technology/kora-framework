@@ -1,0 +1,44 @@
+// ============================================================================
+// Comprehensive User Registration & Profile DTO (E5002 Enforced)
+// Demonstrates all essential API types: Primitives, Files, JSON, Arrays, Enums
+// ============================================================================
+
+import { FileUploadDto } from "./file_dto"
+import { AddressDto, UserPreferencesDto } from "./nested_dto"
+
+model UserRegistrationDto {
+    @required
+    @min(3)
+    @max(30)
+    username: String
+
+    @required
+    @email
+    email: String
+
+    @required
+    @min(18)
+    @max(120)
+    age: Int
+
+    @min(0.0)
+    hourlyRate: Float
+
+    @required
+    agreedToTerms: Bool
+
+    @required
+    address: AddressDto
+
+    @required
+    preferences: UserPreferencesDto
+
+    @min(1)
+    @max(10)
+    skills: List<String>
+
+    avatar: Option<FileUploadDto>
+    documents: List<FileUploadDto>
+    websiteUrl: Option<String>
+    accountTier: String
+}

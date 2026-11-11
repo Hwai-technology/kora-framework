@@ -1,0 +1,16 @@
+// ============================================================================
+// RFC 7807 Standard Validation Result DTOs (E5002 Enforced)
+// ============================================================================
+
+model FieldValidationError {
+    field: String
+    rule: String
+    message: String
+    rejectedValue: String
+}
+
+model ValidationEnvelope {
+    isValid: Bool
+    errorCount: Int
+    errors: List<FieldValidationError>
+}

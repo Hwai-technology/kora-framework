@@ -1,0 +1,74 @@
+// ============================================================================
+// Example 10: DTO Validation & Comprehensive API Types
+// Demonstrates Defense-in-Depth ("DTO Protects You") with every essential API type
+// ============================================================================
+
+import { UserRegistrationDto } from "./models/user_registration_dto"
+import { FileUploadDto } from "./models/file_dto"
+import { AddressDto, UserPreferencesDto } from "./models/nested_dto"
+import { DtoValidatorService } from "./services/dto_validator_service"
+
+let app = run()
+
+// 1. File Upload & Binary Asset Validation Endpoint
+post("/api/v1/files/upload", (req: Request, validator: DtoValidatorService) => {
+    let candidateFile = FileUploadDto {
+        fileName: "avatar.png",
+        mimeType: "image/png",
+        sizeBytes: 2048500,
+        sha256Checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        isPublic: true,
+        imageMeta: null,
+    }
+    let checkResult = validator.validateFileUpload(candidateFile)
+    return send(checkResult)
+})
+
+// 2. Structured JSON / Nested Object Validation Endpoint
+post("/api/v1/addresses/validate", (req: Request, validator: DtoValidatorService) => {
+    let candidateAddress = AddressDto {
+        street: "100 Innovation Way",
+        city: "San Francisco",
+        postalCode: "94105",
+        countryCode: "US",
+        geo: null,
+    }
+    let checkResult = validator.validateAddress(candidateAddress)
+    return send(checkResult)
+})
+
+// 3. Master User Registration DTO Validation Endpoint (All Types Combined)
+post("/api/v1/users/register", (req: Request, validator: DtoValidatorService) => {
+    let sampleAddress = AddressDto {
+        street: "42 Enterprise Boulevard",
+        city: "Austin",
+        postalCode: "78701",
+        countryCode: "US",
+        geo: null,
+    }
+
+    let samplePreferences = UserPreferencesDto {
+        theme: "dark",
+        locale: "en-US",
+        emailNotifications: true,
+        marketingConsent: false,
+    }
+
+    let candidateDto = UserRegistrationDto {
+        username: "alex_developer",
+        email: "alex@kora.dev",
+        age: 26,
+        hourlyRate: 85.50,
+        agreedToTerms: true,
+        address: sampleAddress,
+        preferences: samplePreferences,
+        skills: ["Rust", "Kora", "Distributed Systems"],
+        avatar: null,
+        documents: [],
+        websiteUrl: Some("https://kora.dev"),
+        accountTier: "Pro",
+    }
+
+    let validationResult = validator.validateRegistration(candidateDto)
+    return send(validationResult)
+})

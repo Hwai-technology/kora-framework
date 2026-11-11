@@ -1,11 +1,9 @@
 // ============================================================================
-// User Domain Model
+// Enum: AccountTier (Pure Enum Declaration - E5001 Enforced)
 // ============================================================================
 
-model User {
-    id: Int
-    name: String
-    email: String
-    active: Bool
+enum AccountTier {
+    Free,
+    Pro,
+    Enterprise,
 }
-

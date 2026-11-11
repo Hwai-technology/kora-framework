@@ -1,0 +1,10 @@
+// ============================================================================
+// Enum: FileClassification (Pure Enum Declaration - E5001 Enforced)
+// ============================================================================
+
+enum FileClassification {
+    Avatar,
+    Document,
+    GalleryImage,
+    InvoicePdf,
+}

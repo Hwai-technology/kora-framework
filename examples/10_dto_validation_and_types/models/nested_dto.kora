@@ -1,0 +1,34 @@
+// ============================================================================
+// Nested JSON & Structured DTOs (Pure Data Envelopes - E5002 Enforced)
+// ============================================================================
+
+model GeoLocationDto {
+    latitude: Float
+    longitude: Float
+    accuracyMeters: Float
+    timezone: String
+}
+
+model AddressDto {
+    @required
+    @min(3)
+    street: String
+
+    @required
+    city: String
+
+    @required
+    postalCode: String
+
+    @required
+    countryCode: String
+
+    geo: Option<GeoLocationDto>
+}
+
+model UserPreferencesDto {
+    theme: String
+    locale: String
+    emailNotifications: Bool
+    marketingConsent: Bool
+}
