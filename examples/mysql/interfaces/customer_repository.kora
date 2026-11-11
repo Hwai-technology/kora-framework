@@ -9,3 +9,4 @@ interface CustomerDatabaseRepository {
     fn insertCustomer(input: CustomerSignupInput) -> Result<Customer, String>
     fn addCredit(id: Int, amount: Int) -> Result<Customer, String>
 }
+

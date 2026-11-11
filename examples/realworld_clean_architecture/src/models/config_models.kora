@@ -16,3 +16,4 @@ model SecurityConstants {
     headerTraceId: String
     tokenExpirySeconds: Int
 }
+

@@ -8,3 +8,4 @@ interface AuthServiceInterface {
     fn register(req: RegisterRequest) -> Result<AuthUser, String>
     fn login(req: LoginRequest) -> Result<AuthTokenResponse, String>
 }
+

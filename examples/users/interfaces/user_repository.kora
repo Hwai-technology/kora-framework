@@ -8,3 +8,4 @@ interface UserRepository {
     fn findById(id: Int) -> Option<User>
     fn validateNewUser(user: User) -> Result<User, String>
 }
+

@@ -15,3 +15,4 @@ model CustomerSignupInput {
     email: String
     initialCredit: Int
 }
+

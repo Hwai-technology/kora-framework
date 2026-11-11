@@ -50,3 +50,4 @@ model UpdateProductRequest {
     priceCents: Int
     inStock: Bool
 }
+

@@ -24,3 +24,4 @@ model AuthTokenResponse {
     tokenType: String
     expiresInSeconds: Int
 }
+

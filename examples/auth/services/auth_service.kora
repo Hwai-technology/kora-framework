@@ -40,3 +40,4 @@ class AuthService implements AuthServiceInterface {
         return Err("Invalid credentials")
     }
 }
+
