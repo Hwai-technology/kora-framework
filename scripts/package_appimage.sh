@@ -9,7 +9,9 @@ set -e
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="$ROOT_DIR/target/appimage"
 APPDIR="$BUILD_DIR/Kora.AppDir"
-OUTPUT_DIR="${1:-$ROOT_DIR/target/release}"
+TARGET_ARG="${1:-$ROOT_DIR/target/release}"
+mkdir -p "$TARGET_ARG"
+OUTPUT_DIR="$(cd "$TARGET_ARG" && pwd)"
 
 echo "📦 Packaging Kora Linux AppImage..."
 
@@ -24,6 +26,7 @@ rm -rf "$APPDIR"
 mkdir -p "$APPDIR/usr/bin"
 mkdir -p "$APPDIR/usr/share/icons/hicolor/scalable/apps"
 mkdir -p "$APPDIR/usr/share/mime/packages"
+mkdir -p "$APPDIR/usr/share/metainfo"
 
 # Copy binary
 cp -f "$ROOT_DIR/target/release/kora" "$APPDIR/usr/bin/kora"
@@ -52,7 +55,7 @@ mkdir -p "$OUTPUT_DIR"
 APPIMAGE_NAME="kora-x86_64.AppImage"
 
 if command -v appimagetool &>/dev/null; then
-    ARCH=x86_64 appimagetool "$APPDIR" "$OUTPUT_DIR/$APPIMAGE_NAME"
+    ARCH=x86_64 appimagetool -n "$APPDIR" "$OUTPUT_DIR/$APPIMAGE_NAME"
 else
     # Fetch appimagetool if curl exists and running in CI
     TOOL_URL="https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
@@ -62,9 +65,9 @@ else
         cd "$BUILD_DIR"
         "$TOOL_BIN" --appimage-extract >/dev/null 2>&1 || true
         if [[ -f "$BUILD_DIR/squashfs-root/AppRun" ]]; then
-            ARCH=x86_64 "$BUILD_DIR/squashfs-root/AppRun" "$APPDIR" "$OUTPUT_DIR/$APPIMAGE_NAME"
+            ARCH=x86_64 "$BUILD_DIR/squashfs-root/AppRun" -n "$APPDIR" "$OUTPUT_DIR/$APPIMAGE_NAME"
         else
-            ARCH=x86_64 "$TOOL_BIN" "$APPDIR" "$OUTPUT_DIR/$APPIMAGE_NAME" || true
+            ARCH=x86_64 "$TOOL_BIN" -n "$APPDIR" "$OUTPUT_DIR/$APPIMAGE_NAME" || true
         fi
         cd "$ROOT_DIR"
     fi
