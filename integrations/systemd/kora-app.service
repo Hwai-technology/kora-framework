@@ -1,0 +1,32 @@
+[Unit]
+Description=Kora High-Performance Backend Service
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=kora
+Group=kora
+WorkingDirectory=/opt/kora-app
+ExecStart=/usr/local/bin/kora run
+Restart=always
+RestartSec=5s
+
+# Security Hardening & Sandboxing
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictRealtime=true
+
+# Resource Limits
+LimitNOFILE=65536
+Environment=KORA_ENV=production
+Environment=PORT=8080
+
+[Install]
+WantedBy=multi-user.target
+

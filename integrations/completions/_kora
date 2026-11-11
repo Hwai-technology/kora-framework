@@ -1,0 +1,71 @@
+#compdef kora
+
+_kora() {
+    local -a commands
+    commands=(
+        'run:Compile and execute a Kora program directly or project entrypoint'
+        'check:Parse and verify architectural purity without codegen'
+        'build:Compile Kora source to an optimized native binary'
+        'types:Run static type inference and interface verification'
+        'codegen:Generate intermediate Rust code into .kora-build'
+        'fmt:Format Kora source files according to language standards'
+        'init:Initialize a new Kora project in the current directory'
+        'create:Create a new Kora project with Clean Architecture'
+        'generate:Generate a new domain feature or component'
+        'g:Short alias for generate'
+        'bench:Run the high-performance async concurrency benchmark'
+        'lsp:Start the Language Server Protocol (LSP) daemon'
+        'version:Display Kora compiler version information'
+    )
+
+    local -a generate_types
+    generate_types=(
+        'feature:Scaffold a Clean Architecture domain feature (controller, service, models, DTOs, events)'
+    )
+
+    _arguments -C \
+        '(-v --version)'{-v,--version}'[Show version]' \
+        '(-h --help)'{-h,--help}'[Show help]' \
+        '1: :->command' \
+        '2: :->subcommand' \
+        '*:: :->args'
+
+    case $state in
+        command)
+            _describe -t commands 'kora command' commands
+            _files -g '*.kora *.kr'
+            ;;
+        subcommand)
+            case $words[2] in
+                g|generate)
+                    _describe -t generate_types 'generator type' generate_types
+                    ;;
+                run|check|build|types|codegen|fmt)
+                    _files -g '*.kora *.kr'
+                    ;;
+                *)
+                    _files
+                    ;;
+            esac
+            ;;
+        args)
+            case $words[2] in
+                fmt)
+                    _arguments \
+                        '--check[Check formatting without modifying files]' \
+                        '*:file:_files -g "*.kora *.kr"'
+                    ;;
+                create|init)
+                    _arguments \
+                        '*:project name:_files -/'
+                    ;;
+                *)
+                    _files
+                    ;;
+            esac
+            ;;
+    esac
+}
+
+_kora "$@"
+

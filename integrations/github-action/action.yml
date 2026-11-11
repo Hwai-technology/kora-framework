@@ -1,0 +1,26 @@
+name: 'Setup Kora Language & Toolchain'
+description: 'Install and set up the Kora compiler, CLI, and runtime dependencies for GitHub Actions CI/CD workflows'
+author: 'Hwai Technology'
+
+inputs:
+  version:
+    description: 'Version of Kora to install (or "latest" / "source")'
+    required: false
+    default: 'source'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Ensure Rust toolchain is installed
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: rustfmt, clippy
+
+    - name: Build and install Kora CLI
+      shell: bash
+      run: |
+        echo "Building and installing Kora compiler..."
+        cargo install --path crates/kora-cli --locked --force
+        kora --version
+        echo "Kora toolchain is ready."
+

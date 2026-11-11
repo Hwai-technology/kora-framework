@@ -70,12 +70,28 @@ if [[ -f "$ROOT_DIR/integrations/linux/kora.xml" ]]; then
     fi
 fi
 
-# 4. Install Shell Completions
-echo -e "\n${COLOR_BLUE}[4/5] Installing Bash completions...${COLOR_RESET}"
+# 4. Install Shell Completions (Bash, Zsh, Fish)
+echo -e "\n${COLOR_BLUE}[4/5] Installing Shell completions...${COLOR_RESET}"
 mkdir -p "$COMPLETION_TARGET_DIR"
 if [[ -f "$ROOT_DIR/integrations/completions/kora.bash" ]]; then
     cp -f "$ROOT_DIR/integrations/completions/kora.bash" "$COMPLETION_TARGET_DIR/kora"
     echo -e "${COLOR_GREEN}✓ Bash completion installed.${COLOR_RESET}"
+fi
+
+# Zsh completions
+ZSH_COMPLETION_DIR="$HOME/.zsh/completion"
+if [[ -f "$ROOT_DIR/integrations/completions/_kora" ]]; then
+    mkdir -p "$ZSH_COMPLETION_DIR"
+    cp -f "$ROOT_DIR/integrations/completions/_kora" "$ZSH_COMPLETION_DIR/_kora"
+    echo -e "${COLOR_GREEN}✓ Zsh completion installed at $ZSH_COMPLETION_DIR/_kora.${COLOR_RESET}"
+fi
+
+# Fish completions
+FISH_COMPLETION_DIR="$HOME/.config/fish/completions"
+if [[ -f "$ROOT_DIR/integrations/completions/kora.fish" ]]; then
+    mkdir -p "$FISH_COMPLETION_DIR"
+    cp -f "$ROOT_DIR/integrations/completions/kora.fish" "$FISH_COMPLETION_DIR/kora.fish"
+    echo -e "${COLOR_GREEN}✓ Fish completion installed.${COLOR_RESET}"
 fi
 
 # 5. Install / Update Antigravity IDE and VS Code Extensions

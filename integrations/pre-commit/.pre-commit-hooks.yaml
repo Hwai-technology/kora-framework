@@ -1,0 +1,15 @@
+- id: kora-fmt
+  name: Kora Formatter
+  description: Automatically format Kora source files (*.kora, *.kr)
+  entry: kora fmt
+  language: system
+  files: \.(kora|kr)$
+
+- id: kora-check
+  name: Kora Architectural & Type Check
+  description: Verify Kora code architecture purity and static types
+  entry: kora check
+  language: system
+  files: \.(kora|kr)$
+  pass_filenames: true
+

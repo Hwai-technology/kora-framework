@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: integrations/docker/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - KORA_ENV=production
+      - DATABASE_URL=postgresql://kora:kora_secret@db:5432/kora_db
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: kora
+      POSTGRES_PASSWORD: kora_secret
+      POSTGRES_DB: kora_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+
