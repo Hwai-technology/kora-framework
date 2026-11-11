@@ -4,6 +4,7 @@
   "scopeName": "source.kora",
   "patterns": [
     { "include": "#comments" },
+    { "include": "#decorators" },
     { "include": "#strings" },
     { "include": "#numbers" },
     { "include": "#keywords" },
@@ -24,6 +25,14 @@
           "name": "comment.block.kora",
           "begin": "/\\*",
           "end": "\\*/"
+        }
+      ]
+    },
+    "decorators": {
+      "patterns": [
+        {
+          "name": "entity.name.tag.decorator.kora",
+          "match": "@(entity|table|primary|autoIncrement|unique|index|required|email|min|max|default)\\b"
         }
       ]
     },
@@ -54,7 +63,7 @@
       "patterns": [
         {
           "name": "keyword.control.kora",
-          "match": "\\b(if|else|while|return|match)\\b"
+          "match": "\\b(if|else|while|return|match|select|spawn)\\b"
         },
         {
           "name": "keyword.declaration.kora",
@@ -62,7 +71,7 @@
         },
         {
           "name": "storage.type.kora",
-          "match": "\\b(struct|model|class|interface|enum)\\b"
+          "match": "\\b(model|class|interface|enum|actor)\\b"
         }
       ]
     },
@@ -74,7 +83,7 @@
         },
         {
           "name": "support.type.composite.kora",
-          "match": "\\b(List|Option|Result|Channel)\\b"
+          "match": "\\b(List|Option|Result|Channel|BroadcastChannel|TaskGroup)\\b"
         },
         {
           "name": "entity.name.type.class.kora",
@@ -91,6 +100,10 @@
         {
           "name": "constant.language.option.kora",
           "match": "\\b(Some|None|Ok|Err)\\b"
+        },
+        {
+          "name": "constant.language.null.kora",
+          "match": "\\bnull\\b"
         },
         {
           "name": "variable.language.this.kora",
@@ -126,7 +139,7 @@
       "patterns": [
         {
           "name": "support.function.builtin.kora",
-          "match": "\\b(run|send|get|post|put|delete|print|channel)\\b"
+          "match": "\\b(run|send|recv|get|post|put|delete|print|channel|broadcast|spawn|tell|ask)\\b"
         },
         {
           "match": "\\b([a-z][a-zA-Z0-9_]*)\\s*(?=\\()",
@@ -146,7 +159,7 @@
           }
         },
         {
-          "match": "\\b(struct|model|class|interface|enum)\\s+([A-Z][a-zA-Z0-9_]*)",
+          "match": "\\b(model|class|interface|enum|actor)\\s+([A-Z][a-zA-Z0-9_]*)",
           "captures": {
             "1": { "name": "storage.type.kora" },
             "2": { "name": "entity.name.type.class.kora" }
@@ -156,4 +169,3 @@
     }
   }
 }
-

@@ -951,6 +951,7 @@ name = "kora-pkg"
 version = "0.1.0-alpha.1"
 dependencies = [
  "serde",
+ "sha2",
  "toml",
 ]
 

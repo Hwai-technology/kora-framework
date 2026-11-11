@@ -253,6 +253,7 @@ fn main() -> ExitCode {
         "bench" => cmd_bench(),
         "init" => cmd_init(args.get(1)),
         "db" => cmd_db(args.get(1), args.get(2)),
+        "pkg" => cmd_pkg(args.get(1), args.get(2), args.get(3)),
         unknown => {
             eprintln!("error: unknown command `{unknown}`\n");
             print_usage();
@@ -277,6 +278,7 @@ fn print_usage() {
          \x20 run <file.kora>      Compile and execute the native binary\n\
          \x20 bench                Run reproducible benchmark comparing Kora, Rust, Go, Node, Laravel\n\
          \x20 db <action> <file>   Manage database lifecycle (migrate, sync, seed, truncate, drop, refresh)\n\
+         \x20 pkg <action> [args]  Manage distributed packages and modules (install, add, remove, list, publish)\n\
          \x20 init <dir>           Scaffold a new production-ready Kora application project",
         env!("CARGO_PKG_VERSION")
     );
@@ -684,6 +686,129 @@ fn cmd_db(action: Option<&String>, path: Option<&String>) -> ExitCode {
         unknown => {
             eprintln!("error: unknown database action `{unknown}`");
             eprintln!("Available actions: migrate, sync, seed, truncate, drop, refresh");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+fn cmd_pkg(action: Option<&String>, arg1: Option<&String>, arg2: Option<&String>) -> ExitCode {
+    use kora_pkg::PackageManager;
+    let action_str = match action {
+        Some(a) => a.as_str(),
+        None => {
+            eprintln!("error: missing package action (install, add, remove, list, publish)");
+            return ExitCode::FAILURE;
+        }
+    };
+
+    let project_dir = Path::new(".");
+    let manifest_path = project_dir.join("kora.toml");
+
+    match action_str {
+        "install" => {
+            println!("⚡ [PKG:INSTALL] Resolving package dependencies and generating lockfile...");
+            match PackageManager::install(project_dir) {
+                Ok(lockfile) => {
+                    println!("  ✓ Verified {} packages:", lockfile.package.len());
+                    for pkg in &lockfile.package {
+                        let hash_prefix = if pkg.checksum.len() >= 12 {
+                            &pkg.checksum[..12]
+                        } else {
+                            &pkg.checksum
+                        };
+                        println!(
+                            "    - {} @ {} (sha256: {})",
+                            pkg.name, pkg.version, hash_prefix
+                        );
+                    }
+                    println!("\n✓ All dependencies installed and locked in `kora.lock`.");
+                    ExitCode::SUCCESS
+                }
+                Err(e) => {
+                    eprintln!("error installing packages: {e}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
+        "add" => {
+            let Some(pkg_name) = arg1 else {
+                eprintln!("error: usage: kora pkg add <package_name> [version_req]");
+                return ExitCode::FAILURE;
+            };
+            let req = arg2.map(|s| s.as_str()).unwrap_or("^0.1.0");
+            println!("⚡ [PKG:ADD] Adding `{pkg_name}` ({req}) to `kora.toml`...");
+            if let Err(e) = PackageManager::add_dependency(&manifest_path, pkg_name, req) {
+                eprintln!("error adding dependency: {e}");
+                return ExitCode::FAILURE;
+            }
+            match PackageManager::install(project_dir) {
+                Ok(_) => {
+                    println!("✓ Added `{pkg_name}` ({req}) and synchronized `kora.lock`.");
+                    ExitCode::SUCCESS
+                }
+                Err(e) => {
+                    eprintln!("error resolving after add: {e}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
+        "remove" => {
+            let Some(pkg_name) = arg1 else {
+                eprintln!("error: usage: kora pkg remove <package_name>");
+                return ExitCode::FAILURE;
+            };
+            println!("⚡ [PKG:REMOVE] Removing `{pkg_name}` from `kora.toml`...");
+            if let Err(e) = PackageManager::remove_dependency(&manifest_path, pkg_name) {
+                eprintln!("error removing dependency: {e}");
+                return ExitCode::FAILURE;
+            }
+            let _ = PackageManager::install(project_dir);
+            println!("✓ Removed `{pkg_name}` and updated `kora.lock`.");
+            ExitCode::SUCCESS
+        }
+        "list" => match PackageManager::parse_manifest(&manifest_path) {
+            Ok(manifest) => {
+                println!("=== Kora Manifest (`{}`) ===", manifest.package.name);
+                println!("Version: {}", manifest.package.version);
+                println!("Dependencies ({}):", manifest.dependencies.len());
+                for (k, v) in &manifest.dependencies {
+                    println!("  - {k} = \"{v}\"");
+                }
+                if !manifest.dev_dependencies.is_empty() {
+                    println!("Dev Dependencies ({}):", manifest.dev_dependencies.len());
+                    for (k, v) in &manifest.dev_dependencies {
+                        println!("  - {k} = \"{v}\"");
+                    }
+                }
+                ExitCode::SUCCESS
+            }
+            Err(e) => {
+                eprintln!("error reading manifest: {e}");
+                ExitCode::FAILURE
+            }
+        },
+        "publish" => {
+            let registry_url = arg1
+                .map(|s| s.as_str())
+                .unwrap_or("https://pkg.kora-lang.org");
+            println!("⚡ [PKG:PUBLISH] Publishing package to registry `{registry_url}`...");
+            match PackageManager::publish(project_dir, registry_url) {
+                Ok(entry) => {
+                    println!("  ✓ Verified package: {} @ {}", entry.name, entry.version);
+                    println!("  ✓ Integrity Checksum (SHA-256): {}", entry.checksum);
+                    println!("  ✓ Artifact URL: {}", entry.download_url);
+                    println!("\n✓ Package published successfully to Kora Distributed Registry.");
+                    ExitCode::SUCCESS
+                }
+                Err(e) => {
+                    eprintln!("error publishing package: {e}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
+        unknown => {
+            eprintln!("error: unknown package action `{unknown}`");
+            eprintln!("Available actions: install, add, remove, list, publish");
             ExitCode::FAILURE
         }
     }

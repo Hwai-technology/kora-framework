@@ -182,9 +182,9 @@ flowchart TD
 | **Clean Architecture** | Boundary enforcement (`E5001`–`E5004`) | ✅ **Ready** | Enforced purity for `enums/`, `models/`, services, and `main.kora`. |
 | **Database Engine** | Schema Auto-Sync, Migrations, Seeders | ✅ **Ready** | CLI commands (`kora db <migrate\|sync\|seed\|truncate\|drop\|refresh>`). |
 | **Code Generation** | Verified Native Rust Generation | ✅ **Ready** | Compiles to zero-GC native binary via `.kora-build/`. |
-| **Async Concurrency** | Non-blocking I/O & Actor/Channels | 🟡 **Active** | MPSC typed channels & broadcast pub/sub channels. |
-| **Tooling & Ecosystem**| VS Code / Antigravity IDE Extension | 🟡 **Active** | Syntax grammar, snippets, language config & custom icons. |
-| **Package Registry** | Distributed Package Manager (`kora-pkg`) | 🔄 **Planned** | Dependency resolution and community module hosting. |
+| **Async Concurrency** | Non-blocking I/O & Actor/Channels | ✅ **Ready** | MPSC typed channels, broadcast pub/sub, actors (`ask`/`tell`) & `TaskGroup`. |
+| **Tooling & Ecosystem**| VS Code / Antigravity IDE Extension | ✅ **Ready** | Syntax grammar, modern snippets, language config & dot-free custom icons. |
+| **Package Registry** | Distributed Package Manager (`kora-pkg`) | ✅ **Ready** | SemVer solver, SHA-256 lockfile (`kora.lock`) & CLI commands (`kora pkg`). |
 
 ---
 
@@ -200,10 +200,12 @@ All components live in a modular Cargo workspace under `crates/`:
 | `kora-hir` | High-level Intermediate Representation and symbol resolution. |
 | `kora-ty` | Static type system, interface verification, and purity checker. |
 | `kora-codegen` | Transpilation from Kora AST to safe native Rust code. |
+| `kora-runtime` | Async concurrency runtime: MPSC channels, broadcast pub/sub, actors & task groups. |
+| `kora-pkg` | Distributed package manager, SemVer solver, and SHA-256 lockfile engine. |
 | `kora-http` | Async HTTP engine powered by Axum and Tokio. |
 | `kora-orm` | Compile-time query and schema integration. |
 | `kora-realtime`| WebSocket channels and domain event streaming. |
-| `kora-cli` | Command-line interface (`check`, `build`, `run`, `codegen`). |
+| `kora-cli` | Command-line interface (`check`, `build`, `run`, `codegen`, `db`, `pkg`). |
 
 ---
 

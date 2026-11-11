@@ -1,22 +1,27 @@
 {
-  "Model Declaration": {
+  "Data Transfer Model": {
     "prefix": "model",
     "body": [
       "model ${1:Name} {",
-      "    id: Int",
       "    ${2:field}: ${3:String}",
       "}"
     ],
-    "description": "Create a new Kora persistent database model"
+    "description": "Create an immutable, pure Data Transfer Object (DTO) model"
   },
-  "Struct Declaration": {
-    "prefix": "struct",
+  "Database Entity Model": {
+    "prefix": "entity",
     "body": [
-      "struct ${1:Name} {",
-      "    ${2:field}: ${3:String}",
+      "@entity",
+      "@table(\"${1:users}\")",
+      "model ${2:User} {",
+      "    @primary",
+      "    @autoIncrement",
+      "    id: Int",
+      "    @required",
+      "    ${3:name}: String",
       "}"
     ],
-    "description": "Create a lightweight value struct / DTO"
+    "description": "Create a database entity model with ORM decorators"
   },
   "Service Class with DI": {
     "prefix": "class",
@@ -43,6 +48,53 @@
       "}"
     ],
     "description": "Create a behavioral contract interface"
+  },
+  "Enum Declaration": {
+    "prefix": "enum",
+    "body": [
+      "enum ${1:Status} {",
+      "    ${2:Active},",
+      "    ${3:Inactive},",
+      "    ${4:Pending}",
+      "}"
+    ],
+    "description": "Create a type-safe enumerated type"
+  },
+  "Actor Concurrency": {
+    "prefix": "actor",
+    "body": [
+      "class ${1:Counter}Actor {",
+      "    var state: Int",
+      "",
+      "    init() {",
+      "        this.state = 0",
+      "    }",
+      "",
+      "    fn handle(msg: ${2:String}) -> Int {",
+      "        this.state = this.state + 1",
+      "        return this.state",
+      "    }",
+      "}"
+    ],
+    "description": "Create an isolated stateful Actor"
+  },
+  "Async Channel": {
+    "prefix": "channel",
+    "body": [
+      "let ch = channel<${1:String}>(${2:100})",
+      "ch.send(${3:value})",
+      "let item = ch.recv()"
+    ],
+    "description": "Create and operate a non-blocking MPSC channel"
+  },
+  "Spawn Concurrent Task": {
+    "prefix": "spawn",
+    "body": [
+      "spawn(async () => {",
+      "    ${0}",
+      "})"
+    ],
+    "description": "Spawn an asynchronous concurrent task"
   },
   "HTTP GET Route": {
     "prefix": "get",
@@ -73,4 +125,3 @@
     "description": "Pattern matching expression"
   }
 }
-
