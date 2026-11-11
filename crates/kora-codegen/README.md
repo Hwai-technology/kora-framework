@@ -1,14 +1,14 @@
 # kora-codegen
 
-> **Kora Native Rust Code Generator**
+> **Kora Native Rust Code Generator & OpenAPI Synthesizer**
 
-Emits mathematically safe, highly optimized native Rust source code from verified HIR and compiles it into standalone native executables.
+Emits mathematically safe, highly optimized native Rust source code from verified HIR, synthesizes automatic OpenAPI 3.1 & Swagger UI, and compiles via Cargo onto dedicated port 7582.
 
 ---
 
 ## 🏛️ Architectural Role & Pipeline
 
-* **Pipeline Placement:** Phase 5 (Code Generation) — Bridges Kora frontend with Rust native backend.
+* **Pipeline Placement:** Phase 5 (Code Generation) — Bridges Kora frontend with Rust native backend and web ecosystem.
 * **License:** GNU Affero General Public License v3 (AGPL-3.0)
 * **File Support:** Fully supports `.kora` and `.kr` file extensions.
 
@@ -18,6 +18,10 @@ Emits mathematically safe, highly optimized native Rust source code from verifie
 
 - `generate_rust(hir, types, ownership, name)`
 - `compile_native(rust_code, target_dir)`
+- `has_http_routes`
+- `Database`
+- `Request`
+- `send`
 
 ---
 
@@ -30,7 +34,7 @@ Emits mathematically safe, highly optimized native Rust source code from verifie
 
 ## 🚀 How to Contribute & Improve
 
-Add direct LLVM IR emission backend (via inkwell/cranelift) to bypass cargo compilation for rapid development iteration.
+Add direct LLVM IR or Cranelift emission backend to bypass cargo compilation for rapid development iteration.
 
 ### Testing this Crate
 ```bash

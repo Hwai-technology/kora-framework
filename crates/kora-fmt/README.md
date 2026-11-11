@@ -1,14 +1,14 @@
 # kora-fmt
 
-> **Kora Code Formatter & Linter Engine**
+> **Kora Code Formatter Engine**
 
-Opinionated, high-performance code formatter for Kora source files (`.kora` and `.kr`), guaranteeing canonical indentation (4 spaces), clean bracket alignment, trailing whitespace stripping, and blank line normalization.
+Opinionated code formatter for Kora source files (.kora and .kr) guaranteeing consistent syntax style, indenting, and spacing.
 
 ---
 
 ## 🏛️ Architectural Role & Pipeline
 
-* **Pipeline Placement:** Developer Tooling & LSP Backend — Powers `kora fmt` CLI and IDE `formatOnSave`.
+* **Pipeline Placement:** Developer Tooling — Enforces unified formatting across teams.
 * **License:** GNU Affero General Public License v3 (AGPL-3.0)
 * **File Support:** Fully supports `.kora` and `.kr` file extensions.
 
@@ -16,23 +16,21 @@ Opinionated, high-performance code formatter for Kora source files (`.kora` and 
 
 ## 🧩 Key Types & Public API
 
-- `Formatter::format_source(source: &str) -> String`
-- `Formatter::format_module(module: &Module) -> String`
+- `format_source(src, options)`
+- `FormatOptions`
 
 ---
 
 ## 🛡️ Security & Invariants
 
 * **Memory Safety:** 100% safe Rust. Compiles under `#[forbid(unsafe_code)]`.
-* **Security & Idempotency Guarantees:** 
-  - Formatter operations are strictly idempotent: formatting formatted code produces identical results (`fmt(fmt(x)) == fmt(x)`).
-  - Formatting operates purely on whitespace and indentation without altering AST token semantics.
+* **Security Guarantees:** Idempotent formatting: running the formatter multiple times produces identical output without AST alterations.
 
 ---
 
 ## 🚀 How to Contribute & Improve
 
-- Add multi-threaded directory formatting using Rayon for massive repositories.
+Add parallel formatting using Rayon to format large repositories of thousands of files in milliseconds.
 
 ### Testing this Crate
 ```bash

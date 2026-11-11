@@ -266,14 +266,14 @@ kora codegen src/main.kora
 
 ```bash
 # 1. فحص الصحة
-curl http://localhost:8080/health
+curl http://localhost:7582/health
 
 # 2. تشغيل الترحيل التلقائي
-curl http://localhost:8080/api/v1/database/migrate
+curl http://localhost:7582/api/v1/database/migrate
 
 # 3. تسجيل الدخول عبر وحدة الـ Auth
-curl -X POST http://localhost:8080/api/v1/auth/login
+curl -X POST http://localhost:7582/api/v1/auth/login
 
 # 4. إنشاء طلب شراء وحساب الخصم وبث الحدث
-curl -X POST http://localhost:8080/api/v1/orders
+curl -X POST http://localhost:7582/api/v1/orders
 ```

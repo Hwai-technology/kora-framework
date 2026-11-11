@@ -7,11 +7,11 @@ services:
     container_name: kora_app_server
     restart: always
     ports:
-      - "8080:8080"
+      - "7582:7582"
     environment:
       - KORA_ENV=production
       - SERVER_HOST=0.0.0.0
-      - SERVER_PORT=8080
+      - SERVER_PORT=7582
       - DATABASE_URL=mysql://kora_user:kora_secret_pass@mysql-db:3306/kora_production
       - REDIS_URL=redis://redis-cache:6379
       - JWT_SECRET=super_secret_jwt_key_with_at_least_32_bytes_length

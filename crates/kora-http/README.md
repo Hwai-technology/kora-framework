@@ -2,7 +2,7 @@
 
 > **Kora High-Performance HTTP Engine**
 
-Zero-overhead asynchronous HTTP web engine built on Axum and Hyper with automatic request routing, JSON serialization, and middleware chaining.
+Zero-overhead asynchronous HTTP web engine built on Axum and Hyper with automatic request routing, JSON serialization, middleware chaining, and OpenAPI 3.1 generation on port 7582.
 
 ---
 
@@ -16,10 +16,12 @@ Zero-overhead asynchronous HTTP web engine built on Axum and Hyper with automati
 
 ## 🧩 Key Types & Public API
 
+- `KoraApp`
+- `RouteInfo`
 - `HttpServer`
 - `RouteHandler`
 - `Request`
-- `Response`
+- `Validator`
 
 ---
 

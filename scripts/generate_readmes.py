@@ -66,12 +66,12 @@ crates = {
         'improve': 'Add compile-time tracking for async task handle ownership and actor message buffer lifetimes.'
     },
     'kora-codegen': {
-        'title': 'Kora Native Rust Code Generator',
-        'purpose': 'Emits mathematically safe, highly optimized native Rust source code from verified HIR and compiles it into standalone native executables.',
-        'pipeline': 'Phase 5 (Code Generation) — Bridges Kora frontend with Rust native backend.',
-        'types': ['generate_rust(hir, types, ownership, name)', 'compile_native(rust_code, target_dir)'],
+        'title': 'Kora Native Rust Code Generator & OpenAPI Synthesizer',
+        'purpose': 'Emits mathematically safe, highly optimized native Rust source code from verified HIR, synthesizes automatic OpenAPI 3.1 & Swagger UI, and compiles via Cargo onto dedicated port 7582.',
+        'pipeline': 'Phase 5 (Code Generation) — Bridges Kora frontend with Rust native backend and web ecosystem.',
+        'types': ['generate_rust(hir, types, ownership, name)', 'compile_native(rust_code, target_dir)', 'has_http_routes', 'Database', 'Request', 'send'],
         'security': 'Generates 100% unsafe-free Rust code. Emits #[forbid(unsafe_code)] at the top of every generated Rust file.',
-        'improve': 'Add direct LLVM IR emission backend (via inkwell/cranelift) to bypass cargo compilation for rapid development iteration.'
+        'improve': 'Add direct LLVM IR or Cranelift emission backend to bypass cargo compilation for rapid development iteration.'
     },
     'kora-runtime': {
         'title': 'Kora Concurrency & Async Actor Runtime',
@@ -83,9 +83,9 @@ crates = {
     },
     'kora-http': {
         'title': 'Kora High-Performance HTTP Engine',
-        'purpose': 'Zero-overhead asynchronous HTTP web engine built on Axum and Hyper with automatic request routing, JSON serialization, and middleware chaining.',
+        'purpose': 'Zero-overhead asynchronous HTTP web engine built on Axum and Hyper with automatic request routing, JSON serialization, middleware chaining, and OpenAPI 3.1 generation on port 7582.',
         'pipeline': 'Web Engine — Powers get, post, put, delete routing and server pipelines.',
-        'types': ['HttpServer', 'RouteHandler', 'Request', 'Response'],
+        'types': ['KoraApp', 'RouteInfo', 'HttpServer', 'RouteHandler', 'Request', 'Validator'],
         'security': 'Built-in request body size limits, rate limiting, and header sanitization to protect against HTTP flood attacks.',
         'improve': 'Add native HTTP/3 (QUIC) protocol support and automated OpenAPI / Swagger 3.1 JSON schema generator.'
     },
@@ -179,11 +179,11 @@ crates = {
     },
     'kora-cli': {
         'title': 'Kora Command-Line Interface (kora)',
-        'purpose': 'The unified developer CLI providing check, types, ast, tokens, codegen, build, run, bench, db, and pkg commands for .kora and .kr files.',
-        'pipeline': 'Primary Entrypoint — User-facing executable for all developer operations.',
-        'types': ['main()', 'cmd_check', 'cmd_build', 'cmd_run', 'cmd_db', 'cmd_pkg'],
-        'security': 'Validates all file paths, enforces architectural purity rules, and builds binaries with #[forbid(unsafe_code)].',
-        'improve': 'Add interactive watch mode (kora watch) for instant automatic recompilation and hot-reloading on file change.'
+        'purpose': 'The unified developer CLI providing check, types, ast, tokens, codegen, build, run, watch, fmt, lsp, swagger, bench, db, pkg, init, create, and update commands for .kora and .kr files.',
+        'pipeline': 'Primary Entrypoint — User-facing executable for all developer operations and architectural scaffolding.',
+        'types': ['main()', 'cmd_check', 'cmd_build', 'cmd_run', 'cmd_watch', 'cmd_fmt', 'cmd_lsp', 'cmd_swagger', 'cmd_bench', 'cmd_db', 'cmd_pkg', 'cmd_init', 'cmd_create', 'cmd_update'],
+        'security': 'Validates all file paths, catches missing imports/files with actionable hints, enforces architectural purity rules, and builds binaries with #[forbid(unsafe_code)].',
+        'improve': 'Add interactive project migration and deployment integrations for cloud providers directly from CLI.'
     }
 }
 

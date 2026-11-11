@@ -8,7 +8,7 @@ entry = "src/main.kora"
 
 [server]
 host = "0.0.0.0"
-port = 8080
+port = 7582
 workers = 8
 backlog = 8192
 keep_alive = true

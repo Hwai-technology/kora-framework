@@ -25,7 +25,7 @@ RestrictRealtime=true
 # Resource Limits
 LimitNOFILE=65536
 Environment=KORA_ENV=production
-Environment=PORT=8080
+Environment=PORT=7582
 
 [Install]
 WantedBy=multi-user.target

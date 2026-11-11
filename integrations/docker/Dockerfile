@@ -24,7 +24,7 @@ WORKDIR /app
 COPY --from=builder /usr/src/kora/target/release/kora /usr/local/bin/kora
 
 # Expose default HTTP port
-EXPOSE 8080
+EXPOSE 7582
 
 # Run native binary
 CMD ["kora", "bench"]

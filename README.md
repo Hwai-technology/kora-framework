@@ -43,11 +43,11 @@ get("/api/v1/hello", () => {
 ```
 
 ```bash
-# 1. Compile and launch native binary
+# 1. Compile and launch native binary on dedicated port 7582
 kora run server.kora
 
 # 2. Query the endpoint
-curl -i http://localhost:8080/api/v1/hello
+curl -i http://localhost:7582/api/v1/hello
 # HTTP/1.1 200 OK
 # Content-Type: application/json
 # {"message":"Hello from Kora!","timestamp":1773000000}
@@ -213,7 +213,10 @@ flowchart TD
 | **Language Server (LSP)**| JSON-RPC 2.0 Language Server Daemon | ✅ **Ready** | Powers Neovim, Helix, Emacs, and VS Code with completion and hover. |
 | **Code Formatter** | Canonical Source Formatter (`kora-fmt`)| ✅ **Ready** | Automatic 4-space indentation, spacing, and CI `--check` verification. |
 | **Live Hot-Reload** | Instant Watch Mode (`kora watch`) | ✅ **Ready** | Instant sub-second re-compilation and execution on file change. |
+| **OpenAPI 3.1 & Swagger** | Zero-Config Swagger Documentation | ✅ **Ready** | Auto-discovers schemas from `model` & routes into `openapi.json` & `swagger-ui.html`. |
+| **Error Diagnostics** | Compiler-Grade Diagnostics (`E1001`–`E1005`) | ✅ **Ready** | Smart CWD detection, copy-paste hints, missing import/cargo guides. |
 | **Package Registry** | Distributed Package Manager (`kora-pkg`) | ✅ **Ready** | SemVer solver, SHA-256 lockfile (`kora.lock`) & CLI commands (`kora pkg`). |
+| **Scaffolding Suite** | Production Generator (`kora init`/`create`)| ✅ **Ready** | Clean Architecture, Docker Compose, Dockerfile, `.editorconfig`, `.env`, `/health`. |
 
 ---
 
@@ -267,30 +270,35 @@ cargo build --bin kora
 ./target/debug/kora --help
 ```
 
-### Automated System Setup
+### Automated System Setup & Updates
 ```bash
-# Run one-step setup (installs CLI, Linux MIME types, completions & editor extension)
-./scripts/setup.sh
+# Run one-step setup (with interactive options: Update, Clean Reinstall, or Uninstall)
+./install.sh
+
+# Update globally installed toolchain in one step
+kora update
 
 # Verify globally installed toolchain
 kora --version
 kora help
 ```
-```
 
 ### Creating a Clean Architecture Project
 ```bash
-# Scaffold an ultra-clean, production-ready project
+# Scaffold an ultra-clean, production-ready project (or initialize in current dir via `kora init`)
 kora create my-service
 cd my-service
 
 # Generate an entire CRUD domain feature in seconds
 kora g feature products
 
+# Auto-generate OpenAPI 3.1 & Swagger UI documentation
+kora swagger
+
 # Verify architecture & compile
 kora check src/main.kora
 
-# Run directly
+# Run directly on dedicated port 7582
 kora run
 
 # Or launch instant live hot-reloading
