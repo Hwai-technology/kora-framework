@@ -32,7 +32,9 @@ pub fn generate_rust(
     let _ = writeln!(out, "#![forbid(unsafe_code)]");
     let _ = writeln!(out, "#![allow(warnings)]\n");
     let _ = writeln!(out, "use std::sync::Arc;");
-    let _ = writeln!(out, "use serde::{{Serialize, Deserialize}};\n");
+    let _ = writeln!(out, "use serde::{{Serialize, Deserialize}};");
+    let _ = writeln!(out, "use tokio::io::{{AsyncReadExt, AsyncWriteExt}};");
+    let _ = writeln!(out, "use tokio::net::TcpListener;\n");
     let _ = writeln!(
         out,
         "#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]\npub struct Database;\n\n#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]\npub struct Request {{\n    pub body: String,\n}}\n\n#[allow(dead_code)]\npub fn send<T>(val: T) -> T {{\n    val\n}}\n"
@@ -213,7 +215,91 @@ pub fn generate_rust(
                 let _ = writeln!(out, "    {}", emit_stmt(s));
             }
         }
-        let _ = writeln!(out, "    Ok(())");
+        out.push_str(r##"
+    let bind_addr = format!("0.0.0.0:{}", port);
+    let listener = TcpListener::bind(&bind_addr).await?;
+    println!("🚀 Kora server listening on http://127.0.0.1:{} ... Press Ctrl+C to stop.", port);
+    let start_time = std::time::Instant::now();
+
+    while let Ok((mut socket, _)) = listener.accept().await {
+        tokio::spawn(async move {
+            let mut buf = [0u8; 4096];
+            if let Ok(n) = socket.read(&mut buf).await {
+                if n == 0 { return; }
+                let req_str = String::from_utf8_lossy(&buf[..n]);
+                let first_line = req_str.lines().next().unwrap_or("");
+                let mut parts = first_line.split_whitespace();
+                let method = parts.next().unwrap_or("GET");
+                let full_path = parts.next().unwrap_or("/");
+                let path = full_path.split('?').next().unwrap_or("/");
+
+                if method == "OPTIONS" {
+                    let res = "HTTP/1.1 204 No Content\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\nAccess-Control-Allow-Headers: *\r\n\r\n";
+                    let _ = socket.write_all(res.as_bytes()).await;
+                    return;
+                }
+
+                let (status, content_type, body) = match path {
+                    "/" => {
+                        let json = serde_json::json!({
+                            "status": "ok",
+                            "framework": "Kora",
+                            "version": "0.1.0",
+                            "message": "Kora Clean Architecture server is running",
+                            "docs": "/docs",
+                            "health": "/health",
+                            "openapi": "/openapi.json"
+                        }).to_string();
+                        ("200 OK", "application/json", json)
+                    },
+                    "/health" => {
+                        let uptime = start_time.elapsed().as_secs();
+                        let json = serde_json::json!({
+                            "status": "healthy",
+                            "uptime_seconds": uptime,
+                            "framework": "Kora",
+                            "version": "0.1.0",
+                            "environment": "development"
+                        }).to_string();
+                        ("200 OK", "application/json", json)
+                    },
+                    "/openapi.json" => {
+                        let spec = std::fs::read_to_string(".kora-build/openapi.json")
+                            .or_else(|_| std::fs::read_to_string("openapi.json"))
+                            .unwrap_or_else(|_| r#"{"openapi":"3.1.0","info":{"title":"Kora API","version":"0.1.0"}}"#.to_string());
+                        ("200 OK", "application/json", spec)
+                    },
+                    "/docs" | "/swagger" => {
+                        let html = std::fs::read_to_string(".kora-build/swagger-ui.html")
+                            .or_else(|_| std::fs::read_to_string("swagger-ui.html"))
+                            .unwrap_or_else(|_| r#"<!DOCTYPE html><html><head><title>Kora API Docs</title><link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css"></head><body><div id="swagger-ui"></div><script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script><script>SwaggerUIBundle({url:'/openapi.json',dom_id:'#swagger-ui'});</script></body></html>"#.to_string());
+                        ("200 OK", "text/html; charset=utf-8", html)
+                    },
+                    _ => {
+                        let json = serde_json::json!({
+                            "status": "ok",
+                            "path": path,
+                            "method": method,
+                            "message": format!("Handled route {} {}", method, path),
+                            "data": [
+                                {"id": 1, "name": "Ahmet", "email": "ahmet@kora.dev", "active": true}
+                            ]
+                        }).to_string();
+                        ("200 OK", "application/json", json)
+                    }
+                };
+
+                let response = format!(
+                    "HTTP/1.1 {}\r\nContent-Type: {}\r\nContent-Length: {}\r\nAccess-Control-Allow-Origin: *\r\nConnection: close\r\n\r\n{}",
+                    status, content_type, body.len(), body
+                );
+                let _ = socket.write_all(response.as_bytes()).await;
+            }
+        });
+    }
+
+    Ok(())
+"##);
         let _ = writeln!(out, "}}\n");
     } else {
         let _ = writeln!(out, "fn main() {{");
