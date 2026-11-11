@@ -12,8 +12,17 @@
 <p align="center">
   <a href="#vision"><img src="https://img.shields.io/badge/vision-TS%20%2B%20Rust%20%2B%20Go-00D2FF" alt="Vision" /></a>
   <a href="#license"><img src="https://img.shields.io/badge/license-AGPL--3.0-0047FF" alt="License" /></a>
-  <a href="#status"><img src="https://img.shields.io/badge/status-active%20development-00FFA3" alt="Status" /></a>
+  <a href="#status"><img src="https://img.shields.io/badge/status-experimental%20beta%20(v0.1.0)-orange" alt="Status" /></a>
+  <a href="https://github.com/Hwai-technology/kora-framework/stargazers"><img src="https://img.shields.io/github/stars/Hwai-technology/kora-framework?style=social" alt="GitHub Stars" /></a>
 </p>
+
+> [!IMPORTANT]
+> **Experimental / Public Beta Release (`v0.1.0-beta`)**
+> Kora is currently in active public beta and rapid development. While the compiler pipeline, type checker, and native runtime engine are fully functional, language features and standard libraries are evolving continuously.
+>
+> ⭐️ **Support Kora with a GitHub Star**: If you believe in unifying the approachable developer experience of TypeScript with the raw speed of Rust and the concurrency of Go, please give this repository a star! Every star helps spread the word, attracts contributors, and accelerates Kora's evolution.
+>
+> 🌍 **Calling Developers Worldwide**: We warmly invite software engineers, compiler enthusiasts, and backend architects from all over the world to join the Kora community! Whether testing examples, proposing RFCs, reporting bugs, or submitting pull requests—your contributions are deeply valued.
 
 ---
 
@@ -308,20 +317,36 @@ kora watch
 kora fmt
 ```
 
-### Checking and Compiling Files
-```bash
-# Type check a Kora file
-./target/debug/kora check examples/hello.kora
+### 📚 Official Examples & Paradigms Catalog
 
-# Generate native Rust code
-./target/debug/kora codegen examples/hello.kora
-```
+Kora provides an organized catalog of numbered, self-contained examples in [`examples/`](examples/):
 
-### Running the Clean Architecture Showcase
+| # | Example Directory | Topic / Paradigm | Description | Command |
+|:---:|:---|:---|:---|:---|
+| **01** | [`01_hello_world`](examples/01_hello_world/) | **Language Fundamentals** | Models, enums, match expressions, static typing | `kora run examples/01_hello_world/main.kora` |
+| **02** | [`02_clean_architecture_users`](examples/02_clean_architecture_users/) | **Clean Architecture REST** | Model/service segregation, DI, validation | `kora run examples/02_clean_architecture_users/main.kora` |
+| **03** | [`03_crud_products_api`](examples/03_crud_products_api/) | **CRUD & Dynamic SEO/Geo** | Full HTTP methods, OpenGraph meta, Geo headers | `kora run examples/03_crud_products_api/main.kora` |
+| **04** | [`04_mysql_database_orm`](examples/04_mysql_database_orm/) | **Relational MySQL ORM** | Connection pool, prepared queries, Docker Compose | `kora run examples/04_mysql_database_orm/main.kora` |
+| **05** | [`05_jwt_auth_argon2`](examples/05_jwt_auth_argon2/) | **Enterprise Security** | Argon2id password hashing, HMAC-SHA256 JWT tokens | `kora run examples/05_jwt_auth_argon2/main.kora` |
+| **06** | [`06_realtime_websockets`](examples/06_realtime_websockets/) | **Realtime & WebSockets** | Pub/sub topic broadcasting, channel presence | `kora run examples/06_realtime_websockets/main.kora` |
+| **07** | [`07_async_actors_concurrency`](examples/07_async_actors_concurrency/) | **Actor Model Concurrency** | Isolated actor state, MPSC channels, job queues | `kora run examples/07_async_actors_concurrency/main.kora` |
+| **08** | [`08_openapi_swagger`](examples/08_openapi_swagger/) | **OpenAPI 3.1 & Swagger** | Zero-config spec discovery, interactive `/docs` UI | `kora run examples/08_openapi_swagger/main.kora` |
+| **09** | [`09_enterprise_clean_architecture`](examples/09_enterprise_clean_architecture/) | **Enterprise Showcase** | 40+ files, domain modules, middleware, database | `cd examples/realworld_clean_architecture && kora run` |
+
+Read the full catalog documentation in the [`examples/README.md`](examples/README.md).
+
+### Verifying All Examples
 ```bash
-# Verify all 40 architectural files in the real-world showcase
+# Type check all numbered examples
+for dir in examples/0*; do
+  if [ -f "$dir/main.kora" ]; then
+    kora check "$dir/main.kora"
+  fi
+done
+
+# Verify all 40 architectural files in the enterprise showcase
 for f in $(find examples/realworld_clean_architecture/src -name "*.kora"); do
-  ./target/debug/kora check "$f"
+  kora check "$f"
 done
 ```
 
@@ -340,13 +365,12 @@ Kora includes an enterprise GitHub Actions workflow suite:
 
 ## 🤝 Open Architecture & RFCs: Shaping Kora Together
 
-Kora is an evolving open-source research exploration into language design, ownership inference, and backend developer experience. We invite language designers, compiler engineers, Rust developers, and systems architects to challenge our assumptions, critique our design, and shape the roadmap:
+Kora is an evolving open-source research exploration into language design, ownership inference, and backend developer experience. We invite developers, language designers, compiler engineers, Rust specialists, and backend architects from all over the world to join forces and shape the future of high-performance backend development:
 
-- **Type System Design**: Help refine our single-`null` semantics and generic trait bounds.
-- **Ownership & Lifetime Inference**: Debate how high-level closures and services should be Arc-promoted across Tokio runtime boundaries.
-- **Compiler Optimizations**: Propose optimizations for our HIR-to-Rust transpilation pipeline.
-
-Have a critique, question, or design proposal? [Open an RFC Issue](https://github.com/Hwai-technology/kora-framework/issues/new?template=feature_request.yml) or start a discussion!
+- **⭐ Star the Project**: If Kora inspires you, please star our [GitHub repository](https://github.com/Hwai-technology/kora-framework). Stars help Kora reach more developers worldwide and motivate our team.
+- **🌍 Global Community**: Developers from all backgrounds and countries are welcome. Share your thoughts, use cases, and feedback in [GitHub Discussions](https://github.com/Hwai-technology/kora-framework/discussions).
+- **💡 Propose an RFC**: Have ideas for language syntax, ownership rules, or standard library APIs? [Open an RFC Issue](https://github.com/Hwai-technology/kora-framework/issues/new?template=feature_request.yml).
+- **🛠️ Submit Contributions**: From documentation improvements and tutorial examples to compiler passes and runtime optimizations, pull requests of all sizes are warmly welcomed!
 
 ---
 

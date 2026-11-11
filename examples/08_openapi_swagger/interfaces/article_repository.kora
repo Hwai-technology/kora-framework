@@ -1,0 +1,11 @@
+// ============================================================================
+// Article Repository Interface
+// ============================================================================
+
+import { Article, CreateArticleInput, ArticleListResponse } from "../models/article_models"
+
+interface ArticleRepository {
+    fn listArticles() -> ArticleListResponse
+    fn getBySlug(slug: String) -> Option<Article>
+    fn createArticle(input: CreateArticleInput) -> Result<Article, String>
+}

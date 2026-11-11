@@ -1,0 +1,15 @@
+// ============================================================================
+// Concurrency & Async Actor Models
+// ============================================================================
+
+model JobTask {
+    id: Int
+    payload: String
+    priority: Int
+}
+
+model ActorStats {
+    totalProcessed: Int
+    activeWorkers: Int
+    status: String
+}

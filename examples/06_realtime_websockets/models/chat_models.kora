@@ -1,0 +1,22 @@
+// ============================================================================
+// Realtime Chat & WebSocket Models
+// ============================================================================
+
+model ChatMessage {
+    id: Int
+    sender: String
+    room: String
+    content: String
+    timestamp: Int
+}
+
+model SendMessageRequest {
+    sender: String
+    room: String
+    content: String
+}
+
+model RoomPresence {
+    room: String
+    activeMembers: Int
+}

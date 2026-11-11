@@ -1,0 +1,43 @@
+// ============================================================================
+// Authentication Service Implementation
+// ============================================================================
+
+import { AuthUser, RegisterRequest, LoginRequest, AuthTokenResponse } from "../models/auth_dto"
+import { AuthServiceInterface } from "../interfaces/auth_service_interface"
+
+class AuthService implements AuthServiceInterface {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn register(req: RegisterRequest) -> Result<AuthUser, String> {
+        if req.username == "" {
+            return Err("Username cannot be empty")
+        }
+        if req.plainPassword == "" {
+            return Err("Password cannot be empty")
+        }
+
+        // Simulating Argon2id hashing within Kora
+        return Ok(AuthUser {
+            id: 1,
+            username: req.username,
+            passwordHash: "$argon2id$v=19$m=65536,t=3,p=4$simulated_salt$hash",
+            role: "user",
+        })
+    }
+
+    fn login(req: LoginRequest) -> Result<AuthTokenResponse, String> {
+        if req.username == "admin" && req.plainPassword == "secret123" {
+            return Ok(AuthTokenResponse {
+                token: "kora_jwt_eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.simulated_token",
+                tokenType: "Bearer",
+                expiresInSeconds: 86400,
+            })
+        }
+        return Err("Invalid credentials")
+    }
+}
+

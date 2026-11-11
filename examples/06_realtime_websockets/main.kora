@@ -1,0 +1,21 @@
+// ============================================================================
+// Example 06: Realtime WebSockets & Broadcast Hub
+// ============================================================================
+
+import { ChatMessage, SendMessageRequest, RoomPresence } from "./models/chat_models"
+import { ChatHubService } from "./services/chat_hub_service"
+
+let app = run()
+
+get("/chat/presence/{room}", (room: String, hub: ChatHubService) => {
+    return hub.getPresence(room)
+})
+
+post("/chat/message", (request: Request, hub: ChatHubService) => {
+    let req = SendMessageRequest {
+        sender: "Ahmet",
+        room: "general",
+        content: request.body,
+    }
+    return hub.broadcast(req)
+})

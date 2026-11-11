@@ -1,0 +1,21 @@
+// ============================================================================
+// OpenAPI / Swagger Article Models & DTOs
+// ============================================================================
+
+model Article {
+    id: Int
+    slug: String
+    title: String
+    content: String
+    published: Bool
+}
+
+model CreateArticleInput {
+    title: String
+    content: String
+}
+
+model ArticleListResponse {
+    articles: List<Article>
+    totalCount: Int
+}

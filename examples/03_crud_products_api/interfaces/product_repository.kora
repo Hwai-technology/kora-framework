@@ -1,0 +1,13 @@
+// ============================================================================
+// Product Repository Interface
+// ============================================================================
+
+import { Product, CreateProductRequest, UpdateProductRequest } from "../models/product_models"
+
+interface ProductRepository {
+    fn listAll() -> List<Product>
+    fn findById(id: Int) -> Option<Product>
+    fn create(req: CreateProductRequest) -> Result<Product, String>
+    fn update(id: Int, req: UpdateProductRequest) -> Result<Product, String>
+    fn delete(id: Int) -> Result<Bool, String>
+}

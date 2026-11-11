@@ -1,0 +1,22 @@
+// ============================================================================
+// Example 07: Async Actors & Channel Concurrency
+// ============================================================================
+
+import { JobTask, ActorStats } from "./models/task_models"
+import { CounterActorService } from "./services/counter_actor_service"
+
+let app = run()
+
+get("/actors/stats", (actor: CounterActorService) => {
+    return actor.getStats()
+})
+
+post("/actors/jobs", (request: Request, actor: CounterActorService) => {
+    let job = JobTask {
+        id: 1,
+        payload: request.body,
+        priority: 10,
+    }
+    let accepted = actor.enqueue(job)
+    return accepted
+})

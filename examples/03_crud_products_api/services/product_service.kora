@@ -1,0 +1,123 @@
+// ============================================================================
+// Product Service Implementation
+// ============================================================================
+
+import { Product, CreateProductRequest, UpdateProductRequest, SeoMetadata, GeoLocation } from "../models/product_models"
+import { ProductRepository } from "../interfaces/product_repository"
+
+class ProductService implements ProductRepository {
+    repo: ProductRepository
+
+    init(repo: ProductRepository) {
+        this.repo = repo
+    }
+
+    fn listAll() -> List<Product> {
+        let p1 = Product {
+            id: 1,
+            sku: "KORA-BOOK-01",
+            title: "Programming with Kora & Clean Architecture",
+            priceCents: 3999,
+            inStock: true,
+        }
+        let p2 = Product {
+            id: 2,
+            sku: "KORA-TEE-02",
+            title: "Official Kora Developer T-Shirt",
+            priceCents: 2499,
+            inStock: true,
+        }
+        return [p1, p2]
+    }
+
+    fn findById(id: Int) -> Option<Product> {
+        if id == 1 {
+            return Some(Product {
+                id: 1,
+                sku: "KORA-BOOK-01",
+                title: "Programming with Kora & Clean Architecture",
+                priceCents: 3999,
+                inStock: true,
+            })
+        }
+        if id == 2 {
+            return Some(Product {
+                id: 2,
+                sku: "KORA-TEE-02",
+                title: "Official Kora Developer T-Shirt",
+                priceCents: 2499,
+                inStock: true,
+            })
+        }
+        return null
+    }
+
+    fn create(req: CreateProductRequest) -> Result<Product, String> {
+        if req.title == "" {
+            return Err("Product title is required")
+        }
+        if req.priceCents <= 0 {
+            return Err("Price must be greater than zero")
+        }
+        return Ok(Product {
+            id: 3,
+            sku: req.sku,
+            title: req.title,
+            priceCents: req.priceCents,
+            inStock: true,
+        })
+    }
+
+    fn update(id: Int, req: UpdateProductRequest) -> Result<Product, String> {
+        if id <= 0 {
+            return Err("Invalid product ID")
+        }
+        return Ok(Product {
+            id: id,
+            sku: "KORA-UPDATED",
+            title: req.title,
+            priceCents: req.priceCents,
+            inStock: req.inStock,
+        })
+    }
+
+    fn delete(id: Int) -> Result<Bool, String> {
+        if id <= 0 {
+            return Err("Invalid product ID")
+        }
+        return Ok(true)
+    }
+
+    fn getCatalogSeo() -> SeoMetadata {
+        return SeoMetadata {
+            title: "Products Catalog | Kora Store",
+            description: "Explore high-performance products built with Kora backend framework.",
+            canonicalUrl: "http://127.0.0.1:7582/products",
+            keywords: "kora, backend, products, catalog, rust, high performance",
+            ogType: "website",
+            twitterCard: "summary_large_image",
+        }
+    }
+
+    fn getProductSeo(product: Product) -> SeoMetadata {
+        return SeoMetadata {
+            title: "Product Details - Kora Store",
+            description: "View specifications and pricing for this product.",
+            canonicalUrl: "http://127.0.0.1:7582/products/details",
+            keywords: "kora, product, ecommerce, fast api",
+            ogType: "article",
+            twitterCard: "summary",
+        }
+    }
+
+    fn getGeoLocation() -> GeoLocation {
+        return GeoLocation {
+            ip: "127.0.0.1",
+            country: "Global",
+            city: "Earth",
+            region: "Worldwide",
+            timezone: "UTC",
+            coordinates: "0.0,0.0",
+        }
+    }
+}

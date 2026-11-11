@@ -1,0 +1,54 @@
+// ============================================================================
+// Product Domain Models & DTOs
+// ============================================================================
+
+model Product {
+    id: Int
+    sku: String
+    title: String
+    priceCents: Int
+    inStock: Bool
+}
+
+model CreateProductRequest {
+    sku: String
+    title: String
+    priceCents: Int
+}
+
+model UpdateProductRequest {
+    title: String
+    priceCents: Int
+    inStock: Bool
+}
+
+model GeoLocation {
+    ip: String
+    country: String
+    city: String
+    region: String
+    timezone: String
+    coordinates: String
+}
+
+model SeoMetadata {
+    title: String
+    description: String
+    canonicalUrl: String
+    keywords: String
+    ogType: String
+    twitterCard: String
+}
+
+model ProductCatalogResponse {
+    products: List<Product>
+    total: Int
+    seo: SeoMetadata
+    geo: GeoLocation
+}
+
+model ProductDetailsResponse {
+    product: Product
+    seo: SeoMetadata
+    geo: GeoLocation
+}

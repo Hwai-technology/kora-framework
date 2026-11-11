@@ -1,0 +1,24 @@
+// ============================================================================
+// Example 08: OpenAPI 3.1 & Interactive Swagger UI
+// ============================================================================
+
+import { Article, CreateArticleInput, ArticleListResponse } from "./models/article_models"
+import { ArticleService } from "./services/article_service"
+
+let app = run()
+
+get("/articles", (svc: ArticleService) => {
+    return svc.listArticles()
+})
+
+get("/articles/{slug}", (slug: String, svc: ArticleService) => {
+    return svc.getBySlug(slug)
+})
+
+post("/articles", (request: Request, svc: ArticleService) => {
+    let input = CreateArticleInput {
+        title: "Announcing Kora v0.1.0 Beta",
+        content: request.body,
+    }
+    return svc.createArticle(input)
+})

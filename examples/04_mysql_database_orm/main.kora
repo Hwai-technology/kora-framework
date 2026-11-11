@@ -1,0 +1,26 @@
+// ============================================================================
+// Example 04: MySQL Database Connection & ORM Repository
+// ============================================================================
+
+import { Customer, CustomerSignupInput } from "./models/customer_models"
+import { MySqlCustomerRepository } from "./services/mysql_customer_service"
+
+// REST Endpoints connected to MySQL Repository
+let app = run()
+
+get("/customers/lookup", (request: Request, repo: MySqlCustomerRepository) => {
+    return repo.findByEmail(request.body)
+})
+
+post("/customers", (request: Request, repo: MySqlCustomerRepository) => {
+    let input = CustomerSignupInput {
+        fullName: "New Customer",
+        email: request.body,
+        initialCredit: 1000,
+    }
+    return repo.insertCustomer(input)
+})
+
+post("/customers/{id}/credit", (id: Int, request: Request, repo: MySqlCustomerRepository) => {
+    return repo.addCredit(id, 250)
+})
