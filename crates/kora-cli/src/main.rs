@@ -1659,17 +1659,24 @@ fn cmd_pkg(action: Option<&String>, arg1: Option<&String>, arg2: Option<&String>
 }
 
 fn collect_kora_files(dir: &Path, files: &mut Vec<PathBuf>) {
+    collect_kora_files_depth(dir, files, 0, 3);
+}
+
+fn collect_kora_files_depth(dir: &Path, files: &mut Vec<PathBuf>, depth: usize, max_depth: usize) {
+    if depth >= max_depth || files.len() >= 10 {
+        return;
+    }
     if let Ok(entries) = fs::read_dir(dir) {
         for entry in entries.flatten() {
             let path = entry.path();
             if path.is_dir() {
                 let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
-                if name != "target"
-                    && name != ".git"
-                    && name != ".kora-build"
+                if !name.starts_with('.')
+                    && name != "target"
                     && name != "node_modules"
+                    && name != "dist"
                 {
-                    collect_kora_files(&path, files);
+                    collect_kora_files_depth(&path, files, depth + 1, max_depth);
                 }
             } else if path.is_file() {
                 let is_kora = path
@@ -1678,6 +1685,9 @@ fn collect_kora_files(dir: &Path, files: &mut Vec<PathBuf>) {
                     .is_some_and(|ext| ext == "kora" || ext == "kr");
                 if is_kora {
                     files.push(path);
+                    if files.len() >= 10 {
+                        return;
+                    }
                 }
             }
         }
