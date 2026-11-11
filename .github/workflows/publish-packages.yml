@@ -57,11 +57,109 @@ jobs:
           path: RELEASE_NOTES.md
 
   # ----------------------------------------------------------------------------
-  # Job 2: Build & Attach Precompiled Release Binaries (Runs on every push to main & tags)
+  # Job 2: Build Native Binaries Matrix (Linux, Windows, macOS Apple Silicon & Intel)
   # ----------------------------------------------------------------------------
-  release-binaries:
-    name: Build & Attach Release Binaries
+  build-binaries:
+    name: Build Binary (${{ matrix.target.platform }})
     needs: prepare-release
+    runs-on: ${{ matrix.target.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - platform: linux-x86_64
+            os: ubuntu-latest
+            archive: tar
+          - platform: windows-x86_64
+            os: windows-latest
+            archive: zip
+          - platform: darwin-arm64
+            os: macos-latest
+            archive: tar
+          - platform: darwin-x86_64
+            os: macos-13
+            archive: tar
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build Kora Release Binary
+        run: cargo build --release -p kora-cli
+
+      # Linux Packaging (Tarball + Standalone AppImage)
+      - name: Package Linux Artifacts
+        if: matrix.target.platform == 'linux-x86_64'
+        shell: bash
+        run: |
+          mkdir -p dist
+          TAG="${{ needs.prepare-release.outputs.tag_name }}"
+          TAR_VER="dist/kora-${TAG}-linux-x86_64.tar.gz"
+          TAR_LATEST="dist/kora-latest-linux-x86_64.tar.gz"
+
+          # 1. Standard Tarball
+          tar -czvf "${TAR_VER}" -C target/release kora
+          sha256sum "${TAR_VER}" > "${TAR_VER}.sha256"
+          cp "${TAR_VER}" "${TAR_LATEST}"
+          sha256sum "${TAR_LATEST}" > "${TAR_LATEST}.sha256"
+
+          # 2. Linux AppImage
+          ./scripts/package_appimage.sh dist
+          if [ -f "dist/kora-x86_64.AppImage" ]; then
+            mv dist/kora-x86_64.AppImage "dist/kora-${TAG}-linux-x86_64.AppImage"
+            cp "dist/kora-${TAG}-linux-x86_64.AppImage" "dist/kora-latest-linux-x86_64.AppImage"
+            sha256sum "dist/kora-${TAG}-linux-x86_64.AppImage" > "dist/kora-${TAG}-linux-x86_64.AppImage.sha256"
+            sha256sum "dist/kora-latest-linux-x86_64.AppImage" > "dist/kora-latest-linux-x86_64.AppImage.sha256"
+          fi
+
+      # Windows Packaging (Zip + Standalone kora.exe)
+      - name: Package Windows Artifacts
+        if: matrix.target.platform == 'windows-x86_64'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+          $TAG = "${{ needs.prepare-release.outputs.tag_name }}"
+          $ExePath = "target\release\kora.exe"
+          $ZipVer = "dist\kora-$TAG-windows-x86_64.zip"
+          $ZipLatest = "dist\kora-latest-windows-x86_64.zip"
+
+          Compress-Archive -Path $ExePath -DestinationPath $ZipVer -Force
+          Copy-Item $ZipVer $ZipLatest -Force
+          Copy-Item $ExePath "dist\kora.exe" -Force
+
+          (Get-FileHash -Path $ZipVer -Algorithm SHA256).Hash + "  kora-$TAG-windows-x86_64.zip" | Out-File -FilePath "$ZipVer.sha256" -Encoding ascii
+          (Get-FileHash -Path $ZipLatest -Algorithm SHA256).Hash + "  kora-latest-windows-x86_64.zip" | Out-File -FilePath "$ZipLatest.sha256" -Encoding ascii
+
+      # macOS Packaging (Tarball for arm64 / x86_64)
+      - name: Package macOS Artifacts
+        if: startsWith(matrix.target.platform, 'darwin')
+        shell: bash
+        run: |
+          mkdir -p dist
+          TAG="${{ needs.prepare-release.outputs.tag_name }}"
+          PLAT="${{ matrix.target.platform }}"
+          TAR_VER="dist/kora-${TAG}-${PLAT}.tar.gz"
+          TAR_LATEST="dist/kora-latest-${PLAT}.tar.gz"
+
+          tar -czvf "${TAR_VER}" -C target/release kora
+          shasum -a 256 "${TAR_VER}" > "${TAR_VER}.sha256"
+          cp "${TAR_VER}" "${TAR_LATEST}"
+          shasum -a 256 "${TAR_LATEST}" > "${TAR_LATEST}.sha256"
+
+      - name: Upload Platform Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.target.platform }}
+          path: dist/*
+
+  # ----------------------------------------------------------------------------
+  # Job 3: Collate All Multi-Platform Artifacts & Publish GitHub Release
+  # ----------------------------------------------------------------------------
+  publish-release:
+    name: Collate & Publish GitHub Release
+    needs: [prepare-release, build-binaries]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -72,29 +170,12 @@ jobs:
         with:
           name: release-notes
 
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Build Kora Release Binary
-        run: cargo build --release -p kora-cli
-
-      - name: Package Binary Artifacts
-        id: package
-        run: |
-          TAG="${{ needs.prepare-release.outputs.tag_name }}"
-          TAR_VER="kora-${TAG}-linux-x86_64.tar.gz"
-          TAR_LATEST="kora-latest-linux-x86_64.tar.gz"
-
-          # Package versioned archive
-          tar -czvf "${TAR_VER}" -C target/release kora
-          sha256sum "${TAR_VER}" > "${TAR_VER}.sha256"
-
-          # Package latest archive alias
-          cp "${TAR_VER}" "${TAR_LATEST}"
-          sha256sum "${TAR_LATEST}" > "${TAR_LATEST}.sha256"
-
-          echo "tar_ver=${TAR_VER}" >> $GITHUB_OUTPUT
-          echo "tar_latest=${TAR_LATEST}" >> $GITHUB_OUTPUT
+      - name: Download All Binaries Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          pattern: binaries-*
+          merge-multiple: true
 
       - name: Tag commit on main
         if: github.ref == 'refs/heads/main'
@@ -113,16 +194,12 @@ jobs:
           body_path: RELEASE_NOTES.md
           draft: false
           prerelease: false
-          files: |
-            ${{ steps.package.outputs.tar_ver }}
-            ${{ steps.package.outputs.tar_ver }}.sha256
-            ${{ steps.package.outputs.tar_latest }}
-            ${{ steps.package.outputs.tar_latest }}.sha256
+          files: release-assets/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # ----------------------------------------------------------------------------
-  # Job 3: Publish Container Image to GitHub Container Registry (ghcr.io)
+  # Job 4: Publish Container Image to GitHub Container Registry (ghcr.io)
   # ----------------------------------------------------------------------------
   publish-container:
     name: Build & Push Docker Image to GHCR
@@ -165,7 +242,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   # ----------------------------------------------------------------------------
-  # Job 4: Publish npm Wrapper Package to GitHub Packages
+  # Job 5: Publish npm Wrapper Package to GitHub Packages
   # ----------------------------------------------------------------------------
   publish-npm:
     name: Publish npm Package to GitHub Packages

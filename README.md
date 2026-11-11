@@ -64,6 +64,22 @@ curl -i http://localhost:7582/api/v1/hello
 
 ---
 
+## ⚡ Quick Start & Cross-Platform Installation
+
+Kora is engineered to be portable and accessible across all major operating systems and architectures.
+
+| Platform / Environment | Method | Command |
+|---|---|---|
+| **Linux & macOS** (Bash/Zsh) | Automated One-Line Installer | `curl -fsSL https://raw.githubusercontent.com/Hwai-technology/kora-framework/main/install.sh \| bash` |
+| **Windows** (PowerShell) | PowerShell One-Line Installer | `irm https://raw.githubusercontent.com/Hwai-technology/kora-framework/main/install.ps1 \| iex` |
+| **Linux Standalone** | Portable Self-Contained AppImage | Download `kora-latest-linux-x86_64.AppImage`, `chmod +x`, and run directly |
+| **Docker / Container** | GitHub Container Registry (GHCR) | `docker run --rm -it ghcr.io/hwai-technology/kora:latest doctor` |
+| **Rust / Cargo** | Build from Source | `cargo install --path crates/kora-cli` |
+
+Detailed setup instructions, editor tooling configuration, and uninstall guides are available in [Installation & Toolchain Setup](docs/getting-started/installation.md).
+
+---
+
 ## 🚀 Key Language Features
 
 ### 1. Hybrid Object & Data Model (Struct-Free)

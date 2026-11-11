@@ -97,15 +97,22 @@ if [[ -f "$ROOT_DIR/Cargo.toml" ]] && [[ -f "$ROOT_DIR/crates/kora-cli/Cargo.tom
     RELEASE_BIN="$ROOT_DIR/target/release/kora"
 else
     echo -e "${COLOR_CYAN}  Fetching precompiled release binary from GitHub Releases...${COLOR_RESET}"
+    OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
     ARCH="$(uname -m)"
     case "$ARCH" in
         x86_64|amd64) ARCH="x86_64" ;;
-        aarch64|arm64) ARCH="aarch64" ;;
+        aarch64|arm64)
+            if [[ "$OS" == "darwin" ]]; then
+                ARCH="arm64"
+            else
+                ARCH="aarch64"
+            fi
+            ;;
         *) ARCH="x86_64" ;;
     esac
 
     TMP_DIR="$(mktemp -d)"
-    TARBALL="kora-latest-linux-${ARCH}.tar.gz"
+    TARBALL="kora-latest-${OS}-${ARCH}.tar.gz"
     DOWNLOAD_URL="https://github.com/Hwai-technology/kora-framework/releases/latest/download/${TARBALL}"
 
     if curl -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/$TARBALL" 2>/dev/null; then
@@ -138,10 +145,18 @@ mkdir -p "$BIN_TARGET_DIR"
 cp -f "$RELEASE_BIN" "$BIN_TARGET_DIR/kora"
 chmod +x "$BIN_TARGET_DIR/kora"
 
-# Ensure ~/.local/bin is in PATH in ~/.bashrc if missing
+# Ensure ~/.local/bin is in PATH across all active shell configs
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-    echo -e "${COLOR_CYAN}  Adding ~/.local/bin to PATH in ~/.bashrc...${COLOR_RESET}"
-    echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+    echo -e "${COLOR_CYAN}  Adding ~/.local/bin to PATH...${COLOR_RESET}"
+    if [[ -f "$HOME/.zshrc" ]] || [[ "$SHELL" == *"zsh"* ]]; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshrc"
+    fi
+    if [[ -f "$HOME/.bashrc" ]]; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+    fi
+    if [[ -f "$HOME/.bash_profile" ]]; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bash_profile"
+    fi
     export PATH="$HOME/.local/bin:$PATH"
 fi
 echo -e "${COLOR_GREEN}✓ Binary installed at: $BIN_TARGET_DIR/kora${COLOR_RESET}"
@@ -193,17 +208,21 @@ echo -e "\n${COLOR_BLUE}[5/5] Synchronizing editor extensions for Antigravity ID
 ANTIGRAVITY_EXT="$HOME/.antigravity-ide/extensions/kora-lang.kora-vscode-0.1.0"
 VSCODE_EXT="$HOME/.vscode/extensions/kora-vscode"
 
-for EXT_PATH in "$ANTIGRAVITY_EXT" "$VSCODE_EXT"; do
-    mkdir -p "$EXT_PATH/client" "$EXT_PATH/icons" "$EXT_PATH/snippets" "$EXT_PATH/syntaxes"
-    cp -f "$ROOT_DIR/integrations/vscode/package.json" "$EXT_PATH/package.json"
-    cp -f "$ROOT_DIR/integrations/vscode/kora-icons.json" "$EXT_PATH/kora-icons.json"
-    cp -f "$ROOT_DIR/integrations/vscode/language-configuration.json" "$EXT_PATH/language-configuration.json"
-    cp -f "$ROOT_DIR/integrations/vscode/client/extension.js" "$EXT_PATH/client/extension.js"
-    cp -rf "$ROOT_DIR/integrations/vscode/icons/"* "$EXT_PATH/icons/"
-    cp -rf "$ROOT_DIR/integrations/vscode/snippets/"* "$EXT_PATH/snippets/"
-    cp -rf "$ROOT_DIR/integrations/vscode/syntaxes/"* "$EXT_PATH/syntaxes/"
-done
-echo -e "${COLOR_GREEN}✓ Editor extension synced to Antigravity IDE and VS Code.${COLOR_RESET}"
+if [[ -d "$ROOT_DIR/integrations/vscode" ]]; then
+    for EXT_PATH in "$ANTIGRAVITY_EXT" "$VSCODE_EXT"; do
+        mkdir -p "$EXT_PATH/client" "$EXT_PATH/icons" "$EXT_PATH/snippets" "$EXT_PATH/syntaxes"
+        cp -f "$ROOT_DIR/integrations/vscode/package.json" "$EXT_PATH/package.json"
+        cp -f "$ROOT_DIR/integrations/vscode/kora-icons.json" "$EXT_PATH/kora-icons.json"
+        cp -f "$ROOT_DIR/integrations/vscode/language-configuration.json" "$EXT_PATH/language-configuration.json"
+        cp -f "$ROOT_DIR/integrations/vscode/client/extension.js" "$EXT_PATH/client/extension.js"
+        cp -rf "$ROOT_DIR/integrations/vscode/icons/"* "$EXT_PATH/icons/"
+        cp -rf "$ROOT_DIR/integrations/vscode/snippets/"* "$EXT_PATH/snippets/"
+        cp -rf "$ROOT_DIR/integrations/vscode/syntaxes/"* "$EXT_PATH/syntaxes/"
+    done
+    echo -e "${COLOR_GREEN}✓ Editor extension synced to Antigravity IDE and VS Code.${COLOR_RESET}"
+else
+    echo -e "${COLOR_YELLOW}  Notice: Editor integration files not found locally, skipping IDE extension sync.${COLOR_RESET}"
+fi
 
 # Verification
 echo -e "\n${COLOR_CYAN}================================================================${COLOR_RESET}"

@@ -2,7 +2,6 @@
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
   <mime-type type="text/x-kora">
     <comment>Kora Programming Language Source</comment>
-    <comment xml:lang="ar">ملف لغة البرمجة كورا (Kora)</comment>
     <icon name="kora-file"/>
     <glob pattern="*.kora"/>
     <glob pattern="*.kr"/>

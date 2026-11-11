@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Kora
+GenericName=Compiler & Language Runtime
+Comment=Next-generation compiled backend programming language and framework
+Exec=kora %F
+Terminal=true
+Icon=kora
+Categories=Development;Building;
+MimeType=text/x-kora;
+Keywords=kora;compiler;rust;backend;framework;
+StartupNotify=false

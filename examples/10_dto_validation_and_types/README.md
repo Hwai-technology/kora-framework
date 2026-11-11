@@ -1,11 +1,11 @@
 # Example 10: DTO Validation, Defense-in-Depth & Comprehensive API Types
 
-> **"DTO Protects You" (الـ DTO هو درع الحماية)**  
+> **"DTO Protects You" (The Shield of API Data Integrity)**  
 > In modern production APIs, untrusted external input must **never** reach your database models or business domain entities directly. A Data Transfer Object (DTO) acts as a strict boundary firewall at the edge of your service, guaranteeing that only cryptographically valid, schema-compliant, and well-typed data enters your application.
 
 ---
 
-## 🛡️ Why DTO Validation is Essential ("DTO سيحميك")
+## 🛡️ Why DTO Validation is Essential (Boundary Defense)
 
 1. **Immunity to Mass Assignment & Over-Posting**:
    - Attackers often inject unauthorized fields (e.g., `isAdmin: true`, `role: "superuser"`, `balance: 999999`) into raw request payloads.
