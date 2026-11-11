@@ -543,7 +543,30 @@ pub fn generate_swagger_ui_html(spec_json: &Value, title: &str) -> String {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{title} — Swagger UI</title>
+  <title>{title} — Interactive Swagger UI & OpenAPI 3.1</title>
+  <meta name="description" content="Explore and test the {title} API endpoints, data transfer objects, and CRUD operations with automated OpenAPI 3.1.0 interactive documentation." />
+  <meta name="keywords" content="kora, api, openapi, swagger, rest, {title}, clean-architecture, microservices, backend" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="http://127.0.0.1:7582/docs" />
+
+  <!-- OpenGraph Metadata -->
+  <meta property="og:title" content="{title} — Interactive API Documentation" />
+  <meta property="og:description" content="Explore and test the {title} RESTful endpoints with automated OpenAPI 3.1.0 specifications." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="http://127.0.0.1:7582/docs" />
+  <meta property="og:site_name" content="Kora Framework" />
+
+  <!-- Twitter Card Metadata -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{title} — Interactive API Documentation" />
+  <meta name="twitter:description" content="Explore and test the {title} RESTful endpoints with automated OpenAPI 3.1.0 specifications." />
+
+  <!-- Geographic Location Metadata -->
+  <meta name="geo.region" content="US-CA" />
+  <meta name="geo.placename" content="San Francisco, California" />
+  <meta name="geo.position" content="37.7749;-122.4194" />
+  <meta name="ICBM" content="37.7749, -122.4194" />
+
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
   <link rel="icon" type="image/png" href="https://unpkg.com/swagger-ui-dist@5/favicon-32x32.png" />
   <style>

@@ -220,8 +220,10 @@ pub fn generate_rust(
     let listener = TcpListener::bind(&bind_addr).await?;
     println!("🚀 Kora server listening on http://127.0.0.1:{} ... Press Ctrl+C to stop.", port);
     let start_time = std::time::Instant::now();
+    let srv_port = port.clone();
 
     while let Ok((mut socket, _)) = listener.accept().await {
+        let port = srv_port.clone();
         tokio::spawn(async move {
             let mut buf = [0u8; 4096];
             if let Ok(n) = socket.read(&mut buf).await {
@@ -239,6 +241,118 @@ pub fn generate_rust(
                     return;
                 }
 
+                // Parse headers for Host and Geo location overrides
+                let mut host = format!("127.0.0.1:{}", port);
+                let mut client_ip = "127.0.0.1".to_string();
+                let mut geo_country = "US".to_string();
+                let mut geo_city = "San Francisco".to_string();
+                let mut geo_region = "California".to_string();
+                let mut geo_timezone = "UTC".to_string();
+                let mut geo_lat = 37.7749;
+                let mut geo_lng = -122.4194;
+
+                for line in req_str.lines() {
+                    let mut parts = line.splitn(2, ':');
+                    let key = parts.next().unwrap_or("").trim().to_lowercase();
+                    let val = parts.next().unwrap_or("").trim().to_string();
+                    match key.as_str() {
+                        "host" => { if !val.is_empty() { host = val; } },
+                        "cf-connecting-ip" | "x-forwarded-for" | "x-real-ip" => {
+                            if let Some(first_ip) = val.split(',').next() {
+                                client_ip = first_ip.trim().to_string();
+                            }
+                        },
+                        "cf-ipcountry" | "x-geo-country" => { if !val.is_empty() { geo_country = val; } },
+                        "cf-ipcity" | "x-geo-city" => { if !val.is_empty() { geo_city = val; } },
+                        "cf-region" | "x-geo-region" => { if !val.is_empty() { geo_region = val; } },
+                        "cf-timezone" | "x-geo-timezone" => { if !val.is_empty() { geo_timezone = val; } },
+                        "cf-coordinates" => {
+                            let mut coords = val.split(',');
+                            if let (Some(la), Some(lo)) = (coords.next(), coords.next()) {
+                                if let (Ok(nla), Ok(nlo)) = (la.trim().parse::<f64>(), lo.trim().parse::<f64>()) {
+                                    geo_lat = nla; geo_lng = nlo;
+                                }
+                            }
+                        },
+                        _ => {}
+                    }
+                }
+
+                // Dynamic SEO derivation based on route path
+                let canonical_url = format!("http://{}{}", host, path);
+                let segments: Vec<&str> = path.trim_matches('/').split('/').filter(|s| !s.is_empty()).collect();
+                let mut keywords = vec!["kora".to_string(), "api".to_string(), "clean-architecture".to_string(), "rest".to_string()];
+                for seg in &segments {
+                    keywords.push(seg.to_lowercase());
+                }
+
+                let (seo_title, seo_desc) = if path == "/" {
+                    (
+                        "Kora Engine - Clean Architecture Backend Platform".to_string(),
+                        "Official Kora application root endpoint with zero-cost native Rust execution and automated OpenAPI generation.".to_string()
+                    )
+                } else if path == "/health" {
+                    (
+                        "Health & Uptime Telemetry Status - Kora API".to_string(),
+                        "Live telemetry monitoring, health checks, and service availability probes.".to_string()
+                    )
+                } else if path == "/docs" || path == "/swagger" {
+                    (
+                        "Interactive Swagger UI Documentation - Kora Platform".to_string(),
+                        "Explore, inspect, and test RESTful operations with real-time OpenAPI 3.1.0 specifications.".to_string()
+                    )
+                } else if path == "/openapi.json" {
+                    (
+                        "OpenAPI 3.1.0 Specification Contract - Kora API".to_string(),
+                        "Machine-readable JSON schema defining data models, DTOs, and endpoints.".to_string()
+                    )
+                } else {
+                    let resource_name = if let Some(first) = segments.first() {
+                        let mut c = first.chars();
+                        match c.next() {
+                            None => "Endpoint".to_string(),
+                            Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+                        }
+                    } else {
+                        "Resource".to_string()
+                    };
+                    let sub_id = if segments.len() > 1 { format!(" #{}", segments[1]) } else { String::new() };
+                    let title = format!("{resource_name}{sub_id} API Operations - Kora Store");
+                    let desc = format!("Dynamic {method} operations and model persistence for {path} powered by Kora framework.");
+                    (title, desc)
+                };
+
+                let geo_json = serde_json::json!({
+                    "ip": client_ip,
+                    "country": geo_country,
+                    "city": geo_city,
+                    "region": geo_region,
+                    "timezone": geo_timezone,
+                    "coordinates": {
+                        "latitude": geo_lat,
+                        "longitude": geo_lng
+                    }
+                });
+
+                let seo_json = serde_json::json!({
+                    "title": seo_title,
+                    "description": seo_desc,
+                    "canonical": canonical_url,
+                    "keywords": keywords,
+                    "og": {
+                        "title": seo_title,
+                        "description": seo_desc,
+                        "url": canonical_url,
+                        "type": "website",
+                        "site_name": "Kora Application"
+                    },
+                    "twitter": {
+                        "card": "summary_large_image",
+                        "title": seo_title,
+                        "description": seo_desc
+                    }
+                });
+
                 let (status, content_type, body) = match path {
                     "/" => {
                         let json = serde_json::json!({
@@ -248,7 +362,9 @@ pub fn generate_rust(
                             "message": "Kora Clean Architecture server is running",
                             "docs": "/docs",
                             "health": "/health",
-                            "openapi": "/openapi.json"
+                            "openapi": "/openapi.json",
+                            "seo": seo_json,
+                            "geo": geo_json
                         }).to_string();
                         ("200 OK", "application/json", json)
                     },
@@ -259,7 +375,9 @@ pub fn generate_rust(
                             "uptime_seconds": uptime,
                             "framework": "Kora",
                             "version": "0.1.0",
-                            "environment": "development"
+                            "environment": "development",
+                            "seo": seo_json,
+                            "geo": geo_json
                         }).to_string();
                         ("200 OK", "application/json", json)
                     },
@@ -283,7 +401,9 @@ pub fn generate_rust(
                             "message": format!("Handled route {} {}", method, path),
                             "data": [
                                 {"id": 1, "name": "Ahmet", "email": "ahmet@kora.dev", "active": true}
-                            ]
+                            ],
+                            "seo": seo_json,
+                            "geo": geo_json
                         }).to_string();
                         ("200 OK", "application/json", json)
                     }
@@ -453,6 +573,27 @@ fn emit_stmt(stmt: &Stmt) -> String {
     }
 }
 
+fn is_string_expr(expr: &Expr) -> bool {
+    match expr {
+        Expr::StringLit { .. } => true,
+        Expr::Binary {
+            op: BinaryOp::Add,
+            lhs,
+            rhs,
+            ..
+        } => is_string_expr(lhs) || is_string_expr(rhs),
+        Expr::Call { callee, .. } => {
+            if let Expr::FieldAccess { field, .. } = callee.as_ref()
+                && (field.name == "toString" || field.name == "to_string")
+            {
+                return true;
+            }
+            false
+        }
+        _ => false,
+    }
+}
+
 fn emit_expr(expr: &Expr) -> String {
     match expr {
         Expr::IntLit { value, .. } => value.to_string(),
@@ -473,22 +614,30 @@ fn emit_expr(expr: &Expr) -> String {
             UnaryOp::Neg => format!("-({})", emit_expr(inner)),
         },
         Expr::Binary { op, lhs, rhs, .. } => {
-            let sym = match op {
-                BinaryOp::Add => "+",
-                BinaryOp::Sub => "-",
-                BinaryOp::Mul => "*",
-                BinaryOp::Div => "/",
-                BinaryOp::Mod => "%",
-                BinaryOp::Eq => "==",
-                BinaryOp::Neq => "!=",
-                BinaryOp::Lt => "<",
-                BinaryOp::Lte => "<=",
-                BinaryOp::Gt => ">",
-                BinaryOp::Gte => ">=",
-                BinaryOp::And => "&&",
-                BinaryOp::Or => "||",
-            };
-            format!("({} {} {})", emit_expr(lhs), sym, emit_expr(rhs))
+            if *op == BinaryOp::Add && (is_string_expr(lhs) || is_string_expr(rhs)) {
+                format!(
+                    "format!(\"{{}}{{}}\", {}, {})",
+                    emit_expr(lhs),
+                    emit_expr(rhs)
+                )
+            } else {
+                let sym = match op {
+                    BinaryOp::Add => "+",
+                    BinaryOp::Sub => "-",
+                    BinaryOp::Mul => "*",
+                    BinaryOp::Div => "/",
+                    BinaryOp::Mod => "%",
+                    BinaryOp::Eq => "==",
+                    BinaryOp::Neq => "!=",
+                    BinaryOp::Lt => "<",
+                    BinaryOp::Lte => "<=",
+                    BinaryOp::Gt => ">",
+                    BinaryOp::Gte => ">=",
+                    BinaryOp::And => "&&",
+                    BinaryOp::Or => "||",
+                };
+                format!("({} {} {})", emit_expr(lhs), sym, emit_expr(rhs))
+            }
         }
         Expr::Assign { target, value, .. } => {
             format!("{} = {}", emit_expr(target), emit_expr(value))

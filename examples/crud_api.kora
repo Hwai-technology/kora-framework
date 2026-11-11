@@ -1,6 +1,22 @@
 // ============================================================================
-// Kora Example 3: Full CRUD RESTful API with Authentication & Validation
+// Kora Example 3: Full CRUD RESTful API with Dynamic SEO & Geo Location Meta
 // ============================================================================
+
+model SeoMetadata {
+    title: String
+    description: String
+    canonicalUrl: String
+    ogTitle: String
+    ogDescription: String
+}
+
+model GeoLocation {
+    clientIp: String
+    country: String
+    city: String
+    region: String
+    timezone: String
+}
 
 model Product {
     id: Int
@@ -8,6 +24,19 @@ model Product {
     title: String
     priceCents: Int
     inStock: Bool
+}
+
+model ProductDetailsResponse {
+    product: Product
+    seo: SeoMetadata
+    geo: GeoLocation
+}
+
+model ProductCatalogResponse {
+    products: List<Product>
+    total: Int
+    seo: SeoMetadata
+    geo: GeoLocation
 }
 
 model CreateProductRequest {
@@ -28,6 +57,9 @@ interface ProductRepository {
     fn create(req: CreateProductRequest) -> Result<Product, String>
     fn update(id: Int, req: UpdateProductRequest) -> Result<Product, String>
     fn deleteById(id: Int) -> Bool
+    fn getCatalogSeo() -> SeoMetadata
+    fn getProductSeo(product: Product) -> SeoMetadata
+    fn getGeoLocation() -> GeoLocation
 }
 
 class ProductService implements ProductRepository {
@@ -67,6 +99,36 @@ class ProductService implements ProductRepository {
             priceCents: 12900,
             inStock: true,
         })
+    }
+
+    fn getCatalogSeo() -> SeoMetadata {
+        return SeoMetadata {
+            title: "Hardware & Accessories Catalog | Kora Official Store",
+            description: "Browse premium gaming keyboards, ergonomic mice, and hardware with live stock updates and instant dispatch.",
+            canonicalUrl: "http://127.0.0.1:7582/products",
+            ogTitle: "Hardware & Accessories Catalog - Kora Store",
+            ogDescription: "High-performance developer peripherals and equipment.",
+        }
+    }
+
+    fn getProductSeo(product: Product) -> SeoMetadata {
+        return SeoMetadata {
+            title: product.title + " | Kora Store",
+            description: "Official specifications and stock availability for " + product.title + " (SKU: " + product.sku + ").",
+            canonicalUrl: "http://127.0.0.1:7582/products/" + product.id.toString(),
+            ogTitle: product.title + " - Buy Online",
+            ogDescription: "In stock with instant global delivery.",
+        }
+    }
+
+    fn getGeoLocation() -> GeoLocation {
+        return GeoLocation {
+            clientIp: "127.0.0.1",
+            country: "United States",
+            city: "San Francisco",
+            region: "California",
+            timezone: "UTC",
+        }
     }
 
     fn create(req: CreateProductRequest) -> Result<Product, String> {
@@ -109,14 +171,36 @@ class ProductService implements ProductRepository {
 // Zero-Config CRUD Routes with Automatic JSON Serialization & Dependency Injection
 let app = run()
 
-// 1. GET /products -> List all products
+// 1. GET /products -> List all products with dynamic SEO and Geo metadata
 get("/products", (svc: ProductService) => {
-    return svc.listAll()
+    let items = svc.listAll()
+    let seo = svc.getCatalogSeo()
+    let geo = svc.getGeoLocation()
+    return ProductCatalogResponse {
+        products: items,
+        total: 2,
+        seo: seo,
+        geo: geo,
+    }
 })
 
-// 2. GET /products/{id} -> Single product details
+// 2. GET /products/{id} -> Single product details with dynamic per-item SEO and Geo
 get("/products/{id}", (id: Int, svc: ProductService) => {
-    return svc.findById(id)
+    let opt = svc.findById(id)
+    match opt {
+        Some(p) => {
+            let seo = svc.getProductSeo(p)
+            let geo = svc.getGeoLocation()
+            return Ok(ProductDetailsResponse {
+                product: p,
+                seo: seo,
+                geo: geo,
+            })
+        },
+        null => {
+            return Err("Product not found")
+        }
+    }
 })
 
 // 3. POST /products -> Create a new product
@@ -143,4 +227,3 @@ put("/products/{id}", (id: Int, request: Request, svc: ProductService) => {
 delete("/products/{id}", (id: Int, svc: ProductService) => {
     return svc.deleteById(id)
 })
-
