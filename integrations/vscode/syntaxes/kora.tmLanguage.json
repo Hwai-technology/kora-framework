@@ -63,11 +63,11 @@
       "patterns": [
         {
           "name": "keyword.control.kora",
-          "match": "\\b(if|else|while|return|match|select|spawn)\\b"
+          "match": "\\b(if|else|while|for|in|break|continue|try|catch|finally|throw|return|match|select|spawn)\\b"
         },
         {
           "name": "keyword.declaration.kora",
-          "match": "\\b(let|var|fn|async|await|init|implements|module|import|pub|extend)\\b"
+          "match": "\\b(let|var|const|fn|async|await|init|implements|module|import|pub|extend)\\b"
         },
         {
           "name": "storage.type.kora",
@@ -118,6 +118,10 @@
           "match": "(->|=>)"
         },
         {
+          "name": "keyword.operator.pipe_range_coalesce.kora",
+          "match": "(\\?\\?|\\?\\.|\\|\\>|\\.\\.)"
+        },
+        {
           "name": "keyword.operator.comparison.kora",
           "match": "(==|!=|<=|>=|<|>)"
         },
@@ -127,7 +131,7 @@
         },
         {
           "name": "keyword.operator.assignment.kora",
-          "match": "="
+          "match": "(\\+=|\\-=|\\*=|\\/=|%=|=)"
         },
         {
           "name": "keyword.operator.arithmetic.kora",

@@ -1,5 +1,5 @@
 const vscode = require('vscode');
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
@@ -47,6 +47,15 @@ function activate(context) {
                     { label: 'actor', detail: 'Isolated stateful actor concurrency construct', kind: vscode.CompletionItemKind.Class, snippet: 'class ${1:Name}Actor {\n\tvar state: ${2:Int}\n\n\tinit() {\n\t\tthis.state = 0\n\t}\n\n\tfn handle(msg: ${3:String}) -> ${4:Int} {\n\t\t${0}\n\t}\n}' },
                     { label: 'let', detail: 'Declare an immutable binding', kind: vscode.CompletionItemKind.Keyword, snippet: 'let ${1:name} = ${2:value}' },
                     { label: 'var', detail: 'Declare a mutable binding', kind: vscode.CompletionItemKind.Keyword, snippet: 'var ${1:name} = ${2:value}' },
+                    { label: 'const', detail: 'Declare a compile-time constant', kind: vscode.CompletionItemKind.Keyword, snippet: 'const ${1:NAME} = ${2:value}' },
+                    { label: 'for', detail: 'For-in loop over collections or ranges', kind: vscode.CompletionItemKind.Keyword, snippet: 'for ${1:item} in ${2:collection} {\n\t${0}\n}' },
+                    { label: 'in', detail: 'In operator for loop collections', kind: vscode.CompletionItemKind.Keyword },
+                    { label: 'break', detail: 'Break out of current loop', kind: vscode.CompletionItemKind.Keyword },
+                    { label: 'continue', detail: 'Continue to next loop iteration', kind: vscode.CompletionItemKind.Keyword },
+                    { label: 'try', detail: 'Try-catch error resilience block', kind: vscode.CompletionItemKind.Keyword, snippet: 'try {\n\t${1}\n} catch (${2:err}) {\n\t${0}\n}' },
+                    { label: 'catch', detail: 'Catch block handling errors', kind: vscode.CompletionItemKind.Keyword },
+                    { label: 'finally', detail: 'Finally cleanup block', kind: vscode.CompletionItemKind.Keyword },
+                    { label: 'throw', detail: 'Throw an error', kind: vscode.CompletionItemKind.Keyword, snippet: 'throw ${1:err}' },
                     { label: 'fn', detail: 'Function declaration', kind: vscode.CompletionItemKind.Function, snippet: 'fn ${1:name}(${2:params}) -> ${3:Unit} {\n\t${0}\n}' },
                     { label: 'async', detail: 'Asynchronous function modifier', kind: vscode.CompletionItemKind.Keyword },
                     { label: 'await', detail: 'Await an asynchronous operation', kind: vscode.CompletionItemKind.Keyword },
@@ -163,6 +172,13 @@ function activate(context) {
                 channel: '**Kora `channel<T>(capacity)`**\n\nNon-blocking MPSC channel for asynchronous message passing.',
                 broadcast: '**Kora `broadcast<T>(capacity)`**\n\nMulti-producer, multi-consumer broadcast channel for pub/sub events.',
                 spawn: '**Kora `spawn(async () => { ... })`**\n\nSpawns an asynchronous concurrent task executed on high-performance native threads.',
+                for: '**Kora `for .. in` Loop**\n\nIterate over collections, arrays, or numeric ranges (e.g. `for i in 1..10`). Supports `break` and `continue`.',
+                try: '**Kora `try .. catch` Resilience**\n\nStructured error handling syntax ensuring resource safety and controlled error handling.',
+                catch: '**Kora `catch` Block**\n\nCaptures exceptions or errors thrown during execution.',
+                finally: '**Kora `finally` Block**\n\nGuaranteed cleanup block executed regardless of whether an error was thrown.',
+                throw: '**Kora `throw`**\n\nRaises an error to be handled by an enclosing `try/catch` block or central error boundary.',
+                const: '**Kora `const` Declaration**\n\nImmutable compile-time constant evaluated during compilation.',
+                match: '**Kora `match` Expression**\n\nExhaustive pattern matching construct statically verified at compile time.',
                 null: '**Kora `null`**\n\nSingle-null design: represents absent optional values (`Option<T>`). Note: `undefined` is strictly forbidden in Kora (`E2005`).'
             };
 
@@ -179,7 +195,7 @@ function activate(context) {
         provideDocumentFormattingEdits(document, options, token) {
             return new Promise((resolve) => {
                 const filePath = document.fileName;
-                exec(`kora fmt "${filePath}"`, (err, stdout, stderr) => {
+                execFile('kora', ['fmt', filePath], (err, stdout, stderr) => {
                     if (err) {
                         vscode.window.showErrorMessage(`Kora format error: ${stderr || err.message}`);
                         return resolve([]);
@@ -360,7 +376,7 @@ function activate(context) {
 
             let terminal = vscode.window.terminals.find(t => t.name === 'Kora Run') || vscode.window.createTerminal('Kora Run');
             terminal.show();
-            terminal.sendText(`kora "${activeFile}"`);
+            terminal.sendText(`kora run "${activeFile}"`);
         }),
         vscode.commands.registerCommand('kora.checkFile', (filePath) => {
             const activeFile = filePath || (vscode.window.activeTextEditor && vscode.window.activeTextEditor.document.fileName);
@@ -418,7 +434,7 @@ function validateKoraDocument(document) {
     }
 
     const filePath = document.fileName;
-    exec(`kora check "${filePath}"`, (err, stdout, stderr) => {
+    execFile('kora', ['check', filePath], (err, stdout, stderr) => {
         const diagnostics = [];
         const output = stderr || stdout || '';
 

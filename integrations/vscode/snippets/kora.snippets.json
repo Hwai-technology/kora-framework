@@ -123,5 +123,32 @@
       "}"
     ],
     "description": "Pattern matching expression"
+  },
+  "Try Catch Block": {
+    "prefix": "try",
+    "body": [
+      "try {",
+      "    ${1:// resilient operation}",
+      "} catch (${2:err}) {",
+      "    ${0:// handle error}",
+      "}"
+    ],
+    "description": "Resilient structured try-catch error block"
+  },
+  "For In Loop": {
+    "prefix": "for",
+    "body": [
+      "for ${1:item} in ${2:collection} {",
+      "    ${0}",
+      "}"
+    ],
+    "description": "Iterate over collections, arrays, or numeric ranges"
+  },
+  "Compile-time Constant": {
+    "prefix": "const",
+    "body": [
+      "const ${1:MAX_CONNECTIONS} = ${2:100}"
+    ],
+    "description": "Declare a compile-time immutable constant"
   }
 }

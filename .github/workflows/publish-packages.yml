@@ -2,10 +2,10 @@ name: Publish Packages & Releases
 
 on:
   push:
-    tags:
-      - 'v*'
     branches:
       - main
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
       publish_docker:
@@ -25,10 +25,108 @@ permissions:
 
 jobs:
   # ----------------------------------------------------------------------------
-  # Job 1: Publish Container Image to GitHub Container Registry (ghcr.io)
+  # Job 1: Prepare Release Metadata, Distinguish Features/Fixes & Bump Version
+  # ----------------------------------------------------------------------------
+  prepare-release:
+    name: Compute SemVer & Generate Release Notes
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.notes.outputs.version }}
+      tag_name: ${{ steps.notes.outputs.tag_name }}
+      release_name: ${{ steps.notes.outputs.release_name }}
+      bump_type: ${{ steps.notes.outputs.bump_type }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Calculate Version & Categorize Release
+        id: notes
+        run: python3 scripts/release_notes.py
+
+      - name: Upload Release Notes Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-notes
+          path: RELEASE_NOTES.md
+
+  # ----------------------------------------------------------------------------
+  # Job 2: Build & Attach Precompiled Release Binaries (Runs on every push to main & tags)
+  # ----------------------------------------------------------------------------
+  release-binaries:
+    name: Build & Attach Release Binaries
+    needs: prepare-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Release Notes
+        uses: actions/download-artifact@v4
+        with:
+          name: release-notes
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build Kora Release Binary
+        run: cargo build --release -p kora-cli
+
+      - name: Package Binary Artifacts
+        id: package
+        run: |
+          TAG="${{ needs.prepare-release.outputs.tag_name }}"
+          TAR_VER="kora-${TAG}-linux-x86_64.tar.gz"
+          TAR_LATEST="kora-latest-linux-x86_64.tar.gz"
+
+          # Package versioned archive
+          tar -czvf "${TAR_VER}" -C target/release kora
+          sha256sum "${TAR_VER}" > "${TAR_VER}.sha256"
+
+          # Package latest archive alias
+          cp "${TAR_VER}" "${TAR_LATEST}"
+          sha256sum "${TAR_LATEST}" > "${TAR_LATEST}.sha256"
+
+          echo "tar_ver=${TAR_VER}" >> $GITHUB_OUTPUT
+          echo "tar_latest=${TAR_LATEST}" >> $GITHUB_OUTPUT
+
+      - name: Tag commit on main
+        if: github.ref == 'refs/heads/main'
+        run: |
+          TAG="${{ needs.prepare-release.outputs.tag_name }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -f "$TAG"
+          git push -f origin "$TAG"
+
+      - name: Create or Update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare-release.outputs.tag_name }}
+          name: ${{ needs.prepare-release.outputs.release_name }}
+          body_path: RELEASE_NOTES.md
+          draft: false
+          prerelease: false
+          files: |
+            ${{ steps.package.outputs.tar_ver }}
+            ${{ steps.package.outputs.tar_ver }}.sha256
+            ${{ steps.package.outputs.tar_latest }}
+            ${{ steps.package.outputs.tar_latest }}.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ----------------------------------------------------------------------------
+  # Job 3: Publish Container Image to GitHub Container Registry (ghcr.io)
   # ----------------------------------------------------------------------------
   publish-container:
     name: Build & Push Docker Image to GHCR
+    needs: prepare-release
     if: github.event_name != 'workflow_dispatch' || inputs.publish_docker
     runs-on: ubuntu-latest
     steps:
@@ -51,9 +149,8 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') }}
+            type=raw,value=${{ needs.prepare-release.outputs.tag_name }}
+            type=raw,value=latest
             type=sha,prefix=sha-
 
       - name: Build and push Docker image
@@ -68,10 +165,11 @@ jobs:
           cache-to: type=gha,mode=max
 
   # ----------------------------------------------------------------------------
-  # Job 2: Publish npm Wrapper Package to GitHub Packages
+  # Job 4: Publish npm Wrapper Package to GitHub Packages
   # ----------------------------------------------------------------------------
   publish-npm:
     name: Publish npm Package to GitHub Packages
+    needs: prepare-release
     if: github.event_name != 'workflow_dispatch' || inputs.publish_npm
     runs-on: ubuntu-latest
     steps:
@@ -85,51 +183,15 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
           scope: '@hwai-technology'
 
+      - name: Update package.json version
+        working-directory: packages/npm
+        run: |
+          VERSION="${{ needs.prepare-release.outputs.version }}"
+          node -e "const pkg = require('./package.json'); pkg.version = '${VERSION}'; require('fs').writeFileSync('./package.json', JSON.stringify(pkg, null, 2));"
+
       - name: Publish to GitHub Packages
         working-directory: packages/npm
         run: |
-          # Only publish if this version does not already exist in registry
           npm publish || echo "Package version may already be published."
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # ----------------------------------------------------------------------------
-  # Job 3: Build & Attach Precompiled Release Binaries (on tag push)
-  # ----------------------------------------------------------------------------
-  release-binaries:
-    name: Build & Attach Release Binaries
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Build Kora Release Binary
-        run: cargo build --release --bin kora
-
-      - name: Package Binary Artifacts
-        id: package
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          ARCHIVE_NAME="kora-v${VERSION}-linux-x86_64.tar.gz"
-          tar -czvf "${ARCHIVE_NAME}" -C target/release kora
-          sha256sum "${ARCHIVE_NAME}" > "${ARCHIVE_NAME}.sha256"
-          echo "archive_name=${ARCHIVE_NAME}" >> $GITHUB_OUTPUT
-
-      - name: Create or Update GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: Kora Framework ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          generate_release_notes: true
-          files: |
-            ${{ steps.package.outputs.archive_name }}
-            ${{ steps.package.outputs.archive_name }}.sha256
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

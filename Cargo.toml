@@ -32,7 +32,7 @@ version = "0.1.0"
 edition = "2024"
 license = "AGPL-3.0-only"
 authors = ["Kora Contributors"]
-repository = "https://github.com/kora-lang/kora"
+repository = "https://github.com/Hwai-technology/kora-framework"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

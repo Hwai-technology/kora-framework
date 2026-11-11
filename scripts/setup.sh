@@ -44,13 +44,13 @@ if [[ -f "$BIN_TARGET_DIR/kora" ]] || command -v kora &>/dev/null; then
         "$ROOT_DIR/scripts/uninstall.sh"
     elif [[ "$1" != "--yes" && "$1" != "-y" ]]; then
         echo -e "${COLOR_CYAN}================================================================${COLOR_RESET}"
-        echo -e "${COLOR_YELLOW}  ⚠️  Kora is already installed on this machine (${INSTALLED_VER})${COLOR_RESET}"
+        echo -e "${COLOR_YELLOW}  ⚠️  Kora is already installed on this system (${INSTALLED_VER})${COLOR_RESET}"
         echo -e "${COLOR_CYAN}================================================================${COLOR_RESET}"
-        echo -e "Choose an option / اختر الإجراء المطلوب:"
-        echo -e "  [1] 🔄 Update / Refresh installation  (تحديث التثبيت الحالي وحزم التعريفات)"
-        echo -e "  [2] 🔨 Clean Reinstall from scratch   (تثبيت نظيف بالكامل من الصفر)"
-        echo -e "  [3] 🗑️  Uninstall Kora from system     (إلغاء تثبيت اللغة بالكامل من الجهاز)"
-        echo -e "  [4] ❌ Exit / Cancel                  (إلغاء العملية والخروج)"
+        echo -e "Choose an action:"
+        echo -e "  [1] 🔄 Update / Refresh installation  (rebuild binary, update MIME & completions)"
+        echo -e "  [2] 🔨 Clean Reinstall from scratch   (uninstall and perform fresh build)"
+        echo -e "  [3] 🗑️  Uninstall Kora from system     (remove binary, completions, and IDE tools)"
+        echo -e "  [4] ❌ Exit / Cancel                  (abort operation and exit)"
         echo ""
         
         CHOICE=""
@@ -88,17 +88,49 @@ echo -e "${COLOR_CYAN}==========================================================
 echo -e "${COLOR_CYAN}  ⚡ Kora Language & Framework — System Installer & Setup      ${COLOR_RESET}"
 echo -e "${COLOR_CYAN}================================================================${COLOR_RESET}"
 
-# 1. Compile Release Binary
-echo -e "\n${COLOR_BLUE}[1/5] Compiling Kora release binary with Cargo...${COLOR_RESET}"
-cd "$ROOT_DIR"
-cargo build --release -p kora-cli
+# 1. Compile or Download Release Binary
+echo -e "\n${COLOR_BLUE}[1/5] Preparing Kora release binary...${COLOR_RESET}"
+if [[ -f "$ROOT_DIR/Cargo.toml" ]] && [[ -f "$ROOT_DIR/crates/kora-cli/Cargo.toml" ]]; then
+    echo -e "${COLOR_CYAN}  Building native release binary from source with Cargo...${COLOR_RESET}"
+    cd "$ROOT_DIR"
+    cargo build --release -p kora-cli
+    RELEASE_BIN="$ROOT_DIR/target/release/kora"
+else
+    echo -e "${COLOR_CYAN}  Fetching precompiled release binary from GitHub Releases...${COLOR_RESET}"
+    ARCH="$(uname -m)"
+    case "$ARCH" in
+        x86_64|amd64) ARCH="x86_64" ;;
+        aarch64|arm64) ARCH="aarch64" ;;
+        *) ARCH="x86_64" ;;
+    esac
 
-RELEASE_BIN="$ROOT_DIR/target/release/kora"
+    TMP_DIR="$(mktemp -d)"
+    TARBALL="kora-latest-linux-${ARCH}.tar.gz"
+    DOWNLOAD_URL="https://github.com/Hwai-technology/kora-framework/releases/latest/download/${TARBALL}"
+
+    if curl -fsSL "$DOWNLOAD_URL" -o "$TMP_DIR/$TARBALL" 2>/dev/null; then
+        tar -xzf "$TMP_DIR/$TARBALL" -C "$TMP_DIR"
+        RELEASE_BIN="$TMP_DIR/kora"
+    elif command -v cargo &>/dev/null; then
+        echo -e "${COLOR_YELLOW}  Release binary download unavailable; compiling from git source...${COLOR_RESET}"
+        git clone --depth 1 https://github.com/Hwai-technology/kora-framework.git "$TMP_DIR/kora-src"
+        cd "$TMP_DIR/kora-src"
+        cargo build --release -p kora-cli
+        RELEASE_BIN="$TMP_DIR/kora-src/target/release/kora"
+        ROOT_DIR="$TMP_DIR/kora-src"
+    else
+        echo -e "${COLOR_RED}error: could not download precompiled binary and cargo is not installed.${COLOR_RESET}"
+        echo -e "${COLOR_YELLOW}Please install Rust/Cargo (https://rustup.rs) or download a release from:${COLOR_RESET}"
+        echo -e "${COLOR_CYAN}https://github.com/Hwai-technology/kora-framework/releases${COLOR_RESET}"
+        exit 1
+    fi
+fi
+
 if [[ ! -f "$RELEASE_BIN" ]]; then
     echo -e "${COLOR_RED}error: build failed, $RELEASE_BIN not found${COLOR_RESET}"
     exit 1
 fi
-echo -e "${COLOR_GREEN}✓ Release binary built successfully.${COLOR_RESET}"
+echo -e "${COLOR_GREEN}✓ Release binary ready: $RELEASE_BIN${COLOR_RESET}"
 
 # 2. Install Binary into ~/.local/bin
 echo -e "\n${COLOR_BLUE}[2/5] Installing 'kora' into user path ($BIN_TARGET_DIR)...${COLOR_RESET}"

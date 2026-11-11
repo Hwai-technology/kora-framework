@@ -1658,7 +1658,13 @@ impl<'a> TypeChecker<'a> {
                 self.check_stmt(stmt);
             }
         }
-        found_return.unwrap_or(Ty::Unit)
+        if let Some(rty) = found_return {
+            rty
+        } else if let Some(Stmt::Expr { expr, .. }) = blk.stmts.last() {
+            self.check_expr(expr, explicit_ret)
+        } else {
+            Ty::Unit
+        }
     }
 
     fn check_match(
@@ -2052,6 +2058,11 @@ fn stmt_always_returns(stmt: &Stmt) -> bool {
             };
             block_always_returns(then_branch) && else_returns
         }
+        Stmt::TryCatch {
+            try_block,
+            catch_block,
+            ..
+        } => block_always_returns(try_block) && block_always_returns(catch_block),
         _ => false,
     }
 }

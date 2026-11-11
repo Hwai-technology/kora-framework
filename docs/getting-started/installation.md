@@ -6,10 +6,13 @@ This guide walks you through installing, updating, and managing the Kora compile
 
 ## ⚡ 1. Automated One-Command Installation
 
-The easiest way to install Kora and its entire development suite (binary, shell auto-completions, Linux MIME types, and editor extensions) is using the automated setup script:
+The easiest way to install Kora and its entire development suite (binary, shell auto-completions, Linux MIME types, and editor extensions) is using the automated one-line installer:
 
 ```bash
-# From the project repository root:
+# Direct install via curl:
+curl -fsSL https://raw.githubusercontent.com/Hwai-technology/kora-framework/main/install.sh | bash
+
+# Or from within a cloned repository root:
 ./scripts/setup.sh
 ```
 
@@ -68,7 +71,7 @@ If you prefer building manually using Rust and Cargo:
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # Clone the repository
-git clone https://github.com/kora-lang/kora.git
+git clone https://github.com/Hwai-technology/kora-framework.git
 cd kora
 
 # Compile CLI in release mode
