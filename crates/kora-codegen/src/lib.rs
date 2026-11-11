@@ -190,7 +190,23 @@ pub fn generate_rust(
         );
         let _ = writeln!(
             out,
-            "    println!(\"Starting Kora server on http://127.0.0.1:8080\");"
+            "    let port = std::env::var(\"PORT\").or_else(|_| std::env::var(\"KORA_PORT\")).unwrap_or_else(|_| \"7582\".to_string());"
+        );
+        let _ = writeln!(
+            out,
+            "    println!(\"Starting Kora server on http://127.0.0.1:{{}}\", port);"
+        );
+        let _ = writeln!(
+            out,
+            "    println!(\"⚡ Root endpoint:      GET  http://127.0.0.1:{{}}/\", port);"
+        );
+        let _ = writeln!(
+            out,
+            "    println!(\"⚡ Health endpoint:    GET  http://127.0.0.1:{{}}/health\", port);"
+        );
+        let _ = writeln!(
+            out,
+            "    println!(\"⚡ Swagger UI docs:   GET  http://127.0.0.1:{{}}/docs\", port);"
         );
         for item in &hir.ast.items {
             if let Item::Stmt(s) = item {

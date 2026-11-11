@@ -1048,7 +1048,7 @@ fn scaffold_project(p: &Path, pkg_name: &str, is_current_dir: bool) -> ExitCode 
                  description = \"Clean Architecture backend service powered by Kora\"\n\n\
                  [server]\n\
                  host = \"127.0.0.1\"\n\
-                 port = 8080\n\
+                 port = 7582\n\
                  workers = 4\n\n\
                  [dependencies]\n"
             ),
@@ -1060,8 +1060,135 @@ fn scaffold_project(p: &Path, pkg_name: &str, is_current_dir: bool) -> ExitCode 
     if !gitignore_path.exists() {
         let _ = fs::write(
             &gitignore_path,
-            "/.kora-build/\n/.kora-packages/\n/dist/\n/target/\n*.log\n.DS_Store\n.env\n",
+            "/.kora-build/\n/.kora-packages/\n/dist/\n/target/\n*.log\n.DS_Store\n.env\nopenapi.json\nswagger-ui.html\n",
         );
+    }
+
+    // 2b. .editorconfig
+    let editorconfig_path = p.join(".editorconfig");
+    if !editorconfig_path.exists() {
+        let _ = fs::write(
+            &editorconfig_path,
+            "root = true\n\n\
+             [*]\n\
+             charset = utf-8\n\
+             end_of_line = lf\n\
+             indent_size = 4\n\
+             indent_style = space\n\
+             insert_final_newline = true\n\
+             trim_trailing_whitespace = true\n\n\
+             [*.{kora,kr}]\n\
+             indent_size = 4\n\
+             indent_style = space\n\n\
+             [*.{json,yaml,yml,toml}]\n\
+             indent_size = 2\n\
+             indent_style = space\n\n\
+             [Makefile]\n\
+             indent_style = tab\n",
+        );
+    }
+
+    // 2c. Dockerfile
+    let dockerfile_path = p.join("Dockerfile");
+    if !dockerfile_path.exists() {
+        let _ = fs::write(
+            &dockerfile_path,
+            "# Multi-Stage Production Dockerfile for Kora Microservice\n\
+             FROM rust:1.80-alpine AS builder\n\
+             RUN apk add --no-cache musl-dev gcc\n\
+             WORKDIR /usr/src/app\n\
+             COPY . .\n\
+             RUN cargo build --release || true\n\n\
+             FROM alpine:3.20\n\
+             RUN apk add --no-cache ca-certificates tzdata\n\
+             WORKDIR /app\n\
+             COPY --from=builder /usr/src/app/.kora-build/target/release/kora_app /app/server 2>/dev/null || true\n\
+             EXPOSE 7582\n\
+             ENV PORT=7582\n\
+             ENV HOST=0.0.0.0\n\
+             USER nobody\n\
+             ENTRYPOINT [\"/app/server\"]\n",
+        );
+    }
+
+    // 2d. docker-compose.yml
+    let compose_path = p.join("docker-compose.yml");
+    if !compose_path.exists() {
+        let _ = fs::write(
+            &compose_path,
+            format!(
+                "services:\n\
+                 \x20 app:\n\
+                 \x20   build: .\n\
+                 \x20   container_name: {pkg_name}-app\n\
+                 \x20   ports:\n\
+                 \x20     - \"7582:7582\"\n\
+                 \x20   environment:\n\
+                 \x20     - PORT=7582\n\
+                 \x20     - HOST=0.0.0.0\n\
+                 \x20     - DATABASE_URL=postgres://kora_user:kora_secret@postgres:5432/{pkg_name}_db\n\
+                 \x20     - REDIS_URL=redis://redis:6379\n\
+                 \x20   depends_on:\n\
+                 \x20     postgres:\n\
+                 \x20       condition: service_healthy\n\
+                 \x20     redis:\n\
+                 \x20       condition: service_healthy\n\
+                 \x20   restart: unless-stopped\n\n\
+                 \x20 postgres:\n\
+                 \x20   image: postgres:16-alpine\n\
+                 \x20   container_name: {pkg_name}-postgres\n\
+                 \x20   environment:\n\
+                 \x20     POSTGRES_USER: kora_user\n\
+                 \x20     POSTGRES_PASSWORD: kora_secret\n\
+                 \x20     POSTGRES_DB: {pkg_name}_db\n\
+                 \x20   ports:\n\
+                 \x20     - \"5432:5432\"\n\
+                 \x20   volumes:\n\
+                 \x20     - postgres_data:/var/lib/postgresql/data\n\
+                 \x20   healthcheck:\n\
+                 \x20     test: [\"CMD-SHELL\", \"pg_isready -U kora_user -d {pkg_name}_db\"]\n\
+                 \x20     interval: 5s\n\
+                 \x20     timeout: 5s\n\
+                 \x20     retries: 5\n\n\
+                 \x20 redis:\n\
+                 \x20   image: redis:7-alpine\n\
+                 \x20   container_name: {pkg_name}-redis\n\
+                 \x20   ports:\n\
+                 \x20     - \"6379:6379\"\n\
+                 \x20   healthcheck:\n\
+                 \x20     test: [\"CMD\", \"redis-cli\", \"ping\"]\n\
+                 \x20     interval: 5s\n\
+                 \x20     timeout: 3s\n\
+                 \x20     retries: 5\n\n\
+                 volumes:\n\
+                 \x20 postgres_data:\n"
+            ),
+        );
+    }
+
+    // 2e. .env.example & .env
+    let env_example_path = p.join(".env.example");
+    if !env_example_path.exists() {
+        let env_content = format!(
+            "# Kora Server Configuration\n\
+             PORT=7582\n\
+             HOST=127.0.0.1\n\
+             ENVIRONMENT=development\n\
+             LOG_LEVEL=info\n\n\
+             # Database Connection (PostgreSQL / SQLite / MySQL)\n\
+             DATABASE_URL=postgres://kora_user:kora_secret@localhost:5432/{pkg_name}_db\n\
+             DATABASE_POOL_SIZE=10\n\n\
+             # Redis Cache & Realtime WebSocket\n\
+             REDIS_URL=redis://localhost:6379\n\n\
+             # Authentication Secrets\n\
+             JWT_SECRET=super_secret_kora_jwt_token_change_in_production_32chars\n\
+             JWT_EXPIRATION_HOURS=24\n"
+        );
+        let _ = fs::write(&env_example_path, &env_content);
+        let env_path = p.join(".env");
+        if !env_path.exists() {
+            let _ = fs::write(&env_path, &env_content);
+        }
     }
 
     // 3. README.md
@@ -1316,6 +1443,14 @@ fn scaffold_project(p: &Path, pkg_name: &str, is_current_dir: bool) -> ExitCode 
              import { CreateUserDto } from \"./features/users/models/user_dto\"\n\
              import { LoggerService } from \"./shared/services/logger_service\"\n\n\
              let app = run()\n\n\
+             // Root verification & health check endpoints\n\
+             get(\"/\", () => {\n\
+             \x20   return \"⚡ Kora server is running on http://127.0.0.1:7582\"\n\
+             })\n\n\
+             get(\"/health\", () => {\n\
+             \x20   return \"{\\\"status\\\": \\\"UP\\\", \\\"service\\\": \\\"kora-app\\\", \\\"port\\\": 7582, \\\"healthy\\\": true}\"\n\
+             })\n\n\
+             // Domain Feature Endpoints\n\
              get(\"/api/users\", (ctrl: UsersController) => {\n\
              \x20   return ctrl.list()\n\
              })\n\n\
@@ -1338,8 +1473,9 @@ fn scaffold_project(p: &Path, pkg_name: &str, is_current_dir: bool) -> ExitCode 
         pkg_name
     };
     println!("✓ Clean Architecture Kora application ready in {display_dir}:");
-    println!("  ├── kora.toml, .gitignore, README.md");
-    println!("  ├── src/main.kora (Application Entrypoint & Routing)");
+    println!("  ├── kora.toml, .gitignore, .editorconfig, README.md");
+    println!("  ├── Dockerfile, docker-compose.yml, .env.example, .env");
+    println!("  ├── src/main.kora (Root `/`, `/health` & Domain Routing)");
     println!("  ├── src/enums/ (HttpStatus, UserRole)");
     println!("  ├── src/models/ (ResponseEnvelope<T>)");
     println!("  ├── src/shared/services/ (LoggerService)");

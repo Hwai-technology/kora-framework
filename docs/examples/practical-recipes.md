@@ -112,7 +112,7 @@ if isMatch {
 import { LoggerService } from "./shared/services/logger_service"
 
 let logger = LoggerService {}
-logger.info("Server started on port 8080")
+logger.info("Server started on port 7582")
 logger.error("Database connection retry attempt 1")
 ```
 

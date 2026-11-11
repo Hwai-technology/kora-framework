@@ -179,7 +179,7 @@ pub fn generate_openapi(ast: &Module, app_name: &str) -> OpenApiDoc {
         },
         "servers": [
             {
-                "url": "http://127.0.0.1:8080",
+                "url": "http://127.0.0.1:7582",
                 "description": "Local Development Server"
             }
         ],

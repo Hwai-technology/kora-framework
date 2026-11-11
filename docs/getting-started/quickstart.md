@@ -88,7 +88,7 @@ Output:
 ```text
 Compiling and running `src/main.kora` ...
     Finished `release` profile [optimized] target(s) in 0.18s
-Starting Kora server on http://127.0.0.1:8080
+Starting Kora server on http://127.0.0.1:7582
 ⚡ HTTP Route registered: GET    /api/users
 ⚡ HTTP Route registered: GET    /api/users/:id
 ⚡ HTTP Route registered: POST   /api/users
