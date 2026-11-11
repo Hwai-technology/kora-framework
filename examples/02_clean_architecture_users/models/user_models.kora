@@ -8,3 +8,4 @@ model User {
     email: String
     active: Bool
 }
+

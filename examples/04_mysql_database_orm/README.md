@@ -43,3 +43,4 @@ curl -X POST http://localhost:7582/customers -d "bob@kora.dev"
 # 6. Add credit to customer account
 curl -X POST http://localhost:7582/customers/1/credit
 ```
+

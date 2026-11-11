@@ -13,13 +13,13 @@ fn workspace_root() -> PathBuf {
 
 #[test]
 fn verifies_hello_example_end_to_end() {
-    let path = workspace_root().join("examples/hello.kora");
-    let src = fs::read_to_string(&path).expect("read hello.kora");
-    let session = FrontendSession::check_source("examples/hello.kora", src);
+    let path = workspace_root().join("examples/01_hello_world/main.kora");
+    let src = fs::read_to_string(&path).expect("read 01_hello_world/main.kora");
+    let session = FrontendSession::check_source(path.to_str().unwrap(), src);
 
     assert!(
         !session.diagnostics.has_errors(),
-        "hello.kora failed check:\n{}",
+        "01_hello_world/main.kora failed check:\n{}",
         session.diagnostics.render_all(&session.source_map, false)
     );
 
@@ -32,20 +32,20 @@ fn verifies_hello_example_end_to_end() {
 
 #[test]
 fn verifies_users_api_example_end_to_end() {
-    let path = workspace_root().join("examples/users_api.kora");
-    let src = fs::read_to_string(&path).expect("read users_api.kora");
-    let session = FrontendSession::check_source("examples/users_api.kora", src);
+    let path = workspace_root().join("examples/02_clean_architecture_users/main.kora");
+    let src = fs::read_to_string(&path).expect("read 02_clean_architecture_users/main.kora");
+    let session = FrontendSession::check_source(path.to_str().unwrap(), src);
 
     assert!(
         !session.diagnostics.has_errors(),
-        "users_api.kora failed check:\n{}",
+        "02_clean_architecture_users/main.kora failed check:\n{}",
         session.diagnostics.render_all(&session.source_map, false)
     );
 
     let report = format_type_report(&session.types);
     assert!(report.contains("model User"));
     assert!(report.contains("interface UserRepository"));
-    assert!(report.contains("class UserService implements UserRepository | init(db: Database)"));
+    assert!(report.contains("class UserService implements UserRepository"));
     assert!(report.contains("let app: App"));
 }
 
@@ -127,4 +127,32 @@ fn bad() {
         codes.contains(&"E2005"),
         "expected E2005 for undefined, got {codes:?}"
     );
+}
+
+#[test]
+fn verifies_all_numbered_catalog_examples_pass_frontend_check() {
+    let root = workspace_root();
+    let examples_dir = root.join("examples");
+    let mut checked_count = 0;
+
+    for entry in fs::read_dir(&examples_dir).expect("read examples dir") {
+        let entry = entry.expect("valid entry");
+        let path = entry.path();
+        if path.is_dir() {
+            let main_kora = path.join("main.kora");
+            if main_kora.exists() {
+                let src = fs::read_to_string(&main_kora).expect("read main.kora");
+                let session = FrontendSession::check_source(main_kora.to_str().unwrap(), src);
+                assert!(
+                    !session.diagnostics.has_errors(),
+                    "Example at {} failed check:\n{}",
+                    main_kora.display(),
+                    session.diagnostics.render_all(&session.source_map, false)
+                );
+                checked_count += 1;
+            }
+        }
+    }
+
+    assert!(checked_count >= 8, "Expected at least 8 catalog examples, checked {checked_count}");
 }

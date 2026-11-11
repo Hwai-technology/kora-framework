@@ -331,21 +331,22 @@ Kora provides an organized catalog of numbered, self-contained examples in [`exa
 | **06** | [`06_realtime_websockets`](examples/06_realtime_websockets/) | **Realtime & WebSockets** | Pub/sub topic broadcasting, channel presence | `kora run examples/06_realtime_websockets/main.kora` |
 | **07** | [`07_async_actors_concurrency`](examples/07_async_actors_concurrency/) | **Actor Model Concurrency** | Isolated actor state, MPSC channels, job queues | `kora run examples/07_async_actors_concurrency/main.kora` |
 | **08** | [`08_openapi_swagger`](examples/08_openapi_swagger/) | **OpenAPI 3.1 & Swagger** | Zero-config spec discovery, interactive `/docs` UI | `kora run examples/08_openapi_swagger/main.kora` |
-| **09** | [`09_enterprise_clean_architecture`](examples/09_enterprise_clean_architecture/) | **Enterprise Showcase** | 40+ files, domain modules, middleware, database | `cd examples/realworld_clean_architecture && kora run` |
+| **09** | [`09_enterprise_clean_architecture`](examples/09_enterprise_clean_architecture/) | **Enterprise Showcase** | 40+ files, domain modules, middleware, database | `cd examples/09_enterprise_clean_architecture && kora run` |
+| **10** | [`10_dto_validation_and_types`](examples/10_dto_validation_and_types/) | **DTO Defense & Type Safety** | Robust validation, files/images, JSON, arrays, enums | `kora run examples/10_dto_validation_and_types/main.kora` |
 
 Read the full catalog documentation in the [`examples/README.md`](examples/README.md).
 
 ### Verifying All Examples
 ```bash
 # Type check all numbered examples
-for dir in examples/0*; do
+for dir in examples/[0-9]*; do
   if [ -f "$dir/main.kora" ]; then
     kora check "$dir/main.kora"
   fi
 done
 
 # Verify all 40 architectural files in the enterprise showcase
-for f in $(find examples/realworld_clean_architecture/src -name "*.kora"); do
+for f in $(find examples/09_enterprise_clean_architecture/src -name "*.kora"); do
   kora check "$f"
 done
 ```

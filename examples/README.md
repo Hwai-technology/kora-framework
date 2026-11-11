@@ -16,7 +16,8 @@ Welcome to the official collection of Kora examples. Each example is housed in i
 | **06** | [`06_realtime_websockets`](./06_realtime_websockets/) | **Realtime & WebSockets** | Pub/sub topic broadcasting, channel presence, realtime streaming | `kora run examples/06_realtime_websockets/main.kora` |
 | **07** | [`07_async_actors_concurrency`](./07_async_actors_concurrency/) | **Actor Model Concurrency** | Isolated actor state, MPSC channels, non-blocking background workers | `kora run examples/07_async_actors_concurrency/main.kora` |
 | **08** | [`08_openapi_swagger`](./08_openapi_swagger/) | **OpenAPI 3.1 & Swagger UI** | Zero-config spec discovery, interactive `/docs` UI, dynamic head meta | `kora run examples/08_openapi_swagger/main.kora` |
-| **09** | [`09_enterprise_clean_architecture`](./09_enterprise_clean_architecture/) | **Full Enterprise Showcase** | 40+ source files, DDD modules, middleware, database layer | `cd examples/realworld_clean_architecture && kora run` |
+| **09** | [`09_enterprise_clean_architecture`](./09_enterprise_clean_architecture/) | **Full Enterprise Showcase** | 40+ source files, DDD modules, middleware, database layer | `cd examples/09_enterprise_clean_architecture && kora run` |
+| **10** | [`10_dto_validation_and_types`](./10_dto_validation_and_types/) | **DTO Defense & Type Safety** | Robust validation, files/images, JSON, arrays, enums | `kora run examples/10_dto_validation_and_types/main.kora` |
 
 ---
 
@@ -35,7 +36,7 @@ All examples in this repository strictly satisfy Kora's compiler-enforced archit
 You can verify the entire catalog in one command:
 ```bash
 # Type check all example entrypoints
-for dir in examples/0*; do
+for dir in examples/[0-9]*; do
   if [ -f "$dir/main.kora" ]; then
     echo "Verifying $dir..."
     kora check "$dir/main.kora"
@@ -43,7 +44,8 @@ for dir in examples/0*; do
 done
 
 # Type check all 40 files in the enterprise clean architecture showcase
-for f in $(find examples/realworld_clean_architecture/src -name "*.kora"); do
+for f in $(find examples/09_enterprise_clean_architecture/src -name "*.kora"); do
   kora check "$f"
 done
 ```
+

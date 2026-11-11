@@ -44,3 +44,4 @@ curl -X PUT http://localhost:7582/products/1 -d "Updated Title"
 # Delete product
 curl -X DELETE http://localhost:7582/products/1
 ```
+

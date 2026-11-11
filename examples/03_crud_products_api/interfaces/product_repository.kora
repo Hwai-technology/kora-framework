@@ -11,3 +11,4 @@ interface ProductRepository {
     fn update(id: Int, req: UpdateProductRequest) -> Result<Product, String>
     fn delete(id: Int) -> Result<Bool, String>
 }
+

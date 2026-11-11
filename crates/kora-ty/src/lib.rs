@@ -1220,6 +1220,27 @@ impl<'a> TypeChecker<'a> {
                 },
                 _ => self.emit_unknown_member(recv_ty, field, span),
             },
+            Ty::Float => match field {
+                "toString" => Ty::Fn {
+                    params: Vec::new(),
+                    ret: Box::new(Ty::String),
+                    is_async: false,
+                },
+                _ => self.emit_unknown_member(recv_ty, field, span),
+            },
+            Ty::List(_) => match field {
+                "len" | "length" | "count" => Ty::Fn {
+                    params: Vec::new(),
+                    ret: Box::new(Ty::Int),
+                    is_async: false,
+                },
+                "isEmpty" => Ty::Fn {
+                    params: Vec::new(),
+                    ret: Box::new(Ty::Bool),
+                    is_async: false,
+                },
+                _ => self.emit_unknown_member(recv_ty, field, span),
+            },
             _ => self.emit_unknown_member(recv_ty, field, span),
         }
     }

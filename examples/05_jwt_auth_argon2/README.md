@@ -34,3 +34,4 @@ curl -X POST http://localhost:7582/auth/register -d "SuperSecretPassword123!"
 # Login to receive JWT bearer token
 curl -X POST http://localhost:7582/auth/login -d "SuperSecretPassword123!"
 ```
+

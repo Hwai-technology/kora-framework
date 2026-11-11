@@ -34,3 +34,4 @@ curl http://localhost:7582/chat/presence/general
 # Broadcast a message to the room
 curl -X POST http://localhost:7582/chat/message -d "Hello world over WebSockets!"
 ```
+

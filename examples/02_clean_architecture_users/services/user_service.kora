@@ -27,3 +27,4 @@ class UserService implements UserRepository {
         return Ok(user)
     }
 }
+

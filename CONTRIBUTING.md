@@ -24,7 +24,7 @@ cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 
 # 4. Check all Kora real-world examples
-for f in $(find examples/realworld_clean_architecture/src -name "*.kora"); do
+for f in $(find examples/09_enterprise_clean_architecture/src -name "*.kora"); do
   ./target/debug/kora check "$f"
 done
 ```

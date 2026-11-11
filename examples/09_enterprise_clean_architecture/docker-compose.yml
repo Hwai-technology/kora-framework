@@ -67,7 +67,7 @@ services:
       - KORA_PORT=7582
       - RATE_LIMIT_RPM=120
     volumes:
-      - ./src:/app/examples/realworld_clean_architecture/src
+      - ./src:/app/examples/09_enterprise_clean_architecture/src
 
 volumes:
   mysql_data:

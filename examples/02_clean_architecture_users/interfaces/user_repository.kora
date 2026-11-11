@@ -8,3 +8,4 @@ interface UserRepository {
     fn findById(id: Int) -> Option<User>
     fn save(user: User) -> Result<User, String>
 }
+

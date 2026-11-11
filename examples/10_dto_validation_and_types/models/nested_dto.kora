@@ -32,3 +32,4 @@ model UserPreferencesDto {
     emailNotifications: Bool
     marketingConsent: Bool
 }
+

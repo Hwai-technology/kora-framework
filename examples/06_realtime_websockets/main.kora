@@ -19,3 +19,4 @@ post("/chat/message", (request: Request, hub: ChatHubService) => {
     }
     return hub.broadcast(req)
 })
+

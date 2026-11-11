@@ -13,3 +13,4 @@ model ActorStats {
     activeWorkers: Int
     status: String
 }
+

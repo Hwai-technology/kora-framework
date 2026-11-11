@@ -38,7 +38,7 @@
 The project serves as an authoritative enterprise template demonstrating full domain layer segregation:
 
 ```text
-examples/realworld_clean_architecture/src/
+examples/09_enterprise_clean_architecture/src/
 ├── constants/                            # 1. Security configurations & boundary constants
 │   └── app_constants.kora                # Rate limits, headers, and crypto salt keys
 │
@@ -108,7 +108,7 @@ examples/realworld_clean_architecture/src/
 - All enumerations (`HttpStatus`, `OrderStatus`, `PaymentStatus`, `UserRole`) reside in their own dedicated files within `src/enums/`. This prevents circular dependency chains across controllers, services, and models.
 
 ### 2.2 `src/constants/`: Application Constants & Configurations
-- [`app_constants.kora`](file:///home/ahmet/Desktop/Projects/Kora/examples/realworld_clean_architecture/src/constants/app_constants.kora) declares standard boundary limits, pagination thresholds, token lifetimes, and security header definitions.
+- [`app_constants.kora`](file:///home/ahmet/Desktop/Projects/Kora/examples/09_enterprise_clean_architecture/src/constants/app_constants.kora) declares standard boundary limits, pagination thresholds, token lifetimes, and security header definitions.
 
 ### 2.3 `src/interfaces/`: Inversion of Control Contracts
 - Declares decoupled interfaces (`IOrderRepository`, `IUserRepository`, `IDomainEventEmitter`) allowing business services to execute domain logic independent of storage engines or external drivers.
@@ -121,7 +121,7 @@ examples/realworld_clean_architecture/src/
 - **Auto-Migration & Seeding**: Inspects defined entities and automatically aligns relational schemas while seeding default development data.
 
 ### 2.6 `src/middleware/`: Pipeline Middleware & Response Factory
-- The [`ApiResponse`](file:///home/ahmet/Desktop/Projects/Kora/examples/realworld_clean_architecture/src/middleware/api_response_factory.kora) factory standardizes API outputs into unified JSON structures:
+- The [`ApiResponse`](file:///home/ahmet/Desktop/Projects/Kora/examples/09_enterprise_clean_architecture/src/middleware/api_response_factory.kora) factory standardizes API outputs into unified JSON structures:
 ```kora
 return this.response.ok("Order fetched successfully", 1)
 return this.response.created("Order placed successfully", 1)

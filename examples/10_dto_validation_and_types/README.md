@@ -97,3 +97,4 @@ curl -X POST http://127.0.0.1:7582/api/v1/addresses/validate \
 curl -X POST http://127.0.0.1:7582/api/v1/users/register \
   -H "Content-Type: application/json"
 ```
+

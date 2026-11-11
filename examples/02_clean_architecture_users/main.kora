@@ -25,3 +25,4 @@ post("/users", (request: Request, service: UserService) => {
     let checked = service.validateNewUser(candidate)
     return send(checked)
 })
+

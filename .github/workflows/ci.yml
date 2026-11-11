@@ -50,7 +50,7 @@ jobs:
 
       - name: Verify Kora architectural examples
         run: |
-          for f in $(find examples/realworld_clean_architecture/src -name "*.kora"); do
+          for f in $(find examples/09_enterprise_clean_architecture/src -name "*.kora"); do
             echo "Verifying $f..."
             ./target/debug/kora check "$f"
           done

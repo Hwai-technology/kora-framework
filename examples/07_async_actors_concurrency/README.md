@@ -34,3 +34,4 @@ curl http://localhost:7582/actors/stats
 # Submit an asynchronous job to the actor queue
 curl -X POST http://localhost:7582/actors/jobs -d "GenerateAnalyticsReport"
 ```
+

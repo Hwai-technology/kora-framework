@@ -6,3 +6,4 @@ model Coordinates {
     lat: Float
     lng: Float
 }
+

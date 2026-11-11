@@ -1740,7 +1740,11 @@ fn cmd_db(action: Option<&String>, path: Option<&String>) -> ExitCode {
     };
 
     let target_path = path.cloned().unwrap_or_else(|| {
-        if Path::new("examples/realworld_clean_architecture/src/main.kora").exists() {
+        if Path::new("examples/09_enterprise_clean_architecture/src/main.kora").exists() {
+            "examples/09_enterprise_clean_architecture/src/main.kora".to_string()
+        } else if Path::new("examples/09_enterprise_clean_architecture/src/main.kr").exists() {
+            "examples/09_enterprise_clean_architecture/src/main.kr".to_string()
+        } else if Path::new("examples/realworld_clean_architecture/src/main.kora").exists() {
             "examples/realworld_clean_architecture/src/main.kora".to_string()
         } else if Path::new("examples/realworld_clean_architecture/src/main.kr").exists() {
             "examples/realworld_clean_architecture/src/main.kr".to_string()

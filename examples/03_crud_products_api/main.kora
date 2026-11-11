@@ -63,3 +63,4 @@ put("/products/{id}", (id: Int, request: Request, svc: ProductService) => {
 delete("/products/{id}", (id: Int, svc: ProductService) => {
     return svc.delete(id)
 })
+

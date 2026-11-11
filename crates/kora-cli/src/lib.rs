@@ -65,6 +65,9 @@ impl FrontendSession {
                         .parent()
                         .and_then(|p| p.parent())
                         .unwrap_or_else(|| std::path::Path::new("."));
+                    candidates.push(ws_root.join(&base_dir).join(clean_p));
+                    candidates.push(ws_root.join(&base_dir).join(format!("{clean_p}.kora")));
+                    candidates.push(ws_root.join(&base_dir).join(format!("{clean_p}.kr")));
                     candidates.push(ws_root.join(clean_p));
                     candidates.push(ws_root.join(format!("{clean_p}.kora")));
                     candidates.push(ws_root.join("examples").join(clean_p));

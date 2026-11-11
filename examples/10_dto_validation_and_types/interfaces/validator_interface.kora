@@ -12,3 +12,4 @@ interface RequestValidatorContract {
     fn validateFileUpload(file: FileUploadDto) -> Result<Bool, String>
     fn validateAddress(address: AddressDto) -> Result<Bool, String>
 }
+

@@ -19,3 +19,4 @@ model ArticleListResponse {
     articles: List<Article>
     totalCount: Int
 }
+

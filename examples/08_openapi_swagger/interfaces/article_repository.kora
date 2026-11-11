@@ -9,3 +9,4 @@ interface ArticleRepository {
     fn getBySlug(slug: String) -> Option<Article>
     fn createArticle(input: CreateArticleInput) -> Result<Article, String>
 }
+

@@ -20,3 +20,4 @@ model RoomPresence {
     room: String
     activeMembers: Int
 }
+

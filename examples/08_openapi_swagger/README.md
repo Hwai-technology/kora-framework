@@ -37,3 +37,4 @@ kora run main.kora
 # Inspect the raw OpenAPI 3.1 JSON definition:
 # http://localhost:7582/docs/openapi.json
 ```
+

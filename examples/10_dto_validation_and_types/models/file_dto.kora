@@ -27,3 +27,4 @@ model FileUploadDto {
     isPublic: Bool
     imageMeta: Option<ImageMetadataDto>
 }
+

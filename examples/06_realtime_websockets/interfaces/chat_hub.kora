@@ -8,3 +8,4 @@ interface ChatHub {
     fn broadcast(req: SendMessageRequest) -> ChatMessage
     fn getPresence(room: String) -> RoomPresence
 }
+
