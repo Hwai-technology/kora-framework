@@ -75,9 +75,11 @@ jobs:
             archive: zip
           - platform: darwin-arm64
             os: macos-latest
+            rust_target: aarch64-apple-darwin
             archive: tar
           - platform: darwin-x86_64
-            os: macos-13
+            os: macos-latest
+            rust_target: x86_64-apple-darwin
             archive: tar
     steps:
       - name: Checkout repository
@@ -85,9 +87,19 @@ jobs:
 
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target.rust_target }}
 
       - name: Build Kora Release Binary
-        run: cargo build --release -p kora-cli
+        shell: bash
+        run: |
+          if [ -n "${{ matrix.target.rust_target }}" ]; then
+            cargo build --release -p kora-cli --target ${{ matrix.target.rust_target }}
+            mkdir -p target/release
+            cp target/${{ matrix.target.rust_target }}/release/kora target/release/kora
+          else
+            cargo build --release -p kora-cli
+          fi
 
       # Linux Packaging (Tarball + Standalone AppImage)
       - name: Package Linux Artifacts
