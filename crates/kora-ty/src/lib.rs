@@ -1,6 +1,8 @@
 //! Strong static type system, bidirectional type inference, interface conformance,
 //! pattern exhaustiveness, and compile-time Dependency Injection verification for Kora.
 
+#![allow(clippy::collapsible_if)]
+
 use std::collections::{HashMap, HashSet};
 use std::fmt;
 
@@ -1061,7 +1063,10 @@ impl<'a> TypeChecker<'a> {
                                     "E4001",
                                     format!("cannot string-index into value of type `{other}`"),
                                 )
-                                .with_primary_label(receiver.span(), "expected string-indexed map or dictionary"),
+                                .with_primary_label(
+                                    receiver.span(),
+                                    "expected string-indexed map or dictionary",
+                                ),
                             );
                             Ty::Unknown
                         }
@@ -1250,26 +1255,27 @@ impl<'a> TypeChecker<'a> {
                 self.emit_unknown_member(recv_ty, field, span)
             }
             Ty::MetaClass(cls) => {
-                if let Some(cls_info) = self.classes.get(cls) {
-                    if let Some(m) = cls_info.methods.get(field) {
-                        return Ty::Fn {
-                            params: m.params.iter().map(|(_, t)| t.clone()).collect(),
-                            ret: Box::new(m.ret.clone()),
-                            is_async: m.is_async,
-                        };
-                    }
+                if let Some(cls_info) = self.classes.get(cls)
+                    && let Some(m) = cls_info.methods.get(field)
+                {
+                    let ty = Ty::Fn {
+                        params: m.params.iter().map(|(_, t)| t.clone()).collect(),
+                        ret: Box::new(m.ret.clone()),
+                        is_async: m.is_async,
+                    };
+                    return ty;
                 }
                 self.emit_unknown_member(recv_ty, field, span)
             }
             Ty::MetaResponse => match field {
-                "json" | "ok" | "created" | "error" | "badRequest" | "unauthorized" | "forbidden"
-                | "notFound" | "internalError" | "status" | "text" => Ty::Fn {
+                "json" | "ok" | "created" | "error" | "badRequest" | "unauthorized"
+                | "forbidden" | "notFound" | "internalError" | "status" | "text" => Ty::Fn {
                     params: vec![Ty::Unknown],
                     ret: Box::new(Ty::Response),
                     is_async: false,
                 },
                 _ => self.emit_unknown_member(recv_ty, field, span),
-            }
+            },
             Ty::App => match field {
                 "use" => Ty::Fn {
                     params: vec![Ty::Unknown],
@@ -1287,7 +1293,7 @@ impl<'a> TypeChecker<'a> {
                     is_async: false,
                 },
                 _ => self.emit_unknown_member(recv_ty, field, span),
-            }
+            },
             Ty::Request => match field {
                 "path" | "body" | "method" | "ip" | "url" => Ty::String,
                 "params" => Ty::Request,
@@ -1601,7 +1607,10 @@ impl<'a> TypeChecker<'a> {
             }
         }
 
-        if let Expr::FieldAccess { receiver, field, .. } = callee {
+        if let Expr::FieldAccess {
+            receiver, field, ..
+        } = callee
+        {
             let recv_ty = self.check_expr(receiver, None);
             if recv_ty == Ty::App {
                 match field.name.as_str() {

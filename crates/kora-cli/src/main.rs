@@ -811,7 +811,11 @@ fn cmd_codegen(path: Option<&String>) -> ExitCode {
             })
             .collect();
         tables.sort();
-        println!("⚡ [Kora ORM] Auto-migration active: synchronizing {} entity table(s): {}", tables.len(), tables.join(", "));
+        println!(
+            "⚡ [Kora ORM] Auto-migration active: synchronizing {} entity table(s): {}",
+            tables.len(),
+            tables.join(", ")
+        );
         for t in &tables {
             println!("  ✓ Table `{t}` verified and ensured in database (IF NOT EXISTS).");
         }
@@ -879,7 +883,11 @@ fn cmd_build(path: Option<&String>) -> ExitCode {
             })
             .collect();
         tables.sort();
-        println!("⚡ [Kora ORM] Auto-migration active: synchronizing {} entity table(s): {}", tables.len(), tables.join(", "));
+        println!(
+            "⚡ [Kora ORM] Auto-migration active: synchronizing {} entity table(s): {}",
+            tables.len(),
+            tables.join(", ")
+        );
         for t in &tables {
             println!("  ✓ Table `{t}` verified and ensured in database (IF NOT EXISTS).");
         }
@@ -958,7 +966,11 @@ fn cmd_run(path: Option<&String>) -> ExitCode {
             })
             .collect();
         tables.sort();
-        println!("⚡ [Kora ORM] Auto-migration active: synchronizing {} entity table(s): {}", tables.len(), tables.join(", "));
+        println!(
+            "⚡ [Kora ORM] Auto-migration active: synchronizing {} entity table(s): {}",
+            tables.len(),
+            tables.join(", ")
+        );
         for t in &tables {
             println!("  ✓ Table `{t}` verified and ensured in database (IF NOT EXISTS).");
         }
@@ -2084,7 +2096,9 @@ fn cmd_generate(subcmd: Option<&String>, name: Option<&String>) -> ExitCode {
     .unwrap();
 
     println!("✓ Generated Clean Architecture slice for `{feat_lower}`:");
-    println!("  ├── routes/{singular_lower}_routes.kora (HTTP Route Mapping & Controller Delegation)");
+    println!(
+        "  ├── routes/{singular_lower}_routes.kora (HTTP Route Mapping & Controller Delegation)"
+    );
     println!("  ├── controllers/{singular_lower}_controller.kora (HTTP Endpoints & DI)");
     println!("  ├── services/{singular_lower}_service.kora (Business Logic & Transactions)");
     println!("  ├── repositories/{singular_lower}_repository.kora (Database Data Access)");

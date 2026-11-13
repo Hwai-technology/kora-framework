@@ -116,22 +116,18 @@ pub fn generate_openapi(ast: &Module, app_name: &str) -> OpenApiDoc {
                         let tag = derive_route_tag(&normalized_path);
 
                         let closure_expr = args.last();
-                            let mut op_obj = Map::new();
-                            op_obj.insert("tags".into(), json!([tag]));
-                            op_obj.insert(
-                                "summary".into(),
-                                Value::String(format!(
-                                    "{} {}",
-                                    method.to_uppercase(),
-                                    normalized_path
-                                )),
-                            );
+                        let mut op_obj = Map::new();
+                        op_obj.insert("tags".into(), json!([tag]));
+                        op_obj.insert(
+                            "summary".into(),
+                            Value::String(format!("{} {}", method.to_uppercase(), normalized_path)),
+                        );
 
-                            // Path parameters
-                            if !path_params.is_empty() {
-                                let mut params_arr = Vec::new();
-                                for p in &path_params {
-                                    params_arr.push(json!({
+                        // Path parameters
+                        if !path_params.is_empty() {
+                            let mut params_arr = Vec::new();
+                            for p in &path_params {
+                                params_arr.push(json!({
                                         "name": p,
                                         "in": "path",
                                         "required": true,
@@ -140,60 +136,60 @@ pub fn generate_openapi(ast: &Module, app_name: &str) -> OpenApiDoc {
                                             "format": if p.ends_with("id") || p.ends_with("Id") { "int64" } else { "" }
                                         }
                                     }));
-                                }
-                                op_obj.insert("parameters".into(), Value::Array(params_arr));
                             }
+                            op_obj.insert("parameters".into(), Value::Array(params_arr));
+                        }
 
-                            // Correlate handler and Request Body / Responses
-                            let (req_body, resp_schema) =
-                                correlate_handler(closure_expr, &controllers, &schemas, &method);
+                        // Correlate handler and Request Body / Responses
+                        let (req_body, resp_schema) =
+                            correlate_handler(closure_expr, &controllers, &schemas, &method);
 
-                            if let Some(rb) = req_body {
-                                op_obj.insert("requestBody".into(), rb);
-                            }
+                        if let Some(rb) = req_body {
+                            op_obj.insert("requestBody".into(), rb);
+                        }
 
-                            let success_code = if method == "post" { "201" } else { "200" };
-                            let mut responses = Map::new();
-                            responses.insert(
-                                success_code.into(),
-                                json!({
-                                    "description": "Successful operation",
-                                    "content": {
-                                        "application/json": {
-                                            "schema": resp_schema
-                                        }
+                        let success_code = if method == "post" { "201" } else { "200" };
+                        let mut responses = Map::new();
+                        responses.insert(
+                            success_code.into(),
+                            json!({
+                                "description": "Successful operation",
+                                "content": {
+                                    "application/json": {
+                                        "schema": resp_schema
                                     }
-                                }),
-                            );
-                            if !path_params.is_empty() {
-                                responses.insert(
-                                    "404".into(),
-                                    json!({ "description": "Resource not found" }),
-                                );
-                            }
+                                }
+                            }),
+                        );
+                        if !path_params.is_empty() {
                             responses.insert(
-                                "400".into(),
-                                json!({ "description": "Invalid input / bad request" }),
+                                "404".into(),
+                                json!({ "description": "Resource not found" }),
                             );
-                            responses.insert(
-                                "500".into(),
-                                json!({ "description": "Internal server error" }),
-                            );
+                        }
+                        responses.insert(
+                            "400".into(),
+                            json!({ "description": "Invalid input / bad request" }),
+                        );
+                        responses.insert(
+                            "500".into(),
+                            json!({ "description": "Internal server error" }),
+                        );
 
-                            op_obj.insert("responses".into(), Value::Object(responses));
+                        op_obj.insert("responses".into(), Value::Object(responses));
 
-                            let path_entry = paths
-                                .entry(normalized_path.clone())
-                                .or_insert_with(|| Value::Object(Map::new()));
-                            if let Value::Object(p_map) = path_entry {
-                                p_map.insert(method, Value::Object(op_obj));
-                                endpoint_count += 1;
-                            }
+                        let path_entry = paths
+                            .entry(normalized_path.clone())
+                            .or_insert_with(|| Value::Object(Map::new()));
+                        if let Value::Object(p_map) = path_entry {
+                            p_map.insert(method, Value::Object(op_obj));
+                            endpoint_count += 1;
                         }
                     }
                 }
             }
         }
+    }
 
     let spec = json!({
         "openapi": "3.1.0",
