@@ -108,11 +108,15 @@ impl RbacGuard {
 mod tests {
     use super::*;
 
+    fn test_password() -> String {
+        SaltString::generate(&mut OsRng).to_string()
+    }
+
     #[test]
     fn hashes_and_verifies_password_with_argon2id() {
-        let pwd = "SuperSecretPassword123!";
-        let hash = PasswordAuth::hash_password(pwd).expect("hash success");
-        assert!(PasswordAuth::verify_password(pwd, &hash));
+        let pwd = test_password();
+        let hash = PasswordAuth::hash_password(&pwd).expect("hash success");
+        assert!(PasswordAuth::verify_password(&pwd, &hash));
         assert!(!PasswordAuth::verify_password("wrong", &hash));
     }
 
