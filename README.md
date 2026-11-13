@@ -402,6 +402,14 @@ Kora is an evolving open-source research exploration into language design, owner
 
 A huge thank you to everyone helping build Kora into the next-generation backend language and framework!
 
+### Automated contributors
+
+The following automated tools have dedicated working branches. They are tooling identities, not human contributors, and their changes must be submitted through the normal pull request workflow:
+
+- **Claude (Anthropic)** — works from the [`claude`](https://github.com/Hwai-technology/kora-framework/tree/claude) branch.
+- **Gemini (Google)** — works from the [`gemini`](https://github.com/Hwai-technology/kora-framework/tree/gemini) branch.
+- **Renovate (Renovate Bot)** — uses the [`renovate`](https://github.com/Hwai-technology/kora-framework/tree/renovate) branch for its dedicated configuration; dependency updates are proposed as `renovate/*` pull requests targeting `main`.
+
 <!-- CONTRIBUTORS:START -->
 <!-- Automatically maintained by GitHub Actions -->
 <a href="https://github.com/Eng-Ahmet/Eng-Ahmet"><img src="https://avatars.githubusercontent.com/Eng-Ahmet?v=4&s=64" width="48" height="48" alt="Eng-Ahmet" title="Eng-Ahmet" style="border-radius: 50%; margin: 4px;" /></a>

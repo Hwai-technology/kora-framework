@@ -1,0 +1,11 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "baseBranches": ["main"],
+  "branchPrefix": "renovate/",
+  "commitMessagePrefix": "chore(deps):",
+  "dependencyDashboard": true,
+  "labels": ["dependencies", "renovate"],
+  "prCreation": "immediate",
+  "automerge": false
+}
