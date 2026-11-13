@@ -131,13 +131,17 @@ mod tests {
 
     #[test]
     fn security_verifies_argon2id_unique_salts_and_brute_force_resistance() {
-        let pwd = "IdenticalPassword2026!";
-        let hash1 = PasswordAuth::hash_password(pwd).unwrap();
-        let hash2 = PasswordAuth::hash_password(pwd).unwrap();
+        let nonce = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .expect("system time before unix epoch")
+            .as_nanos();
+        let pwd = format!("test-password-{nonce}");
+        let hash1 = PasswordAuth::hash_password(pwd.as_str()).unwrap();
+        let hash2 = PasswordAuth::hash_password(pwd.as_str()).unwrap();
         // Cryptographic salts must be unique, ensuring identical passwords yield different hashes
         assert_ne!(hash1, hash2);
-        assert!(PasswordAuth::verify_password(pwd, &hash1));
-        assert!(PasswordAuth::verify_password(pwd, &hash2));
+        assert!(PasswordAuth::verify_password(pwd.as_str(), &hash1));
+        assert!(PasswordAuth::verify_password(pwd.as_str(), &hash2));
     }
 
     #[test]
