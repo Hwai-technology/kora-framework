@@ -1,0 +1,24 @@
+# ==============================================================================
+# GitHub Linguist Configuration for Kora Framework
+# ==============================================================================
+
+# Map .kora source files to TypeScript for accurate syntax highlighting
+# and language statistics in GitHub's repository overview
+*.kora linguist-language=TypeScript
+*.kora linguist-detectable=true
+*.kr linguist-language=TypeScript
+*.kr linguist-detectable=true
+
+# Exclude generated / build artifacts from repository language breakdown
+.kora-build/** linguist-vendored
+swagger-ui.html linguist-vendored
+openapi.json linguist-vendored
+*.min.js linguist-vendored
+*.min.css linguist-vendored
+
+# Mark documentation, configuration, and schemas so they do not skew stats
+docs/** linguist-documentation
+*.md linguist-documentation
+kora.toml linguist-documentation
+docker-compose.yml linguist-documentation
+Dockerfile linguist-documentation

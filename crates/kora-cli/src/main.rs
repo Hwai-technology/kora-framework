@@ -1306,6 +1306,31 @@ fn scaffold_project(p: &Path, pkg_name: &str, is_current_dir: bool) -> ExitCode 
         }
     }
 
+    // 2f. .gitattributes (GitHub Linguist & Syntax Highlighting)
+    let gitattributes_path = p.join(".gitattributes");
+    if !gitattributes_path.exists() {
+        let _ = fs::write(
+            &gitattributes_path,
+            "# ==============================================================================\n\
+             # GitHub Linguist Configuration for Kora\n\
+             # ==============================================================================\n\n\
+             *.kora linguist-language=TypeScript\n\
+             *.kora linguist-detectable=true\n\
+             *.kr linguist-language=TypeScript\n\
+             *.kr linguist-detectable=true\n\n\
+             .kora-build/** linguist-vendored\n\
+             swagger-ui.html linguist-vendored\n\
+             openapi.json linguist-vendored\n\
+             *.min.js linguist-vendored\n\
+             *.min.css linguist-vendored\n\n\
+             docs/** linguist-documentation\n\
+             *.md linguist-documentation\n\
+             kora.toml linguist-documentation\n\
+             docker-compose.yml linguist-documentation\n\
+             Dockerfile linguist-documentation\n",
+        );
+    }
+
     // 3. README.md
     let readme_path = p.join("README.md");
     if !readme_path.exists() {
@@ -1313,6 +1338,11 @@ fn scaffold_project(p: &Path, pkg_name: &str, is_current_dir: bool) -> ExitCode 
             &readme_path,
             format!(
                 "# {pkg_name}\n\n\
+                 <p align=\"center\">\n\
+                 \x20 <a href=\"https://github.com/Hwai-technology/kora-framework\"><img src=\"https://img.shields.io/badge/Language-Kora%20v0.2.0-2563EB?style=for-the-badge&logo=code\" alt=\"Language: Kora\" /></a>\n\
+                 \x20 <a href=\"https://github.com/Hwai-technology/kora-framework\"><img src=\"https://img.shields.io/badge/Kora-100%25-10B981?style=for-the-badge\" alt=\"Kora 100%\" /></a>\n\
+                 \x20 <a href=\"https://github.com/Hwai-technology/kora-framework\"><img src=\"https://img.shields.io/badge/Architecture-Clean%20%26%20Modular-7C3AED?style=for-the-badge\" alt=\"Clean Architecture\" /></a>\n\
+                 </p>\n\n\
                  A high-performance, clean architecture backend application built with **Kora**.\n\n\
                  ## 🚀 Quickstart\n\n\
                  ```bash\n\
@@ -1328,6 +1358,7 @@ fn scaffold_project(p: &Path, pkg_name: &str, is_current_dir: bool) -> ExitCode 
                  kora g feature <name>\n\
                  ```\n\n\
                  ## 🏛️ Clean Architecture Structure\n\n\
+                 - `src/routes/`: Declarative HTTP routing modules\n\
                  - `src/features/users/`: Modular user domain feature (controller, service, DTOs, interfaces, events)\n\
                  - `src/enums/`: Pure type-safe enums (HttpStatus, UserRole)\n\
                  - `src/models/`: Global DTO envelopes (ResponseEnvelope)\n\

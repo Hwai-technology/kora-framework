@@ -10,9 +10,14 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/Hwai-technology/kora-framework"><img src="https://img.shields.io/badge/Language-Kora%20v0.2.0-2563EB?style=for-the-badge&logo=code" alt="Language: Kora" /></a>
+  <a href="https://github.com/Hwai-technology/kora-framework"><img src="https://img.shields.io/badge/Kora-100%25-10B981?style=for-the-badge" alt="Kora 100%" /></a>
+  <a href="https://github.com/Hwai-technology/kora-framework/releases"><img src="https://img.shields.io/github/v/release/Hwai-technology/kora-framework?color=orange&label=release&style=for-the-badge" alt="Release" /></a>
+  <a href="#license"><img src="https://img.shields.io/badge/license-AGPL--3.0-0047FF?style=for-the-badge" alt="License" /></a>
+</p>
+
+<p align="center">
   <a href="#vision"><img src="https://img.shields.io/badge/vision-TS%20%2B%20Rust%20%2B%20Go-00D2FF" alt="Vision" /></a>
-  <a href="#license"><img src="https://img.shields.io/badge/license-AGPL--3.0-0047FF" alt="License" /></a>
-  <a href="https://github.com/Hwai-technology/kora-framework/releases"><img src="https://img.shields.io/github/v/release/Hwai-technology/kora-framework?color=orange&label=release" alt="Release" /></a>
   <a href="https://github.com/Hwai-technology/kora-framework/stargazers"><img src="https://img.shields.io/github/stars/Hwai-technology/kora-framework?style=social" alt="GitHub Stars" /></a>
 </p>
 
