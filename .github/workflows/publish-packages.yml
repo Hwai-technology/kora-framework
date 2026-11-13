@@ -183,11 +183,12 @@ jobs:
           node-version: '20.x'
 
       - name: Build and Package VS Code Extension
-        working-directory: integrations/vscode
         run: |
           VERSION="${{ needs.prepare-release.outputs.version }}"
+          mkdir -p dist
+          cd integrations/vscode
           npm install
-          npx @vscode/vsce package --no-git-tag-version --version "${VERSION}" --out "../../dist/kora-vscode-${VERSION}.vsix"
+          npx @vscode/vsce package --no-git-tag-version "${VERSION}" --out "../../dist/kora-vscode-${VERSION}.vsix" --allow-missing-repository
           cp "../../dist/kora-vscode-${VERSION}.vsix" "../../dist/kora-vscode-latest.vsix"
 
       - name: Upload VS Code Extension Artifact

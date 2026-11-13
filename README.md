@@ -19,6 +19,7 @@
 <p align="center">
   <a href="#vision"><img src="https://img.shields.io/badge/vision-TS%20%2B%20Rust%20%2B%20Go-00D2FF" alt="Vision" /></a>
   <a href="https://github.com/Hwai-technology/kora-framework/stargazers"><img src="https://img.shields.io/github/stars/Hwai-technology/kora-framework?style=social" alt="GitHub Stars" /></a>
+  <img src="https://komarev.com/ghpvc/?username=Hwai-technology-kora-framework&label=Repository%20Views&color=0e7fc0&style=flat-square" alt="Repository Views" />
 </p>
 
 > [!IMPORTANT]
