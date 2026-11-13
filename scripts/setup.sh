@@ -25,11 +25,50 @@ while [ -h "$SOURCE" ]; do
   SOURCE="$(readlink "$SOURCE")"
   [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
 done
-ROOT_DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+if [[ -f "$SCRIPT_DIR/../Cargo.toml" ]]; then
+    ROOT_DIR="$( cd -P "$SCRIPT_DIR/.." >/dev/null 2>&1 && pwd )"
+elif [[ -f "$SCRIPT_DIR/Cargo.toml" ]]; then
+    ROOT_DIR="$SCRIPT_DIR"
+else
+    ROOT_DIR="$( cd -P "$SCRIPT_DIR/.." >/dev/null 2>&1 && pwd )"
+fi
 
 BIN_TARGET_DIR="$HOME/.local/bin"
 MIME_TARGET_DIR="$HOME/.local/share/mime/packages"
 COMPLETION_TARGET_DIR="$HOME/.local/share/bash-completion/completions"
+
+do_uninstall() {
+    if [[ -f "$ROOT_DIR/scripts/uninstall.sh" ]]; then
+        "$ROOT_DIR/scripts/uninstall.sh"
+    else
+        echo -e "${COLOR_CYAN}================================================================${COLOR_RESET}"
+        echo -e "${COLOR_RED}  🗑️  Kora Language & Framework — System Uninstaller           ${COLOR_RESET}"
+        echo -e "${COLOR_CYAN}================================================================${COLOR_RESET}"
+        echo -e "\n${COLOR_BLUE}[1/4] Removing Kora binaries...${COLOR_RESET}"
+        rm -f "$HOME/.local/bin/kora"
+        if [[ $EUID -eq 0 ]]; then
+            rm -f "/usr/local/bin/kora"
+        fi
+        echo -e "${COLOR_GREEN}✓ Binary removed from ~/.local/bin/kora${COLOR_RESET}"
+        echo -e "\n${COLOR_BLUE}[2/4] Removing shell auto-completions...${COLOR_RESET}"
+        rm -f "$HOME/.local/share/bash-completion/completions/kora"
+        rm -f "$HOME/.zsh/completion/_kora"
+        rm -f "$HOME/.config/fish/completions/kora.fish"
+        echo -e "${COLOR_GREEN}✓ Shell completions removed (Bash, Zsh, Fish).${COLOR_RESET}"
+        echo -e "\n${COLOR_BLUE}[3/4] Removing Linux Shared MIME registrations...${COLOR_RESET}"
+        rm -f "$HOME/.local/share/mime/packages/kora.xml"
+        if command -v update-mime-database &>/dev/null; then
+            update-mime-database "$HOME/.local/share/mime" &>/dev/null || true
+            echo -e "${COLOR_GREEN}✓ MIME database updated.${COLOR_RESET}"
+        fi
+        echo -e "\n${COLOR_BLUE}[4/4] Removing editor extensions...${COLOR_RESET}"
+        rm -rf "$HOME/.antigravity-ide/extensions/kora-lang."*
+        rm -rf "$HOME/.vscode/extensions/kora-vscode"
+        echo -e "${COLOR_GREEN}✓ Editor extensions removed.${COLOR_RESET}"
+        echo -e "\n${COLOR_GREEN}✓ Kora has been cleanly uninstalled from your system.${COLOR_RESET}"
+    fi
+}
 
 # Ensure cargo is accessible if installed via rustup
 if ! command -v cargo &>/dev/null; then
@@ -46,11 +85,11 @@ if [[ -f "$BIN_TARGET_DIR/kora" ]] || command -v kora &>/dev/null; then
 
     # Handle explicit command line flags
     if [[ "$1" == "--uninstall" ]]; then
-        "$ROOT_DIR/scripts/uninstall.sh"
+        do_uninstall
         exit 0
     elif [[ "$1" == "--clean" || "$1" == "--reinstall" ]]; then
         echo -e "${COLOR_CYAN}Performing clean fresh reinstall...${COLOR_RESET}"
-        "$ROOT_DIR/scripts/uninstall.sh"
+        do_uninstall
     elif [[ "$1" != "--yes" && "$1" != "-y" ]]; then
         echo -e "${COLOR_CYAN}================================================================${COLOR_RESET}"
         echo -e "${COLOR_YELLOW}  ⚠️  Kora is already installed on this system (${INSTALLED_VER})${COLOR_RESET}"
@@ -76,10 +115,10 @@ if [[ -f "$BIN_TARGET_DIR/kora" ]] || command -v kora &>/dev/null; then
                 ;;
             2)
                 echo -e "${COLOR_CYAN}Performing clean fresh reinstall...${COLOR_RESET}"
-                "$ROOT_DIR/scripts/uninstall.sh"
+                do_uninstall
                 ;;
             3)
-                "$ROOT_DIR/scripts/uninstall.sh"
+                do_uninstall
                 exit 0
                 ;;
             4)
