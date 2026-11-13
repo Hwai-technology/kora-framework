@@ -7,7 +7,7 @@
   "engines": {
     "vscode": "^1.80.0"
   },
-  "icon": "./icons/kora-file.svg",
+  "icon": "./icon.png",
   "main": "./client/extension.js",
   "activationEvents": [
     "onLanguage:kora"
