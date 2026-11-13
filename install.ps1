@@ -150,7 +150,7 @@ if (Test-Path $LocalVsix) {
     $VsixPath = $LocalVsix
 } else {
     try {
-        $VsixUrl = "https://github.com/$KoraRepo/releases/latest/download/kora-vscode.vsix"
+        $VsixUrl = "https://github.com/$KoraRepo/releases/latest/download/kora-vscode-latest.vsix"
         Invoke-WebRequest -Uri $VsixUrl -OutFile $VsixPath -UseBasicParsing -ErrorAction SilentlyContinue
     } catch {}
 }

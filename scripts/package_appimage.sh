@@ -39,13 +39,28 @@ cp -f "$ROOT_DIR/integrations/vscode/icon.svg" "$APPDIR/usr/share/icons/hicolor/
 cp -f "$ROOT_DIR/integrations/vscode/icon.png" "$APPDIR/kora.png"
 cp -f "$ROOT_DIR/integrations/linux/kora.xml" "$APPDIR/usr/share/mime/packages/kora.xml"
 
-# 3. Create AppRun launcher
+# 3. Create AppRun launcher (Handles CLI parameters & GUI desktop launch)
 cat << 'EOF' > "$APPDIR/AppRun"
 #!/bin/sh
 SELF=$(readlink -f "$0")
 HERE=${SELF%/*}
 export PATH="${HERE}/usr/bin:${PATH}"
 export LD_LIBRARY_PATH="${HERE}/usr/lib:${LD_LIBRARY_PATH}"
+
+# If executed without arguments or double-clicked from GUI file manager
+if [ $# -eq 0 ] && [ ! -t 0 ]; then
+    # Spawn terminal window running interactive kora doctor & help
+    if command -v x-terminal-emulator >/dev/null 2>&1; then
+        exec x-terminal-emulator -e sh -c "${HERE}/usr/bin/kora doctor; echo ''; echo 'Press Enter to exit...'; read line"
+    elif command -v gnome-terminal >/dev/null 2>&1; then
+        exec gnome-terminal -- sh -c "${HERE}/usr/bin/kora doctor; echo ''; echo 'Press Enter to exit...'; read line"
+    elif command -v konsole >/dev/null 2>&1; then
+        exec konsole -e sh -c "${HERE}/usr/bin/kora doctor; echo ''; echo 'Press Enter to exit...'; read line"
+    elif command -v xterm >/dev/null 2>&1; then
+        exec xterm -e sh -c "${HERE}/usr/bin/kora doctor; echo ''; echo 'Press Enter to exit...'; read line"
+    fi
+fi
+
 exec "${HERE}/usr/bin/kora" "$@"
 EOF
 chmod +x "$APPDIR/AppRun"
