@@ -795,14 +795,14 @@ dependencies = [
 
 [[package]]
 name = "kora-ast"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "kora-span",
 ]
 
 [[package]]
 name = "kora-auth"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "argon2",
  "hmac",
@@ -814,7 +814,7 @@ dependencies = [
 
 [[package]]
 name = "kora-bench"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -823,7 +823,7 @@ dependencies = [
 
 [[package]]
 name = "kora-cli"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "kora-ast",
  "kora-auth",
@@ -853,7 +853,7 @@ dependencies = [
 
 [[package]]
 name = "kora-codegen"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "kora-ast",
  "kora-diagnostics",
@@ -865,14 +865,14 @@ dependencies = [
 
 [[package]]
 name = "kora-diagnostics"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "kora-span",
 ]
 
 [[package]]
 name = "kora-fmt"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "kora-ast",
  "kora-span",
@@ -880,7 +880,7 @@ dependencies = [
 
 [[package]]
 name = "kora-hir"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "kora-ast",
  "kora-diagnostics",
@@ -890,7 +890,7 @@ dependencies = [
 
 [[package]]
 name = "kora-http"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "axum",
  "serde",
@@ -902,7 +902,7 @@ dependencies = [
 
 [[package]]
 name = "kora-lexer"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "kora-diagnostics",
  "kora-span",
@@ -910,7 +910,7 @@ dependencies = [
 
 [[package]]
 name = "kora-lsp"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "kora-ast",
  "kora-diagnostics",
@@ -926,7 +926,7 @@ dependencies = [
 
 [[package]]
 name = "kora-observability"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -934,7 +934,7 @@ dependencies = [
 
 [[package]]
 name = "kora-orm"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -944,7 +944,7 @@ dependencies = [
 
 [[package]]
 name = "kora-ownership"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "kora-ast",
  "kora-diagnostics",
@@ -956,7 +956,7 @@ dependencies = [
 
 [[package]]
 name = "kora-parser"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "kora-ast",
  "kora-diagnostics",
@@ -966,7 +966,7 @@ dependencies = [
 
 [[package]]
 name = "kora-pkg"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "serde",
  "sha2",
@@ -975,7 +975,7 @@ dependencies = [
 
 [[package]]
 name = "kora-profiler"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -983,7 +983,7 @@ dependencies = [
 
 [[package]]
 name = "kora-queue"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -992,7 +992,7 @@ dependencies = [
 
 [[package]]
 name = "kora-realtime"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -1001,18 +1001,18 @@ dependencies = [
 
 [[package]]
 name = "kora-runtime"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "tokio",
 ]
 
 [[package]]
 name = "kora-span"
-version = "0.2.0"
+version = "0.4.1"
 
 [[package]]
 name = "kora-testing"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -1020,7 +1020,7 @@ dependencies = [
 
 [[package]]
 name = "kora-ty"
-version = "0.2.0"
+version = "0.4.1"
 dependencies = [
  "kora-ast",
  "kora-diagnostics",

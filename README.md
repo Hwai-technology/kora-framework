@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Hwai-technology/kora-framework"><img src="https://img.shields.io/badge/Language-Kora%20v0.2.0-2563EB?style=for-the-badge&logo=code" alt="Language: Kora" /></a>
+  <a href="https://github.com/Hwai-technology/kora-framework"><img src="https://img.shields.io/github/v/release/Hwai-technology/kora-framework?color=2563EB&label=Language%20Kora&style=for-the-badge&logo=code" alt="Language: Kora" /></a>
   <a href="https://github.com/Hwai-technology/kora-framework"><img src="https://img.shields.io/badge/Kora-100%25-10B981?style=for-the-badge" alt="Kora 100%" /></a>
   <a href="https://github.com/Hwai-technology/kora-framework/releases"><img src="https://img.shields.io/github/v/release/Hwai-technology/kora-framework?color=orange&label=release&style=for-the-badge" alt="Release" /></a>
   <a href="#license"><img src="https://img.shields.io/badge/license-AGPL--3.0-0047FF?style=for-the-badge" alt="License" /></a>
@@ -22,7 +22,7 @@
 </p>
 
 > [!IMPORTANT]
-> **Public Beta Release (`v0.2.0` / [Latest Release](https://github.com/Hwai-technology/kora-framework/releases))**
+> **Public Beta Release ([Latest Release](https://github.com/Hwai-technology/kora-framework/releases))**
 > Kora is currently in active public beta and rapid development. While the compiler pipeline, type checker, and native runtime engine are fully functional, language features and standard libraries are evolving continuously.
 >
 > ⭐️ **Support Kora with a GitHub Star**: If you believe in unifying the approachable developer experience of TypeScript with the raw speed of Rust and the concurrency of Go, please give this repository a star! Every star helps spread the word, attracts contributors, and accelerates Kora's evolution.

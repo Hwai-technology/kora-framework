@@ -167,11 +167,41 @@ jobs:
           path: dist/*
 
   # ----------------------------------------------------------------------------
+  # Job 2b: Package VS Code Extension (.vsix)
+  # ----------------------------------------------------------------------------
+  package-extension:
+    name: Package VS Code Extension (.vsix)
+    needs: prepare-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Build and Package VS Code Extension
+        working-directory: integrations/vscode
+        run: |
+          VERSION="${{ needs.prepare-release.outputs.version }}"
+          npm install
+          npx @vscode/vsce package --no-git-tag-version --version "${VERSION}" --out "../../dist/kora-vscode-${VERSION}.vsix"
+          cp "../../dist/kora-vscode-${VERSION}.vsix" "../../dist/kora-vscode-latest.vsix"
+
+      - name: Upload VS Code Extension Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-vscode-extension
+          path: dist/*
+
+  # ----------------------------------------------------------------------------
   # Job 3: Collate All Multi-Platform Artifacts & Publish GitHub Release
   # ----------------------------------------------------------------------------
   publish-release:
     name: Collate & Publish GitHub Release
-    needs: [prepare-release, build-binaries]
+    needs: [prepare-release, build-binaries, package-extension]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
