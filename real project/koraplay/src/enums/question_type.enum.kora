@@ -1,9 +1,0 @@
-pub enum QuestionType {
-    SingleChoice,
-    MultipleChoice,
-    TrueFalse,
-    ShortAnswer,
-    Ordering,
-    Poll,
-    CodeChallenge,
-}

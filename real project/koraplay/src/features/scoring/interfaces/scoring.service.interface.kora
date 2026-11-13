@@ -1,9 +1,0 @@
-import { CreateScoringDto, ScoringResponseDto, PaginatedScoringDto } from "../models/scoring.dto"
-import { ScoringError } from "../errors/scoring.errors"
-
-interface ScoringServiceInterface {
-    fn create_scoring(dto: CreateScoringDto) -> Result<ScoringResponseDto, ScoringError>
-    fn get_scoring_by_id(id: Int) -> Result<ScoringResponseDto, ScoringError>
-    fn list_scoring(page: Int, pageSize: Int) -> PaginatedScoringDto
-    fn delete_scoring(id: Int) -> Bool
-}

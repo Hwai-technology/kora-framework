@@ -1,9 +1,0 @@
-model GameCreatedEvent {
-    game_id: Int,
-    timestamp: Int,
-}
-
-model GameDeletedEvent {
-    game_id: Int,
-    timestamp: Int,
-}

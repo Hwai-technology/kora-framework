@@ -1,6 +1,0 @@
-model ResponseEnvelope<T> {
-    success: Bool,
-    message: String,
-    data: Option<T>,
-    status_code: Int,
-}

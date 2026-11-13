@@ -1,7 +1,0 @@
-import { QuizzesController } from "./controllers/quiz.controller"
-import { QuizzesService } from "./services/quiz.service"
-import { QuizzesRepository } from "./repositories/quiz.repository"
-import { QuizzeValidator } from "./validators/quiz.validator"
-import { QuizzeError } from "./errors/quiz.errors"
-import { CreateQuizzeDto, UpdateQuizzeDto, QuizzeResponseDto, PaginatedQuizzesDto } from "./models/quiz.dto"
-import { QuizzeEntity } from "./models/quiz.entity"

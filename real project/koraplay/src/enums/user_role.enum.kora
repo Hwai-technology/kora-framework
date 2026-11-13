@@ -1,5 +1,0 @@
-pub enum UserRole {
-    Admin,
-    Member,
-    Guest,
-}

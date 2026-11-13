@@ -1,9 +1,0 @@
-import { CreateQuizzeDto, QuizzeResponseDto, PaginatedQuizzesDto } from "../models/quiz.dto"
-import { QuizzeError } from "../errors/quiz.errors"
-
-interface QuizzesServiceInterface {
-    fn create_quizze(dto: CreateQuizzeDto) -> Result<QuizzeResponseDto, QuizzeError>
-    fn get_quizze_by_id(id: Int) -> Result<QuizzeResponseDto, QuizzeError>
-    fn list_quizzes(page: Int, pageSize: Int) -> PaginatedQuizzesDto
-    fn delete_quizze(id: Int) -> Bool
-}

@@ -1,9 +1,0 @@
-model ScoringCreatedEvent {
-    scoring_id: Int,
-    timestamp: Int,
-}
-
-model ScoringDeletedEvent {
-    scoring_id: Int,
-    timestamp: Int,
-}

@@ -1,9 +1,0 @@
-import { CreateGameDto, GameResponseDto, PaginatedGamesDto } from "../models/game.dto"
-import { GameError } from "../errors/game.errors"
-
-interface GamesServiceInterface {
-    fn create_game(dto: CreateGameDto) -> Result<GameResponseDto, GameError>
-    fn get_game_by_id(id: Int) -> Result<GameResponseDto, GameError>
-    fn list_games(page: Int, pageSize: Int) -> PaginatedGamesDto
-    fn delete_game(id: Int) -> Bool
-}

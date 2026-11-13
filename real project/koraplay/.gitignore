@@ -1,9 +1,0 @@
-/.kora-build/
-/.kora-packages/
-/dist/
-/target/
-*.log
-.DS_Store
-.env
-openapi.json
-swagger-ui.html
