@@ -1,4 +1,4 @@
-# ==============================================================================
+﻿# ==============================================================================
 # Kora Programming Language & Framework — Windows PowerShell Automated Installer
 # Usage:
 #   irm https://raw.githubusercontent.com/Hwai-technology/kora-framework/main/install.ps1 | iex
@@ -52,18 +52,61 @@ try {
     }
 }
 
+# Ensure cargo is accessible if installed via rustup
+if (!(Get-Command cargo -ErrorAction SilentlyContinue)) {
+    if (Test-Path "$env:USERPROFILE\.cargo\bin\cargo.exe") {
+        $env:Path = "$env:USERPROFILE\.cargo\bin;$env:Path"
+    }
+}
+
 # If precompiled binary is not available, check if cargo is present to compile from source
 if (!$Downloaded -or !(Test-Path -Path $KoraExe)) {
+    # Check if run from a local repository clone
+    $LocalCargoToml = Join-Path $PSScriptRoot "Cargo.toml"
+    $LocalCliToml = Join-Path $PSScriptRoot "crates\kora-cli\Cargo.toml"
+    $BuildDir = $null
+
+    if ((Test-Path $LocalCargoToml) -and (Test-Path $LocalCliToml)) {
+        $BuildDir = $PSScriptRoot
+    }
+
+    if (!(Get-Command cargo -ErrorAction SilentlyContinue)) {
+        Write-Host "  ⚠️ Cargo is not installed. Attempting to install Rust via winget / rustup..." -ForegroundColor Yellow
+        try {
+            if (Get-Command winget -ErrorAction SilentlyContinue) {
+                Write-Host "  Installing Rustup via winget..." -ForegroundColor Cyan
+                winget install --id Rustlang.Rustup --silent --accept-source-agreements --accept-package-agreements
+            } else {
+                $RustupInit = Join-Path $env:TEMP "rustup-init.exe"
+                Invoke-WebRequest -Uri "https://win.rustup.rs/x86_64" -OutFile $RustupInit -UseBasicParsing
+                Start-Process -FilePath $RustupInit -ArgumentList "-y" -Wait -NoNewWindow
+                Remove-Item $RustupInit -Force -ErrorAction SilentlyContinue
+            }
+            if (Test-Path "$env:USERPROFILE\.cargo\bin\cargo.exe") {
+                $env:Path = "$env:USERPROFILE\.cargo\bin;$env:Path"
+            }
+        } catch {
+            Write-Host "  Automatic Rust installation failed." -ForegroundColor Yellow
+        }
+    }
+
     if (Get-Command cargo -ErrorAction SilentlyContinue) {
-        Write-Host "  Precompiled Windows binary unavailable. Building from source via Cargo..." -ForegroundColor Yellow
-        $TempSrc = Join-Path $env:TEMP "kora-src"
-        if (Test-Path $TempSrc) { Remove-Item $TempSrc -Recurse -Force }
-        git clone --depth 1 "https://github.com/$KoraRepo.git" $TempSrc
-        Push-Location $TempSrc
-        cargo build --release -p kora-cli
-        Copy-Item "target\release\kora.exe" $KoraExe -Force
-        Pop-Location
-        Remove-Item $TempSrc -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Host "  Building from source via Cargo..." -ForegroundColor Yellow
+        if ($BuildDir) {
+            Push-Location $BuildDir
+            cargo build --release -p kora-cli
+            Copy-Item "target\release\kora.exe" $KoraExe -Force
+            Pop-Location
+        } else {
+            $TempSrc = Join-Path $env:TEMP "kora-src"
+            if (Test-Path $TempSrc) { Remove-Item $TempSrc -Recurse -Force }
+            git clone --depth 1 "https://github.com/$KoraRepo.git" $TempSrc
+            Push-Location $TempSrc
+            cargo build --release -p kora-cli
+            Copy-Item "target\release\kora.exe" $KoraExe -Force
+            Pop-Location
+            Remove-Item $TempSrc -Recurse -Force -ErrorAction SilentlyContinue
+        }
     } else {
         Write-Error "Failed to install Kora. Please install Rust (https://rustup.rs) or download a release from https://github.com/$KoraRepo/releases"
         exit 1
@@ -95,25 +138,89 @@ try {
     Write-Host "ℹ️  Could not set file associations (non-elevated). Skipping." -ForegroundColor Gray
 }
 
-# 5. Sync VS Code Extension if installed
-Write-Host "`n[4/4] Synchronizing VS Code & Editor Tooling..." -ForegroundColor Blue
-$VsCodeExtDir = "$env:USERPROFILE\.vscode\extensions\kora-vscode"
-try {
-    if (Test-Path "$env:USERPROFILE\.vscode") {
-        New-Item -ItemType Directory -Path "$VsCodeExtDir\client" -Force | Out-Null
-        New-Item -ItemType Directory -Path "$VsCodeExtDir\syntaxes" -Force | Out-Null
-        New-Item -ItemType Directory -Path "$VsCodeExtDir\snippets" -Force | Out-Null
+# 5. Install & Synchronize VS Code, Cursor & Editor Tooling
+Write-Host "`n[4/4] Installing & Synchronizing VS Code, Cursor & Editor Extensions..." -ForegroundColor Blue
 
-        $BaseRaw = "https://raw.githubusercontent.com/$KoraRepo/main/integrations/vscode"
-        Invoke-WebRequest -Uri "$BaseRaw/package.json" -OutFile "$VsCodeExtDir\package.json" -UseBasicParsing
-        Invoke-WebRequest -Uri "$BaseRaw/language-configuration.json" -OutFile "$VsCodeExtDir\language-configuration.json" -UseBasicParsing
-        Invoke-WebRequest -Uri "$BaseRaw/client/extension.js" -OutFile "$VsCodeExtDir\client\extension.js" -UseBasicParsing
-        Invoke-WebRequest -Uri "$BaseRaw/syntaxes/kora.tmLanguage.json" -OutFile "$VsCodeExtDir\syntaxes\kora.tmLanguage.json" -UseBasicParsing
-        Invoke-WebRequest -Uri "$BaseRaw/snippets/kora.snippets.json" -OutFile "$VsCodeExtDir\snippets\kora.snippets.json" -UseBasicParsing
-        Write-Host "✓ VS Code extension installed at $VsCodeExtDir." -ForegroundColor Green
+$EditorClis = @("code", "code-insiders", "cursor", "codium", "windsurf")
+$VsixPath = "$env:TEMP\kora-vscode-0.1.0.vsix"
+$LocalVsix = "$PSScriptRoot\integrations\vscode\kora-vscode-0.1.0.vsix"
+
+# 5.1 Locate or download VSIX package
+if (Test-Path $LocalVsix) {
+    $VsixPath = $LocalVsix
+} else {
+    try {
+        $VsixUrl = "https://github.com/$KoraRepo/releases/latest/download/kora-vscode.vsix"
+        Invoke-WebRequest -Uri $VsixUrl -OutFile $VsixPath -UseBasicParsing -ErrorAction SilentlyContinue
+    } catch {}
+}
+
+# 5.2 Execute extension installation via editor CLI commands
+foreach ($cli in $EditorClis) {
+    $cmd = Get-Command $cli -ErrorAction SilentlyContinue
+    if ($cmd) {
+        try {
+            Write-Host "  Found $cli CLI. Installing Kora extension..." -ForegroundColor Cyan
+            if (Test-Path $VsixPath) {
+                & $cli --install-extension "$VsixPath" --force | Out-Null
+                Write-Host "✓ Extension installed in $cli via command-line." -ForegroundColor Green
+            } else {
+                & $cli --install-extension "kora-lang.kora-vscode" --force 2>$null | Out-Null
+                Write-Host "✓ Extension installed in $cli via marketplace command." -ForegroundColor Green
+            }
+        } catch {
+            Write-Host "ℹ️  Could not complete CLI extension install for $cli. Proceeding with file sync." -ForegroundColor Gray
+        }
     }
-} catch {
-    Write-Host "ℹ️  Skipped editor extension auto-sync." -ForegroundColor Gray
+}
+
+# 5.3 Direct Directory Sync fallback for VS Code, Cursor, and Antigravity IDE
+$TargetExtDirs = @(
+    "$env:USERPROFILE\.vscode\extensions\kora-vscode",
+    "$env:USERPROFILE\.vscode-insiders\extensions\kora-vscode",
+    "$env:USERPROFILE\.cursor\extensions\kora-vscode",
+    "$env:USERPROFILE\.antigravity-ide\extensions\kora-lang.kora-vscode-0.1.0"
+)
+
+foreach ($VsCodeExtDir in $TargetExtDirs) {
+    try {
+        $ParentDir = Split-Path $VsCodeExtDir -Parent
+        if ((Test-Path $ParentDir) -or ($VsCodeExtDir -like "*\.vscode\*")) {
+            New-Item -ItemType Directory -Path "$VsCodeExtDir\client" -Force | Out-Null
+            New-Item -ItemType Directory -Path "$VsCodeExtDir\syntaxes" -Force | Out-Null
+            New-Item -ItemType Directory -Path "$VsCodeExtDir\snippets" -Force | Out-Null
+
+            if (Test-Path "$PSScriptRoot\integrations\vscode") {
+                Copy-Item "$PSScriptRoot\integrations\vscode\package.json" "$VsCodeExtDir\package.json" -Force -ErrorAction SilentlyContinue
+                Copy-Item "$PSScriptRoot\integrations\vscode\language-configuration.json" "$VsCodeExtDir\language-configuration.json" -Force -ErrorAction SilentlyContinue
+                Copy-Item "$PSScriptRoot\integrations\vscode\client\extension.js" "$VsCodeExtDir\client\extension.js" -Force -ErrorAction SilentlyContinue
+                Copy-Item "$PSScriptRoot\integrations\vscode\syntaxes\kora.tmLanguage.json" "$VsCodeExtDir\syntaxes\kora.tmLanguage.json" -Force -ErrorAction SilentlyContinue
+                Copy-Item "$PSScriptRoot\integrations\vscode\snippets\kora.snippets.json" "$VsCodeExtDir\snippets\kora.snippets.json" -Force -ErrorAction SilentlyContinue
+            } else {
+                $BaseRaw = "https://raw.githubusercontent.com/$KoraRepo/main/integrations/vscode"
+                Invoke-WebRequest -Uri "$BaseRaw/package.json" -OutFile "$VsCodeExtDir\package.json" -UseBasicParsing -ErrorAction SilentlyContinue
+                Invoke-WebRequest -Uri "$BaseRaw/language-configuration.json" -OutFile "$VsCodeExtDir\language-configuration.json" -UseBasicParsing -ErrorAction SilentlyContinue
+                Invoke-WebRequest -Uri "$BaseRaw/client/extension.js" -OutFile "$VsCodeExtDir\client\extension.js" -UseBasicParsing -ErrorAction SilentlyContinue
+                Invoke-WebRequest -Uri "$BaseRaw/syntaxes/kora.tmLanguage.json" -OutFile "$VsCodeExtDir\syntaxes\kora.tmLanguage.json" -UseBasicParsing -ErrorAction SilentlyContinue
+                Invoke-WebRequest -Uri "$BaseRaw/snippets/kora.snippets.json" -OutFile "$VsCodeExtDir\snippets\kora.snippets.json" -UseBasicParsing -ErrorAction SilentlyContinue
+            }
+            Write-Host "✓ Extension files synced to $VsCodeExtDir." -ForegroundColor Green
+        }
+    } catch {
+        Write-Host "ℹ️  Skipped editor extension auto-sync for $VsCodeExtDir." -ForegroundColor Gray
+    }
+}
+
+# 5.4 Seamless Material Icon Theme Integration
+$LocalKoraSvg = "$PSScriptRoot\integrations\vscode\icons\kora-file.svg"
+if (Test-Path $LocalKoraSvg) {
+    Get-ChildItem -Path "$env:USERPROFILE" -Filter "pkief.material-icon-theme*" -Recurse -Depth 5 -Directory -ErrorAction SilentlyContinue | ForEach-Object {
+        $MatIconDir = Join-Path $_.FullName "icons"
+        if (Test-Path $MatIconDir) {
+            Copy-Item $LocalKoraSvg (Join-Path $MatIconDir "kora.svg") -Force -ErrorAction SilentlyContinue
+            Write-Host "✓ Seamlessly integrated Kora icons into Material Icon Theme ($($_.Name))." -ForegroundColor Green
+        }
+    }
 }
 
 Write-Host "`n================================================================" -ForegroundColor Cyan

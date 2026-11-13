@@ -1,0 +1,11 @@
+import { CreateQuizzeDto } from "../models/quiz.dto"
+import { QuizzeError } from "../errors/quiz.errors"
+
+class QuizzeValidator {
+    fn validate_create(dto: CreateQuizzeDto) -> Result<Bool, QuizzeError> {
+        if dto.name == "" {
+            return Err(QuizzeError.ValidationFailed("name field cannot be empty"))
+        }
+        return Ok(true)
+    }
+}

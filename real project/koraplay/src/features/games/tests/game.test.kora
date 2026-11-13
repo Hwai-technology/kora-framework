@@ -1,0 +1,37 @@
+import { CreateGameDto } from "../models/game.dto"
+import { GameValidator } from "../validators/game.validator"
+import { GameError } from "../errors/game.errors"
+
+fn test_validation_passes() -> Bool {
+    let validator = GameValidator()
+    let valid_dto = CreateGameDto {
+        name: "Valid Game",
+    }
+    let res = validator.validate_create(valid_dto)
+    return match res {
+        Ok(valid) => valid,
+        Err(e) => false,
+    }
+}
+
+fn test_validation_fails_on_empty() -> Bool {
+    let validator = GameValidator()
+    let empty_dto = CreateGameDto {
+        name: "",
+    }
+    let res = validator.validate_create(empty_dto)
+    return match res {
+        Ok(valid) => false,
+        Err(e) => true,
+    }
+}
+
+fn main() {
+    let p1 = test_validation_passes()
+    let p2 = test_validation_fails_on_empty()
+    if p1 && p2 {
+        print("✓ All Game feature tests passed!")
+    } else {
+        print("✗ Feature tests failed")
+    }
+}

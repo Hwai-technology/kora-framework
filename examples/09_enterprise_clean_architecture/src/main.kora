@@ -4,154 +4,93 @@
 // Everything is Class-Based Architecture with Compile-Time Dependency Injection
 // ============================================================================
 
-import { HttpStatus } from "enums/http_status";
-import { User, UserProfileDto } from "models/user_model";
-import { Order, OrderItem, CreateOrderInput } from "models/order_model";
-import { Product } from "models/product_model";
-import { SecureApiResponse, LogEntry } from "models/response_envelope";
-import { AuthSessionDto } from "modules/auth/auth_types";
-import { Logger } from "shared/services/logger_service";
-import { AutoMigrator, DatabaseSeeder } from "database/auto_migrator";
-import { ApiResponse } from "middleware/api_response_factory";
-import { AuthController } from "modules/auth/auth_controller";
-import { OrderController } from "modules/orders/order_controller";
+import { SecureApiResponse } from "models/response_envelope.model";
+import { ApiRouter } from "routes/api.routes";
+import { DatabaseRouter } from "routes/database.routes";
+import { AuthRouter } from "routes/auth.routes";
+import { OrderRouter } from "routes/order.routes";
 
 // ============================================================================
 // Enterprise Application Container (Class-based Lifecycle & Orchestration)
 // ============================================================================
 
 class Application {
-    migrator: AutoMigrator
-    seeder: DatabaseSeeder
-    auth: AuthController
-    orders: OrderController
-    response: ApiResponse
-    logger: Logger
+    router: ApiRouter
+    database: DatabaseRouter
+    auth: AuthRouter
+    orders: OrderRouter
 
     init(
-        migrator: AutoMigrator,
-        seeder: DatabaseSeeder,
-        auth: AuthController,
-        orders: OrderController,
-        response: ApiResponse,
-        logger: Logger,
+        router: ApiRouter,
+        database: DatabaseRouter,
+        auth: AuthRouter,
+        orders: OrderRouter,
     ) {
-        this.migrator = migrator
-        this.seeder = seeder
+        this.router = router
+        this.database = database
         this.auth = auth
         this.orders = orders
-        this.response = response
-        this.logger = logger
     }
 
     fn health() -> SecureApiResponse {
-        let l = this.logger.info("server", "Health check probe OK", "trace_health_01")
-        return this.response.ok("Kora Clean Architecture Enterprise Engine is running healthy", 1)
-    }
-
-    fn migrateDatabase() -> SecureApiResponse {
-        let mig = this.migrator.runAllMigrations()
-        let l = this.logger.info("db", "Schema migrations executed", "trace_mig_01")
-        return this.response.ok("Database schema migrations executed successfully", 4)
-    }
-
-    fn syncDatabaseSchema() -> SecureApiResponse {
-        let sync = this.migrator.syncSchemaWithEntities()
-        let l = this.logger.info("db", "Database schema synchronized with Entity models", "trace_sync_01")
-        return this.response.ok("Database schema synchronized with Entity models successfully", 5)
-    }
-
-    fn seedDatabase() -> SecureApiResponse {
-        let seed = this.seeder.seedInitialData()
-        let l = this.logger.info("db", "Database seeded with initial enterprise records", "trace_seed_01")
-        return this.response.ok("Database seeded with initial records successfully", 4)
-    }
-
-    fn truncateDatabase() -> SecureApiResponse {
-        let trunc = this.migrator.truncateAllData()
-        let l = this.logger.warn("db", "Database tables truncated cleanly", "trace_trunc_01")
-        return this.response.ok("Database table records wiped successfully", 4)
-    }
-
-    fn dropDatabaseTables() -> SecureApiResponse {
-        let drop = this.migrator.dropAllTables()
-        let l = this.logger.warn("db", "All database tables dropped", "trace_drop_01")
-        return this.response.ok("All database tables dropped successfully", 4)
-    }
-
-    fn refreshDatabase() -> SecureApiResponse {
-        let d = this.migrator.dropAllTables()
-        let m = this.migrator.runAllMigrations()
-        let s = this.seeder.seedInitialData()
-        let l = this.logger.info("db", "Database refreshed (drop, migrate, seed)", "trace_refresh_01")
-        return this.response.ok("Database refreshed completely (drop + migrate + seed)", 12)
-    }
-
-    fn destroy() -> Bool {
-        let d1 = this.migrator.destroy()
-        let d2 = this.seeder.destroy()
-        let d3 = this.auth.destroy()
-        let d4 = this.orders.destroy()
-        let d5 = this.response.destroy()
-        let d6 = this.logger.destroy()
-        return true
+        return this.router.health()
     }
 }
 
 // ============================================================================
-// Server Bootstrap & REST Routing via Application Container
+// Server Bootstrap & REST Routing via Modular Clean Routers
 // ============================================================================
 
 let app = run()
 
-// 1. Healthcheck Endpoint
-get("/health", (server: Application) => {
-    return server.health()
+// 1. Healthcheck & Banner Endpoints
+get("/health", (router: ApiRouter) => {
+    return router.health()
 })
 
 // 2. Database Management & Schema Auto-Sync Endpoints
-get("/api/v1/database/migrate", (server: Application) => {
-    return server.migrateDatabase()
+get("/api/v1/database/migrate", (dbRoutes: DatabaseRouter) => {
+    return dbRoutes.migrateDatabase()
 })
 
-post("/api/v1/database/sync", (server: Application) => {
-    return server.syncDatabaseSchema()
+post("/api/v1/database/sync", (dbRoutes: DatabaseRouter) => {
+    return dbRoutes.syncDatabaseSchema()
 })
 
-post("/api/v1/database/seed", (server: Application) => {
-    return server.seedDatabase()
+post("/api/v1/database/seed", (dbRoutes: DatabaseRouter) => {
+    return dbRoutes.seedDatabase()
 })
 
-post("/api/v1/database/truncate", (server: Application) => {
-    return server.truncateDatabase()
+post("/api/v1/database/truncate", (dbRoutes: DatabaseRouter) => {
+    return dbRoutes.truncateDatabase()
 })
 
-post("/api/v1/database/drop", (server: Application) => {
-    return server.dropDatabaseTables()
+post("/api/v1/database/drop", (dbRoutes: DatabaseRouter) => {
+    return dbRoutes.dropDatabaseTables()
 })
 
-post("/api/v1/database/refresh", (server: Application) => {
-    return server.refreshDatabase()
+post("/api/v1/database/refresh", (dbRoutes: DatabaseRouter) => {
+    return dbRoutes.refreshDatabase()
 })
 
 // 3. Auth Routes
-post("/api/v1/auth/login", (server: Application) => {
-    return server.auth.handleLogin("ahmet@kora-lang.org", "secretPassword")
+post("/api/v1/auth/login", (authRoutes: AuthRouter) => {
+    return authRoutes.login("ahmet@kora-lang.org", "secretPassword")
 })
 
-post("/api/v1/auth/register", (server: Application) => {
-    return server.auth.handleRegister("newuser@kora-lang.org", "New User")
+post("/api/v1/auth/register", (authRoutes: AuthRouter) => {
+    return authRoutes.register("newuser@kora-lang.org", "New User")
 })
 
 // 4. Orders Routes
-get("/api/v1/orders/{id}", (id: Int, server: Application) => {
-    return server.orders.handleGet(id)
+get("/api/v1/orders/{id}", (id: Int, orderRoutes: OrderRouter) => {
+    return orderRoutes.getOrder(id)
 })
 
-post("/api/v1/orders", (server: Application) => {
-    return server.orders.handleCreate(1, 5, 500000)
+post("/api/v1/orders", (orderRoutes: OrderRouter) => {
+    return orderRoutes.createOrder(1, 5, 500000)
 })
 
-post("/api/v1/orders/{id}/cancel", (id: Int, server: Application) => {
-    return server.orders.handleCancel(id)
+post("/api/v1/orders/{id}/cancel", (id: Int, orderRoutes: OrderRouter) => {
+    return orderRoutes.cancelOrder(id)
 })

@@ -43,6 +43,10 @@ pub enum Ty {
     MetaModel(String),
     /// Type-level receiver for enum variant access (e.g. `Status.Pending`).
     MetaEnum(String),
+    /// Type-level receiver for class reference / static methods (e.g. `ChatController.sendMessage`, `app.use(LoggerMiddleware)`).
+    MetaClass(String),
+    /// Static HTTP Response factory (e.g. `Response.json(data)`, `Response.ok(msg)`).
+    MetaResponse,
     /// Poison/unconstrained placeholder preventing cascading errors.
     Unknown,
 }
@@ -70,6 +74,8 @@ impl fmt::Display for Ty {
             | Self::Enum(n) => write!(f, "{n}"),
             Self::MetaModel(n) => write!(f, "model {n}"),
             Self::MetaEnum(n) => write!(f, "enum {n}"),
+            Self::MetaClass(n) => write!(f, "class {n}"),
+            Self::MetaResponse => write!(f, "Response"),
             Self::Fn {
                 params,
                 ret,
@@ -106,7 +112,10 @@ impl Ty {
     }
 
     pub fn is_meta(&self) -> bool {
-        matches!(self, Self::MetaModel(_) | Self::MetaEnum(_))
+        matches!(
+            self,
+            Self::MetaModel(_) | Self::MetaEnum(_) | Self::MetaClass(_) | Self::MetaResponse
+        )
     }
 }
 
@@ -393,7 +402,7 @@ impl<'a> TypeChecker<'a> {
                     self.expect_arity(&name.name, args, 0, *span);
                     Ty::Database
                 }
-                "App" => {
+                "App" | "Router" => {
                     self.expect_arity(&name.name, args, 0, *span);
                     Ty::App
                 }
@@ -561,7 +570,7 @@ impl<'a> TypeChecker<'a> {
     }
 
     fn is_di_injectable(ty: &Ty) -> bool {
-        matches!(ty, Ty::Class(_) | Ty::Interface(_) | Ty::Database)
+        matches!(ty, Ty::Class(_) | Ty::Interface(_) | Ty::Database | Ty::App)
     }
 
     fn check_bodies(&mut self, hir: &HirModule) {
@@ -851,12 +860,25 @@ impl<'a> TypeChecker<'a> {
                     }
                     return Ty::Option(Box::new(Ty::Unknown));
                 }
+                if id.name == "Response" {
+                    return Ty::MetaResponse;
+                }
+                if id.name == "App" || id.name == "Router" {
+                    return Ty::Fn {
+                        params: Vec::new(),
+                        ret: Box::new(Ty::App),
+                        is_async: false,
+                    };
+                }
                 if let Some(fn_info) = self.functions.get(&id.name) {
                     return Ty::Fn {
                         params: fn_info.params.iter().map(|(_, t)| t.clone()).collect(),
                         ret: Box::new(fn_info.ret.clone()),
                         is_async: fn_info.is_async,
                     };
+                }
+                if self.classes.contains_key(&id.name) {
+                    return Ty::MetaClass(id.name.clone());
                 }
                 if self.models.contains_key(&id.name) {
                     return Ty::MetaModel(id.name.clone());
@@ -1014,23 +1036,39 @@ impl<'a> TypeChecker<'a> {
                 receiver, index, ..
             } => {
                 let recv_ty = self.check_expr(receiver, None);
-                let idx_ty = self.check_expr(index, Some(&Ty::Int));
-                if !self.is_assignable(&Ty::Int, &idx_ty) {
-                    self.emit_type_mismatch(&Ty::Int, &idx_ty, index.span());
-                }
-                match recv_ty {
-                    Ty::List(inner) => *inner,
-                    Ty::Unknown => Ty::Unknown,
-                    other => {
-                        self.diagnostics.emit(
-                            Diagnostic::error(
-                                "E4001",
-                                format!("cannot index into value of type `{other}`"),
-                            )
-                            .with_primary_label(receiver.span(), "expected `List<T>`"),
-                        );
-                        Ty::Unknown
+                let idx_ty = self.check_expr(index, None);
+                if self.is_assignable(&Ty::Int, &idx_ty) {
+                    match recv_ty {
+                        Ty::List(inner) => *inner,
+                        Ty::Unknown => Ty::Unknown,
+                        other => {
+                            self.diagnostics.emit(
+                                Diagnostic::error(
+                                    "E4001",
+                                    format!("cannot index into value of type `{other}`"),
+                                )
+                                .with_primary_label(receiver.span(), "expected `List<T>`"),
+                            );
+                            Ty::Unknown
+                        }
                     }
+                } else if self.is_assignable(&Ty::String, &idx_ty) {
+                    match recv_ty {
+                        Ty::Request | Ty::Headers | Ty::Database | Ty::Unknown => Ty::String,
+                        other => {
+                            self.diagnostics.emit(
+                                Diagnostic::error(
+                                    "E4001",
+                                    format!("cannot string-index into value of type `{other}`"),
+                                )
+                                .with_primary_label(receiver.span(), "expected string-indexed map or dictionary"),
+                            );
+                            Ty::Unknown
+                        }
+                    }
+                } else {
+                    self.emit_type_mismatch(&Ty::Int, &idx_ty, index.span());
+                    Ty::Unknown
                 }
             }
             Expr::Call { callee, args, span } => self.check_call(callee, args, expected, *span),
@@ -1211,15 +1249,60 @@ impl<'a> TypeChecker<'a> {
                 }
                 self.emit_unknown_member(recv_ty, field, span)
             }
+            Ty::MetaClass(cls) => {
+                if let Some(cls_info) = self.classes.get(cls) {
+                    if let Some(m) = cls_info.methods.get(field) {
+                        return Ty::Fn {
+                            params: m.params.iter().map(|(_, t)| t.clone()).collect(),
+                            ret: Box::new(m.ret.clone()),
+                            is_async: m.is_async,
+                        };
+                    }
+                }
+                self.emit_unknown_member(recv_ty, field, span)
+            }
+            Ty::MetaResponse => match field {
+                "json" | "ok" | "created" | "error" | "badRequest" | "unauthorized" | "forbidden"
+                | "notFound" | "internalError" | "status" | "text" => Ty::Fn {
+                    params: vec![Ty::Unknown],
+                    ret: Box::new(Ty::Response),
+                    is_async: false,
+                },
+                _ => self.emit_unknown_member(recv_ty, field, span),
+            }
+            Ty::App => match field {
+                "use" => Ty::Fn {
+                    params: vec![Ty::Unknown],
+                    ret: Box::new(Ty::App),
+                    is_async: false,
+                },
+                "get" | "post" | "put" | "delete" | "patch" => Ty::Fn {
+                    params: vec![Ty::String, Ty::Unknown],
+                    ret: Box::new(Ty::App),
+                    is_async: false,
+                },
+                "listen" => Ty::Fn {
+                    params: vec![Ty::Int],
+                    ret: Box::new(Ty::Unit),
+                    is_async: false,
+                },
+                _ => self.emit_unknown_member(recv_ty, field, span),
+            }
             Ty::Request => match field {
                 "path" | "body" | "method" | "ip" | "url" => Ty::String,
+                "params" => Ty::Request,
                 "headers" => Ty::Headers,
                 "header" => Ty::Fn {
                     params: vec![Ty::String],
                     ret: Box::new(Ty::Option(Box::new(Ty::String))),
                     is_async: false,
                 },
-                "query" | "param" => Ty::Fn {
+                "param" => Ty::Fn {
+                    params: vec![Ty::String],
+                    ret: Box::new(Ty::String),
+                    is_async: false,
+                },
+                "query" => Ty::Fn {
                     params: vec![Ty::String],
                     ret: Box::new(Ty::Option(Box::new(Ty::String))),
                     is_async: false,
@@ -1265,14 +1348,19 @@ impl<'a> TypeChecker<'a> {
                 _ => self.emit_unknown_member(recv_ty, field, span),
             },
             Ty::Database => match field {
-                "query" | "execute" => Ty::Fn {
+                "query" | "execute" | "executeRaw" | "queryOne" | "queryMany" => Ty::Fn {
                     params: vec![Ty::String],
                     ret: Box::new(Ty::Result(Box::new(Ty::Int), Box::new(Ty::String))),
                     is_async: false,
                 },
-                "findUnique" => Ty::Fn {
+                "findUnique" | "findFirst" => Ty::Fn {
                     params: vec![Ty::String, Ty::String],
                     ret: Box::new(Ty::Option(Box::new(Ty::Unknown))),
+                    is_async: false,
+                },
+                "findMany" => Ty::Fn {
+                    params: vec![Ty::String, Ty::String],
+                    ret: Box::new(Ty::List(Box::new(Ty::Unknown))),
                     is_async: false,
                 },
                 "isConnected" => Ty::Fn {
@@ -1285,7 +1373,13 @@ impl<'a> TypeChecker<'a> {
                     ret: Box::new(Ty::Bool),
                     is_async: false,
                 },
-                _ => self.emit_unknown_member(recv_ty, field, span),
+                "create" | "insert" | "update" | "delete" | "save" | "getPresence" => Ty::Fn {
+                    params: vec![Ty::Unknown],
+                    ret: Box::new(Ty::Unknown),
+                    is_async: false,
+                },
+                // Dynamic collection / repository table access (e.g. database.users, database.quizzes)
+                _ => Ty::Database,
             },
             Ty::String => match field {
                 "len" | "length" => Ty::Fn {
@@ -1445,9 +1539,9 @@ impl<'a> TypeChecker<'a> {
                     }
                     return Ty::Unit;
                 }
-                "run" => {
-                    if !args.is_empty() {
-                        self.emit_arg_count("run", 0, args.len(), span);
+                "run" | "App" | "Router" => {
+                    for a in args {
+                        let _ = self.check_expr(a, None);
                     }
                     return Ty::App;
                 }
@@ -1460,7 +1554,7 @@ impl<'a> TypeChecker<'a> {
                     return Ty::Response;
                 }
                 "get" | "post" | "put" | "delete" => {
-                    if args.len() != 2 {
+                    if args.len() != 2 && args.len() != 3 {
                         self.emit_arg_count(&id.name, 2, args.len(), span);
                         return Ty::Unit;
                     }
@@ -1468,7 +1562,13 @@ impl<'a> TypeChecker<'a> {
                     if !self.is_assignable(&Ty::String, &path_ty) {
                         self.emit_type_mismatch(&Ty::String, &path_ty, args[0].span());
                     }
-                    let handler_ty = self.check_expr(&args[1], None);
+                    let handler_arg = if args.len() == 3 {
+                        let _ = self.check_expr(&args[1], None);
+                        &args[2]
+                    } else {
+                        &args[1]
+                    };
+                    let handler_ty = self.check_expr(handler_arg, None);
                     if !matches!(handler_ty, Ty::Fn { .. } | Ty::Unknown) {
                         self.diagnostics.emit(
                             Diagnostic::error(
@@ -1478,7 +1578,7 @@ impl<'a> TypeChecker<'a> {
                                     id.name
                                 ),
                             )
-                            .with_primary_label(args[1].span(), "expected handler function/closure"),
+                            .with_primary_label(handler_arg.span(), "expected handler function/closure"),
                         );
                     }
                     return Ty::Unit;
@@ -1498,6 +1598,38 @@ impl<'a> TypeChecker<'a> {
                     return Ty::Class(cls_name.to_string());
                 }
                 _ => {}
+            }
+        }
+
+        if let Expr::FieldAccess { receiver, field, .. } = callee {
+            let recv_ty = self.check_expr(receiver, None);
+            if recv_ty == Ty::App {
+                match field.name.as_str() {
+                    "use" => {
+                        for a in args {
+                            let _ = self.check_expr(a, None);
+                        }
+                        return Ty::App;
+                    }
+                    "get" | "post" | "put" | "delete" | "patch" => {
+                        for a in args {
+                            let _ = self.check_expr(a, None);
+                        }
+                        return Ty::App;
+                    }
+                    "listen" => {
+                        for a in args {
+                            let _ = self.check_expr(a, None);
+                        }
+                        return Ty::Unit;
+                    }
+                    _ => {}
+                }
+            } else if recv_ty == Ty::MetaResponse {
+                for a in args {
+                    let _ = self.check_expr(a, None);
+                }
+                return Ty::Response;
             }
         }
 

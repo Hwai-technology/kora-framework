@@ -1,0 +1,10 @@
+import { QuizzeEntity } from "../models/quiz.entity"
+import { QuizzeError } from "../errors/quiz.errors"
+
+interface QuizzesRepositoryInterface {
+    fn find_by_id(id: Int) -> Option<QuizzeEntity>
+    fn find_all(page: Int, pageSize: Int) -> List<QuizzeEntity>
+    fn count_all() -> Int
+    fn save(entity: QuizzeEntity) -> Result<QuizzeEntity, QuizzeError>
+    fn remove(id: Int) -> Bool
+}

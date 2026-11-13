@@ -64,6 +64,13 @@ Deep class field inheritance (`Admin extends User`) clashes with flat memory lay
 - **ORM**: Eliminates runtime reflection and dynamic query AST allocation where queries are statically known, while preserving realistic connection pooling, transaction boundaries, and parameterized SQL (`SQLx`).
 - **Security**: Context-specific protection—parameterized SQL bindings, typed JWT/Session extractors, RBAC attributes, CORS/CSRF policies per route group, and structured input validation.
 
+### 3.5 Layered Clean Architecture & Request Pipeline
+Kora strictly enforces a 5-tier layered architecture for maintainable, enterprise-scale backends:
+- **Pipeline**: `Application -> Middleware Pipeline -> Routes -> Controllers -> Services -> Repositories -> Database`
+- **Native DI**: Dependencies are injected automatically across layers through compile-time constructor verification.
+- **Unified Registration**: Module routing via `app.use(...)` and `Routes.register(app)`.
+- Detailed specification and examples: see [Layered Architecture & Request Pipeline](architecture/layered-architecture-and-pipeline.md).
+
 ---
 
 ## 4. Benchmark Methodology (Phase 8 Standard)

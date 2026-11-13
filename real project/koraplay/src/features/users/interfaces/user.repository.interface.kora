@@ -1,0 +1,15 @@
+// ============================================================================
+// KoraPlay Users Domain Repository Contract Interface (Clean Architecture IoC)
+// ============================================================================
+
+import { UserEntity } from "../models/user.entity"
+
+interface UsersRepositoryInterface {
+    fn find_by_id(id: Int) -> Option<UserEntity>
+    fn find_by_email(email: String) -> Option<UserEntity>
+    fn find_all(page: Int, pageSize: Int) -> List<UserEntity>
+    fn count_all() -> Int
+    fn save(entity: UserEntity) -> Result<UserEntity, String>
+    fn delete(id: Int) -> Bool
+    fn is_connected() -> Bool
+}

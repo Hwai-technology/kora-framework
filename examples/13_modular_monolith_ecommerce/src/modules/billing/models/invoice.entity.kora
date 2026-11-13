@@ -1,0 +1,11 @@
+@entity
+@table("invoices")
+model InvoiceEntity {
+    @primary
+    @autoIncrement
+    id: Int,
+    @required
+    customerEmail: String,
+    totalCents: Int,
+    paid: Bool,
+}

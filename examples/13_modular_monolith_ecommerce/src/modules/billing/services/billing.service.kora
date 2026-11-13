@@ -1,0 +1,14 @@
+import { InvoiceEntity } from "../models/invoice.entity"
+import { BillingRepository } from "../repositories/billing.repository"
+
+class BillingService {
+    repo: BillingRepository
+
+    init(repo: BillingRepository) {
+        this.repo = repo
+    }
+
+    fn charge(email: String, amount: Int) -> Result<InvoiceEntity, String> {
+        return this.repo.createInvoice(email, amount)
+    }
+}

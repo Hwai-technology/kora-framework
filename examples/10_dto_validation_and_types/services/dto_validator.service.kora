@@ -1,0 +1,99 @@
+// ============================================================================
+// Service: DtoValidatorService (Clean Architecture Implementation)
+// Implements RequestValidatorContract to safeguard the domain against invalid payloads
+// ============================================================================
+
+import { UserRegistrationDto } from "../models/user_registration.dto"
+import { FileUploadDto } from "../models/file.dto"
+import { AddressDto } from "../models/nested.dto"
+import { FieldValidationError, ValidationEnvelope } from "../models/validation_result.dto"
+import { RequestValidatorContract } from "../interfaces/validator.interface"
+
+class DtoValidatorService implements RequestValidatorContract {
+    init() {}
+
+    fn validateFileUpload(file: FileUploadDto) -> Result<Bool, String> {
+        if file.fileName == "" {
+            return Err("fileName cannot be empty")
+        }
+        if file.sizeBytes <= 0 {
+            return Err("sizeBytes must be greater than zero")
+        }
+        if file.sizeBytes > 10485760 {
+            return Err("sizeBytes exceeds 10MB limit")
+        }
+        if file.mimeType != "image/png" && file.mimeType != "image/jpeg" && file.mimeType != "application/pdf" {
+            return Err("unsupported mimeType: only image/png, image/jpeg, and application/pdf are allowed")
+        }
+        return Ok(true)
+    }
+
+    fn validateAddress(address: AddressDto) -> Result<Bool, String> {
+        if address.street == "" {
+            return Err("street address is required")
+        }
+        if address.city == "" {
+            return Err("city is required")
+        }
+        if address.countryCode == "" {
+            return Err("countryCode is required")
+        }
+        return Ok(true)
+    }
+
+    fn validateRegistration(dto: UserRegistrationDto) -> ValidationEnvelope {
+        var errors: List<FieldValidationError> = []
+
+        // 1. Primitive Type Validations: String length and constraints
+        if dto.username == "" {
+            let err = FieldValidationError {
+                field: "username",
+                rule: "required",
+                message: "Username is required and cannot be empty",
+                rejectedValue: dto.username,
+            }
+            errors = [err]
+        }
+
+        // 2. Email format validation
+        if dto.email == "" {
+            let err = FieldValidationError {
+                field: "email",
+                rule: "email",
+                message: "A valid email address is required",
+                rejectedValue: dto.email,
+            }
+            errors = [err]
+        }
+
+        // 3. Integer range validation
+        if dto.age < 18 {
+            let err = FieldValidationError {
+                field: "age",
+                rule: "min",
+                message: "User must be at least 18 years of age",
+                rejectedValue: dto.age.toString(),
+            }
+            errors = [err]
+        }
+
+        // 4. Boolean consent validation
+        if !dto.agreedToTerms {
+            let err = FieldValidationError {
+                field: "agreedToTerms",
+                rule: "accepted",
+                message: "Terms and conditions must be explicitly accepted",
+                rejectedValue: "false",
+            }
+            errors = [err]
+        }
+
+        let isClean = errors.len() == 0
+        return ValidationEnvelope {
+            isValid: isClean,
+            errorCount: errors.len(),
+            errors: errors,
+        }
+    }
+}
+

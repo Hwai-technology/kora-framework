@@ -1,0 +1,18 @@
+import { EventPublisherService } from "../services/event_publisher.service"
+import { DomainEventEntity } from "../models/domain_event.entity"
+
+class OrderEventsController {
+    service: EventPublisherService
+
+    init(service: EventPublisherService) {
+        this.service = service
+    }
+
+    fn publishOrderPlaced() -> Result<DomainEventEntity, String> {
+        return this.service.publish("ORDER_PLACED", "{\"orderId\": 999, \"amount\": 250}")
+    }
+
+    fn getEvents() -> Result<Int, String> {
+        return this.service.listRecent()
+    }
+}

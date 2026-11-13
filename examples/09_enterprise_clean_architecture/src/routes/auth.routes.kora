@@ -1,0 +1,26 @@
+// ============================================================================
+// Enterprise Clean Architecture — Auth Routes
+// ============================================================================
+
+import { SecureApiResponse } from "../models/response_envelope.model"
+import { AuthController } from "../modules/auth/auth.controller"
+
+class AuthRouter {
+    controller: AuthController
+
+    init(controller: AuthController) {
+        this.controller = controller
+    }
+
+    fn login(email: String, passwordPlain: String) -> SecureApiResponse {
+        return this.controller.handleLogin(email, passwordPlain)
+    }
+
+    fn register(email: String, fullName: String) -> SecureApiResponse {
+        return this.controller.handleRegister(email, fullName)
+    }
+
+    fn profile(req: Request) -> SecureApiResponse {
+        return this.controller.handleProfile(req)
+    }
+}

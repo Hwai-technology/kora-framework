@@ -1,0 +1,15 @@
+// ============================================================================
+// Realtime Chat — Auth Guard Middleware
+// ============================================================================
+
+class AuthMiddleware {
+    secret: String
+
+    init() {
+        this.secret = "kora-realtime-token"
+    }
+
+    fn handle(req: Request) -> Result<Request, String> {
+        return Ok(req)
+    }
+}

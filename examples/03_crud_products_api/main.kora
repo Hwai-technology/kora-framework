@@ -1,66 +1,27 @@
 // ============================================================================
-// Example 03: Full RESTful CRUD Products API with Dynamic SEO & Geo Meta
+// Example 03: Full RESTful CRUD Products API — Main Entrypoint
 // ============================================================================
 
-import { Product, CreateProductRequest, UpdateProductRequest, SeoMetadata, GeoLocation, ProductCatalogResponse, ProductDetailsResponse } from "./models/product_models"
-import { ProductService } from "./services/product_service"
+import { ProductRouter } from "./routes/product.routes"
 
 let app = run()
 
-// 1. GET /products -> List all products with dynamic SEO and Geo metadata
-get("/products", (svc: ProductService) => {
-    let items = svc.listAll()
-    let seo = svc.getCatalogSeo()
-    let geo = svc.getGeoLocation()
-    return ProductCatalogResponse {
-        products: items,
-        total: 2,
-        seo: seo,
-        geo: geo,
-    }
+get("/products", (routes: ProductRouter) => {
+    return routes.listProducts()
 })
 
-// 2. GET /products/{id} -> Single product details with dynamic per-item SEO and Geo
-get("/products/{id}", (id: Int, svc: ProductService) => {
-    let opt = svc.findById(id)
-    match opt {
-        Some(p) => {
-            let seo = svc.getProductSeo(p)
-            let geo = svc.getGeoLocation()
-            return Ok(ProductDetailsResponse {
-                product: p,
-                seo: seo,
-                geo: geo,
-            })
-        },
-        null => {
-            return Err("Product not found")
-        }
-    }
+get("/products/{id}", (id: Int, routes: ProductRouter) => {
+    return routes.getProduct(id)
 })
 
-// 3. POST /products -> Create a new product
-post("/products", (request: Request, svc: ProductService) => {
-    let req = CreateProductRequest {
-        sku: "PRD-NEW",
-        title: request.body,
-        priceCents: 4999,
-    }
-    return svc.create(req)
+post("/products", (request: Request, routes: ProductRouter) => {
+    return routes.createProduct(request.body)
 })
 
-// 4. PUT /products/{id} -> Update existing product
-put("/products/{id}", (id: Int, request: Request, svc: ProductService) => {
-    let req = UpdateProductRequest {
-        title: request.body,
-        priceCents: 5999,
-        inStock: true,
-    }
-    return svc.update(id, req)
+put("/products/{id}", (id: Int, request: Request, routes: ProductRouter) => {
+    return routes.updateProduct(id, request.body)
 })
 
-// 5. DELETE /products/{id} -> Remove product by id
-delete("/products/{id}", (id: Int, svc: ProductService) => {
-    return svc.delete(id)
+delete("/products/{id}", (id: Int, routes: ProductRouter) => {
+    return routes.deleteProduct(id)
 })
-

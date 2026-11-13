@@ -1,0 +1,11 @@
+@entity
+@table("catalog_items")
+model CatalogItemEntity {
+    @primary
+    @autoIncrement
+    id: Int,
+    @required
+    title: String,
+    priceCents: Int,
+    active: Bool,
+}

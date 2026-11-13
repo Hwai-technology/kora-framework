@@ -1,0 +1,20 @@
+// ============================================================================
+// KoraPlay Scoring Domain Routes Module (register to app)
+// ============================================================================
+
+import { ScoringController } from "../features/scoring/controllers/scoring.controller"
+
+class ScoringRoutes {
+    controller: ScoringController,
+
+    init(controller: ScoringController) {
+        this.controller = controller
+    }
+
+    fn register(app: App) -> App {
+        app.get("/api/v1/scoring", this.controller.list)
+        app.get("/api/v1/scoring/{id}", this.controller.get_by_id)
+        app.post("/api/v1/scoring", this.controller.calculate)
+        return app
+    }
+}

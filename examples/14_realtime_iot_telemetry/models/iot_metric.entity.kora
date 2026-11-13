@@ -1,0 +1,18 @@
+@entity
+@table("iot_metrics")
+model IotMetricEntity {
+    @primary
+    @autoIncrement
+    id: Int,
+    @required
+    deviceId: String,
+    temperatureCelsius: Int,
+    batteryPercent: Int,
+    active: Bool,
+}
+
+model DeviceTelemetryPayload {
+    deviceId: String,
+    temperatureCelsius: Int,
+    batteryPercent: Int,
+}

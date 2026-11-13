@@ -1,0 +1,15 @@
+// ============================================================================
+// Validator Interface Contract (Pure Behavioral Contract - E5002 Enforced)
+// ============================================================================
+
+import { UserRegistrationDto } from "../models/user_registration.dto"
+import { FileUploadDto } from "../models/file.dto"
+import { AddressDto } from "../models/nested.dto"
+import { ValidationEnvelope } from "../models/validation_result.dto"
+
+interface RequestValidatorContract {
+    fn validateRegistration(dto: UserRegistrationDto) -> ValidationEnvelope
+    fn validateFileUpload(file: FileUploadDto) -> Result<Bool, String>
+    fn validateAddress(address: AddressDto) -> Result<Bool, String>
+}
+

@@ -25,11 +25,20 @@ while [ -h "$SOURCE" ]; do
   SOURCE="$(readlink "$SOURCE")"
   [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
 done
-ROOT_DIR="$( cd -P "$( dirname "$SOURCE" )/.." >/dev/null 2>&1 && pwd )"
+ROOT_DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
 BIN_TARGET_DIR="$HOME/.local/bin"
 MIME_TARGET_DIR="$HOME/.local/share/mime/packages"
 COMPLETION_TARGET_DIR="$HOME/.local/share/bash-completion/completions"
+
+# Ensure cargo is accessible if installed via rustup
+if ! command -v cargo &>/dev/null; then
+    if [[ -f "$HOME/.cargo/env" ]]; then
+        . "$HOME/.cargo/env"
+    elif [[ -d "$HOME/.cargo/bin" ]]; then
+        export PATH="$HOME/.cargo/bin:$PATH"
+    fi
+fi
 
 # Check if Kora is already installed
 if [[ -f "$BIN_TARGET_DIR/kora" ]] || command -v kora &>/dev/null; then
@@ -91,11 +100,41 @@ echo -e "${COLOR_CYAN}==========================================================
 # 1. Compile or Download Release Binary
 echo -e "\n${COLOR_BLUE}[1/5] Preparing Kora release binary...${COLOR_RESET}"
 if [[ -f "$ROOT_DIR/Cargo.toml" ]] && [[ -f "$ROOT_DIR/crates/kora-cli/Cargo.toml" ]]; then
-    echo -e "${COLOR_CYAN}  Building native release binary from source with Cargo...${COLOR_RESET}"
-    cd "$ROOT_DIR"
-    cargo build --release -p kora-cli
-    RELEASE_BIN="$ROOT_DIR/target/release/kora"
-else
+    if ! command -v cargo &>/dev/null; then
+        echo -e "${COLOR_YELLOW}  ⚠️  Cargo is not installed or not in PATH.${COLOR_RESET}"
+        AUTO_INSTALL=""
+        if [ -t 0 ]; then
+            read -rp "  Would you like to install Rust and Cargo via rustup automatically? [Y/n] " AUTO_INSTALL
+        elif [ -r /dev/stdin ]; then
+            read -r AUTO_INSTALL || AUTO_INSTALL="y"
+        fi
+        AUTO_INSTALL="${AUTO_INSTALL:-y}"
+        if [[ "$AUTO_INSTALL" =~ ^[Yy] ]]; then
+            echo -e "${COLOR_CYAN}  Installing Rust toolchain (rustup)...${COLOR_RESET}"
+            if command -v curl &>/dev/null; then
+                curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+            elif command -v wget &>/dev/null; then
+                wget -qO- https://sh.rustup.rs | sh -s -- -y
+            else
+                echo -e "${COLOR_RED}  error: neither curl nor wget found to download rustup.${COLOR_RESET}"
+            fi
+            if [[ -f "$HOME/.cargo/env" ]]; then
+                . "$HOME/.cargo/env"
+            fi
+        fi
+    fi
+
+    if command -v cargo &>/dev/null; then
+        echo -e "${COLOR_CYAN}  Building native release binary from source with Cargo...${COLOR_RESET}"
+        cd "$ROOT_DIR"
+        cargo build --release -p kora-cli
+        RELEASE_BIN="$ROOT_DIR/target/release/kora"
+    else
+        echo -e "${COLOR_YELLOW}  Cargo unavailable. Attempting to fetch precompiled release binary...${COLOR_RESET}"
+    fi
+fi
+
+if [[ -z "$RELEASE_BIN" || ! -f "$RELEASE_BIN" ]]; then
     echo -e "${COLOR_CYAN}  Fetching precompiled release binary from GitHub Releases...${COLOR_RESET}"
     OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
     ARCH="$(uname -m)"
@@ -203,25 +242,126 @@ if [[ -f "$ROOT_DIR/integrations/completions/kora.fish" ]]; then
     echo -e "${COLOR_GREEN}✓ Fish completion installed.${COLOR_RESET}"
 fi
 
-# 5. Install / Update Antigravity IDE and VS Code Extensions
-echo -e "\n${COLOR_BLUE}[5/5] Synchronizing editor extensions for Antigravity IDE and VS Code...${COLOR_RESET}"
-ANTIGRAVITY_EXT="$HOME/.antigravity-ide/extensions/kora-lang.kora-vscode-0.1.0"
-VSCODE_EXT="$HOME/.vscode/extensions/kora-vscode"
+# 5. Install / Update Antigravity IDE, VS Code, and Cursor Extensions
+echo -e "\n${COLOR_BLUE}[5/5] Installing & Synchronizing editor extensions for VS Code, Cursor, and Antigravity IDE...${COLOR_RESET}"
 
-if [[ -d "$ROOT_DIR/integrations/vscode" ]]; then
-    for EXT_PATH in "$ANTIGRAVITY_EXT" "$VSCODE_EXT"; do
-        mkdir -p "$EXT_PATH/client" "$EXT_PATH/icons" "$EXT_PATH/snippets" "$EXT_PATH/syntaxes"
-        cp -f "$ROOT_DIR/integrations/vscode/package.json" "$EXT_PATH/package.json"
-        cp -f "$ROOT_DIR/integrations/vscode/kora-icons.json" "$EXT_PATH/kora-icons.json"
-        cp -f "$ROOT_DIR/integrations/vscode/language-configuration.json" "$EXT_PATH/language-configuration.json"
-        cp -f "$ROOT_DIR/integrations/vscode/client/extension.js" "$EXT_PATH/client/extension.js"
-        cp -rf "$ROOT_DIR/integrations/vscode/icons/"* "$EXT_PATH/icons/"
-        cp -rf "$ROOT_DIR/integrations/vscode/snippets/"* "$EXT_PATH/snippets/"
-        cp -rf "$ROOT_DIR/integrations/vscode/syntaxes/"* "$EXT_PATH/syntaxes/"
-    done
-    echo -e "${COLOR_GREEN}✓ Editor extension synced to Antigravity IDE and VS Code.${COLOR_RESET}"
-else
-    echo -e "${COLOR_YELLOW}  Notice: Editor integration files not found locally, skipping IDE extension sync.${COLOR_RESET}"
+VSIX_PATH="$ROOT_DIR/integrations/vscode/kora-vscode-0.1.0.vsix"
+
+# If VSIX does not exist, package it automatically
+if [[ ! -f "$VSIX_PATH" ]] && [[ -d "$ROOT_DIR/integrations/vscode" ]]; then
+    if command -v python3 &>/dev/null; then
+        python3 -c "
+import os, zipfile
+vsix_path = '$VSIX_PATH'
+base_dir = '$ROOT_DIR/integrations/vscode'
+manifest = '''<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<PackageManifest Version=\"2.0.0\" xmlns=\"http://schemas.microsoft.com/developer/vsx-schema/2011\" xmlns:d=\"http://schemas.microsoft.com/developer/vsx-schema-design/2011\">
+  <Metadata>
+    <Identity Language=\"en-US\" Id=\"kora-vscode\" Version=\"0.1.0\" Publisher=\"kora-lang\"/>
+    <DisplayName>Kora Language Support</DisplayName>
+    <Description xml:space=\"preserve\">Official syntax highlighting, rich language configuration, snippets, and real-time compiler diagnostics for the Kora programming language and framework.</Description>
+    <Tags>kora,rust,backend,syntax,framework</Tags>
+    <Categories>Programming Languages,Snippets,Linters</Categories>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Id=\"Microsoft.VisualStudio.Code\"/>
+  </Installation>
+  <Dependencies/>
+  <Assets>
+    <Asset Type=\"Microsoft.VisualStudio.Code.Manifest\" Path=\"extension/package.json\" Addressable=\"true\"/>
+  </Assets>
+</PackageManifest>
+'''
+content_types = '''<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">
+  <Default Extension=\"json\" ContentType=\"application/json\" />
+  <Default Extension=\"vsixmanifest\" ContentType=\"text/xml\" />
+  <Default Extension=\"js\" ContentType=\"application/javascript\" />
+  <Default Extension=\"svg\" ContentType=\"image/svg+xml\" />
+  <Default Extension=\"png\" ContentType=\"image/png\" />
+  <Default Extension=\"md\" ContentType=\"text/markdown\" />
+</Types>
+'''
+with zipfile.ZipFile(vsix_path, 'w', zipfile.ZIP_DEFLATED) as z:
+    z.writestr('[Content_Types].xml', content_types)
+    z.writestr('extension.vsixmanifest', manifest)
+    for root, dirs, files in os.walk(base_dir):
+        for f in files:
+            if f.endswith('.vsix'): continue
+            fp = os.path.join(root, f)
+            arcname = os.path.join('extension', os.path.relpath(fp, base_dir))
+            z.write(fp, arcname)
+" 2>/dev/null || true
+    fi
+fi
+
+# 5.1 Execute extension install command via CLI if available
+for EDITOR_BIN in code code-insiders cursor codium windsurf; do
+    if command -v "$EDITOR_BIN" &>/dev/null; then
+        echo -e "${COLOR_CYAN}  Found editor CLI: $EDITOR_BIN${COLOR_RESET}"
+        if [[ -f "$VSIX_PATH" ]]; then
+            echo -e "${COLOR_CYAN}  Executing: $EDITOR_BIN --install-extension \"$VSIX_PATH\" --force${COLOR_RESET}"
+            "$EDITOR_BIN" --install-extension "$VSIX_PATH" --force 2>/dev/null && {
+                echo -e "${COLOR_GREEN}✓ Extension successfully installed into $EDITOR_BIN.${COLOR_RESET}"
+            } || true
+        else
+            "$EDITOR_BIN" --install-extension "kora-lang.kora-vscode" --force 2>/dev/null || true
+        fi
+    fi
+done
+
+# 5.2 Direct directory installation for Antigravity IDE, VS Code, and Cursor
+TARGET_EXT_DIRS=(
+    "$HOME/.antigravity-ide/extensions/kora-lang.kora-vscode-0.1.0"
+    "$HOME/.antigravity/extensions/kora-lang.kora-vscode-0.1.0"
+    "$HOME/.vscode/extensions/kora-lang.kora-vscode-0.1.0"
+    "$HOME/.vscode/extensions/kora-vscode"
+    "$HOME/.vscode-insiders/extensions/kora-vscode"
+    "$HOME/.cursor/extensions/kora-vscode"
+    "$HOME/.cursor/extensions/kora-lang.kora-vscode-0.1.0"
+    "$HOME/.windsurf/extensions/kora-vscode"
+)
+
+# Unpack from VSIX if available, or copy from source
+for EXT_PATH in "${TARGET_EXT_DIRS[@]}"; do
+    mkdir -p "$EXT_PATH" 2>/dev/null || true
+    if [[ -f "$VSIX_PATH" ]] && command -v unzip &>/dev/null; then
+        TMP_EXT="$(mktemp -d)"
+        if unzip -q -o "$VSIX_PATH" -d "$TMP_EXT" 2>/dev/null && [[ -d "$TMP_EXT/extension" ]]; then
+            cp -rf "$TMP_EXT/extension/"* "$EXT_PATH/" 2>/dev/null || true
+        fi
+        rm -rf "$TMP_EXT"
+    elif [[ -d "$ROOT_DIR/integrations/vscode" ]]; then
+        mkdir -p "$EXT_PATH/client" "$EXT_PATH/icons" "$EXT_PATH/snippets" "$EXT_PATH/syntaxes" 2>/dev/null || true
+        cp -f "$ROOT_DIR/integrations/vscode/package.json" "$EXT_PATH/package.json" 2>/dev/null || true
+        cp -f "$ROOT_DIR/integrations/vscode/kora-icons.json" "$EXT_PATH/kora-icons.json" 2>/dev/null || true
+        cp -f "$ROOT_DIR/integrations/vscode/language-configuration.json" "$EXT_PATH/language-configuration.json" 2>/dev/null || true
+        cp -f "$ROOT_DIR/integrations/vscode/client/extension.js" "$EXT_PATH/client/extension.js" 2>/dev/null || true
+        cp -rf "$ROOT_DIR/integrations/vscode/icons/"* "$EXT_PATH/icons/" 2>/dev/null || true
+        cp -rf "$ROOT_DIR/integrations/vscode/snippets/"* "$EXT_PATH/snippets/" 2>/dev/null || true
+        cp -rf "$ROOT_DIR/integrations/vscode/syntaxes/"* "$EXT_PATH/syntaxes/" 2>/dev/null || true
+    else
+        # Remote fallback
+        BASE_RAW="https://raw.githubusercontent.com/Hwai-technology/kora-framework/main/integrations/vscode"
+        mkdir -p "$EXT_PATH/client" "$EXT_PATH/syntaxes" "$EXT_PATH/snippets" 2>/dev/null || true
+        curl -fsSL "$BASE_RAW/package.json" -o "$EXT_PATH/package.json" 2>/dev/null || true
+        curl -fsSL "$BASE_RAW/language-configuration.json" -o "$EXT_PATH/language-configuration.json" 2>/dev/null || true
+        curl -fsSL "$BASE_RAW/client/extension.js" -o "$EXT_PATH/client/extension.js" 2>/dev/null || true
+        curl -fsSL "$BASE_RAW/syntaxes/kora.tmLanguage.json" -o "$EXT_PATH/syntaxes/kora.tmLanguage.json" 2>/dev/null || true
+        curl -fsSL "$BASE_RAW/snippets/kora.snippets.json" -o "$EXT_PATH/snippets/kora.snippets.json" 2>/dev/null || true
+    fi
+done
+echo -e "${COLOR_GREEN}✓ Editor extension automatically deployed to all IDE profiles.${COLOR_RESET}"
+
+# 5.3 Automatically integrate with Material Icon Theme to prevent conflicts
+KORA_SVG="$ROOT_DIR/integrations/vscode/icons/kora-file.svg"
+if [[ -f "$KORA_SVG" ]]; then
+    while IFS= read -r MAT_DIR; do
+        if [[ -d "$MAT_DIR/icons" ]]; then
+            cp -f "$KORA_SVG" "$MAT_DIR/icons/kora.svg" 2>/dev/null || true
+            echo -e "${COLOR_GREEN}✓ Seamlessly integrated Kora icons into Material Icon Theme (${MAT_DIR##*/}).${COLOR_RESET}"
+        fi
+    done < <(find "$HOME" -maxdepth 5 -type d -name "pkief.material-icon-theme*" 2>/dev/null)
 fi
 
 # Verification

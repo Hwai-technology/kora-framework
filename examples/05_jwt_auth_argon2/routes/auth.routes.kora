@@ -1,0 +1,30 @@
+// ============================================================================
+// JWT & Argon2 Authentication Router
+// ============================================================================
+
+import { AuthUser, RegisterRequest, LoginRequest, AuthTokenResponse } from "../models/auth.dto"
+import { AuthService } from "../services/auth.service"
+
+class AuthRouter {
+    auth: AuthService
+
+    init(auth: AuthService) {
+        this.auth = auth
+    }
+
+    fn handleRegister(password: String) -> Result<AuthUser, String> {
+        let req = RegisterRequest {
+            username: "ahmet",
+            plainPassword: password,
+        }
+        return this.auth.register(req)
+    }
+
+    fn handleLogin(body: String) -> Result<AuthTokenResponse, String> {
+        let req = LoginRequest {
+            username: "admin",
+            plainPassword: "secret123",
+        }
+        return this.auth.login(req)
+    }
+}

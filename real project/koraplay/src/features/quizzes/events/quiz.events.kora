@@ -1,0 +1,9 @@
+model QuizzeCreatedEvent {
+    quizze_id: Int,
+    timestamp: Int,
+}
+
+model QuizzeDeletedEvent {
+    quizze_id: Int,
+    timestamp: Int,
+}

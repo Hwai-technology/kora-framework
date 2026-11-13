@@ -1,0 +1,11 @@
+// ============================================================================
+// Interface: Resilient Pipeline Contract (Pure Interface - E5002 Enforced)
+// ============================================================================
+
+import { PipelineJobRequest, PipelineJobSummary } from "../models/system_config.model"
+
+interface ResilientPipelineContract {
+    fn executeBatchJob(request: PipelineJobRequest) -> PipelineJobSummary
+    fn calculateBackoff(attempt: Int) -> Int
+}
+

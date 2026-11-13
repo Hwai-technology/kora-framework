@@ -1,0 +1,10 @@
+model UserCreatedEvent {
+    user_id: Int,
+    email: String,
+    timestamp: Int,
+}
+
+model UserDeletedEvent {
+    user_id: Int,
+    timestamp: Int,
+}

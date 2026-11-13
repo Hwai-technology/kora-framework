@@ -1,0 +1,14 @@
+// ============================================================================
+// Example 12: Event-Driven Microservice Architecture
+// Main Application Container with Event Bus & Consumer Handlers
+// ============================================================================
+
+import { App } from "kora/http"
+import { OrderEventsRoutes } from "./routes/order_events.routes"
+
+let app = App()
+
+// Register Event Sourcing & Messaging Routes
+app.use(OrderEventsRoutes)
+
+app.listen(8081)

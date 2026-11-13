@@ -1,0 +1,6 @@
+import { IotMetricEntity } from "../models/iot_metric.entity"
+
+interface TelemetryRepositoryInterface {
+    fn recordMetric(deviceId: String, temp: Int, battery: Int) -> Result<IotMetricEntity, String>
+    fn getLatestMetrics() -> Result<Int, String>
+}

@@ -1,0 +1,37 @@
+import { CreateQuizzeDto } from "../models/quiz.dto"
+import { QuizzeValidator } from "../validators/quiz.validator"
+import { QuizzeError } from "../errors/quiz.errors"
+
+fn test_validation_passes() -> Bool {
+    let validator = QuizzeValidator()
+    let valid_dto = CreateQuizzeDto {
+        name: "Valid Quizze",
+    }
+    let res = validator.validate_create(valid_dto)
+    return match res {
+        Ok(valid) => valid,
+        Err(e) => false,
+    }
+}
+
+fn test_validation_fails_on_empty() -> Bool {
+    let validator = QuizzeValidator()
+    let empty_dto = CreateQuizzeDto {
+        name: "",
+    }
+    let res = validator.validate_create(empty_dto)
+    return match res {
+        Ok(valid) => false,
+        Err(e) => true,
+    }
+}
+
+fn main() {
+    let p1 = test_validation_passes()
+    let p2 = test_validation_fails_on_empty()
+    if p1 && p2 {
+        print("✓ All Quizze feature tests passed!")
+    } else {
+        print("✗ Feature tests failed")
+    }
+}

@@ -1,0 +1,33 @@
+// ============================================================================
+// Enterprise Clean Architecture Database Seeder
+// Injects test users, catalog products, and initial orders
+// ============================================================================
+
+import { AmbientDatabasePool } from "./database.pool"
+
+class EnterpriseDatabaseSeeder {
+    pool: AmbientDatabasePool
+
+    init(pool: AmbientDatabasePool) {
+        this.pool = pool
+    }
+
+    fn seed() -> Result<Bool, String> {
+        // 1. Seed initial enterprise administrator
+        this.pool.executeQuery(
+            "INSERT INTO users (id, email, password_hash, role, status) VALUES (1, 'admin@enterprise.io', '$argon2id$v=19$m=65536,t=3,p=4$xyz', 'ADMIN', 'ACTIVE') ON CONFLICT (email) DO NOTHING"
+        )
+
+        // 2. Seed initial demo customer
+        this.pool.executeQuery(
+            "INSERT INTO users (id, email, password_hash, role, status) VALUES (2, 'customer@enterprise.io', '$argon2id$v=19$m=65536,t=3,p=4$abc', 'CUSTOMER', 'ACTIVE') ON CONFLICT (email) DO NOTHING"
+        )
+
+        // 3. Seed product catalog item
+        this.pool.executeQuery(
+            "INSERT INTO products (id, sku, name, price, stock) VALUES (1, 'PROD-001', 'Enterprise Cloud License', 4999.00, 100) ON CONFLICT (sku) DO NOTHING"
+        )
+
+        return Ok(true)
+    }
+}

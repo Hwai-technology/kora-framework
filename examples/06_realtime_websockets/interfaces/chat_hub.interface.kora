@@ -1,0 +1,11 @@
+// ============================================================================
+// Realtime Chat Hub Interface
+// ============================================================================
+
+import { ChatMessage, SendMessageRequest, RoomPresence } from "../models/chat.models"
+
+interface ChatHub {
+    fn broadcast(req: SendMessageRequest) -> ChatMessage
+    fn getPresence(room: String) -> RoomPresence
+}
+

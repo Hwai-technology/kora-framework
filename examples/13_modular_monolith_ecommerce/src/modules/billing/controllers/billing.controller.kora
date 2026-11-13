@@ -1,0 +1,14 @@
+import { BillingService } from "../services/billing.service"
+import { InvoiceEntity } from "../models/invoice.entity"
+
+class BillingController {
+    service: BillingService
+
+    init(service: BillingService) {
+        this.service = service
+    }
+
+    fn generateInvoice() -> Result<InvoiceEntity, String> {
+        return this.service.charge("customer@korashop.com", 249900)
+    }
+}

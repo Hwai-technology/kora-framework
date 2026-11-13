@@ -1,0 +1,15 @@
+import { TelemetryController } from "../controllers/telemetry.controller"
+
+class TelemetryRoutes {
+    controller: TelemetryController
+
+    init(controller: TelemetryController) {
+        this.controller = controller
+    }
+
+    fn register(app: App) -> App {
+        app.post("/api/telemetry/ingest", this.controller.postMetric)
+        app.get("/api/telemetry/metrics", this.controller.listMetrics)
+        return app
+    }
+}

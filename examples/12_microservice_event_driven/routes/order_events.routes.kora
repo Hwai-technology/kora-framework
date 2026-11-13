@@ -1,0 +1,15 @@
+import { OrderEventsController } from "../controllers/order_events.controller"
+
+class OrderEventsRoutes {
+    controller: OrderEventsController
+
+    init(controller: OrderEventsController) {
+        this.controller = controller
+    }
+
+    fn register(app: App) -> App {
+        app.post("/events/publish", this.controller.publishOrderPlaced)
+        app.get("/events/stream", this.controller.getEvents)
+        return app
+    }
+}

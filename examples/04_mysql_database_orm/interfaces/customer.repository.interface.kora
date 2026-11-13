@@ -1,0 +1,12 @@
+// ============================================================================
+// Customer Database Repository Interface
+// ============================================================================
+
+import { Customer, CustomerSignupInput } from "../models/customer.models"
+
+interface CustomerDatabaseRepository {
+    fn findByEmail(email: String) -> Option<Customer>
+    fn insertCustomer(input: CustomerSignupInput) -> Result<Customer, String>
+    fn addCredit(id: Int, amount: Int) -> Result<Customer, String>
+}
+

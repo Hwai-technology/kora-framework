@@ -1,0 +1,53 @@
+// ============================================================================
+// Auth Module: Security Guard & Bearer Token Validator
+// Inspects incoming HTTP Request, extracts headers, and verifies JWT claims
+// ============================================================================
+
+import { JwtService } from "shared/services/jwt.service";
+import { Logger } from "shared/services/logger.service";
+
+class AuthGuard {
+    jwt: JwtService
+    logger: Logger
+
+    init(jwt: JwtService, logger: Logger) {
+        this.jwt = jwt
+        this.logger = logger
+    }
+
+    fn validateRequest(req: Request) -> Result<Int, String> {
+        let authHeaderOpt = req.header("authorization")
+        if authHeaderOpt == null {
+            let l = this.logger.warn("AuthGuard", "Rejected request: Authorization header missing", "sec_guard_01")
+            return Err("Authorization header is missing")
+        }
+
+        return match authHeaderOpt {
+            Some(headerVal) => {
+                if headerVal == "" {
+                    let l = this.logger.warn("AuthGuard", "Rejected request: Authorization header is empty", "sec_guard_02")
+                    return Err("Authorization header cannot be empty")
+                }
+                let verified = this.jwt.verifyAccessToken(headerVal)
+                return match verified {
+                    Ok(userId) => {
+                        let l = this.logger.info("AuthGuard", "Request token successfully verified", "sec_guard_03")
+                        return Ok(userId)
+                    },
+                    Err(err) => {
+                        let l = this.logger.warn("AuthGuard", "Rejected request: Invalid bearer token", "sec_guard_04")
+                        return Err(err)
+                    },
+                }
+            },
+            null => Err("Authorization header is missing"),
+        }
+    }
+
+    fn destroy() -> Bool {
+        let d1 = this.jwt.destroy()
+        let d2 = this.logger.destroy()
+        return true
+    }
+}
+

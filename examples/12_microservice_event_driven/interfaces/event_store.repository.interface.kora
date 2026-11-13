@@ -1,0 +1,6 @@
+import { DomainEventEntity } from "../models/domain_event.entity"
+
+interface EventStoreRepositoryInterface {
+    fn saveEvent(eventType: String, payload: String) -> Result<DomainEventEntity, String>
+    fn getLatestEvents(limit: Int) -> Result<Int, String>
+}

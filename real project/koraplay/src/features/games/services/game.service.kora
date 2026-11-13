@@ -1,0 +1,68 @@
+import { CreateGameDto, GameResponseDto, PaginatedGamesDto } from "../models/game.dto"
+import { GameEntity } from "../models/game.entity"
+import { GameError } from "../errors/game.errors"
+import { GamesServiceInterface } from "../interfaces/game.service.interface"
+import { GamesRepository } from "../repositories/game.repository"
+import { GameValidator } from "../validators/game.validator"
+
+class GamesService implements GamesServiceInterface {
+    repo: GamesRepository,
+    validator: GameValidator,
+
+    init(repo: GamesRepository, validator: GameValidator) {
+        this.repo = repo
+        this.validator = validator
+    }
+
+    fn create_game(dto: CreateGameDto) -> Result<GameResponseDto, GameError> {
+        let valid = this.validator.validate_create(dto)
+        return match valid {
+            Ok(ok) => {
+                let entity = GameEntity {
+                    id: 1,
+                    name: dto.name,
+                    active: true,
+                }
+                let saved = this.repo.save(entity)
+                match saved {
+                    Ok(persisted) => Ok(GameResponseDto {
+                        id: persisted.id,
+                        name: persisted.name,
+                        active: persisted.active,
+                    }),
+                    Err(e) => Err(e),
+                }
+            },
+            Err(e) => Err(e),
+        }
+    }
+
+    fn get_game_by_id(id: Int) -> Result<GameResponseDto, GameError> {
+        let item = this.repo.find_by_id(id)
+        return match item {
+            Some(found) => Ok(GameResponseDto {
+                id: found.id,
+                name: found.name,
+                active: found.active,
+            }),
+            None => Err(GameError.NotFound("Game with specified ID not found")),
+        }
+    }
+
+    fn list_games(page: Int, pageSize: Int) -> PaginatedGamesDto {
+        let entities = this.repo.find_all(page, pageSize)
+        let total = this.repo.count_all()
+        return PaginatedGamesDto {
+            items: [
+                GameResponseDto { id: 1, name: "Game 1", active: true },
+            ],
+            total: total,
+            page: page,
+            pageSize: pageSize,
+        }
+    }
+
+    fn delete_game(id: Int) -> Bool {
+        return this.repo.remove(id)
+    }
+}

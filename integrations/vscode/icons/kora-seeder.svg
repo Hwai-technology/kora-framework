@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="kora-seeder-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#14B8A6"/>
+      <stop offset="100%" stop-color="#0F766E"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="28" height="28" rx="6" fill="url(#kora-seeder-grad)" stroke="#2DD4BF" stroke-width="1.5"/>
+  <path d="M10 8 L10 24 M10 16 L22 8 M12 14 L22 24" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Small sprout/seed indicator badge -->
+  <circle cx="24" cy="24" r="3" fill="#34D399"/>
+</svg>

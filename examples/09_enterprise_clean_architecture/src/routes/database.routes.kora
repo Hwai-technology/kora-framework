@@ -1,0 +1,65 @@
+// ============================================================================
+// Enterprise Clean Architecture — Database & Schema Routes
+// ============================================================================
+
+import { SecureApiResponse } from "../models/response_envelope.model"
+import { AutoMigrator, DatabaseSeeder } from "../database/auto.migrator"
+import { ApiResponse } from "../middleware/api_response_factory.middleware"
+import { Logger } from "../shared/services/logger.service"
+
+class DatabaseRouter {
+    migrator: AutoMigrator
+    seeder: DatabaseSeeder
+    response: ApiResponse
+    logger: Logger
+
+    init(
+        migrator: AutoMigrator,
+        seeder: DatabaseSeeder,
+        response: ApiResponse,
+        logger: Logger,
+    ) {
+        this.migrator = migrator
+        this.seeder = seeder
+        this.response = response
+        this.logger = logger
+    }
+
+    fn migrateDatabase() -> SecureApiResponse {
+        let mig = this.migrator.runAllMigrations()
+        let l = this.logger.info("db", "Schema migrations executed", "trace_mig_01")
+        return this.response.ok("Database schema migrations executed successfully", 4)
+    }
+
+    fn syncDatabaseSchema() -> SecureApiResponse {
+        let sync = this.migrator.syncSchemaWithEntities()
+        let l = this.logger.info("db", "Database schema synchronized with Entity models", "trace_sync_01")
+        return this.response.ok("Database schema synchronized with Entity models successfully", 5)
+    }
+
+    fn seedDatabase() -> SecureApiResponse {
+        let seed = this.seeder.seedInitialData()
+        let l = this.logger.info("db", "Database seeded with initial enterprise records", "trace_seed_01")
+        return this.response.ok("Database seeded with initial records successfully", 4)
+    }
+
+    fn truncateDatabase() -> SecureApiResponse {
+        let trunc = this.migrator.truncateAllData()
+        let l = this.logger.warn("db", "Database tables truncated cleanly", "trace_trunc_01")
+        return this.response.ok("Database table records wiped successfully", 4)
+    }
+
+    fn dropDatabaseTables() -> SecureApiResponse {
+        let drop = this.migrator.dropAllTables()
+        let l = this.logger.warn("db", "All database tables dropped", "trace_drop_01")
+        return this.response.ok("All database tables dropped successfully", 4)
+    }
+
+    fn refreshDatabase() -> SecureApiResponse {
+        let d = this.migrator.dropAllTables()
+        let m = this.migrator.runAllMigrations()
+        let s = this.seeder.seedInitialData()
+        let l = this.logger.info("db", "Database refreshed (drop, migrate, seed)", "trace_refresh_01")
+        return this.response.ok("Database refreshed completely (drop + migrate + seed)", 12)
+    }
+}

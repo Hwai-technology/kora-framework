@@ -73,23 +73,49 @@ pub fn generate_openapi(ast: &Module, app_name: &str) -> OpenApiDoc {
         }
     }
 
-    // 2. Auto-discover all routes (get, post, put, delete, patch)
+    // 2. Auto-discover all routes (get, post, put, delete, patch) from top-level and router class methods
+    let mut call_exprs = Vec::new();
     for item in &ast.items {
-        if let Item::Stmt(Stmt::Expr { expr, .. }) = item {
-            if let Expr::Call { callee, args, .. } = expr {
-                if let Expr::Ident(id) = callee.as_ref() {
-                    let method = id.name.to_lowercase();
-                    if matches!(method.as_str(), "get" | "post" | "put" | "delete" | "patch") {
-                        if let Some(path_expr) = args.first() {
-                            let raw_path = match path_expr {
-                                Expr::StringLit { value, .. } => value.clone(),
-                                _ => "/api".to_string(),
-                            };
+        match item {
+            Item::Stmt(Stmt::Expr { expr, .. }) => {
+                if let Expr::Call { .. } = expr {
+                    call_exprs.push(expr);
+                }
+            }
+            Item::Class(cls) => {
+                for m in &cls.methods {
+                    for stmt in &m.body.stmts {
+                        if let Stmt::Expr { expr, .. } = stmt {
+                            if let Expr::Call { .. } = expr {
+                                call_exprs.push(expr);
+                            }
+                        }
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
 
-                            let (normalized_path, path_params) = normalize_route_path(&raw_path);
-                            let tag = derive_route_tag(&normalized_path);
+    for expr in call_exprs {
+        if let Expr::Call { callee, args, .. } = expr {
+            let method_opt = match callee.as_ref() {
+                Expr::Ident(id) => Some(id.name.to_lowercase()),
+                Expr::FieldAccess { field, .. } => Some(field.name.to_lowercase()),
+                _ => None,
+            };
+            if let Some(method) = method_opt {
+                if matches!(method.as_str(), "get" | "post" | "put" | "delete" | "patch") {
+                    if let Some(path_expr) = args.first() {
+                        let raw_path = match path_expr {
+                            Expr::StringLit { value, .. } => value.clone(),
+                            _ => "/api".to_string(),
+                        };
 
-                            let closure_expr = args.get(1);
+                        let (normalized_path, path_params) = normalize_route_path(&raw_path);
+                        let tag = derive_route_tag(&normalized_path);
+
+                        let closure_expr = args.last();
                             let mut op_obj = Map::new();
                             op_obj.insert("tags".into(), json!([tag]));
                             op_obj.insert(
@@ -168,7 +194,6 @@ pub fn generate_openapi(ast: &Module, app_name: &str) -> OpenApiDoc {
                 }
             }
         }
-    }
 
     let spec = json!({
         "openapi": "3.1.0",

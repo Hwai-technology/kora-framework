@@ -1,28 +1,31 @@
 // ============================================================================
-// Example 01: Core Language Basics, Enums, Match, Models & Functions
+// Example 01: Core Language Basics, Enums, Match, Models & Class Architecture
 // ============================================================================
 
-import { Coordinates } from "./models/coordinates"
-import { OrderStatus } from "./enums/order_status"
+import { Coordinates } from "./models/coordinates.model"
+import { OrderStatus } from "./enums/order_status.enum"
 
-fn describeOrder(status: OrderStatus) -> String {
-    return match status {
-        OrderStatus.Pending => "Order is awaiting payment",
-        OrderStatus.Paid(cents) => "Order payment confirmed",
-        OrderStatus.Cancelled(reason) => reason,
+class OrderProcessor {
+    fn describeOrder(status: OrderStatus) -> String {
+        return match status {
+            OrderStatus.Pending => "Order is awaiting payment",
+            OrderStatus.Paid(cents) => "Order payment confirmed",
+            OrderStatus.Cancelled(reason) => reason,
+        }
+    }
+
+    fn calculateTotal(subtotal: Int, taxRatePercent: Int) -> Int {
+        let tax = (subtotal * taxRatePercent) / 100
+        return subtotal + tax
     }
 }
 
-fn calculateTotal(subtotal: Int, taxRatePercent: Int) -> Int {
-    let tax = (subtotal * taxRatePercent) / 100
-    return subtotal + tax
-}
-
+let processor = OrderProcessor()
 let developer = "Ahmet"
 let location = Coordinates { lat: 41.0082, lng: 28.9784 }
-let finalAmount = calculateTotal(1200, 18)
+let finalAmount = processor.calculateTotal(1200, 18)
 let currentStatus = OrderStatus.Paid(finalAmount)
-let message = describeOrder(currentStatus)
+let message = processor.describeOrder(currentStatus)
 
 print(developer)
 print(message)

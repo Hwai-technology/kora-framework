@@ -1,0 +1,41 @@
+// ============================================================================
+// Enterprise Clean Architecture — Central API Gateway & Aggregate Router
+// ============================================================================
+
+import { SecureApiResponse } from "../models/response_envelope.model"
+import { DatabaseRouter } from "./database.routes"
+import { AuthRouter } from "./auth.routes"
+import { OrderRouter } from "./order.routes"
+import { ApiResponse } from "../middleware/api_response_factory.middleware"
+import { Logger } from "../shared/services/logger.service"
+
+class ApiRouter {
+    database: DatabaseRouter
+    auth: AuthRouter
+    orders: OrderRouter
+    response: ApiResponse
+    logger: Logger
+
+    init(
+        database: DatabaseRouter,
+        auth: AuthRouter,
+        orders: OrderRouter,
+        response: ApiResponse,
+        logger: Logger,
+    ) {
+        this.database = database
+        this.auth = auth
+        this.orders = orders
+        this.response = response
+        this.logger = logger
+    }
+
+    fn health() -> SecureApiResponse {
+        let l = this.logger.info("server", "Health check probe OK", "trace_health_01")
+        return this.response.ok("Kora Clean Architecture Enterprise Engine is running healthy", 1)
+    }
+
+    fn banner() -> SecureApiResponse {
+        return this.response.ok("⚡ Kora Clean Architecture Enterprise API v1.0", 1)
+    }
+}

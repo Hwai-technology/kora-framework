@@ -1,0 +1,8 @@
+import { UserResponseDto, CreateUserDto } from "../models/user.dto"
+
+interface UserServiceInterface {
+    fn create_user(dto: CreateUserDto) -> UserResponseDto
+    fn get_user_by_id(id: Int) -> Option<UserResponseDto>
+    fn get_all_users() -> List<UserResponseDto>
+    fn delete_user(id: Int) -> Bool
+}

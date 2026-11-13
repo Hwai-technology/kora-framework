@@ -1,0 +1,24 @@
+// ============================================================================
+// Realtime Chat — Presentation Controller Layer
+// ============================================================================
+
+import { ChatService } from "../services/chat_hub.service"
+
+class ChatController {
+    service: ChatService
+
+    init(service: ChatService) {
+        this.service = service
+    }
+
+    fn presence(request: Request) -> Response {
+        let room = request.params["room"]
+        let result = this.service.getPresence(room)
+        return Response.json(result)
+    }
+
+    fn sendMessage(request: Request) -> Response {
+        let result = this.service.sendMessage(request.body)
+        return Response.json(result)
+    }
+}

@@ -1,0 +1,32 @@
+// ============================================================================
+// Clean Architecture Users Router
+// ============================================================================
+
+import { User } from "../models/user.models"
+import { UserService } from "../services/user.service"
+
+class UserRouter {
+    service: UserService
+
+    init(service: UserService) {
+        this.service = service
+    }
+
+    fn listUsers() -> List<User> {
+        return User.all()
+    }
+
+    fn getUser(id: Int) -> Option<User> {
+        return this.service.findById(id)
+    }
+
+    fn createUser(name: String) -> Result<User, String> {
+        let candidate = User {
+            id: 1,
+            name: name,
+            email: "new@kora.dev",
+            active: true,
+        }
+        return this.service.validateNewUser(candidate)
+    }
+}

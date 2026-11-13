@@ -1,0 +1,29 @@
+import { DomainEventEntity } from "../models/domain_event.entity"
+import { EventStoreRepositoryInterface } from "../interfaces/event_store.repository.interface"
+
+class EventStoreRepository implements EventStoreRepositoryInterface {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn saveEvent(eventType: String, payload: String) -> Result<DomainEventEntity, String> {
+        if eventType == "" {
+            return Err("Event type cannot be empty")
+        }
+        let sql = "INSERT INTO domain_events (eventType, payload, active) VALUES (?1, ?2, true)"
+        let res = this.db.execute(sql)
+        return Ok(DomainEventEntity {
+            id: 1,
+            eventType: eventType,
+            payload: payload,
+            active: true,
+        })
+    }
+
+    fn getLatestEvents(limit: Int) -> Result<Int, String> {
+        let sql = "SELECT * FROM domain_events ORDER BY id DESC LIMIT 50"
+        return this.db.query(sql)
+    }
+}

@@ -1,0 +1,18 @@
+import { CatalogService } from "../services/catalog.service"
+import { CatalogItemEntity } from "../models/catalog_item.entity"
+
+class CatalogController {
+    service: CatalogService
+
+    init(service: CatalogService) {
+        this.service = service
+    }
+
+    fn getCatalog() -> Result<Int, String> {
+        return this.service.listCatalog()
+    }
+
+    fn createProduct() -> Result<CatalogItemEntity, String> {
+        return this.service.addProduct("MacBook Pro 16 M3", 249900)
+    }
+}

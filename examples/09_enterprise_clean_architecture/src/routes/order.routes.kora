@@ -1,0 +1,26 @@
+// ============================================================================
+// Enterprise Clean Architecture — Orders Routes
+// ============================================================================
+
+import { SecureApiResponse } from "../models/response_envelope.model"
+import { OrderController } from "../modules/orders/order.controller"
+
+class OrderRouter {
+    controller: OrderController
+
+    init(controller: OrderController) {
+        this.controller = controller
+    }
+
+    fn getOrder(id: Int) -> SecureApiResponse {
+        return this.controller.handleGet(id)
+    }
+
+    fn createOrder(userId: Int, itemsCount: Int, amount: Int) -> SecureApiResponse {
+        return this.controller.handleCreate(userId, itemsCount, amount)
+    }
+
+    fn cancelOrder(id: Int) -> SecureApiResponse {
+        return this.controller.handleCancel(id)
+    }
+}

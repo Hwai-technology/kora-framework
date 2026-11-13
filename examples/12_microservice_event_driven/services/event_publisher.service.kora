@@ -1,0 +1,18 @@
+import { DomainEventEntity } from "../models/domain_event.entity"
+import { EventStoreRepository } from "../repositories/event_store.repository"
+
+class EventPublisherService {
+    repo: EventStoreRepository
+
+    init(repo: EventStoreRepository) {
+        this.repo = repo
+    }
+
+    fn publish(eventType: String, payload: String) -> Result<DomainEventEntity, String> {
+        return this.repo.saveEvent(eventType, payload)
+    }
+
+    fn listRecent() -> Result<Int, String> {
+        return this.repo.getLatestEvents(50)
+    }
+}

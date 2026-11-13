@@ -1,0 +1,18 @@
+import { TelemetryService } from "../services/telemetry.service"
+import { IotMetricEntity } from "../models/iot_metric.entity"
+
+class TelemetryController {
+    service: TelemetryService
+
+    init(service: TelemetryService) {
+        this.service = service
+    }
+
+    fn postMetric() -> Result<IotMetricEntity, String> {
+        return this.service.ingestMetric("sensor-edge-01", 24, 98)
+    }
+
+    fn listMetrics() -> Result<Int, String> {
+        return this.service.queryRecentTelemetry()
+    }
+}

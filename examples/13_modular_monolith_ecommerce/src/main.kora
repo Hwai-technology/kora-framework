@@ -1,0 +1,16 @@
+// ============================================================================
+// Example 13: Modular Monolith E-Commerce Platform
+// Clean Domain Separation: Catalog Module + Billing Module + Database ORM
+// ============================================================================
+
+import { App } from "kora/http"
+import { CatalogRoutes } from "./modules/catalog/routes/catalog.routes"
+import { BillingRoutes } from "./modules/billing/routes/billing.routes"
+
+let app = App()
+
+// Register bounded-context modular routes
+app.use(CatalogRoutes)
+app.use(BillingRoutes)
+
+app.listen(8082)

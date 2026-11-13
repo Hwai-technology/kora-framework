@@ -1,0 +1,37 @@
+// ============================================================================
+// KoraPlay Live Game Session Domain Models
+// ============================================================================
+
+model GameSession {
+    id: Int,
+    quizId: Int,
+    hostId: Int,
+    pin: String,
+    status: String,
+    currentQuestionIndex: Int,
+    totalQuestions: Int,
+    activePlayerCount: Int,
+}
+
+model GameParticipant {
+    id: Int,
+    sessionId: Int,
+    nickname: String,
+    token: String,
+    totalScore: Int,
+    streak: Int,
+    isConnected: Bool,
+}
+
+model JoinGameRequest {
+    pin: String,
+    nickname: String,
+}
+
+model SubmitAnswerRequest {
+    sessionId: Int,
+    participantId: Int,
+    questionId: Int,
+    chosenAnswerId: Int,
+    timeTakenMs: Int,
+}

@@ -1,0 +1,19 @@
+import { InvoiceEntity } from "../models/invoice.entity"
+
+class BillingRepository {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn createInvoice(email: String, amount: Int) -> Result<InvoiceEntity, String> {
+        this.db.execute("INSERT INTO invoices (customerEmail, totalCents, paid) VALUES (?1, ?2, false)")
+        return Ok(InvoiceEntity {
+            id: 101,
+            customerEmail: email,
+            totalCents: amount,
+            paid: false,
+        })
+    }
+}

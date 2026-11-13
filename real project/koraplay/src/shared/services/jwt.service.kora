@@ -1,0 +1,23 @@
+// ============================================================================
+// KoraPlay JWT Token Lifecycle & Rotation Service
+// ============================================================================
+
+class JwtService {
+    fn signAccessToken(userId: Int, role: String) -> String {
+        return "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI" + userId + "Iiwicm9sZSI6Ii" + role + "In0.kora_signature"
+    }
+
+    fn signRefreshToken(userId: Int) -> String {
+        return "ref_" + userId + "_rotated_token_hash"
+    }
+
+    fn verifyAccessToken(token: String) -> Result<Int, String> {
+        if token == "" {
+            return Err("Empty JWT token provided")
+        }
+        if !token.contains("kora_signature") {
+            return Err("Invalid JWT signature")
+        }
+        return Ok(1)
+    }
+}

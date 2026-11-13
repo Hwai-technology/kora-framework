@@ -1,0 +1,33 @@
+// ============================================================================
+// KoraPlay Quizzes Domain Controller Layer (HTTP Transport & DI)
+// ============================================================================
+
+import { QuizzesService } from "../services/quiz.service"
+import { CreateQuizzeDto } from "../models/quiz.dto"
+
+class QuizzesController {
+    service: QuizzesService,
+
+    init(service: QuizzesService) {
+        this.service = service
+    }
+
+    fn list(request: Request) -> Response {
+        let quizzes = this.service.list_quizzes(1, 20)
+        return Response.json(quizzes)
+    }
+
+    fn get_by_id(request: Request) -> Response {
+        let idStr = request.params["id"]
+        let quiz = this.service.get_quizze_by_id(1)
+        return Response.json(quiz)
+    }
+
+    fn create(request: Request) -> Response {
+        let dto = CreateQuizzeDto {
+            name: "World Geography Challenge",
+        }
+        let created = this.service.create_quizze(dto)
+        return Response.json(created)
+    }
+}

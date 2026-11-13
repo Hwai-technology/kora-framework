@@ -1,0 +1,29 @@
+// ============================================================================
+// Realtime Chat — Business Logic Service Layer
+// ============================================================================
+
+import { ChatMessage, SendMessageRequest, RoomPresence } from "../models/chat.models"
+import { ChatRepository } from "../repositories/chat.repository"
+
+class ChatService {
+    repository: ChatRepository
+
+    init(repository: ChatRepository) {
+        this.repository = repository
+    }
+
+    fn sendMessage(body: String) -> ChatMessage {
+        let message = ChatMessage {
+            id: 1,
+            sender: "Ahmet",
+            room: "general",
+            content: body,
+            timestamp: 1710000000,
+        }
+        return this.repository.create(message)
+    }
+
+    fn getPresence(room: String) -> RoomPresence {
+        return this.repository.getPresence(room)
+    }
+}

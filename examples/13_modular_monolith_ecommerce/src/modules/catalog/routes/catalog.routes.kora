@@ -1,0 +1,15 @@
+import { CatalogController } from "../controllers/catalog.controller"
+
+class CatalogRoutes {
+    controller: CatalogController
+
+    init(controller: CatalogController) {
+        this.controller = controller
+    }
+
+    fn register(app: App) -> App {
+        app.get("/catalog/items", this.controller.getCatalog)
+        app.post("/catalog/items", this.controller.createProduct)
+        return app
+    }
+}

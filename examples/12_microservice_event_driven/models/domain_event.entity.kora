@@ -1,0 +1,18 @@
+@entity
+@table("domain_events")
+model DomainEventEntity {
+    @primary
+    @autoIncrement
+    id: Int,
+    @required
+    eventType: String,
+    @required
+    payload: String,
+    active: Bool,
+}
+
+model EventEnvelope {
+    topic: String,
+    eventId: Int,
+    data: String,
+}

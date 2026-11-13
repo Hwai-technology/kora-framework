@@ -1,0 +1,61 @@
+// ============================================================================
+// Orders Module: Business Logic Service
+// Injects OrderRepository & OrderEventEmitter with Compile-Time DI
+// ============================================================================
+
+import { Order, CreateOrderInput } from "models/order.model";
+import { OrderRepository } from "modules/orders/order.repository";
+import { OrderEventEmitter } from "modules/orders/order.events";
+
+class OrderService {
+    repo: OrderRepository
+    events: OrderEventEmitter
+
+    init(repo: OrderRepository, events: OrderEventEmitter) {
+        this.repo = repo
+        this.events = events
+    }
+
+    fn placeOrder(userId: Int, itemsCount: Int, amount: Int) -> Result<Order, String> {
+        if userId <= 0 {
+            return Err("Invalid user ID")
+        }
+        if itemsCount <= 0 {
+            return Err("Cart must contain at least one item")
+        }
+
+        // Automatic bulk discount: 15% discount for 5 or more items
+        var finalAmount = amount
+        if itemsCount >= 5 {
+            finalAmount = (amount * 85) / 100
+        }
+
+        let input = CreateOrderInput {
+            userId: userId,
+            itemsCount: itemsCount,
+            totalAmount: finalAmount,
+        }
+        let res = this.repo.insertOrder(input)
+        return match res {
+            Ok(order) => {
+                let evt = this.events.emitOrderPlaced(order.id)
+                return Ok(order)
+            },
+            Err(err) => Err(err),
+        }
+    }
+
+    fn getOrder(id: Int) -> Option<Order> {
+        return this.repo.findById(id)
+    }
+
+    fn cancelOrder(id: Int) -> Result<Bool, String> {
+        return this.repo.cancel(id)
+    }
+
+    fn destroy() -> Bool {
+        let d1 = this.repo.destroy()
+        let d2 = this.events.destroy()
+        return true
+    }
+}

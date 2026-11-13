@@ -1,0 +1,11 @@
+// ============================================================================
+// Task Worker Interface
+// ============================================================================
+
+import { JobTask, ActorStats } from "../models/task.models"
+
+interface TaskWorker {
+    fn enqueue(task: JobTask) -> Bool
+    fn getStats() -> ActorStats
+}
+

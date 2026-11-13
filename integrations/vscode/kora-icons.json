@@ -3,14 +3,50 @@
     "_kora_file": {
       "iconPath": "./icons/kora-file.svg"
     },
+    "_kora_controller": {
+      "iconPath": "./icons/kora-controller.svg"
+    },
+    "_kora_service": {
+      "iconPath": "./icons/kora-service.svg"
+    },
+    "_kora_repository": {
+      "iconPath": "./icons/kora-repository.svg"
+    },
+    "_kora_routes": {
+      "iconPath": "./icons/kora-routes.svg"
+    },
+    "_kora_entity": {
+      "iconPath": "./icons/kora-entity.svg"
+    },
+    "_kora_dto": {
+      "iconPath": "./icons/kora-dto.svg"
+    },
     "_kora_model": {
       "iconPath": "./icons/kora-model.svg"
     },
-    "_kora_config": {
-      "iconPath": "./icons/kora-config.svg"
+    "_kora_interface": {
+      "iconPath": "./icons/kora-interface.svg"
+    },
+    "_kora_enum": {
+      "iconPath": "./icons/kora-enum.svg"
+    },
+    "_kora_middleware": {
+      "iconPath": "./icons/kora-middleware.svg"
+    },
+    "_kora_validator": {
+      "iconPath": "./icons/kora-validator.svg"
+    },
+    "_kora_event": {
+      "iconPath": "./icons/kora-event.svg"
     },
     "_kora_test": {
       "iconPath": "./icons/kora-test.svg"
+    },
+    "_kora_seeder": {
+      "iconPath": "./icons/kora-seeder.svg"
+    },
+    "_kora_config": {
+      "iconPath": "./icons/kora-config.svg"
     },
     "_kora_module": {
       "iconPath": "./icons/kora-module.svg"
@@ -20,7 +56,50 @@
   "fileExtensions": {
     "kora": "_kora_file",
     "kr": "_kora_file",
-    "kora.toml": "_kora_config"
+    "controller.kora": "_kora_controller",
+    "controller.kr": "_kora_controller",
+    "router.kora": "_kora_routes",
+    "router.kr": "_kora_routes",
+    "routes.kora": "_kora_routes",
+    "routes.kr": "_kora_routes",
+    "service.kora": "_kora_service",
+    "service.kr": "_kora_service",
+    "repository.kora": "_kora_repository",
+    "repository.kr": "_kora_repository",
+    "repo.kora": "_kora_repository",
+    "repo.kr": "_kora_repository",
+    "entity.kora": "_kora_entity",
+    "entity.kr": "_kora_entity",
+    "dto.kora": "_kora_dto",
+    "dto.kr": "_kora_dto",
+    "model.kora": "_kora_model",
+    "model.kr": "_kora_model",
+    "models.kora": "_kora_model",
+    "models.kr": "_kora_model",
+    "interface.kora": "_kora_interface",
+    "interface.kr": "_kora_interface",
+    "enum.kora": "_kora_enum",
+    "enum.kr": "_kora_enum",
+    "middleware.kora": "_kora_middleware",
+    "middleware.kr": "_kora_middleware",
+    "guard.kora": "_kora_middleware",
+    "guard.kr": "_kora_middleware",
+    "validator.kora": "_kora_validator",
+    "validator.kr": "_kora_validator",
+    "events.kora": "_kora_event",
+    "events.kr": "_kora_event",
+    "event.kora": "_kora_event",
+    "event.kr": "_kora_event",
+    "seeder.kora": "_kora_seeder",
+    "seeder.kr": "_kora_seeder",
+    "seeders.kora": "_kora_seeder",
+    "seeders.kr": "_kora_seeder",
+    "seed.kora": "_kora_seeder",
+    "seed.kr": "_kora_seeder",
+    "test.kora": "_kora_test",
+    "test.kr": "_kora_test",
+    "spec.kora": "_kora_test",
+    "spec.kr": "_kora_test"
   },
   "fileNames": {
     "kora.toml": "_kora_config",
@@ -30,4 +109,3 @@
     "kora": "_kora_file"
   }
 }
-

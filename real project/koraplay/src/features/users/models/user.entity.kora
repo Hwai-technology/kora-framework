@@ -1,0 +1,13 @@
+@entity
+@table("users")
+model UserEntity {
+    @primary
+    @autoIncrement
+    id: Int,
+    @required
+    name: String,
+    @unique
+    @email
+    email: String,
+    active: Bool,
+}

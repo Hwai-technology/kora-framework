@@ -1,0 +1,10 @@
+pub enum SessionStatus {
+    Created,
+    WaitingForPlayers,
+    Starting,
+    QuestionActive,
+    QuestionClosed,
+    Leaderboard,
+    Finished,
+    Cancelled,
+}

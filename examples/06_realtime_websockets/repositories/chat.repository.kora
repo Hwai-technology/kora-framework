@@ -1,0 +1,25 @@
+// ============================================================================
+// Realtime Chat — Repository Data Access Layer
+// ============================================================================
+
+import { ChatMessage, RoomPresence } from "../models/chat.models"
+
+class ChatRepository {
+    database: Database
+
+    init(database: Database) {
+        this.database = database
+    }
+
+    fn create(message: ChatMessage) -> ChatMessage {
+        let res = this.database.chatMessages.create(message)
+        return message
+    }
+
+    fn getPresence(room: String) -> RoomPresence {
+        return RoomPresence {
+            room: room,
+            activeMembers: 42,
+        }
+    }
+}

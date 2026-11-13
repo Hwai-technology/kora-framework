@@ -1,0 +1,74 @@
+// ============================================================================
+// DTO Validation & Type Checking — Dedicated Validation Router
+// ============================================================================
+
+import { UserRegistrationDto } from "../models/user_registration.dto"
+import { FileUploadDto } from "../models/file.dto"
+import { AddressDto, UserPreferencesDto } from "../models/nested.dto"
+import { ValidationEnvelope } from "../models/validation_result.dto"
+import { DtoValidatorService } from "../services/dto_validator.service"
+
+class ValidationRouter {
+    validator: DtoValidatorService
+
+    init(validator: DtoValidatorService) {
+        this.validator = validator
+    }
+
+    fn validateFileUpload() -> Result<Bool, String> {
+        let candidateFile = FileUploadDto {
+            fileName: "avatar.png",
+            mimeType: "image/png",
+            sizeBytes: 2048500,
+            sha256Checksum: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            isPublic: true,
+            imageMeta: null,
+        }
+        return this.validator.validateFileUpload(candidateFile)
+    }
+
+    fn validateAddress() -> Result<Bool, String> {
+        let candidateAddress = AddressDto {
+            street: "100 Innovation Way",
+            city: "San Francisco",
+            postalCode: "94105",
+            countryCode: "US",
+            geo: null,
+        }
+        return this.validator.validateAddress(candidateAddress)
+    }
+
+    fn validateRegistration() -> ValidationEnvelope {
+        let sampleAddress = AddressDto {
+            street: "42 Enterprise Boulevard",
+            city: "Austin",
+            postalCode: "78701",
+            countryCode: "US",
+            geo: null,
+        }
+
+        let samplePreferences = UserPreferencesDto {
+            theme: "dark",
+            locale: "en-US",
+            emailNotifications: true,
+            marketingConsent: false,
+        }
+
+        let candidateDto = UserRegistrationDto {
+            username: "alex_developer",
+            email: "alex@kora.dev",
+            age: 26,
+            hourlyRate: 85.50,
+            agreedToTerms: true,
+            address: sampleAddress,
+            preferences: samplePreferences,
+            skills: ["Rust", "Kora", "Distributed Systems"],
+            avatar: null,
+            documents: [],
+            websiteUrl: Some("https://kora.dev"),
+            accountTier: "Pro",
+        }
+
+        return this.validator.validateRegistration(candidateDto)
+    }
+}

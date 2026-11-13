@@ -1,0 +1,17 @@
+// ============================================================================
+// Realtime Chat — Global Logger Middleware
+// ============================================================================
+
+class LoggerMiddleware {
+    prefix: String
+
+    init() {
+        this.prefix = "[LOGGER]"
+    }
+
+    fn handle(req: Request) -> Request {
+        print(this.prefix)
+        print(req.path)
+        return req
+    }
+}

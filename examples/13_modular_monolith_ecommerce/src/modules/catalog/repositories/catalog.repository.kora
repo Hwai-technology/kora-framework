@@ -1,0 +1,23 @@
+import { CatalogItemEntity } from "../models/catalog_item.entity"
+
+class CatalogRepository {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn listAll() -> Result<Int, String> {
+        return this.db.query("SELECT * FROM catalog_items WHERE active = true")
+    }
+
+    fn create(title: String, priceCents: Int) -> Result<CatalogItemEntity, String> {
+        this.db.execute("INSERT INTO catalog_items (title, priceCents, active) VALUES (?1, ?2, true)")
+        return Ok(CatalogItemEntity {
+            id: 10,
+            title: title,
+            priceCents: priceCents,
+            active: true,
+        })
+    }
+}

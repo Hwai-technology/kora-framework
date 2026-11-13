@@ -1,0 +1,10 @@
+import { ScoringEntity } from "../models/scoring.entity"
+import { ScoringError } from "../errors/scoring.errors"
+
+interface ScoringRepositoryInterface {
+    fn find_by_id(id: Int) -> Option<ScoringEntity>
+    fn find_all(page: Int, pageSize: Int) -> List<ScoringEntity>
+    fn count_all() -> Int
+    fn save(entity: ScoringEntity) -> Result<ScoringEntity, ScoringError>
+    fn remove(id: Int) -> Bool
+}

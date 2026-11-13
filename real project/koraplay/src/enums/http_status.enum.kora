@@ -1,0 +1,11 @@
+pub enum HttpStatus {
+    Ok,
+    Created,
+    Accepted,
+    BadRequest,
+    Unauthorized,
+    Forbidden,
+    NotFound,
+    Conflict,
+    InternalError,
+}

@@ -1,0 +1,30 @@
+// ============================================================================
+// OpenAPI Swagger Articles Router
+// ============================================================================
+
+import { Article, CreateArticleInput, ArticleListResponse } from "../models/article.models"
+import { ArticleService } from "../services/article.service"
+
+class ArticleRouter {
+    svc: ArticleService
+
+    init(svc: ArticleService) {
+        this.svc = svc
+    }
+
+    fn list() -> ArticleListResponse {
+        return this.svc.listArticles()
+    }
+
+    fn getBySlug(slug: String) -> Option<Article> {
+        return this.svc.getBySlug(slug)
+    }
+
+    fn create(content: String) -> Result<Article, String> {
+        let input = CreateArticleInput {
+            title: "Announcing Kora v0.1.0 Beta",
+            content: content,
+        }
+        return this.svc.createArticle(input)
+    }
+}

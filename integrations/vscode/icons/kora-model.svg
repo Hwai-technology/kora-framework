@@ -1,14 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
   <defs>
-    <linearGradient id="modelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00F0FF"/>
-      <stop offset="100%" stop-color="#0066FF"/>
+    <linearGradient id="kora_modelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#D97706"/>
     </linearGradient>
   </defs>
-  <rect x="2" y="2" width="28" height="28" rx="7" fill="url(#modelGrad)"/>
-  <!-- Schema / Model Cube Emblem -->
-  <path d="M 16 6 L 24 11 L 16 16 L 8 11 Z" fill="#FFFFFF" fill-opacity="0.95"/>
-  <path d="M 8 13 L 16 18 L 16 26 L 8 21 Z" fill="#FFFFFF" fill-opacity="0.75"/>
-  <path d="M 24 13 L 16 18 L 16 26 L 24 21 Z" fill="#FFFFFF" fill-opacity="0.85"/>
+  <!-- Outer Rounded File Badge -->
+  <rect x="2" y="2" width="28" height="28" rx="7" fill="url(#kora_modelGrad)"/>
+  <!-- Sleek White Official Kora 'K' Emblem -->
+  <path d="M 9 7 L 13 7 L 13 25 L 9 25 Z" fill="#FFFFFF"/>
+  <path d="M 13 16 L 20 7 L 24 7 L 16.5 17 L 24.5 25 L 20.5 25 L 13 18 Z" fill="#FFFFFF"/>
 </svg>
-

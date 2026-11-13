@@ -1,0 +1,33 @@
+// ============================================================================
+// KoraPlay Games Domain Controller Layer (HTTP Transport & DI)
+// ============================================================================
+
+import { GamesService } from "../services/game.service"
+import { CreateGameDto } from "../models/game.dto"
+
+class GamesController {
+    service: GamesService,
+
+    init(service: GamesService) {
+        this.service = service
+    }
+
+    fn list(request: Request) -> Response {
+        let games = this.service.list_games(1, 20)
+        return Response.json(games)
+    }
+
+    fn get_by_id(request: Request) -> Response {
+        let idStr = request.params["id"]
+        let game = this.service.get_game_by_id(1)
+        return Response.json(game)
+    }
+
+    fn create(request: Request) -> Response {
+        let dto = CreateGameDto {
+            name: "Live Session PIN: 849201",
+        }
+        let created = this.service.create_game(dto)
+        return Response.json(created)
+    }
+}

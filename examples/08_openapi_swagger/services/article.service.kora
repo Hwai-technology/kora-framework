@@ -1,0 +1,55 @@
+// ============================================================================
+// Article Service Implementation
+// ============================================================================
+
+import { Article, CreateArticleInput, ArticleListResponse } from "../models/article.models"
+import { ArticleRepository } from "../interfaces/article.repository.interface"
+
+class ArticleService implements ArticleRepository {
+    repo: ArticleRepository
+
+    init(repo: ArticleRepository) {
+        this.repo = repo
+    }
+
+    fn listArticles() -> ArticleListResponse {
+        let a1 = Article {
+            id: 1,
+            slug: "getting-started-with-kora",
+            title: "Getting Started with Kora Framework",
+            content: "Learn how to build high-performance microservices.",
+            published: true,
+        }
+        return ArticleListResponse {
+            articles: [a1],
+            totalCount: 1,
+        }
+    }
+
+    fn getBySlug(slug: String) -> Option<Article> {
+        if slug == "getting-started-with-kora" {
+            return Some(Article {
+                id: 1,
+                slug: slug,
+                title: "Getting Started with Kora Framework",
+                content: "Learn how to build high-performance microservices.",
+                published: true,
+            })
+        }
+        return null
+    }
+
+    fn createArticle(input: CreateArticleInput) -> Result<Article, String> {
+        if input.title == "" {
+            return Err("Article title is mandatory")
+        }
+        return Ok(Article {
+            id: 2,
+            slug: "new-kora-post",
+            title: input.title,
+            content: input.content,
+            published: false,
+        })
+    }
+}
+

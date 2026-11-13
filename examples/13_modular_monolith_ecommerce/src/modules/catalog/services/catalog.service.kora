@@ -1,0 +1,18 @@
+import { CatalogItemEntity } from "../models/catalog_item.entity"
+import { CatalogRepository } from "../repositories/catalog.repository"
+
+class CatalogService {
+    repo: CatalogRepository
+
+    init(repo: CatalogRepository) {
+        this.repo = repo
+    }
+
+    fn listCatalog() -> Result<Int, String> {
+        return this.repo.listAll()
+    }
+
+    fn addProduct(title: String, priceCents: Int) -> Result<CatalogItemEntity, String> {
+        return this.repo.create(title, priceCents)
+    }
+}

@@ -1,0 +1,20 @@
+// ============================================================================
+// KoraPlay Quizzes Domain Routes Module (register to app)
+// ============================================================================
+
+import { QuizzesController } from "../features/quizzes/controllers/quiz.controller"
+
+class QuizRoutes {
+    controller: QuizzesController,
+
+    init(controller: QuizzesController) {
+        this.controller = controller
+    }
+
+    fn register(app: App) -> App {
+        app.get("/api/v1/quizzes", this.controller.list)
+        app.get("/api/v1/quizzes/{id}", this.controller.get_by_id)
+        app.post("/api/v1/quizzes", this.controller.create)
+        return app
+    }
+}

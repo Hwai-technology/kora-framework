@@ -1,0 +1,18 @@
+import { IotMetricEntity } from "../models/iot_metric.entity"
+import { TelemetryRepository } from "../repositories/telemetry.repository"
+
+class TelemetryService {
+    repo: TelemetryRepository
+
+    init(repo: TelemetryRepository) {
+        this.repo = repo
+    }
+
+    fn ingestMetric(deviceId: String, temp: Int, battery: Int) -> Result<IotMetricEntity, String> {
+        return this.repo.recordMetric(deviceId, temp, battery)
+    }
+
+    fn queryRecentTelemetry() -> Result<Int, String> {
+        return this.repo.getLatestMetrics()
+    }
+}

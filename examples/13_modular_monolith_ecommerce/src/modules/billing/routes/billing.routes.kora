@@ -1,0 +1,14 @@
+import { BillingController } from "../controllers/billing.controller"
+
+class BillingRoutes {
+    controller: BillingController
+
+    init(controller: BillingController) {
+        this.controller = controller
+    }
+
+    fn register(app: App) -> App {
+        app.post("/billing/charge", this.controller.generateInvoice)
+        return app
+    }
+}

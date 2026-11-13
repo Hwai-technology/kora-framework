@@ -1,0 +1,27 @@
+// ============================================================================
+// Async Actors & Concurrency Router
+// ============================================================================
+
+import { JobTask, ActorStats } from "../models/task.models"
+import { CounterActorService } from "../services/counter_actor.service"
+
+class ActorRouter {
+    actor: CounterActorService
+
+    init(actor: CounterActorService) {
+        this.actor = actor
+    }
+
+    fn stats() -> ActorStats {
+        return this.actor.getStats()
+    }
+
+    fn enqueueJob(payload: String) -> Bool {
+        let job = JobTask {
+            id: 1,
+            payload: payload,
+            priority: 10,
+        }
+        return this.actor.enqueue(job)
+    }
+}

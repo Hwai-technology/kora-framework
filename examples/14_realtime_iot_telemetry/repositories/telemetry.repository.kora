@@ -1,0 +1,26 @@
+import { IotMetricEntity } from "../models/iot_metric.entity"
+import { TelemetryRepositoryInterface } from "../interfaces/telemetry.repository.interface"
+
+class TelemetryRepository implements TelemetryRepositoryInterface {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn recordMetric(deviceId: String, temp: Int, battery: Int) -> Result<IotMetricEntity, String> {
+        let sql = "INSERT INTO iot_metrics (deviceId, temperatureCelsius, batteryPercent, active) VALUES (?1, ?2, ?3, true)"
+        this.db.execute(sql)
+        return Ok(IotMetricEntity {
+            id: 1,
+            deviceId: deviceId,
+            temperatureCelsius: temp,
+            batteryPercent: battery,
+            active: true,
+        })
+    }
+
+    fn getLatestMetrics() -> Result<Int, String> {
+        return this.db.query("SELECT * FROM iot_metrics ORDER BY id DESC LIMIT 100")
+    }
+}

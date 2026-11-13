@@ -1,0 +1,27 @@
+// ============================================================================
+// Realtime Chat — Modular Routes Definition Layer
+// ============================================================================
+
+import { ChatController } from "../controllers/chat.controller"
+
+class ChatRoutes {
+    controller: ChatController
+
+    init(controller: ChatController) {
+        this.controller = controller
+    }
+
+    fn register(app: App) -> App {
+        app.get(
+            "/chat/presence/{room}",
+            this.controller.presence
+        )
+
+        app.post(
+            "/chat/message",
+            this.controller.sendMessage
+        )
+
+        return app
+    }
+}

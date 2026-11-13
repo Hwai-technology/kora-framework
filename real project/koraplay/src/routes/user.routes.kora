@@ -1,0 +1,20 @@
+// ============================================================================
+// KoraPlay Users Domain Routes Module (register to app)
+// ============================================================================
+
+import { UsersController } from "../features/users/user.controller"
+
+class UserRoutes {
+    controller: UsersController,
+
+    init(controller: UsersController) {
+        this.controller = controller
+    }
+
+    fn register(app: App) -> App {
+        app.get("/api/v1/users", this.controller.list)
+        app.get("/api/v1/users/{id}", this.controller.get_by_id)
+        app.post("/api/v1/users", this.controller.create)
+        return app
+    }
+}

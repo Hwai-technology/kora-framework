@@ -1,0 +1,44 @@
+// ============================================================================
+// KoraPlay Quiz Domain Models
+// ============================================================================
+
+model AnswerChoice {
+    id: Int,
+    text: String,
+    isCorrect: Bool,
+    order: Int,
+}
+
+model Question {
+    id: Int,
+    quizId: Int,
+    prompt: String,
+    questionType: String,
+    timeLimitSeconds: Int,
+    basePoints: Int,
+    order: Int,
+}
+
+model Quiz {
+    id: Int,
+    ownerId: Int,
+    title: String,
+    description: String,
+    category: String,
+    status: String,
+    questionCount: Int,
+}
+
+model CreateQuizRequest {
+    title: String,
+    description: String,
+    category: String,
+}
+
+model QuizSnapshot {
+    quizId: Int,
+    version: Int,
+    title: String,
+    questionsJson: String,
+    publishedAt: Int,
+}

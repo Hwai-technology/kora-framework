@@ -1,0 +1,29 @@
+// ============================================================================
+// Resilient Pipeline Routes — Dedicated Clean Architecture Router
+// ============================================================================
+
+import { PipelineJobRequest, PipelineJobSummary } from "../models/system_config.model"
+import { ResilientPipelineService } from "../services/resilient_pipeline.service"
+
+class PipelineRouter {
+    pipeline: ResilientPipelineService
+
+    init(pipeline: ResilientPipelineService) {
+        this.pipeline = pipeline
+    }
+
+    fn executeSampleJob() -> PipelineJobSummary {
+        let sampleJob = PipelineJobRequest {
+            jobName: "NightlyDataIngestion",
+            batchSize: 50,
+            timeoutSeconds: null,
+            payloads: ["RECORD_101", "SKIP", "RECORD_102", "RECORD_103"],
+            retryAttempts: Some(3),
+        }
+        return this.pipeline.executeBatchJob(sampleJob)
+    }
+
+    fn health() -> String {
+        return "OK: Pipeline service is healthy with automated panic and error boundaries active."
+    }
+}

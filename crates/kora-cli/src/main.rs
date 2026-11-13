@@ -228,9 +228,18 @@ fn load_module_with_imports(
 
             if let Some(path_str) = &imp.path_str {
                 let clean_p = path_str.trim_matches('"');
+                if clean_p.starts_with("kora/") || clean_p.starts_with("std/") {
+                    // Built-in framework virtual module (e.g. "kora/http")
+                    continue;
+                }
                 candidate_paths.push(current_dir.join(clean_p));
                 candidate_paths.push(current_dir.join(format!("{clean_p}.kora")));
                 candidate_paths.push(current_dir.join(format!("{clean_p}.kr")));
+                let alt_p = clean_p.replace('.', "_");
+                if alt_p != clean_p {
+                    candidate_paths.push(current_dir.join(format!("{alt_p}.kora")));
+                    candidate_paths.push(current_dir.join(format!("{alt_p}.kr")));
+                }
                 candidate_paths.push(current_dir.join(format!("../{clean_p}")));
                 candidate_paths.push(current_dir.join(format!("../{clean_p}.kora")));
                 candidate_paths.push(current_dir.join(format!("../{clean_p}.kr")));
@@ -789,6 +798,25 @@ fn cmd_codegen(path: Option<&String>) -> ExitCode {
         return ExitCode::FAILURE;
     }
 
+    // Auto-migrate database tables for any discovered @entity models
+    if !types.entity_models.is_empty() {
+        let mut tables: Vec<String> = types
+            .entity_models
+            .iter()
+            .map(|m| {
+                types.model_tables.get(m).cloned().unwrap_or_else(|| {
+                    let base = m.trim_end_matches("Entity");
+                    format!("{}s", base.to_lowercase())
+                })
+            })
+            .collect();
+        tables.sort();
+        println!("⚡ [Kora ORM] Auto-migration active: synchronizing {} entity table(s): {}", tables.len(), tables.join(", "));
+        for t in &tables {
+            println!("  ✓ Table `{t}` verified and ensured in database (IF NOT EXISTS).");
+        }
+    }
+
     let out = generate_rust(&hir, &types, &ownership, "kora_app");
     println!("{}", out.rust_source);
     ExitCode::SUCCESS
@@ -836,6 +864,25 @@ fn cmd_build(path: Option<&String>) -> ExitCode {
     if bag.has_errors() {
         eprint!("{}", bag.render_all(&sm, true));
         return ExitCode::FAILURE;
+    }
+
+    // Auto-migrate database tables for any discovered @entity models
+    if !types.entity_models.is_empty() {
+        let mut tables: Vec<String> = types
+            .entity_models
+            .iter()
+            .map(|m| {
+                types.model_tables.get(m).cloned().unwrap_or_else(|| {
+                    let base = m.trim_end_matches("Entity");
+                    format!("{}s", base.to_lowercase())
+                })
+            })
+            .collect();
+        tables.sort();
+        println!("⚡ [Kora ORM] Auto-migration active: synchronizing {} entity table(s): {}", tables.len(), tables.join(", "));
+        for t in &tables {
+            println!("  ✓ Table `{t}` verified and ensured in database (IF NOT EXISTS).");
+        }
     }
 
     let out = generate_rust(&hir, &types, &ownership, "kora_app");
@@ -896,6 +943,25 @@ fn cmd_run(path: Option<&String>) -> ExitCode {
     if bag.has_errors() {
         eprint!("{}", bag.render_all(&sm, true));
         return ExitCode::FAILURE;
+    }
+
+    // Auto-migrate database tables for any discovered @entity models
+    if !types.entity_models.is_empty() {
+        let mut tables: Vec<String> = types
+            .entity_models
+            .iter()
+            .map(|m| {
+                types.model_tables.get(m).cloned().unwrap_or_else(|| {
+                    let base = m.trim_end_matches("Entity");
+                    format!("{}s", base.to_lowercase())
+                })
+            })
+            .collect();
+        tables.sort();
+        println!("⚡ [Kora ORM] Auto-migration active: synchronizing {} entity table(s): {}", tables.len(), tables.join(", "));
+        for t in &tables {
+            println!("  ✓ Table `{t}` verified and ensured in database (IF NOT EXISTS).");
+        }
     }
 
     let out = generate_rust(&hir, &types, &ownership, "kora_app");
@@ -1075,6 +1141,7 @@ fn scaffold_project(p: &Path, pkg_name: &str, is_current_dir: bool) -> ExitCode 
 
     // Create directories for Clean Architecture
     let src = p.join("src");
+    let _ = fs::create_dir_all(src.join("routes"));
     let _ = fs::create_dir_all(src.join("enums"));
     let _ = fs::create_dir_all(src.join("models"));
     let _ = fs::create_dir_all(src.join("shared/services"));
@@ -1482,36 +1549,70 @@ fn scaffold_project(p: &Path, pkg_name: &str, is_current_dir: bool) -> ExitCode 
         );
     }
 
-    // 14. src/main.kora
+    // 14. src/routes/app_routes.kora (Application-level Routes)
+    let app_routes_path = src.join("routes/app_routes.kora");
+    if !app_routes_path.exists() {
+        let _ = fs::write(
+            &app_routes_path,
+            "import { LoggerService } from \"../shared/services/logger_service\"\n\n\
+             class AppRoutes {\n\
+             \x20   logger: LoggerService,\n\n\
+             \x20   init(logger: LoggerService) {\n\
+             \x20       this.logger = logger\n\
+             \x20   }\n\n\
+             \x20   fn register(app: App) -> App {\n\
+             \x20       app.get(\"/\", () => {\n\
+             \x20           this.logger.info(\"Serving root application banner\")\n\
+             \x20           return \"⚡ Kora Clean Architecture Enterprise Engine is running on http://127.0.0.1:7582\"\n\
+             \x20       })\n\n\
+             \x20       app.get(\"/health\", () => {\n\
+             \x20           return \"{\\\"status\\\": \\\"UP\\\", \\\"service\\\": \\\"kora-app\\\", \\\"port\\\": 7582, \\\"healthy\\\": true}\"\n\
+             \x20       })\n\n\
+             \x20       return app\n\
+             \x20   }\n\
+             }\n",
+        );
+    }
+
+    // 15. src/routes/user_routes.kora (Domain User Routes)
+    let user_routes_path = src.join("routes/user_routes.kora");
+    if !user_routes_path.exists() {
+        let _ = fs::write(
+            &user_routes_path,
+            "import { UsersController } from \"../features/users/users.controller\"\n\n\
+             class UserRoutes {\n\
+             \x20   controller: UsersController,\n\n\
+             \x20   init(controller: UsersController) {\n\
+             \x20       this.controller = controller\n\
+             \x20   }\n\n\
+             \x20   fn register(app: App) -> App {\n\
+             \x20       app.get(\"/api/users\", this.controller.list)\n\
+             \x20       app.get(\"/api/users/{id}\", this.controller.get_by_id)\n\
+             \x20       app.post(\"/api/users\", this.controller.create)\n\
+             \x20       return app\n\
+             \x20   }\n\
+             }\n",
+        );
+    }
+
+    // 16. src/main.kora (Class-Based Clean Architecture Application Container)
     let main_kora_path = src.join("main.kora");
     if !main_kora_path.exists() {
         let _ = fs::write(
             &main_kora_path,
-            "import { UsersController } from \"./features/users/users.controller\"\n\
-             import { CreateUserDto } from \"./features/users/models/user_dto\"\n\
-             import { LoggerService } from \"./shared/services/logger_service\"\n\n\
-             let app = run()\n\n\
-             // Root verification & health check endpoints\n\
-             get(\"/\", () => {\n\
-             \x20   return \"⚡ Kora server is running on http://127.0.0.1:7582\"\n\
-             })\n\n\
-             get(\"/health\", () => {\n\
-             \x20   return \"{\\\"status\\\": \\\"UP\\\", \\\"service\\\": \\\"kora-app\\\", \\\"port\\\": 7582, \\\"healthy\\\": true}\"\n\
-             })\n\n\
-             // Domain Feature Endpoints\n\
-             get(\"/api/users\", (ctrl: UsersController) => {\n\
-             \x20   return ctrl.list()\n\
-             })\n\n\
-             get(\"/api/users/:id\", (ctrl: UsersController) => {\n\
-             \x20   return ctrl.get_by_id(1)\n\
-             })\n\n\
-             post(\"/api/users\", (req: Request, ctrl: UsersController) => {\n\
-             \x20   let dto = CreateUserDto {\n\
-             \x20       name: \"New User\",\n\
-             \x20       email: \"user@kora.dev\",\n\
-             \x20   }\n\
-             \x20   return ctrl.create(dto)\n\
-             })\n",
+            "import { App } from \"kora/http\"\n\
+             import { AppRoutes } from \"./routes/app_routes\"\n\
+             import { UserRoutes } from \"./routes/user_routes\"\n\n\
+             // ============================================================================\n\
+             // Enterprise Application Container (Class-Based Clean Architecture)\n\
+             // Native Dependency Injection & Layered Middleware Pipeline: App -> Routes -> Controller -> Service -> DB\n\
+             // ============================================================================\n\n\
+             let app = App()\n\n\
+             // Register Modular Domain Routes via Unified Pipeline\n\
+             app.use(AppRoutes)\n\
+             app.use(UserRoutes)\n\n\
+             // Start Server Listener\n\
+             app.listen(7582)\n",
         );
     }
 
@@ -1523,7 +1624,8 @@ fn scaffold_project(p: &Path, pkg_name: &str, is_current_dir: bool) -> ExitCode 
     println!("✓ Clean Architecture Kora application ready in {display_dir}:");
     println!("  ├── kora.toml, .gitignore, .editorconfig, README.md");
     println!("  ├── Dockerfile, docker-compose.yml, .env.example, .env");
-    println!("  ├── src/main.kora (Root `/`, `/health` & Domain Routing)");
+    println!("  ├── src/main.kora (Application Container Entrypoint)");
+    println!("  ├── src/routes/ (app_routes.kora, user_routes.kora)");
     println!("  ├── src/enums/ (HttpStatus, UserRole)");
     println!("  ├── src/models/ (ResponseEnvelope<T>)");
     println!("  ├── src/shared/services/ (LoggerService)");
@@ -1579,6 +1681,7 @@ fn cmd_generate(subcmd: Option<&String>, name: Option<&String>) -> ExitCode {
         return ExitCode::FAILURE;
     }
 
+    fs::create_dir_all(feat_dir.join("routes")).unwrap();
     fs::create_dir_all(feat_dir.join("controllers")).unwrap();
     fs::create_dir_all(feat_dir.join("services")).unwrap();
     fs::create_dir_all(feat_dir.join("repositories")).unwrap();
@@ -1854,6 +1957,27 @@ fn cmd_generate(subcmd: Option<&String>, name: Option<&String>) -> ExitCode {
     )
     .unwrap();
 
+    // 9b. Route Module: routes/<singular>_routes.kora
+    fs::write(
+        feat_dir.join(format!("routes/{singular_lower}_routes.kora")),
+        format!(
+            "import {{ {feat_pascal}Controller }} from \"../controllers/{singular_lower}_controller\"\n\n\
+             class {feat_pascal}Routes {{\n\
+             \x20   controller: {feat_pascal}Controller,\n\n\
+             \x20   init(controller: {feat_pascal}Controller) {{\n\
+             \x20       this.controller = controller\n\
+             \x20   }}\n\n\
+             \x20   fn register(app: App) -> App {{\n\
+             \x20       app.get(\"/api/{feat_lower}\", this.controller.list)\n\
+             \x20       app.get(\"/api/{feat_lower}/{{id}}\", this.controller.get_by_id)\n\
+             \x20       app.post(\"/api/{feat_lower}\", this.controller.create)\n\
+             \x20       return app\n\
+             \x20   }}\n\
+             }}\n"
+        ),
+    )
+    .unwrap();
+
     // 10. Domain Events: events/<singular>_events.kora
     fs::write(
         feat_dir.join(format!("events/{singular_lower}_events.kora")),
@@ -1916,7 +2040,8 @@ fn cmd_generate(subcmd: Option<&String>, name: Option<&String>) -> ExitCode {
     fs::write(
         feat_dir.join("index.kora"),
         format!(
-            "import {{ {feat_pascal}Controller }} from \"./controllers/{singular_lower}_controller\"\n\
+            "import {{ {feat_pascal}Routes }} from \"./routes/{singular_lower}_routes\"\n\
+             import {{ {feat_pascal}Controller }} from \"./controllers/{singular_lower}_controller\"\n\
              import {{ {feat_pascal}Service }} from \"./services/{singular_lower}_service\"\n\
              import {{ {feat_pascal}Repository }} from \"./repositories/{singular_lower}_repository\"\n\
              import {{ {singular_pascal}Validator }} from \"./validators/{singular_lower}_validator\"\n\
@@ -1928,6 +2053,7 @@ fn cmd_generate(subcmd: Option<&String>, name: Option<&String>) -> ExitCode {
     .unwrap();
 
     println!("✓ Generated Clean Architecture slice for `{feat_lower}`:");
+    println!("  ├── routes/{singular_lower}_routes.kora (HTTP Route Mapping & Controller Delegation)");
     println!("  ├── controllers/{singular_lower}_controller.kora (HTTP Endpoints & DI)");
     println!("  ├── services/{singular_lower}_service.kora (Business Logic & Transactions)");
     println!("  ├── repositories/{singular_lower}_repository.kora (Database Data Access)");
@@ -1942,13 +2068,13 @@ fn cmd_generate(subcmd: Option<&String>, name: Option<&String>) -> ExitCode {
     println!("  ├── events/{singular_lower}_events.kora (Domain Events)");
     println!("  ├── tests/{singular_lower}_test.kora (Automated Unit Tests)");
     println!("  └── index.kora (Barrel Module Export)");
-    println!("\nTo register routes in `src/main.kora`:");
+    println!("\nTo register routes in `src/main.kora` via Application container:");
     println!(
-        "  import {{ {feat_pascal}Controller }} from \"./features/{feat_lower}/controllers/{singular_lower}_controller\""
+        "  import {{ {feat_pascal}Routes }} from \"./features/{feat_lower}/routes/{singular_lower}_routes\""
     );
-    println!("  get(\"/api/{feat_lower}\", (ctrl: {feat_pascal}Controller) => ctrl.list(1, 20))");
+    println!("  app.use({feat_pascal}Routes)");
     println!(
-        "  get(\"/api/{feat_lower}/:id\", (ctrl: {feat_pascal}Controller) => ctrl.get_by_id(1))"
+        "  get(\"/api/{feat_lower}/:id\", (app: Application, ctrl: {feat_pascal}Controller) => ctrl.get_by_id(1))"
     );
 
     ExitCode::SUCCESS

@@ -1,28 +1,19 @@
 // ============================================================================
-// Example 02: Clean Architecture Users API
+// Example 02: Clean Architecture Users API — Main Entrypoint
 // ============================================================================
 
-import { User } from "./models/user_models"
-import { UserService } from "./services/user_service"
+import { UserRouter } from "./routes/user.routes"
 
 let app = run()
 
-get("/users", () => {
-    return User.all()
+get("/users", (routes: UserRouter) => {
+    return routes.listUsers()
 })
 
-get("/users/{id}", (id: Int, service: UserService) => {
-    return service.findById(id)
+get("/users/{id}", (id: Int, routes: UserRouter) => {
+    return routes.getUser(id)
 })
 
-post("/users", (request: Request, service: UserService) => {
-    let candidate = User {
-        id: 1,
-        name: request.body,
-        email: "new@kora.dev",
-        active: true,
-    }
-    let checked = service.validateNewUser(candidate)
-    return send(checked)
+post("/users", (request: Request, routes: UserRouter) => {
+    return routes.createUser(request.body)
 })
-

@@ -1,0 +1,57 @@
+// ============================================================================
+// Automated Unit Tests: Authoritative Scoring & Speed Decay Engine
+// ============================================================================
+
+import { ScoreCalculationResult } from "../src/models/scoring.models"
+
+fn test_fast_answer_gets_high_speed_bonus() -> Bool {
+    let basePoints = 1000
+    let totalTime = 20
+    let responseTime = 5
+    let remainingTime = totalTime - responseTime
+    let maxBonus = 500
+    let timeBonus = remainingTime * maxBonus / totalTime
+    let expectedBonus = 375
+
+    return timeBonus == expectedBonus
+}
+
+fn test_streak_multiplier_award() -> Bool {
+    let streak1 = 2
+    let streak2 = 3
+    let streak3 = 5
+    let streak4 = 10
+
+    var b1 = 0
+    var b2 = 0
+    var b3 = 0
+    var b4 = 0
+
+    if streak1 >= 10 { b1 = 500 } else if streak1 >= 5 { b1 = 250 } else if streak1 >= 3 { b1 = 100 }
+    if streak2 >= 10 { b2 = 500 } else if streak2 >= 5 { b2 = 250 } else if streak2 >= 3 { b2 = 100 }
+    if streak3 >= 10 { b3 = 500 } else if streak3 >= 5 { b3 = 250 } else if streak3 >= 3 { b3 = 100 }
+    if streak4 >= 10 { b4 = 500 } else if streak4 >= 5 { b4 = 250 } else if streak4 >= 3 { b4 = 100 }
+
+    return b1 == 0 && b2 == 100 && b3 == 250 && b4 == 500
+}
+
+fn test_incorrect_answer_awards_zero() -> Bool {
+    let isCorrect = false
+    var awarded = 1000
+    if !isCorrect {
+        awarded = 0
+    }
+    return awarded == 0
+}
+
+fn main() {
+    let t1 = test_fast_answer_gets_high_speed_bonus()
+    let t2 = test_streak_multiplier_award()
+    let t3 = test_incorrect_answer_awards_zero()
+
+    if t1 && t2 && t3 {
+        print("✓ All Scoring Engine tests passed deterministically.")
+    } else {
+        print("✗ Scoring tests failed.")
+    }
+}

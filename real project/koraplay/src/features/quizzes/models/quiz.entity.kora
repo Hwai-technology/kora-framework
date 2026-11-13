@@ -1,0 +1,10 @@
+@entity
+@table("quizzes")
+model QuizzeEntity {
+    @primary
+    @autoIncrement
+    id: Int,
+    @required
+    name: String,
+    active: Bool,
+}

@@ -1,0 +1,7 @@
+enum QuizzeError {
+    NotFound(String),
+    ValidationFailed(String),
+    AlreadyExists(String),
+    DatabaseFailure(String),
+    Unauthorized(String),
+}

@@ -1,0 +1,10 @@
+@entity
+@table("scoring")
+model ScoringEntity {
+    @primary
+    @autoIncrement
+    id: Int,
+    @required
+    name: String,
+    active: Bool,
+}

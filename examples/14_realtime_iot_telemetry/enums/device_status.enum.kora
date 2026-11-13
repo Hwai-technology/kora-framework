@@ -1,0 +1,5 @@
+enum DeviceHealthStatus {
+    ONLINE,
+    DEGRADED,
+    OFFLINE,
+}

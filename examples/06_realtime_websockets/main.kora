@@ -1,22 +1,22 @@
 // ============================================================================
-// Example 06: Realtime WebSockets & Broadcast Hub
+// Example 06: Realtime WebSockets & Chat Engine
+// Pure Layered Clean Architecture: App -> Middleware -> Routes -> Controller -> Service -> Repository -> Database
 // ============================================================================
 
-import { ChatMessage, SendMessageRequest, RoomPresence } from "./models/chat_models"
-import { ChatHubService } from "./services/chat_hub_service"
+import { App } from "kora/http"
+import { LoggerMiddleware } from "./middleware/logger.middleware"
+import { AuthMiddleware } from "./middleware/auth.middleware"
+import { ChatRoutes } from "./routes/chat.routes"
 
-let app = run()
+// 1. Application Initialization & Dependency Container
+let app = App()
 
-get("/chat/presence/{room}", (room: String, hub: ChatHubService) => {
-    return hub.getPresence(room)
-})
+// 2. Global Middleware Pipeline
+app.use(LoggerMiddleware)
+app.use(AuthMiddleware)
 
-post("/chat/message", (request: Request, hub: ChatHubService) => {
-    let req = SendMessageRequest {
-        sender: "Ahmet",
-        room: "general",
-        content: request.body,
-    }
-    return hub.broadcast(req)
-})
+// 3. Modular Routes Registration
+app.use(ChatRoutes)
 
+// 4. Server Listener
+app.listen(3000)

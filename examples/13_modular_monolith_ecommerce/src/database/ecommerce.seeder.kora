@@ -1,0 +1,13 @@
+class EcommerceSeeder {
+    db: Database
+
+    init(db: Database) {
+        this.db = db
+    }
+
+    fn seed() -> Result<Bool, String> {
+        this.db.execute("INSERT INTO catalog_items (id, title, priceCents, active) VALUES (1, 'Pro Studio Display', 159900, true) ON CONFLICT (id) DO NOTHING")
+        this.db.execute("INSERT INTO invoices (id, customerEmail, totalCents, paid) VALUES (1, 'admin@korashop.com', 159900, true) ON CONFLICT (id) DO NOTHING")
+        return Ok(true)
+    }
+}

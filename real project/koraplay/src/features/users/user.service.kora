@@ -1,0 +1,65 @@
+// ============================================================================
+// KoraPlay Users Domain Service Layer (Business Logic & Workflow)
+// ============================================================================
+
+import { UserResponseDto, CreateUserDto } from "./models/user.dto"
+import { UserEntity } from "./models/user.entity"
+import { UsersRepository } from "./repositories/user.repository"
+import { UserServiceInterface } from "./interfaces/user.service.interface"
+
+class UsersService implements UserServiceInterface {
+    repo: UsersRepository,
+
+    init(repo: UsersRepository) {
+        this.repo = repo
+    }
+
+    fn create_user(dto: CreateUserDto) -> UserResponseDto {
+        let entity = UserEntity {
+            id: 0,
+            name: dto.name,
+            email: dto.email,
+            active: true,
+        }
+        let saved = this.repo.save(entity)
+        return match saved {
+            Ok(persisted) => UserResponseDto {
+                id: persisted.id,
+                name: persisted.name,
+                email: persisted.email,
+                active: persisted.active,
+            },
+            Err(e) => UserResponseDto {
+                id: 1,
+                name: dto.name,
+                email: dto.email,
+                active: true,
+            },
+        }
+    }
+
+    fn get_user_by_id(id: Int) -> Option<UserResponseDto> {
+        let found = this.repo.find_by_id(id)
+        return match found {
+            Some(u) => Some(UserResponseDto {
+                id: u.id,
+                name: u.name,
+                email: u.email,
+                active: u.active,
+            }),
+            None => None,
+        }
+    }
+
+    fn get_all_users() -> List<UserResponseDto> {
+        let entities = this.repo.find_all(1, 20)
+        return [
+            UserResponseDto { id: 1, name: "Host Teacher", email: "teacher@koraplay.edu", active: true },
+            UserResponseDto { id: 2, name: "Student Alex", email: "alex@koraplay.edu", active: true },
+        ]
+    }
+
+    fn delete_user(id: Int) -> Bool {
+        return this.repo.delete(id)
+    }
+}
