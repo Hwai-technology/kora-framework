@@ -1,0 +1,15 @@
+// Example 71: Autonomous Drone Swarm Formation Coordinator
+// Transport Model: Command Request
+
+model CreateDroneSwarmMissionPlannerTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryDroneSwarmMissionPlannerFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

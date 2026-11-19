@@ -1,0 +1,10 @@
+// Example 43: Raft Distributed Consensus Engine
+// Domain Service Contract
+
+import { RaftDistributedConsensusNodeState } from "../entities/raft_distributed_consensus_primary.entity"
+import { CreateRaftDistributedConsensusTaskRequest } from "../models/raft_distributed_consensus_request.dto"
+
+interface RaftDistributedConsensusConsensusContract {
+    fn processConsensusCommand(req: CreateRaftDistributedConsensusTaskRequest) -> Result<RaftDistributedConsensusNodeState, String>
+    fn evaluateClusterQuorum() -> Bool
+}

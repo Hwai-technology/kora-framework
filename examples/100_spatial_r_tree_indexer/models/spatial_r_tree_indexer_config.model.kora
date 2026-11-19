@@ -1,0 +1,9 @@
+// Example 100: Spatial 2D R-Tree & k-Nearest Neighbors (k-NN)
+// Configuration Model
+
+model SpatialRTreeIndexerConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

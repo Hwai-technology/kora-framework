@@ -1,0 +1,8 @@
+// Example 48: Distributed Cache Cluster & Write-Behind — Domain Event: ThunderingHerdInterceptedEvent
+// Dedicated Domain Event Specification
+
+model ThunderingHerdInterceptedEvent {
+    hotKey: String
+    singleFlightWaitersCount: Int
+    timestamp: Int
+}

@@ -1,0 +1,9 @@
+// Example 27: fraud_detection_engine — Domain Event: BlacklistEntityAddedEvent
+// Dedicated Domain Event Specification
+
+model BlacklistEntityAddedEvent {
+    entityHash: String
+    reason: String
+    addedByOperator: String
+    expiresAt: Int
+}

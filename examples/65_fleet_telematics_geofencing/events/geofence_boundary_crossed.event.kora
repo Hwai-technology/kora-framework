@@ -1,0 +1,7 @@
+// Example 65: Fleet Telematics & Polygonal Geofence Monitor — Domain Event: GeofenceBoundaryCrossedEvent
+
+model GeofenceBoundaryCrossedEvent {
+    vehicleVin: String
+    geofenceId: String
+    breachType: String
+}

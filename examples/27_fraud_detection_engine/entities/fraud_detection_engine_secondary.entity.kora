@@ -1,0 +1,11 @@
+// Example 27: Real-time Fraud & Anomaly Evaluator
+// Secondary Audit Log Entity
+
+@table("fraud_detection_engine_items")
+model FraudDetectionEngineItem {
+    @id
+    id: Int
+    parentId: Int
+    itemCode: String
+    amount: Int
+}

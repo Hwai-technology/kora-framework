@@ -1,0 +1,7 @@
+// Example 87: FIDO2 / WebAuthn Passkey Registration & Attestation — Enum: UserVerificationStatus
+
+enum UserVerificationStatus {
+    UserVerifiedBiometricPin
+    UserPresentTouchOnly
+    NoVerificationDiscouraged
+}

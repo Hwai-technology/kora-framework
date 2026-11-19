@@ -1,0 +1,29 @@
+// ============================================================================
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// Application Container & Dependency Container Bootstrap
+// ============================================================================
+
+import { AntiMoneyLaunderingSiemPrimaryRepository } from "./repositories/anti_money_laundering_siem_primary.repository"
+import { AntiMoneyLaunderingSiemCoreService } from "./services/anti_money_laundering_siem_core.service"
+import { AntiMoneyLaunderingSiemCommandController } from "./controllers/anti_money_laundering_siem_command.controller"
+import { AntiMoneyLaunderingSiemQueryController } from "./controllers/anti_money_laundering_siem_query.controller"
+import { AntiMoneyLaunderingSiemRouter } from "./routes/anti_money_laundering_siem.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = AntiMoneyLaunderingSiemPrimaryRepository()
+        let service = AntiMoneyLaunderingSiemCoreService(repo)
+        let commandCtrl = AntiMoneyLaunderingSiemCommandController(service)
+        let queryCtrl = AntiMoneyLaunderingSiemQueryController(repo)
+        let router = AntiMoneyLaunderingSiemRouter(commandCtrl, queryCtrl)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

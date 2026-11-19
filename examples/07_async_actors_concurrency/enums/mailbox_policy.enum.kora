@@ -1,0 +1,7 @@
+// examples/07_async_actors_concurrency — Enum: MailboxPolicy
+
+enum MailboxPolicy {
+    BoundedDropOldest
+    BoundedBackpressure
+    UnboundedFifo
+}

@@ -1,0 +1,9 @@
+// Example 40: Clinical Trial Electronic Data Capture (EDC)
+// Configuration Model
+
+model ClinicalTrialEdcServiceConfig {
+    hipaaAuditEnabled: Bool
+    encryptionKeyVersion: Int
+    maxBatchFetchSize: Int
+    environment: String
+}

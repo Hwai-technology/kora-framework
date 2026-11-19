@@ -1,0 +1,33 @@
+// Example 63: MQTT Industrial Telemetry Broker & Topic Tree
+// Repository Implementation
+
+import { MqttIndustrialBrokerPrimaryRecord } from "../entities/mqtt_industrial_broker_primary.entity"
+import { MqttIndustrialBrokerRepository } from "../interfaces/mqtt_industrial_broker_repository.interface"
+
+class MqttIndustrialBrokerInMemoryRepository implements MqttIndustrialBrokerRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<MqttIndustrialBrokerPrimaryRecord> {
+        if id > 0 {
+            return Some(MqttIndustrialBrokerPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: MqttIndustrialBrokerPrimaryRecord) -> Result<MqttIndustrialBrokerPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

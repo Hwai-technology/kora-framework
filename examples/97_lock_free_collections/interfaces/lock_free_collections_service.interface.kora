@@ -1,0 +1,10 @@
+// Example 97: Lock-Free Michael-Scott Queue & Treiber Stack
+// Domain Service Contract
+
+import { LockFreeCollectionsPrimaryRecord } from "../entities/lock_free_collections_primary.entity"
+import { CreateLockFreeCollectionsTaskRequest } from "../models/lock_free_collections_request.dto"
+
+interface LockFreeCollectionsDomainContract {
+    fn executeTask(req: CreateLockFreeCollectionsTaskRequest) -> Result<LockFreeCollectionsPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

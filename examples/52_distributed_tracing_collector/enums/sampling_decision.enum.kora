@@ -1,0 +1,8 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector — Enum: SamplingDecision
+// Dedicated Domain Enum Specification
+
+enum SamplingDecision {
+    SampleRecordAndSample
+    RecordOnlyNoExport
+    DropNotSampled
+}

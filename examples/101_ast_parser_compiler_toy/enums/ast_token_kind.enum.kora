@@ -1,0 +1,10 @@
+// Example 101: Pratt Parsing & Bytecode Virtual Machine — Enum: AstTokenKind
+
+enum AstTokenKind {
+    NumberLiteralToken
+    IdentifierToken
+    BinaryOperatorToken
+    KeywordLetToken
+    LeftParenToken
+    RightParenToken
+}

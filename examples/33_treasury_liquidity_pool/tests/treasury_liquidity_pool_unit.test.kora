@@ -1,0 +1,78 @@
+// ============================================================================
+// Unit Test Suite: treasury_liquidity_pool
+// ============================================================================
+
+import { CreateTreasuryLiquidityPoolRequest } from "../models/treasury_liquidity_pool_request.dto"
+import { TreasuryLiquidityPoolPrimaryRepository } from "../repositories/treasury_liquidity_pool_primary.repository"
+import { TreasuryLiquidityPoolCoreService } from "../services/treasury_liquidity_pool_core.service"
+import { TreasuryLiquidityPoolValidationService } from "../services/treasury_liquidity_pool_validation.service"
+
+class TreasuryLiquidityPoolUnitTestSuite {
+    service: TreasuryLiquidityPoolCoreService
+    validator: TreasuryLiquidityPoolValidationService
+
+    init(service: TreasuryLiquidityPoolCoreService, validator: TreasuryLiquidityPoolValidationService) {
+        this.service = service
+        this.validator = validator
+    }
+
+    fn test_valid_processing() -> Bool {
+        let req = CreateTreasuryLiquidityPoolRequest {
+            reference: "TEST-REF-100",
+            targetId: 10,
+            volume: 500,
+            currency: "USD",
+        }
+        let res = this.service.processRequest(req)
+        return match res {
+            Ok(rec) => rec.status == "COMMITTED" && rec.balance == 500,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_volume() -> Bool {
+        let req = CreateTreasuryLiquidityPoolRequest {
+            reference: "TEST-REF-FAIL",
+            targetId: 11,
+            volume: -10,
+            currency: "USD",
+        }
+        let res = this.service.processRequest(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Volume must be positive",
+        }
+    }
+
+    fn test_validator() -> Bool {
+        let req = CreateTreasuryLiquidityPoolRequest {
+            reference: "VALID-REF",
+            targetId: 12,
+            volume: 100,
+            currency: "USD",
+        }
+        let res = this.validator.validateInput(req)
+        return match res {
+            Ok(v) => v,
+            Err(e) => false,
+        }
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_processing()
+        let t2 = this.test_invalid_volume()
+        let t3 = this.test_validator()
+
+        if t1 && t2 && t3 {
+            print("  ✓ Treasury Liquidity & Capital Allocation Unit Tests: 3/3 passed")
+        } else {
+            print("  ✗ Treasury Liquidity & Capital Allocation Unit Tests: failed")
+        }
+    }
+}
+
+let repo = TreasuryLiquidityPoolPrimaryRepository()
+let service = TreasuryLiquidityPoolCoreService(repo)
+let validator = TreasuryLiquidityPoolValidationService()
+let suite = TreasuryLiquidityPoolUnitTestSuite(service, validator)
+suite.run()

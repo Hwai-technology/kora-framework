@@ -1,39 +1,90 @@
 // ============================================================================
-// Load Test Suite: 06_realtime_websockets
-// Simulates concurrent WebSocket chat message broadcasts and socket teardown
+// Load & High-Concurrency Test Suite: 06_realtime_websockets
+// Stresses 250 Virtual WebSocket Sessions, Frame Ingestion & Pub/Sub Fanout
 // ============================================================================
 
-import { ChatMessage } from "../models/chat.models"
+import { WsFrame } from "../models/chat.models"
 import { ChatRepository } from "../repositories/chat.repository"
 import { ChatService } from "../services/chat_hub.service"
 
 class WebSocketsLoadTestSuite {
+    repo: ChatRepository
     service: ChatService
 
-    init(service: ChatService) {
-        this.service = service
+    init() {
+        this.repo = ChatRepository()
+        this.service = ChatService(this.repo)
     }
 
-    fn run_load_stress(iterations: Int) -> Int {
-        var processed = 0
-        for i in 0..iterations {
-            let msg = this.service.sendMessage("Broadcast message")
-            if msg.id > 0 {
-                processed += 1
+    fn runLoadTest() -> Bool {
+        var totalClients = 250
+        var i = 0
+
+        // 1. Concurrent Upgrades across 2 channels
+        while i < totalClients {
+            var ch = "market_data"
+            if i % 2 == 0 {
+                ch = "high_frequency_orders"
             }
+            let token = "kora_ws_token_client_" + i.toString()
+            let opt = this.service.authenticateUpgrade(token, "127.0.0.1", ch)
+            let isPresent = match opt {
+                Some(s) => true,
+                None => false,
+            }
+            if !isPresent {
+                return false
+            }
+            i = i + 1
         }
-        return processed
+
+        // 2. High-throughput Broadcast Fanout
+        let deliveredOrders = this.service.broadcast("high_frequency_orders", "exchange_engine", "TICK: BTC/USD 65000.50")
+        let deliveredMarket = this.service.broadcast("market_data", "exchange_engine", "ORDER_BOOK_DEPTH_UPDATE")
+
+        let expectedOrders = 125
+        let expectedMarket = 125
+
+        if deliveredOrders != expectedOrders || deliveredMarket != expectedMarket {
+            return false
+        }
+
+        // 3. High-throughput Ping/Pong Heartbeat processing
+        var j = 0
+        var pingSuccess = 0
+        while j < 50 {
+            let sid = "ws_sess_" + (1001 + j).toString()
+            let frame = WsFrame {
+                fin: true,
+                opcode: 9,
+                masked: true,
+                maskKey: 9988,
+                payloadLength: 4,
+                payload: "PING",
+            }
+            let reply = this.service.handleFrame(sid, frame)
+            let isPong = match reply {
+                Some(f) => f.opcode == 10,
+                None => false,
+            }
+            if isPong {
+                pingSuccess = pingSuccess + 1
+            }
+            j = j + 1
+        }
+
+        return pingSuccess == 50
     }
 
-    fn teardown() -> Unit {
-        print("  ✓ WebSockets Teardown: 1,000 connection buffers flushed and socket channels disconnected")
+    fn run() -> Unit {
+        let pass = this.runLoadTest()
+        if pass {
+            print("  ✓ WebSockets High-Throughput Load Test: 250 Sessions & Broadcast Fanout PASSED")
+        } else {
+            print("  ✗ WebSockets High-Throughput Load Test: FAILED")
+        }
     }
 }
 
-let db = Database()
-let repo = ChatRepository(db)
-let service = ChatService(repo)
-let load_suite = WebSocketsLoadTestSuite(service)
-let total = load_suite.run_load_stress(1000)
-print("  ✓ WebSockets Load Test: 1,000 messages broadcasted under load")
-load_suite.teardown()
+let loadSuite = WebSocketsLoadTestSuite()
+loadSuite.run()

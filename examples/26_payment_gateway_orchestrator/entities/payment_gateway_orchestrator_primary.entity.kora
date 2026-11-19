@@ -1,0 +1,18 @@
+// ============================================================================
+// Payment Transaction Aggregate Entity
+// ============================================================================
+
+model PaymentGatewayOrchestratorRecord {
+    id: Int
+    transactionId: String
+    idempotencyKey: String
+    provider: String
+    reference: String
+    amountCents: Int
+    currency: String
+    customerCountry: String
+    status: String
+    threeDsStatus: String
+    attempts: Int
+    active: Bool
+}

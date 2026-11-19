@@ -1,0 +1,10 @@
+// Example 61: Supplier Purchase Order & 3-Way Invoice Matcher
+// Repository Interface
+
+import { SupplierPurchaseOrderFlowPrimaryRecord } from "../entities/supplier_purchase_order_flow_primary.entity"
+
+interface SupplierPurchaseOrderFlowRepository {
+    fn findById(id: Int) -> Option<SupplierPurchaseOrderFlowPrimaryRecord>
+    fn save(record: SupplierPurchaseOrderFlowPrimaryRecord) -> Result<SupplierPurchaseOrderFlowPrimaryRecord, String>
+    fn countActive() -> Int
+}

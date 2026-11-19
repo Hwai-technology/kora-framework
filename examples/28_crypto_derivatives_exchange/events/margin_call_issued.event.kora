@@ -1,0 +1,9 @@
+// Example 28: crypto_derivatives_exchange — Domain Event: MarginCallIssuedEvent
+// Dedicated Domain Event Specification
+
+model MarginCallIssuedEvent {
+    traderId: Int
+    marginRatio: Int
+    maintenanceRequirement: Int
+    timestamp: Int
+}

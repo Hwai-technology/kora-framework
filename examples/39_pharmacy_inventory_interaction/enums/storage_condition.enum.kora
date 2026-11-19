@@ -1,0 +1,8 @@
+// Example 39: Pharmacy Dispensing & Drug Interaction Checker — Enum: StorageCondition
+// Dedicated Domain Enum Specification
+
+enum StorageCondition {
+    RoomTemperature20C
+    RefrigeratedColdChain2To8C
+    ControlledSubstanceSafeLocked
+}

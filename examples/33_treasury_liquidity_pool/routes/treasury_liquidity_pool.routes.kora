@@ -1,0 +1,26 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// Router & Endpoint Dispatcher
+
+import { CreateTreasuryLiquidityPoolRequest } from "../models/treasury_liquidity_pool_request.dto"
+import { TreasuryLiquidityPoolResponse } from "../models/treasury_liquidity_pool_response.dto"
+import { TreasuryLiquidityPoolRecord } from "../entities/treasury_liquidity_pool_primary.entity"
+import { TreasuryLiquidityPoolCommandController } from "../controllers/treasury_liquidity_pool_command.controller"
+import { TreasuryLiquidityPoolQueryController } from "../controllers/treasury_liquidity_pool_query.controller"
+
+class TreasuryLiquidityPoolRouter {
+    commandController: TreasuryLiquidityPoolCommandController
+    queryController: TreasuryLiquidityPoolQueryController
+
+    init(commandController: TreasuryLiquidityPoolCommandController, queryController: TreasuryLiquidityPoolQueryController) {
+        this.commandController = commandController
+        this.queryController = queryController
+    }
+
+    fn postRecord(req: CreateTreasuryLiquidityPoolRequest) -> TreasuryLiquidityPoolResponse {
+        return this.commandController.handleCreate(req)
+    }
+
+    fn fetchRecord(id: Int) -> Option<TreasuryLiquidityPoolRecord> {
+        return this.queryController.getById(id)
+    }
+}

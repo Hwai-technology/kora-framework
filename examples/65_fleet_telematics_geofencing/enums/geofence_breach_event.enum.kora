@@ -1,0 +1,7 @@
+// Example 65: Fleet Telematics & Polygonal Geofence Monitor — Enum: GeofenceBreachEvent
+
+enum GeofenceBreachEvent {
+    EnteredAuthorizedZone
+    ExitedAuthorizedBoundary
+    SpeedingInsideRestrictedZone
+}

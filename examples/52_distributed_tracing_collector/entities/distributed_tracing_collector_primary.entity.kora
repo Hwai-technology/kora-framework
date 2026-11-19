@@ -1,0 +1,14 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector
+// Persistent Database Entity: Cluster Node State
+
+@table("distributed_tracing_collector_node_state")
+model DistributedTracingCollectorNodeState {
+    @id
+    id: Int
+    @unique
+    nodeIdentifier: String
+    currentEpochTerm: Int
+    votedForCandidate: Int
+    isLeader: Bool
+    active: Bool
+}

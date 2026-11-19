@@ -1,0 +1,10 @@
+// Example 54: Dynamic Pricing Engine & Flash Sale Rate-Limiter
+// Domain Service Contract
+
+import { DynamicPricingPromotionsPrimaryRecord } from "../entities/dynamic_pricing_promotions_primary.entity"
+import { CreateDynamicPricingPromotionsTaskRequest } from "../models/dynamic_pricing_promotions_request.dto"
+
+interface DynamicPricingPromotionsDomainContract {
+    fn executeTask(req: CreateDynamicPricingPromotionsTaskRequest) -> Result<DynamicPricingPromotionsPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

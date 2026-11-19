@@ -1,0 +1,22 @@
+// Example 47: Cloud Event Bus & Partitioned Streaming
+// Router & Endpoint Dispatcher
+
+import { CreateCloudEventBusTaskRequest } from "../models/cloud_event_bus_request.dto"
+import { CloudEventBusResponseDto } from "../models/cloud_event_bus_response.dto"
+import { CloudEventBusController } from "../controllers/cloud_event_bus.controller"
+
+class CloudEventBusRouter {
+    controller: CloudEventBusController
+
+    init(controller: CloudEventBusController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateCloudEventBusTaskRequest) -> CloudEventBusResponseDto {
+        return this.controller.handleTaskProposal(req)
+    }
+
+    fn getQuorum() -> Bool {
+        return this.controller.checkQuorumStatus()
+    }
+}

@@ -1,0 +1,9 @@
+// Example 64: Smart Electrical Grid Substation Telemetry
+// Specialized Model 2
+
+model SmartGridEnergyMonitorSpecializedProfile2 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

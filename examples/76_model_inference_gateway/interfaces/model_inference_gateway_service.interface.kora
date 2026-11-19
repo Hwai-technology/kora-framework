@@ -1,0 +1,10 @@
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher
+// Domain Service Contract
+
+import { ModelInferenceGatewayPrimaryRecord } from "../entities/model_inference_gateway_primary.entity"
+import { CreateModelInferenceGatewayTaskRequest } from "../models/model_inference_gateway_request.dto"
+
+interface ModelInferenceGatewayDomainContract {
+    fn executeTask(req: CreateModelInferenceGatewayTaskRequest) -> Result<ModelInferenceGatewayPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

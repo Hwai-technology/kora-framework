@@ -1,0 +1,38 @@
+// Example 97: Lock-Free Michael-Scott Queue & Treiber Stack
+// Presentation Controller
+
+import { CreateLockFreeCollectionsTaskRequest } from "../models/lock_free_collections_request.dto"
+import { LockFreeCollectionsResponseDto } from "../models/lock_free_collections_response.dto"
+import { LockFreeCollectionsCoreService } from "../services/lock_free_collections_core.service"
+
+class LockFreeCollectionsController {
+    service: LockFreeCollectionsCoreService
+
+    init(service: LockFreeCollectionsCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateLockFreeCollectionsTaskRequest) -> LockFreeCollectionsResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => LockFreeCollectionsResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => LockFreeCollectionsResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

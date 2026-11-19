@@ -1,0 +1,9 @@
+// Example 80: AI Workflow Directed Acyclic Graph (DAG) Engine — Enum: DagNodeState
+
+enum DagNodeState {
+    WaitingDependencies
+    ExecutingActive
+    CompletedSuccess
+    FailedTerminated
+    PausedAwaitingHumanReview
+}

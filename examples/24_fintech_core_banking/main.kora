@@ -1,0 +1,146 @@
+// ============================================================================
+// Example 24: Fintech Core Banking — Main Entrypoint
+// Production Bootstrap with In-Memory Optimistic Concurrency Repository
+// ============================================================================
+
+import { Account } from "./entities/account.entity"
+import { LedgerJournalEvent } from "./entities/ledger_entry.entity"
+import { BankingRepository } from "./interfaces/banking.repository.interface"
+import { BankingService } from "./services/banking.service"
+import { BankingController } from "./controllers/banking.controller"
+import { BankingRouter } from "./routes/banking.routes"
+
+class InMemoryBankingRepo implements BankingRepository {
+    acc1_balance: Int
+    acc1_reserved: Int
+    acc1_version: Int
+
+    acc2_balance: Int
+    acc2_reserved: Int
+    acc2_version: Int
+
+    acc3_balance: Int
+    acc3_reserved: Int
+    acc3_version: Int
+
+    idempotencyKeyStore: String
+
+    init() {
+        this.acc1_balance = 100000
+        this.acc1_reserved = 0
+        this.acc1_version = 1
+
+        this.acc2_balance = 50000
+        this.acc2_reserved = 0
+        this.acc2_version = 1
+
+        this.acc3_balance = 25000
+        this.acc3_reserved = 0
+        this.acc3_version = 1
+
+        this.idempotencyKeyStore = ""
+    }
+
+    fn findAccountById(id: Int) -> Option<Account> {
+        if id == 1 {
+            return Some(Account {
+                id: 1,
+                accountNumber: "ACC-TREASURY-01",
+                balance: this.acc1_balance,
+                reservedBalance: this.acc1_reserved,
+                version: this.acc1_version,
+                status: "ACTIVE",
+            })
+        }
+        if id == 2 {
+            return Some(Account {
+                id: 2,
+                accountNumber: "ACC-OPERATING-02",
+                balance: this.acc2_balance,
+                reservedBalance: this.acc2_reserved,
+                version: this.acc2_version,
+                status: "ACTIVE",
+            })
+        }
+        if id == 3 {
+            return Some(Account {
+                id: 3,
+                accountNumber: "ACC-COMPLIANCE-LOCKED",
+                balance: this.acc3_balance,
+                reservedBalance: this.acc3_reserved,
+                version: this.acc3_version,
+                status: "FROZEN",
+            })
+        }
+        return None
+    }
+
+    fn saveAccountOptimistic(account: Account, expectedVersion: Int) -> Result<Account, String> {
+        if account.id == 1 {
+            if this.acc1_version != expectedVersion {
+                return Err("Optimistic lock conflict on account 1")
+            }
+            this.acc1_balance = account.balance
+            this.acc1_reserved = account.reservedBalance
+            this.acc1_version = account.version
+            return Ok(account)
+        }
+        if account.id == 2 {
+            if this.acc2_version != expectedVersion {
+                return Err("Optimistic lock conflict on account 2")
+            }
+            this.acc2_balance = account.balance
+            this.acc2_reserved = account.reservedBalance
+            this.acc2_version = account.version
+            return Ok(account)
+        }
+        if account.id == 3 {
+            if this.acc3_version != expectedVersion {
+                return Err("Optimistic lock conflict on account 3")
+            }
+            this.acc3_balance = account.balance
+            this.acc3_reserved = account.reservedBalance
+            this.acc3_version = account.version
+            return Ok(account)
+        }
+        return Err("Account not found")
+    }
+
+    fn appendJournalEvent(event: LedgerJournalEvent) -> Result<LedgerJournalEvent, String> {
+        return Ok(event)
+    }
+
+    fn checkIdempotency(key: String) -> Option<String> {
+        if this.idempotencyKeyStore == key {
+            return Some("SEEN")
+        }
+        return None
+    }
+
+    fn recordIdempotency(key: String, payload: String) -> Bool {
+        this.idempotencyKeyStore = key
+        return true
+    }
+
+    fn getTotalSystemAssets() -> Int {
+        return this.acc1_balance + this.acc1_reserved + this.acc2_balance + this.acc2_reserved + this.acc3_balance + this.acc3_reserved
+    }
+}
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = InMemoryBankingRepo()
+        let service = BankingService(repo)
+        let controller = BankingController(service)
+        let router = BankingRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

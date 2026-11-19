@@ -1,0 +1,10 @@
+// Example 26: Payment Gateway & Webhook Orchestrator
+// Domain Event Model
+
+model PaymentGatewayOrchestratorEvent {
+    eventId: String
+    eventType: String
+    entityId: Int
+    occurredAt: Int
+    payloadHash: String
+}

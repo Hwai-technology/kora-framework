@@ -1,10 +1,11 @@
 // ============================================================================
-// Enum: OrderStatus
+// Example 01: Core Language Foundations — Enum: OrderStatus
+// Algebraic Data Type with payload variants
 // ============================================================================
 
 enum OrderStatus {
     Pending
     Paid(Int)
+    Shipped(String)
     Cancelled(String)
 }
-

@@ -1,0 +1,10 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director
+// Repository Interface
+
+import { ServiceMeshProxyNodeState } from "../entities/service_mesh_proxy_primary.entity"
+
+interface ServiceMeshProxyRepository {
+    fn findNodeById(nodeId: Int) -> Option<ServiceMeshProxyNodeState>
+    fn saveNodeState(state: ServiceMeshProxyNodeState) -> Result<ServiceMeshProxyNodeState, String>
+    fn getActiveQuorumCount() -> Int
+}

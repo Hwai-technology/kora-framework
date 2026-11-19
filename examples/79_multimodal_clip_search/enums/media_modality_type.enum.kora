@@ -1,0 +1,7 @@
+// Example 79: Multimodal CLIP Cross-Search Engine — Enum: MediaModalityType
+
+enum MediaModalityType {
+    RasterImageRgb
+    TextQueryString
+    VideoKeyframeSeq
+}

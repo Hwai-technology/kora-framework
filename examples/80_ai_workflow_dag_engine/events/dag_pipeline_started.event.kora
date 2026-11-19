@@ -1,0 +1,6 @@
+// Example 80: AI Workflow Directed Acyclic Graph (DAG) Engine — Domain Event: DagPipelineStartedEvent
+
+model DagPipelineStartedEvent {
+    dagExecutionId: String
+    nodeCount: Int
+}

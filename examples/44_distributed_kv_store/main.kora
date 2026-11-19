@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 44: Distributed Dynamo-Style Key-Value Store
+// Application Container & Cluster Bootstrap
+// ============================================================================
+
+import { DistributedKvStoreClusterRepository } from "./repositories/distributed_kv_store_cluster.repository"
+import { DistributedKvStoreCoreService } from "./services/distributed_kv_store_core.service"
+import { DistributedKvStoreController } from "./controllers/distributed_kv_store.controller"
+import { DistributedKvStoreRouter } from "./routes/distributed_kv_store.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = DistributedKvStoreClusterRepository()
+        let service = DistributedKvStoreCoreService(repo)
+        let controller = DistributedKvStoreController(service)
+        let router = DistributedKvStoreRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

@@ -1,0 +1,9 @@
+// Example 26: payment_gateway_orchestrator — Domain Event: ChargebackDisputeOpenedEvent
+// Dedicated Domain Event Specification
+
+model ChargebackDisputeOpenedEvent {
+    disputeId: String
+    originalTxId: String
+    disputeReason: String
+    evidenceDueTimestamp: Int
+}

@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 42: Mental Health Longitudinal Assessment Engine
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { MentalHealthAssessmentInMemoryRepository } from "./repositories/mental_health_assessment_inmemory.repository"
+import { MentalHealthAssessmentCoreService } from "./services/mental_health_assessment_core.service"
+import { MentalHealthAssessmentController } from "./controllers/mental_health_assessment.controller"
+import { MentalHealthAssessmentRouter } from "./routes/mental_health_assessment.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = MentalHealthAssessmentInMemoryRepository()
+        let service = MentalHealthAssessmentCoreService(repo)
+        let controller = MentalHealthAssessmentController(service)
+        let router = MentalHealthAssessmentRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

@@ -1,0 +1,10 @@
+// Example 82: OAuth 2.1 & OpenID Connect Authorization Server
+// Repository Interface
+
+import { Oauth2OidcIdentityServerPrimaryRecord } from "../entities/oauth2_oidc_identity_server_primary.entity"
+
+interface Oauth2OidcIdentityServerRepository {
+    fn findById(id: Int) -> Option<Oauth2OidcIdentityServerPrimaryRecord>
+    fn save(record: Oauth2OidcIdentityServerPrimaryRecord) -> Result<Oauth2OidcIdentityServerPrimaryRecord, String>
+    fn countActive() -> Int
+}

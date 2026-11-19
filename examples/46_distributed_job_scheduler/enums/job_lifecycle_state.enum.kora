@@ -1,0 +1,10 @@
+// Example 46: Distributed Task Scheduler & Leader Lease — Enum: JobLifecycleState
+// Dedicated Domain Enum Specification
+
+enum JobLifecycleState {
+    ScheduledPending
+    LeasedRunning
+    SucceededFinal
+    FailedRetrying
+    DeadLetterArchived
+}

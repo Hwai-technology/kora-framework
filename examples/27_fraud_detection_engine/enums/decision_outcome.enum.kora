@@ -1,0 +1,9 @@
+// Example 27: fraud_detection_engine — Enum: DecisionOutcome
+// Dedicated Domain Enum Specification
+
+enum DecisionOutcome {
+    ApproveSilent
+    ChallengeStepUpMfa
+    ManualComplianceReview
+    DropAndBlacklist
+}

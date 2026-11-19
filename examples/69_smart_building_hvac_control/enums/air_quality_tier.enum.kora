@@ -1,0 +1,7 @@
+// Example 69: Smart Building HVAC & Air Quality Coordinator — Enum: AirQualityTier
+
+enum AirQualityTier {
+    ExcellentCleanAir
+    ModerateElevatedCo2
+    HazardousParticulateVentilate
+}

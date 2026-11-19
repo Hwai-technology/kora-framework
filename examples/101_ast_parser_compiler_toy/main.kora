@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 101: Pratt Parsing & Bytecode Virtual Machine
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { AstParserCompilerToyInMemoryRepository } from "./repositories/ast_parser_compiler_toy_inmemory.repository"
+import { AstParserCompilerToyCoreService } from "./services/ast_parser_compiler_toy_core.service"
+import { AstParserCompilerToyController } from "./controllers/ast_parser_compiler_toy.controller"
+import { AstParserCompilerToyRouter } from "./routes/ast_parser_compiler_toy.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = AstParserCompilerToyInMemoryRepository()
+        let service = AstParserCompilerToyCoreService(repo)
+        let controller = AstParserCompilerToyController(service)
+        let router = AstParserCompilerToyRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

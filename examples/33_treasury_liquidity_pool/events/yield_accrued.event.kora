@@ -1,0 +1,8 @@
+// Example 33: treasury_liquidity_pool — Domain Event: YieldAccruedEvent
+// Dedicated Domain Event Specification
+
+model YieldAccruedEvent {
+    poolId: String
+    accruedInterestAmount: Int
+    effectiveRateBps: Int
+}

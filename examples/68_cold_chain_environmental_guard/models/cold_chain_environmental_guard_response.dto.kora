@@ -1,0 +1,16 @@
+// Example 68: Cold Chain Vaccine Temperature Monitoring
+// Transport Model: Standard Response
+
+model ColdChainEnvironmentalGuardResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model ColdChainEnvironmentalGuardSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

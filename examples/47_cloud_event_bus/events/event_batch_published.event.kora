@@ -1,0 +1,9 @@
+// Example 47: Cloud Event Bus & Partitioned Streaming — Domain Event: EventBatchPublishedEvent
+// Dedicated Domain Event Specification
+
+model EventBatchPublishedEvent {
+    topic: String
+    partitionId: Int
+    baseOffset: Int
+    recordCount: Int
+}

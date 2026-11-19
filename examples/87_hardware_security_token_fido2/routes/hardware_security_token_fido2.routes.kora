@@ -1,0 +1,22 @@
+// Example 87: FIDO2 / WebAuthn Passkey Registration & Attestation
+// Router & Endpoint Dispatcher
+
+import { CreateHardwareSecurityTokenFido2TaskRequest } from "../models/hardware_security_token_fido2_request.dto"
+import { HardwareSecurityTokenFido2ResponseDto } from "../models/hardware_security_token_fido2_response.dto"
+import { HardwareSecurityTokenFido2Controller } from "../controllers/hardware_security_token_fido2.controller"
+
+class HardwareSecurityTokenFido2Router {
+    controller: HardwareSecurityTokenFido2Controller
+
+    init(controller: HardwareSecurityTokenFido2Controller) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateHardwareSecurityTokenFido2TaskRequest) -> HardwareSecurityTokenFido2ResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

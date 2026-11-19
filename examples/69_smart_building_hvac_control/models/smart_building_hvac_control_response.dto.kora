@@ -1,0 +1,16 @@
+// Example 69: Smart Building HVAC & Air Quality Coordinator
+// Transport Model: Standard Response
+
+model SmartBuildingHvacControlResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model SmartBuildingHvacControlSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

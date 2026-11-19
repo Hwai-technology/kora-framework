@@ -1,0 +1,10 @@
+// Example 34: HIPAA Compliant Electronic Health Records — Domain Event: EhrRecordAccessedEvent
+// Dedicated Domain Event Specification
+
+model EhrRecordAccessedEvent {
+    recordId: Int
+    accessorId: Int
+    accessLevel: String
+    accessJustification: String
+    timestamp: Int
+}

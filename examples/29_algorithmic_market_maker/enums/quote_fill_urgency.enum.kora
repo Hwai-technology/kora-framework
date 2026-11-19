@@ -1,0 +1,8 @@
+// Example 29: algorithmic_market_maker — Enum: QuoteFillUrgency
+// Dedicated Domain Enum Specification
+
+enum QuoteFillUrgency {
+    PassiveMakerOnly
+    AggressiveCrossTaker
+    CancelReplaceUrgent
+}

@@ -1,0 +1,8 @@
+// examples/11_operators_control_flow_and_resilience — Enum: RetryPolicy
+
+enum RetryPolicy {
+    ImmediateRetry
+    ExponentialBackoff
+    LinearJitter
+    FailFast
+}

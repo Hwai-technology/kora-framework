@@ -1,0 +1,8 @@
+// examples/02_clean_architecture_users — Event: UserRegisteredEvent
+
+model UserRegisteredEvent {
+    userId: Int
+    email: String
+    role: String
+    timestamp: Int
+}

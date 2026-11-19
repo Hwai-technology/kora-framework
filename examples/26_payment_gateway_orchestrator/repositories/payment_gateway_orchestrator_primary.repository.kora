@@ -1,0 +1,62 @@
+// ============================================================================
+// Payment Transaction Primary Repository Implementation
+// ============================================================================
+
+import { PaymentGatewayOrchestratorRecord } from "../entities/payment_gateway_orchestrator_primary.entity"
+import { PaymentGatewayOrchestratorRepository } from "../interfaces/payment_gateway_orchestrator_repository.interface"
+
+class PaymentGatewayOrchestratorPrimaryRepository implements PaymentGatewayOrchestratorRepository {
+    store: Vector<PaymentGatewayOrchestratorRecord>
+
+    init() {
+        this.store = Vector<PaymentGatewayOrchestratorRecord>()
+    }
+
+    fn findById(id: Int) -> Option<PaymentGatewayOrchestratorRecord> {
+        var i = 0
+        while i < this.store.length() {
+            let r = this.store[i]
+            if r.id == id && r.active {
+                return Some(r)
+            }
+            i = i + 1
+        }
+        return None
+    }
+
+    fn findByIdempotencyKey(key: String) -> Option<PaymentGatewayOrchestratorRecord> {
+        var i = 0
+        while i < this.store.length() {
+            let r = this.store[i]
+            if r.idempotencyKey == key && r.active {
+                return Some(r)
+            }
+            i = i + 1
+        }
+        return None
+    }
+
+    fn findByTransactionId(txId: String) -> Option<PaymentGatewayOrchestratorRecord> {
+        var i = 0
+        while i < this.store.length() {
+            let r = this.store[i]
+            if r.transactionId == txId && r.active {
+                return Some(r)
+            }
+            i = i + 1
+        }
+        return None
+    }
+
+    fn save(record: PaymentGatewayOrchestratorRecord) -> Result<PaymentGatewayOrchestratorRecord, String> {
+        if record.amountCents <= 0 {
+            return Err("ERR_INVALID_AMOUNT: Amount must be strictly positive")
+        }
+        this.store.push(record)
+        return Ok(record)
+    }
+
+    fn countAll() -> Int {
+        return this.store.length()
+    }
+}

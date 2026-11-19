@@ -1,0 +1,14 @@
+// Example 38: Radiology PACS DICOM Metadata Indexer
+// Persistent Database Entity: Primary Record
+
+@table("radiology_pacs_metadata_clinical_records")
+model RadiologyPacsMetadataClinicalEntity {
+    @id
+    id: Int
+    @unique
+    patientId: Int
+    clinicianId: Int
+    clinicalMetricScore: Int
+    complianceState: String
+    active: Bool
+}

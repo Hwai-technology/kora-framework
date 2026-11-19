@@ -1,0 +1,33 @@
+// Example 92: Multi-Room WebSocket Chat & Presence Cluster
+// Repository Implementation
+
+import { ChatMultiRoomClusterPrimaryRecord } from "../entities/chat_multi_room_cluster_primary.entity"
+import { ChatMultiRoomClusterRepository } from "../interfaces/chat_multi_room_cluster_repository.interface"
+
+class ChatMultiRoomClusterInMemoryRepository implements ChatMultiRoomClusterRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<ChatMultiRoomClusterPrimaryRecord> {
+        if id > 0 {
+            return Some(ChatMultiRoomClusterPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: ChatMultiRoomClusterPrimaryRecord) -> Result<ChatMultiRoomClusterPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

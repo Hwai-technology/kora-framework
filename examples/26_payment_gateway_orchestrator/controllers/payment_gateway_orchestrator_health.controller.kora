@@ -1,0 +1,14 @@
+// Example 26: Payment Gateway & Webhook Orchestrator
+// Health Check Controller
+
+class PaymentGatewayOrchestratorHealthController {
+    init() {}
+
+    fn checkLiveness() -> Bool {
+        return true
+    }
+
+    fn checkReadiness() -> Bool {
+        return true
+    }
+}

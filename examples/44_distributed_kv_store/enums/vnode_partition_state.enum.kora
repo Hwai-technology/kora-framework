@@ -1,0 +1,8 @@
+// Example 44: Distributed Dynamo-Style Key-Value Store — Enum: VnodePartitionState
+// Dedicated Domain Enum Specification
+
+enum VnodePartitionState {
+    PrimaryAssigned
+    HandoffBuffering
+    RebalancingMigration
+}

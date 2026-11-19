@@ -1,0 +1,47 @@
+// ============================================================================
+// Example 25: HFT Order Book — Models & DTOs
+// Continuous Double Auction Matching Engine Data Structures
+// ============================================================================
+
+model OrderPlacementRequest {
+    orderId: Int
+    traderId: Int
+    side: String // "BUY" or "SELL"
+    price: Int
+    quantity: Int
+    timestamp: Int
+}
+
+model CancelOrderRequest {
+    orderId: Int
+    traderId: Int
+    timestamp: Int
+}
+
+model MatchExecutionResult {
+    orderId: Int
+    status: String // "FILLED", "PARTIALLY_FILLED", "RESTING", "REJECTED_CIRCUIT_BREAKER"
+    filledQuantity: Int
+    remainingQuantity: Int
+    executedPrice: Int
+    tradesGenerated: Int
+}
+
+model OrderBookDepthDto {
+    bestBid: Int
+    bestAsk: Int
+    totalBidVolume: Int
+    totalAskVolume: Int
+    spread: Int
+    lastTradePrice: Int
+    circuitBreakerTripped: Bool
+}
+
+model MatchEngineSnapshot {
+    snapshotId: Int
+    lastTradePrice: Int
+    totalVolumeTraded: Int
+    circuitHalted: Bool
+    activeOrderCount: Int
+    timestamp: Int
+}

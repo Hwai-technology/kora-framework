@@ -1,0 +1,18 @@
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// Validation Rules Engine
+
+import { CreateAntiMoneyLaunderingSiemRequest } from "../models/anti_money_laundering_siem_request.dto"
+
+class AntiMoneyLaunderingSiemValidationService {
+    init() {}
+
+    fn validateInput(req: CreateAntiMoneyLaunderingSiemRequest) -> Result<Bool, String> {
+        if req.reference == "" {
+            return Err("Reference code is mandatory")
+        }
+        if req.volume < 10 {
+            return Err("Volume below minimum threshold")
+        }
+        return Ok(true)
+    }
+}

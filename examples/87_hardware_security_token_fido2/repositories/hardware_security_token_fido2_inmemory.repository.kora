@@ -1,0 +1,33 @@
+// Example 87: FIDO2 / WebAuthn Passkey Registration & Attestation
+// Repository Implementation
+
+import { HardwareSecurityTokenFido2PrimaryRecord } from "../entities/hardware_security_token_fido2_primary.entity"
+import { HardwareSecurityTokenFido2Repository } from "../interfaces/hardware_security_token_fido2_repository.interface"
+
+class HardwareSecurityTokenFido2InMemoryRepository implements HardwareSecurityTokenFido2Repository {
+    init() {}
+
+    fn findById(id: Int) -> Option<HardwareSecurityTokenFido2PrimaryRecord> {
+        if id > 0 {
+            return Some(HardwareSecurityTokenFido2PrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: HardwareSecurityTokenFido2PrimaryRecord) -> Result<HardwareSecurityTokenFido2PrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

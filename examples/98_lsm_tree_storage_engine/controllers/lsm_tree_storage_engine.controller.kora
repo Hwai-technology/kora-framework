@@ -1,0 +1,38 @@
+// Example 98: Log-Structured Merge-Tree (LSM-Tree) Engine
+// Presentation Controller
+
+import { CreateLsmTreeStorageEngineTaskRequest } from "../models/lsm_tree_storage_engine_request.dto"
+import { LsmTreeStorageEngineResponseDto } from "../models/lsm_tree_storage_engine_response.dto"
+import { LsmTreeStorageEngineCoreService } from "../services/lsm_tree_storage_engine_core.service"
+
+class LsmTreeStorageEngineController {
+    service: LsmTreeStorageEngineCoreService
+
+    init(service: LsmTreeStorageEngineCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateLsmTreeStorageEngineTaskRequest) -> LsmTreeStorageEngineResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => LsmTreeStorageEngineResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => LsmTreeStorageEngineResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

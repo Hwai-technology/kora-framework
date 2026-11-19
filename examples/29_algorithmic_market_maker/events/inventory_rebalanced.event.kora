@@ -1,0 +1,9 @@
+// Example 29: algorithmic_market_maker — Domain Event: InventoryRebalancedEvent
+// Dedicated Domain Event Specification
+
+model InventoryRebalancedEvent {
+    symbol: String
+    currentInventory: Int
+    targetInventory: Int
+    actionTaken: String
+}

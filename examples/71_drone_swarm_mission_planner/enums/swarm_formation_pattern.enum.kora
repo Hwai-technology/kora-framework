@@ -1,0 +1,8 @@
+// Example 71: Autonomous Drone Swarm Formation Coordinator — Enum: SwarmFormationPattern
+
+enum SwarmFormationPattern {
+    VeeAerodynamicFormation
+    LinearGridSearchSweep
+    PerimeterShieldDefense
+    LandingPatternStack
+}

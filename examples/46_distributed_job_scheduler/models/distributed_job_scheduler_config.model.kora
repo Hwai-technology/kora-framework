@@ -1,0 +1,9 @@
+// Example 46: Distributed Task Scheduler & Leader Lease
+// Configuration Model
+
+model DistributedJobSchedulerClusterConfig {
+    heartbeatIntervalMs: Int
+    electionTimeoutMs: Int
+    quorumMajoritySize: Int
+    clusterName: String
+}

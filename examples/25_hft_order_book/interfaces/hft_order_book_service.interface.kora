@@ -1,0 +1,10 @@
+// Example 25: High-Frequency Trading Order Book
+// Domain Service Interface
+
+import { HftOrderBookRecord } from "../entities/hft_order_book_primary.entity"
+import { CreateHftOrderBookRequest } from "../models/hft_order_book_request.dto"
+
+interface HftOrderBookServiceInterface {
+    fn processRequest(req: CreateHftOrderBookRequest) -> Result<HftOrderBookRecord, String>
+    fn validateState(id: Int) -> Bool
+}

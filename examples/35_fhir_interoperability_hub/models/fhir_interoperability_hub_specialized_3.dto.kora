@@ -1,0 +1,9 @@
+// Example 35: FHIR R4 & HL7 Interoperability Hub
+// Specialized Model 3
+
+model FhirInteroperabilityHubSpecializedProfile3 {
+    profileId: String
+    classificationCode: String
+    riskWeight: Int
+    isActive: Bool
+}

@@ -1,0 +1,7 @@
+// examples/04_mysql_database_orm — Enum: CustomerSegment
+
+enum CustomerSegment {
+    SMB
+    MidMarket
+    EnterpriseGlobal
+}

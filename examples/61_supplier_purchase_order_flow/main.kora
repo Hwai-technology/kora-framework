@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 61: Supplier Purchase Order & 3-Way Invoice Matcher
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { SupplierPurchaseOrderFlowInMemoryRepository } from "./repositories/supplier_purchase_order_flow_inmemory.repository"
+import { SupplierPurchaseOrderFlowCoreService } from "./services/supplier_purchase_order_flow_core.service"
+import { SupplierPurchaseOrderFlowController } from "./controllers/supplier_purchase_order_flow.controller"
+import { SupplierPurchaseOrderFlowRouter } from "./routes/supplier_purchase_order_flow.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = SupplierPurchaseOrderFlowInMemoryRepository()
+        let service = SupplierPurchaseOrderFlowCoreService(repo)
+        let controller = SupplierPurchaseOrderFlowController(service)
+        let router = SupplierPurchaseOrderFlowRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

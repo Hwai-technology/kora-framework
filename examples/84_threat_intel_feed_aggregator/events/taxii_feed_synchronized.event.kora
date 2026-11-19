@@ -1,0 +1,6 @@
+// Example 84: Threat Intelligence STIX/TAXII Indicator Parser — Domain Event: TaxiiFeedSynchronizedEvent
+
+model TaxiiFeedSynchronizedEvent {
+    feedCollectionId: String
+    newIndicatorsAdded: Int
+}

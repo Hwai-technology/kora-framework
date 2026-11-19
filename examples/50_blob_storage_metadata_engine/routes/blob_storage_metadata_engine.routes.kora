@@ -1,0 +1,22 @@
+// Example 50: Distributed Blob Storage Metadata Engine
+// Router & Endpoint Dispatcher
+
+import { CreateBlobStorageMetadataEngineTaskRequest } from "../models/blob_storage_metadata_engine_request.dto"
+import { BlobStorageMetadataEngineResponseDto } from "../models/blob_storage_metadata_engine_response.dto"
+import { BlobStorageMetadataEngineController } from "../controllers/blob_storage_metadata_engine.controller"
+
+class BlobStorageMetadataEngineRouter {
+    controller: BlobStorageMetadataEngineController
+
+    init(controller: BlobStorageMetadataEngineController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateBlobStorageMetadataEngineTaskRequest) -> BlobStorageMetadataEngineResponseDto {
+        return this.controller.handleTaskProposal(req)
+    }
+
+    fn getQuorum() -> Bool {
+        return this.controller.checkQuorumStatus()
+    }
+}

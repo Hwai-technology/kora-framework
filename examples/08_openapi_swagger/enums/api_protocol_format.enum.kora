@@ -1,0 +1,7 @@
+// examples/08_openapi_swagger — Enum: ApiProtocolFormat
+
+enum ApiProtocolFormat {
+    JsonRest
+    GrpcProtobuf
+    OpenApiYaml
+}

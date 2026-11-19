@@ -1,0 +1,29 @@
+// ============================================================================
+// Example 33: Treasury Liquidity & Capital Allocation
+// Application Container & Dependency Container Bootstrap
+// ============================================================================
+
+import { TreasuryLiquidityPoolPrimaryRepository } from "./repositories/treasury_liquidity_pool_primary.repository"
+import { TreasuryLiquidityPoolCoreService } from "./services/treasury_liquidity_pool_core.service"
+import { TreasuryLiquidityPoolCommandController } from "./controllers/treasury_liquidity_pool_command.controller"
+import { TreasuryLiquidityPoolQueryController } from "./controllers/treasury_liquidity_pool_query.controller"
+import { TreasuryLiquidityPoolRouter } from "./routes/treasury_liquidity_pool.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = TreasuryLiquidityPoolPrimaryRepository()
+        let service = TreasuryLiquidityPoolCoreService(repo)
+        let commandCtrl = TreasuryLiquidityPoolCommandController(service)
+        let queryCtrl = TreasuryLiquidityPoolQueryController(repo)
+        let router = TreasuryLiquidityPoolRouter(commandCtrl, queryCtrl)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

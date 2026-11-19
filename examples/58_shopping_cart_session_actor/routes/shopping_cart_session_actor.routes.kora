@@ -1,0 +1,22 @@
+// Example 58: Distributed Shopping Cart Session Actor
+// Router & Endpoint Dispatcher
+
+import { CreateShoppingCartSessionActorTaskRequest } from "../models/shopping_cart_session_actor_request.dto"
+import { ShoppingCartSessionActorResponseDto } from "../models/shopping_cart_session_actor_response.dto"
+import { ShoppingCartSessionActorController } from "../controllers/shopping_cart_session_actor.controller"
+
+class ShoppingCartSessionActorRouter {
+    controller: ShoppingCartSessionActorController
+
+    init(controller: ShoppingCartSessionActorController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateShoppingCartSessionActorTaskRequest) -> ShoppingCartSessionActorResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

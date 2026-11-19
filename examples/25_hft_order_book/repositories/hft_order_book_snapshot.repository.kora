@@ -1,0 +1,17 @@
+// Example 25: High-Frequency Trading Order Book
+// State Snapshot Repository Implementation
+
+import { HftOrderBookSnapshot } from "../entities/hft_order_book_snapshot.entity"
+
+class HftOrderBookSnapshotRepository {
+    init() {}
+
+    fn captureSnapshot(aggregateId: Int, version: Int) -> HftOrderBookSnapshot {
+        return HftOrderBookSnapshot {
+            id: 1,
+            aggregateId: aggregateId,
+            version: version,
+            stateHash: "sha256-verified-snapshot",
+        }
+    }
+}

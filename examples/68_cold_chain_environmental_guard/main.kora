@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 68: Cold Chain Vaccine Temperature Monitoring
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { ColdChainEnvironmentalGuardInMemoryRepository } from "./repositories/cold_chain_environmental_guard_inmemory.repository"
+import { ColdChainEnvironmentalGuardCoreService } from "./services/cold_chain_environmental_guard_core.service"
+import { ColdChainEnvironmentalGuardController } from "./controllers/cold_chain_environmental_guard.controller"
+import { ColdChainEnvironmentalGuardRouter } from "./routes/cold_chain_environmental_guard.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = ColdChainEnvironmentalGuardInMemoryRepository()
+        let service = ColdChainEnvironmentalGuardCoreService(repo)
+        let controller = ColdChainEnvironmentalGuardController(service)
+        let router = ColdChainEnvironmentalGuardRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

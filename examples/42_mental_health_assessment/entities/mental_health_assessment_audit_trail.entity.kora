@@ -1,0 +1,13 @@
+// Example 42: Mental Health Longitudinal Assessment Engine
+// Persistent Database Entity: Audit Trail Log
+
+@table("mental_health_assessment_audit_trail")
+model MentalHealthAssessmentAuditTrail {
+    @id
+    id: Int
+    recordId: Int
+    performedByStaffId: Int
+    actionTaken: String
+    tamperProofHash: String
+    timestamp: Int
+}

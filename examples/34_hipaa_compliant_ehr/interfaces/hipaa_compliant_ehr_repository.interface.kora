@@ -1,0 +1,10 @@
+// Example 34: HIPAA Compliant Electronic Health Records
+// Repository Interface
+
+import { HipaaCompliantEhrClinicalEntity } from "../entities/hipaa_compliant_ehr_primary.entity"
+
+interface HipaaCompliantEhrRepository {
+    fn findByPatientId(patientId: Int) -> Option<HipaaCompliantEhrClinicalEntity>
+    fn save(entity: HipaaCompliantEhrClinicalEntity) -> Result<HipaaCompliantEhrClinicalEntity, String>
+    fn verifyIntegrity(recordId: Int) -> Bool
+}

@@ -1,0 +1,16 @@
+// Example 92: Multi-Room WebSocket Chat & Presence Cluster
+// Transport Model: Standard Response
+
+model ChatMultiRoomClusterResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model ChatMultiRoomClusterSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

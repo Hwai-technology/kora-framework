@@ -1,0 +1,13 @@
+// Example 37: ICU Real-Time High-Frequency Vitals Monitor
+// Persistent Database Entity: Audit Trail Log
+
+@table("icu_vitals_telemetry_audit_trail")
+model IcuVitalsTelemetryAuditTrail {
+    @id
+    id: Int
+    recordId: Int
+    performedByStaffId: Int
+    actionTaken: String
+    tamperProofHash: String
+    timestamp: Int
+}

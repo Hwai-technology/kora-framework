@@ -1,0 +1,10 @@
+// Example 91: CRDT Collaborative Real-Time Document Editor
+// Repository Interface
+
+import { CollaborativeCrdtDocPrimaryRecord } from "../entities/collaborative_crdt_doc_primary.entity"
+
+interface CollaborativeCrdtDocRepository {
+    fn findById(id: Int) -> Option<CollaborativeCrdtDocPrimaryRecord>
+    fn save(record: CollaborativeCrdtDocPrimaryRecord) -> Result<CollaborativeCrdtDocPrimaryRecord, String>
+    fn countActive() -> Int
+}

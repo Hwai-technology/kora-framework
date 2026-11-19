@@ -1,0 +1,14 @@
+// Example 48: Distributed Cache Cluster & Write-Behind
+// Transport Model: Command Request
+
+model CreateDistributedCacheClusterTaskRequest {
+    taskKey: String
+    originatingNodeId: Int
+    payloadVolume: Int
+    targetCluster: String
+}
+
+model QueryDistributedCacheClusterStatusRequest {
+    resourceKey: String
+    quorumRequired: Int
+}

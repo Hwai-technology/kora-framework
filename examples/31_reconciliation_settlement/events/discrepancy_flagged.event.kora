@@ -1,0 +1,9 @@
+// Example 31: reconciliation_settlement — Domain Event: DiscrepancyFlaggedEvent
+// Dedicated Domain Event Specification
+
+model DiscrepancyFlaggedEvent {
+    recordId: String
+    internalAmount: Int
+    externalAmount: Int
+    variance: Int
+}

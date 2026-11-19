@@ -1,0 +1,7 @@
+// Example 83: Zero-Trust Context-Aware Policy Decision Point (PDP) — Domain Event: StepUpMfaChallengedEvent
+
+model StepUpMfaChallengedEvent {
+    userId: Int
+    riskScore: Int
+    requiredAuthFactor: String
+}

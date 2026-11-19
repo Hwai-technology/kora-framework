@@ -1,0 +1,39 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director
+// Core Domain Service Implementation
+
+import { ServiceMeshProxyNodeState } from "../entities/service_mesh_proxy_primary.entity"
+import { CreateServiceMeshProxyTaskRequest } from "../models/service_mesh_proxy_request.dto"
+import { ServiceMeshProxyRepository } from "../interfaces/service_mesh_proxy_repository.interface"
+import { ServiceMeshProxyConsensusContract } from "../interfaces/service_mesh_proxy_service.interface"
+
+class ServiceMeshProxyCoreService implements ServiceMeshProxyConsensusContract {
+    repo: ServiceMeshProxyRepository
+
+    init(repo: ServiceMeshProxyRepository) {
+        this.repo = repo
+    }
+
+    fn processConsensusCommand(req: CreateServiceMeshProxyTaskRequest) -> Result<ServiceMeshProxyNodeState, String> {
+        if req.originatingNodeId <= 0 {
+            return Err("Originating node ID must be strictly positive")
+        }
+        if req.payloadVolume <= 0 {
+            return Err("Payload volume must be positive")
+        }
+
+        let state = ServiceMeshProxyNodeState {
+            id: req.originatingNodeId,
+            nodeIdentifier: "CLUSTER-NODE-" + req.originatingNodeId.toString(),
+            currentEpochTerm: 5,
+            votedForCandidate: req.originatingNodeId,
+            isLeader: true,
+            active: true,
+        }
+        return this.repo.saveNodeState(state)
+    }
+
+    fn evaluateClusterQuorum() -> Bool {
+        let quorum = this.repo.getActiveQuorumCount()
+        return quorum >= 3
+    }
+}

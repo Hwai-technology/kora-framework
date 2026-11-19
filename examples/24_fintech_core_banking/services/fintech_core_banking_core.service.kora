@@ -1,0 +1,37 @@
+// Example 24: Core Banking Ledger & Accounts
+// Core Domain Service Implementation
+
+import { FintechCoreBankingRecord } from "../entities/fintech_core_banking_primary.entity"
+import { CreateFintechCoreBankingRequest } from "../models/fintech_core_banking_request.dto"
+import { FintechCoreBankingRepository } from "../interfaces/fintech_core_banking_repository.interface"
+import { FintechCoreBankingServiceInterface } from "../interfaces/fintech_core_banking_service.interface"
+
+class FintechCoreBankingCoreService implements FintechCoreBankingServiceInterface {
+    repo: FintechCoreBankingRepository
+
+    init(repo: FintechCoreBankingRepository) {
+        this.repo = repo
+    }
+
+    fn processRequest(req: CreateFintechCoreBankingRequest) -> Result<FintechCoreBankingRecord, String> {
+        if req.volume <= 0 {
+            return Err("Volume must be positive")
+        }
+        let record = FintechCoreBankingRecord {
+            id: req.targetId,
+            reference: req.reference,
+            status: "COMMITTED",
+            balance: req.volume,
+            active: true,
+        }
+        return this.repo.save(record)
+    }
+
+    fn validateState(id: Int) -> Bool {
+        let opt = this.repo.findById(id)
+        return match opt {
+            Some(rec) => rec.active,
+            None => false,
+        }
+    }
+}

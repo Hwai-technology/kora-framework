@@ -1,0 +1,29 @@
+// ============================================================================
+// Example 30: Credit Underwriting & Risk Assessment
+// Application Container & Dependency Container Bootstrap
+// ============================================================================
+
+import { CreditScoringUnderwritingPrimaryRepository } from "./repositories/credit_scoring_underwriting_primary.repository"
+import { CreditScoringUnderwritingCoreService } from "./services/credit_scoring_underwriting_core.service"
+import { CreditScoringUnderwritingCommandController } from "./controllers/credit_scoring_underwriting_command.controller"
+import { CreditScoringUnderwritingQueryController } from "./controllers/credit_scoring_underwriting_query.controller"
+import { CreditScoringUnderwritingRouter } from "./routes/credit_scoring_underwriting.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = CreditScoringUnderwritingPrimaryRepository()
+        let service = CreditScoringUnderwritingCoreService(repo)
+        let commandCtrl = CreditScoringUnderwritingCommandController(service)
+        let queryCtrl = CreditScoringUnderwritingQueryController(repo)
+        let router = CreditScoringUnderwritingRouter(commandCtrl, queryCtrl)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

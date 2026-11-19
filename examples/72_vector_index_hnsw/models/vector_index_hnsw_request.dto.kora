@@ -1,0 +1,15 @@
+// Example 72: HNSW Vector Index & Approximate Nearest Neighbor
+// Transport Model: Command Request
+
+model CreateVectorIndexHnswTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryVectorIndexHnswFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

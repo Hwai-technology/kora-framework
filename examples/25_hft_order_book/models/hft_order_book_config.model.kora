@@ -1,0 +1,10 @@
+// Example 25: High-Frequency Trading Order Book
+// Configuration Model
+
+model HftOrderBookConfig {
+    environment: String
+    maxBatchSize: Int
+    retryAttempts: Int
+    timeoutSeconds: Int
+    enabled: Bool
+}

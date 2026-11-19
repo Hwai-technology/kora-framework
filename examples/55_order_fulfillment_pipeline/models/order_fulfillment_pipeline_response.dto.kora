@@ -1,0 +1,16 @@
+// Example 55: Order Fulfillment & Pick-Pack-Ship Workflow
+// Transport Model: Standard Response
+
+model OrderFulfillmentPipelineResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model OrderFulfillmentPipelineSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

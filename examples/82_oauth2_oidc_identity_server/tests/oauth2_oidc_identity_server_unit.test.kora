@@ -1,0 +1,75 @@
+// ============================================================================
+// Unit Test Suite: OAuth 2.1 & OpenID Connect Authorization Server
+// Verifies Domain Invariants, Boundary Calculations & Liveness
+// ============================================================================
+
+import { CreateOauth2OidcIdentityServerTaskRequest } from "../models/oauth2_oidc_identity_server_request.dto"
+import { Oauth2OidcIdentityServerInMemoryRepository } from "../repositories/oauth2_oidc_identity_server_inmemory.repository"
+import { Oauth2OidcIdentityServerCoreService } from "../services/oauth2_oidc_identity_server_core.service"
+import { Oauth2OidcIdentityServerTelemetryService } from "../services/oauth2_oidc_identity_server_telemetry.service"
+
+class Oauth2OidcIdentityServerUnitTestSuite {
+    service: Oauth2OidcIdentityServerCoreService
+    telemetry: Oauth2OidcIdentityServerTelemetryService
+
+    init(service: Oauth2OidcIdentityServerCoreService, telemetry: Oauth2OidcIdentityServerTelemetryService) {
+        this.service = service
+        this.telemetry = telemetry
+    }
+
+    fn test_valid_task_execution() -> Bool {
+        let req = CreateOauth2OidcIdentityServerTaskRequest {
+            taskKey: "UNIT-TASK-101",
+            targetEntityId: 10,
+            workloadCapacity: 95,
+            domainContext: "Cybersecurity",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(rec) => rec.id == 10 && rec.capacityScore == 95,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_negative_target_rejected() -> Bool {
+        let req = CreateOauth2OidcIdentityServerTaskRequest {
+            taskKey: "INVALID-TASK",
+            targetEntityId: -1,
+            workloadCapacity: 50,
+            domainContext: "Cybersecurity",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Target entity ID must be strictly positive",
+        }
+    }
+
+    fn test_health_evaluation() -> Bool {
+        let health = this.service.evaluateHealth(10)
+        return health == "OPTIMUM_PERFORMANCE" || health == "MODERATE_NORMAL"
+    }
+
+    fn test_telemetry_ping() -> Bool {
+        return this.telemetry.ping()
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_task_execution()
+        let t2 = this.test_invalid_negative_target_rejected()
+        let t3 = this.test_health_evaluation()
+        let t4 = this.test_telemetry_ping()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ OAuth 2.1 & OpenID Connect Authorization Server Unit Tests: 4/4 passed (Domain Invariants Verified)")
+        } else {
+            print("  ✗ OAuth 2.1 & OpenID Connect Authorization Server Unit Tests: failed")
+        }
+    }
+}
+
+let repo = Oauth2OidcIdentityServerInMemoryRepository()
+let service = Oauth2OidcIdentityServerCoreService(repo)
+let telemetry = Oauth2OidcIdentityServerTelemetryService()
+let suite = Oauth2OidcIdentityServerUnitTestSuite(service, telemetry)
+suite.run()

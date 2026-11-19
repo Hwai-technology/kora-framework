@@ -1,0 +1,16 @@
+// Example 31: Inter-Bank Reconciliation & Settlement
+// Notification Service Implementation
+
+import { ReconciliationSettlementNotifier } from "../interfaces/reconciliation_settlement_notifier.interface"
+
+class ReconciliationSettlementNotificationService implements ReconciliationSettlementNotifier {
+    init() {}
+
+    fn sendAlert(subject: String, level: String) -> Bool {
+        return level != "CRITICAL" || subject != ""
+    }
+
+    fn ping() -> Bool {
+        return true
+    }
+}

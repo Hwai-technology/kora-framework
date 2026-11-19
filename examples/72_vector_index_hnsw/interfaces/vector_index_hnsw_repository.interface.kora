@@ -1,0 +1,10 @@
+// Example 72: HNSW Vector Index & Approximate Nearest Neighbor
+// Repository Interface
+
+import { VectorIndexHnswPrimaryRecord } from "../entities/vector_index_hnsw_primary.entity"
+
+interface VectorIndexHnswRepository {
+    fn findById(id: Int) -> Option<VectorIndexHnswPrimaryRecord>
+    fn save(record: VectorIndexHnswPrimaryRecord) -> Result<VectorIndexHnswPrimaryRecord, String>
+    fn countActive() -> Int
+}

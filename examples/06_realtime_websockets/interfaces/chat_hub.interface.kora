@@ -1,11 +1,14 @@
 // ============================================================================
-// Realtime Chat Hub Interface
+// Realtime WebSocket & Pub/Sub Hub Interface Contract
 // ============================================================================
 
-import { ChatMessage, SendMessageRequest, RoomPresence } from "../models/chat.models"
+import { WsFrame, WsSession, RoomPresence, BroadcastEnvelope } from "../models/chat.models"
 
-interface ChatHub {
-    fn broadcast(req: SendMessageRequest) -> ChatMessage
-    fn getPresence(room: String) -> RoomPresence
+interface IWebSocketHub {
+    fn authenticateUpgrade(token: String, clientIp: String, targetChannel: String) -> Option<WsSession>
+    fn handleFrame(sessionId: String, frame: WsFrame) -> Option<WsFrame>
+    fn broadcast(channel: String, senderId: String, payload: String) -> Int
+    fn processHeartbeatWatchdog(currentTimeTs: Int, timeoutSeconds: Int) -> Int
+    fn getRoomPresence(room: String) -> RoomPresence
+    fn closeSession(sessionId: String, reasonCode: Int) -> Bool
 }
-

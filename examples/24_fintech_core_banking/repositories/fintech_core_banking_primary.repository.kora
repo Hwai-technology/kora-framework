@@ -1,0 +1,33 @@
+// Example 24: Core Banking Ledger & Accounts
+// Primary Repository Implementation
+
+import { FintechCoreBankingRecord } from "../entities/fintech_core_banking_primary.entity"
+import { FintechCoreBankingRepository } from "../interfaces/fintech_core_banking_repository.interface"
+
+class FintechCoreBankingPrimaryRepository implements FintechCoreBankingRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<FintechCoreBankingRecord> {
+        if id > 0 {
+            return Some(FintechCoreBankingRecord {
+                id: id,
+                reference: "REF-" + id.toString(),
+                status: "ACTIVE",
+                balance: 100000,
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: FintechCoreBankingRecord) -> Result<FintechCoreBankingRecord, String> {
+        if record.id < 0 {
+            return Err("Invalid record id")
+        }
+        return Ok(record)
+    }
+
+    fn countAll() -> Int {
+        return 42
+    }
+}

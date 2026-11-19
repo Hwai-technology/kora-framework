@@ -1,0 +1,38 @@
+// Example 71: Autonomous Drone Swarm Formation Coordinator
+// Presentation Controller
+
+import { CreateDroneSwarmMissionPlannerTaskRequest } from "../models/drone_swarm_mission_planner_request.dto"
+import { DroneSwarmMissionPlannerResponseDto } from "../models/drone_swarm_mission_planner_response.dto"
+import { DroneSwarmMissionPlannerCoreService } from "../services/drone_swarm_mission_planner_core.service"
+
+class DroneSwarmMissionPlannerController {
+    service: DroneSwarmMissionPlannerCoreService
+
+    init(service: DroneSwarmMissionPlannerCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateDroneSwarmMissionPlannerTaskRequest) -> DroneSwarmMissionPlannerResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => DroneSwarmMissionPlannerResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => DroneSwarmMissionPlannerResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

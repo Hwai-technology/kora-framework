@@ -1,0 +1,8 @@
+// Example 32: anti_money_laundering_siem — Domain Event: SanctionFreezeOrderedEvent
+// Dedicated Domain Event Specification
+
+model SanctionFreezeOrderedEvent {
+    subjectId: String
+    issuingAuthority: String
+    assetsLockedAmount: Int
+}

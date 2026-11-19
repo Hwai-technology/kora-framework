@@ -1,0 +1,9 @@
+// Example 49: API Gateway & Web Application Firewall
+// Specialized Model 2
+
+model ApiGatewayWafSpecializedProfile2 {
+    profileId: String
+    classificationCode: String
+    quorumWeight: Int
+    isActive: Bool
+}

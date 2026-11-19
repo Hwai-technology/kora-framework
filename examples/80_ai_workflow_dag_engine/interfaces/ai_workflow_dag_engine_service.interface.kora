@@ -1,0 +1,10 @@
+// Example 80: AI Workflow Directed Acyclic Graph (DAG) Engine
+// Domain Service Contract
+
+import { AiWorkflowDagEnginePrimaryRecord } from "../entities/ai_workflow_dag_engine_primary.entity"
+import { CreateAiWorkflowDagEngineTaskRequest } from "../models/ai_workflow_dag_engine_request.dto"
+
+interface AiWorkflowDagEngineDomainContract {
+    fn executeTask(req: CreateAiWorkflowDagEngineTaskRequest) -> Result<AiWorkflowDagEnginePrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

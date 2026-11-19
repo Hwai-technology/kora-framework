@@ -1,0 +1,10 @@
+// Example 68: Cold Chain Vaccine Temperature Monitoring
+// Domain Service Contract
+
+import { ColdChainEnvironmentalGuardPrimaryRecord } from "../entities/cold_chain_environmental_guard_primary.entity"
+import { CreateColdChainEnvironmentalGuardTaskRequest } from "../models/cold_chain_environmental_guard_request.dto"
+
+interface ColdChainEnvironmentalGuardDomainContract {
+    fn executeTask(req: CreateColdChainEnvironmentalGuardTaskRequest) -> Result<ColdChainEnvironmentalGuardPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

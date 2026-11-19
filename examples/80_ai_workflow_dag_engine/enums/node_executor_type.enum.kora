@@ -1,0 +1,7 @@
+// Example 80: AI Workflow Directed Acyclic Graph (DAG) Engine — Enum: NodeExecutorType
+
+enum NodeExecutorType {
+    PythonMlRuntime
+    LlmInferenceCall
+    HttpWebhookNotifier
+}

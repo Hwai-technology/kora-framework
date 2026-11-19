@@ -1,0 +1,15 @@
+// Example 61: Supplier Purchase Order & 3-Way Invoice Matcher
+// Transport Model: Command Request
+
+model CreateSupplierPurchaseOrderFlowTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QuerySupplierPurchaseOrderFlowFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

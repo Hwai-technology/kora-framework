@@ -1,0 +1,9 @@
+// Example 101: Pratt Parsing & Bytecode Virtual Machine — Enum: BytecodeOpcode
+
+enum BytecodeOpcode {
+    OpConstantLoad
+    OpAddIntegers
+    OpSubtractIntegers
+    OpStoreVariable
+    OpHaltReturn
+}

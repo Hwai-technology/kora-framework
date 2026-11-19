@@ -1,0 +1,9 @@
+// Example 46: Distributed Task Scheduler & Leader Lease — Domain Event: JobExecutionDispatchedEvent
+// Dedicated Domain Event Specification
+
+model JobExecutionDispatchedEvent {
+    jobId: String
+    assignedWorkerId: Int
+    executionAttempt: Int
+    timestamp: Int
+}

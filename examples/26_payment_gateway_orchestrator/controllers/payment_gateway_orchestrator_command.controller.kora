@@ -1,0 +1,34 @@
+// Example 26: Payment Gateway & Webhook Orchestrator
+// Command Controller (Mutations & Writes)
+
+import { CreatePaymentGatewayOrchestratorRequest } from "../models/payment_gateway_orchestrator_request.dto"
+import { PaymentGatewayOrchestratorResponse } from "../models/payment_gateway_orchestrator_response.dto"
+import { PaymentGatewayOrchestratorCoreService } from "../services/payment_gateway_orchestrator_core.service"
+
+class PaymentGatewayOrchestratorCommandController {
+    service: PaymentGatewayOrchestratorCoreService
+
+    init(service: PaymentGatewayOrchestratorCoreService) {
+        this.service = service
+    }
+
+    fn handleCreate(req: CreatePaymentGatewayOrchestratorRequest) -> PaymentGatewayOrchestratorResponse {
+        let outcome = this.service.processRequest(req)
+        return match outcome {
+            Ok(rec) => PaymentGatewayOrchestratorResponse {
+                id: rec.id,
+                reference: rec.reference,
+                success: true,
+                statusCode: 201,
+                message: "Created successfully",
+            },
+            Err(reason) => PaymentGatewayOrchestratorResponse {
+                id: -1,
+                reference: req.reference,
+                success: false,
+                statusCode: 400,
+                message: reason,
+            },
+        }
+    }
+}

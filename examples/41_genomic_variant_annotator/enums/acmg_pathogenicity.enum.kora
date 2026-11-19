@@ -1,0 +1,10 @@
+// Example 41: Genomic Variant Annotation & Pathogenicity — Enum: AcmgPathogenicity
+// Dedicated Domain Enum Specification
+
+enum AcmgPathogenicity {
+    Benign
+    LikelyBenign
+    VariantUncertainSignificanceVUS
+    LikelyPathogenic
+    PathogenicConfirmed
+}

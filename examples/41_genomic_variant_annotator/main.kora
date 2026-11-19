@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 41: Genomic Variant Annotation & Pathogenicity
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { GenomicVariantAnnotatorInMemoryRepository } from "./repositories/genomic_variant_annotator_inmemory.repository"
+import { GenomicVariantAnnotatorCoreService } from "./services/genomic_variant_annotator_core.service"
+import { GenomicVariantAnnotatorController } from "./controllers/genomic_variant_annotator.controller"
+import { GenomicVariantAnnotatorRouter } from "./routes/genomic_variant_annotator.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = GenomicVariantAnnotatorInMemoryRepository()
+        let service = GenomicVariantAnnotatorCoreService(repo)
+        let controller = GenomicVariantAnnotatorController(service)
+        let router = GenomicVariantAnnotatorRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

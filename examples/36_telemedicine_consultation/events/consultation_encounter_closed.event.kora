@@ -1,0 +1,8 @@
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions — Domain Event: ConsultationEncounterClosedEvent
+// Dedicated Domain Event Specification
+
+model ConsultationEncounterClosedEvent {
+    sessionId: String
+    durationSeconds: Int
+    billingCptCode: String
+}

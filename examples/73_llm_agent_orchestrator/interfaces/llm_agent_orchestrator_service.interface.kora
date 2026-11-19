@@ -1,0 +1,10 @@
+// Example 73: Autonomous LLM Agent Orchestrator & Tool Calling
+// Domain Service Contract
+
+import { LlmAgentOrchestratorPrimaryRecord } from "../entities/llm_agent_orchestrator_primary.entity"
+import { CreateLlmAgentOrchestratorTaskRequest } from "../models/llm_agent_orchestrator_request.dto"
+
+interface LlmAgentOrchestratorDomainContract {
+    fn executeTask(req: CreateLlmAgentOrchestratorTaskRequest) -> Result<LlmAgentOrchestratorPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

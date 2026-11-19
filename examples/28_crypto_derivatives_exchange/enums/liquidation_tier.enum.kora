@@ -1,0 +1,9 @@
+// Example 28: crypto_derivatives_exchange — Enum: LiquidationTier
+// Dedicated Domain Enum Specification
+
+enum LiquidationTier {
+    PreWarningCall
+    PartialDeleveraging
+    FullMarketLiquidation
+    InsuranceFundAbsorbed
+}

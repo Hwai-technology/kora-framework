@@ -1,0 +1,9 @@
+// Example 82: OAuth 2.1 & OpenID Connect Authorization Server
+// Configuration Model
+
+model Oauth2OidcIdentityServerConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

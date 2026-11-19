@@ -1,0 +1,38 @@
+// Example 65: Fleet Telematics & Polygonal Geofence Monitor
+// Presentation Controller
+
+import { CreateFleetTelematicsGeofencingTaskRequest } from "../models/fleet_telematics_geofencing_request.dto"
+import { FleetTelematicsGeofencingResponseDto } from "../models/fleet_telematics_geofencing_response.dto"
+import { FleetTelematicsGeofencingCoreService } from "../services/fleet_telematics_geofencing_core.service"
+
+class FleetTelematicsGeofencingController {
+    service: FleetTelematicsGeofencingCoreService
+
+    init(service: FleetTelematicsGeofencingCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateFleetTelematicsGeofencingTaskRequest) -> FleetTelematicsGeofencingResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => FleetTelematicsGeofencingResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => FleetTelematicsGeofencingResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

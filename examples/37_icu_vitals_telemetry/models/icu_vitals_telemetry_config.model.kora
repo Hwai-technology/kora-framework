@@ -1,0 +1,9 @@
+// Example 37: ICU Real-Time High-Frequency Vitals Monitor
+// Configuration Model
+
+model IcuVitalsTelemetryServiceConfig {
+    hipaaAuditEnabled: Bool
+    encryptionKeyVersion: Int
+    maxBatchFetchSize: Int
+    environment: String
+}

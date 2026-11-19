@@ -1,0 +1,33 @@
+// Example 58: Distributed Shopping Cart Session Actor
+// Repository Implementation
+
+import { ShoppingCartSessionActorPrimaryRecord } from "../entities/shopping_cart_session_actor_primary.entity"
+import { ShoppingCartSessionActorRepository } from "../interfaces/shopping_cart_session_actor_repository.interface"
+
+class ShoppingCartSessionActorInMemoryRepository implements ShoppingCartSessionActorRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<ShoppingCartSessionActorPrimaryRecord> {
+        if id > 0 {
+            return Some(ShoppingCartSessionActorPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: ShoppingCartSessionActorPrimaryRecord) -> Result<ShoppingCartSessionActorPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

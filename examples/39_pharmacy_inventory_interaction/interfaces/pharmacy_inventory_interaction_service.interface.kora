@@ -1,0 +1,10 @@
+// Example 39: Pharmacy Dispensing & Drug Interaction Checker
+// Domain Service Contract
+
+import { PharmacyInventoryInteractionClinicalEntity } from "../entities/pharmacy_inventory_interaction_primary.entity"
+import { CreatePharmacyInventoryInteractionRecordRequest } from "../models/pharmacy_inventory_interaction_request.dto"
+
+interface PharmacyInventoryInteractionDomainContract {
+    fn processClinicalRecord(req: CreatePharmacyInventoryInteractionRecordRequest) -> Result<PharmacyInventoryInteractionClinicalEntity, String>
+    fn evaluateClinicalRisk(patientId: Int) -> String
+}

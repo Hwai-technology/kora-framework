@@ -1,0 +1,17 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director
+// Transport Model: Standard Response
+
+model ServiceMeshProxyResponseDto {
+    operationId: String
+    nodeId: Int
+    status: String
+    isQuorumSatisfied: Bool
+    message: String
+}
+
+model ServiceMeshProxyTopologySummaryDto {
+    activeClusterNodes: Int
+    leaderTerm: Int
+    healthyReplicasCount: Int
+    clusterState: String
+}

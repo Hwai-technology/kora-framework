@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 95: Multiplayer Game 60Hz Tick State Synchronizer
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { GamingStateSynchronizerInMemoryRepository } from "./repositories/gaming_state_synchronizer_inmemory.repository"
+import { GamingStateSynchronizerCoreService } from "./services/gaming_state_synchronizer_core.service"
+import { GamingStateSynchronizerController } from "./controllers/gaming_state_synchronizer.controller"
+import { GamingStateSynchronizerRouter } from "./routes/gaming_state_synchronizer.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = GamingStateSynchronizerInMemoryRepository()
+        let service = GamingStateSynchronizerCoreService(repo)
+        let controller = GamingStateSynchronizerController(service)
+        let router = GamingStateSynchronizerRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

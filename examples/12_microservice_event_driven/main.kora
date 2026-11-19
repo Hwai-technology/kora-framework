@@ -1,17 +1,30 @@
 // ============================================================================
-// Example 12: Microservices & Event-Driven Architecture — Main Entrypoint
-// Encapsulated within Application Class Container
+// Example 12: Microservice Event-Driven Outbox & DLQ Engine — Main Entrypoint
+// Pure Clean Architecture: Container -> Routes -> Controller -> Service -> Repository
 // ============================================================================
 
+import { EventStoreRepository } from "./repositories/event_store.repository"
+import { EventPublisherService } from "./services/event_publisher.service"
+import { OrderEventsController } from "./controllers/order_events.controller"
 import { OrderEventsRoutes } from "./routes/order_events.routes"
 
 class Application {
-    init() {}
+    repo: EventStoreRepository
+    service: EventPublisherService
+    controller: OrderEventsController
+    routes: OrderEventsRoutes
+
+    init() {
+        this.repo = EventStoreRepository()
+        this.service = EventPublisherService(this.repo)
+        this.controller = OrderEventsController(this.service)
+        this.routes = OrderEventsRoutes(this.controller)
+    }
 
     fn bootstrap() -> Unit {
         let app = run()
-        app.use(OrderEventsRoutes)
-        app.listen(8081)
+        this.routes.register()
+        app.listen(7582)
     }
 }
 

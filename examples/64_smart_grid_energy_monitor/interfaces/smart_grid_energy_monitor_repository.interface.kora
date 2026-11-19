@@ -1,0 +1,10 @@
+// Example 64: Smart Electrical Grid Substation Telemetry
+// Repository Interface
+
+import { SmartGridEnergyMonitorPrimaryRecord } from "../entities/smart_grid_energy_monitor_primary.entity"
+
+interface SmartGridEnergyMonitorRepository {
+    fn findById(id: Int) -> Option<SmartGridEnergyMonitorPrimaryRecord>
+    fn save(record: SmartGridEnergyMonitorPrimaryRecord) -> Result<SmartGridEnergyMonitorPrimaryRecord, String>
+    fn countActive() -> Int
+}

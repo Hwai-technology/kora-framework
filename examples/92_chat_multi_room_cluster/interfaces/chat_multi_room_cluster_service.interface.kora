@@ -1,0 +1,10 @@
+// Example 92: Multi-Room WebSocket Chat & Presence Cluster
+// Domain Service Contract
+
+import { ChatMultiRoomClusterPrimaryRecord } from "../entities/chat_multi_room_cluster_primary.entity"
+import { CreateChatMultiRoomClusterTaskRequest } from "../models/chat_multi_room_cluster_request.dto"
+
+interface ChatMultiRoomClusterDomainContract {
+    fn executeTask(req: CreateChatMultiRoomClusterTaskRequest) -> Result<ChatMultiRoomClusterPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

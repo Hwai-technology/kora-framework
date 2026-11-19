@@ -1,0 +1,22 @@
+// Example 42: Mental Health Longitudinal Assessment Engine
+// Router & Endpoint Dispatcher
+
+import { CreateMentalHealthAssessmentRecordRequest } from "../models/mental_health_assessment_request.dto"
+import { MentalHealthAssessmentResponseDto } from "../models/mental_health_assessment_response.dto"
+import { MentalHealthAssessmentController } from "../controllers/mental_health_assessment.controller"
+
+class MentalHealthAssessmentRouter {
+    controller: MentalHealthAssessmentController
+
+    init(controller: MentalHealthAssessmentController) {
+        this.controller = controller
+    }
+
+    fn postRecord(req: CreateMentalHealthAssessmentRecordRequest) -> MentalHealthAssessmentResponseDto {
+        return this.controller.handleRecordSubmission(req)
+    }
+
+    fn getRiskScore(patientId: Int) -> String {
+        return this.controller.checkPatientRisk(patientId)
+    }
+}

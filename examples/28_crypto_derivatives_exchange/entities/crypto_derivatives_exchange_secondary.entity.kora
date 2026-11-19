@@ -1,0 +1,11 @@
+// Example 28: Crypto Derivatives & Margin Engine
+// Secondary Audit Log Entity
+
+@table("crypto_derivatives_exchange_items")
+model CryptoDerivativesExchangeItem {
+    @id
+    id: Int
+    parentId: Int
+    itemCode: String
+    amount: Int
+}

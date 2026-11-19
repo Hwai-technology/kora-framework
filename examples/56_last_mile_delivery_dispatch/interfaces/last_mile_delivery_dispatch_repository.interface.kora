@@ -1,0 +1,10 @@
+// Example 56: Last-Mile Delivery Dispatch & Fleet Geo-Routing
+// Repository Interface
+
+import { LastMileDeliveryDispatchPrimaryRecord } from "../entities/last_mile_delivery_dispatch_primary.entity"
+
+interface LastMileDeliveryDispatchRepository {
+    fn findById(id: Int) -> Option<LastMileDeliveryDispatchPrimaryRecord>
+    fn save(record: LastMileDeliveryDispatchPrimaryRecord) -> Result<LastMileDeliveryDispatchPrimaryRecord, String>
+    fn countActive() -> Int
+}

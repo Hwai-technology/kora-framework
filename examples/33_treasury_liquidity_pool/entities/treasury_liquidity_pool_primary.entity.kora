@@ -1,0 +1,13 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// Primary Persistent Database Entity
+
+@table("treasury_liquidity_pool_records")
+model TreasuryLiquidityPoolRecord {
+    @id
+    id: Int
+    @unique
+    reference: String
+    status: String
+    balance: Int
+    active: Bool
+}

@@ -1,0 +1,7 @@
+// examples/11_operators_control_flow_and_resilience — Enum: CircuitState
+
+enum CircuitState {
+    ClosedNormal
+    OpenTripped
+    HalfOpenTrial
+}

@@ -1,29 +1,141 @@
 // ============================================================================
-// Realtime Chat — Business Logic Service Layer
+// Realtime WebSocket & Pub/Sub Protocol Engine
+// Implements RFC 6455 Framing, Ping/Pong Heartbeats, and Topic Routing
 // ============================================================================
 
-import { ChatMessage, SendMessageRequest, RoomPresence } from "../models/chat.models"
+import { WsFrame, WsSession, RoomPresence, BroadcastEnvelope } from "../models/chat.models"
 import { ChatRepository } from "../repositories/chat.repository"
 
 class ChatService {
     repository: ChatRepository
+    sessionCounter: Int
 
     init(repository: ChatRepository) {
         this.repository = repository
+        this.sessionCounter = 1000
     }
 
-    fn sendMessage(body: String) -> ChatMessage {
-        let message = ChatMessage {
-            id: 1,
-            sender: "Ahmet",
-            room: "general",
-            content: body,
-            timestamp: 1710000000,
+    fn authenticateUpgrade(token: String, clientIp: String, targetChannel: String) -> Option<WsSession> {
+        if !token.startsWith("kora_ws_token_") {
+            return None
         }
-        return this.repository.create(message)
+
+        this.sessionCounter = this.sessionCounter + 1
+        let sid = "ws_sess_" + this.sessionCounter.toString()
+        let uid = "user_" + this.sessionCounter.toString()
+
+        let session = WsSession {
+            sessionId: sid,
+            userId: uid,
+            clientIp: clientIp,
+            channel: targetChannel,
+            lastHeartbeatTs: 1710000000,
+            messagesSent: 0,
+            messagesReceived: 0,
+            active: true,
+        }
+
+        this.repository.storeSession(session)
+        return Some(session)
     }
 
-    fn getPresence(room: String) -> RoomPresence {
-        return this.repository.getPresence(room)
+    fn handleFrame(sessionId: String, frame: WsFrame) -> Option<WsFrame> {
+        let optSession = this.repository.findSession(sessionId)
+        let isPresent = match optSession {
+            Some(s) => true,
+            None => false,
+        }
+        if !isPresent {
+            return None
+        }
+
+        // RFC 6455 Section 5.1: Client-to-Server frames MUST be masked
+        if !frame.masked {
+            this.repository.terminateSession(sessionId)
+            return Some(WsFrame {
+                fin: true,
+                opcode: 8,
+                masked: false,
+                maskKey: 0,
+                payloadLength: 2,
+                payload: "1002_PROTOCOL_ERROR_UNMASKED",
+            })
+        }
+
+        // Handle Close Frame (Opcode 8)
+        if frame.opcode == 8 {
+            this.repository.terminateSession(sessionId)
+            return Some(WsFrame {
+                fin: true,
+                opcode: 8,
+                masked: false,
+                maskKey: 0,
+                payloadLength: 0,
+                payload: "1000_NORMAL_CLOSURE",
+            })
+        }
+
+        // Handle Ping Frame (Opcode 9) -> Respond with Pong (Opcode 10)
+        if frame.opcode == 9 {
+            this.repository.updateHeartbeat(sessionId, 1710000050)
+            return Some(WsFrame {
+                fin: true,
+                opcode: 10,
+                masked: false,
+                maskKey: 0,
+                payloadLength: frame.payloadLength,
+                payload: frame.payload,
+            })
+        }
+
+        // Handle Pong Frame (Opcode 10) -> Update Heartbeat
+        if frame.opcode == 10 {
+            this.repository.updateHeartbeat(sessionId, 1710000050)
+            return None
+        }
+
+        // Handle Text Frame (Opcode 1)
+        if frame.opcode == 1 {
+            this.repository.updateHeartbeat(sessionId, 1710000050)
+            return None
+        }
+
+        return None
+    }
+
+    fn broadcast(channel: String, senderId: String, payload: String) -> Int {
+        let targets = this.repository.getActiveSessionsByChannel(channel)
+        let count = targets.length()
+
+        let envelope = BroadcastEnvelope {
+            messageId: "msg_bc_" + senderId,
+            channel: channel,
+            senderId: senderId,
+            payload: payload,
+            timestamp: 1710000055,
+        }
+        this.repository.recordBroadcast(envelope)
+
+        var i = 0
+        while i < targets.length() {
+            let s = targets[i]
+            this.repository.recordMessageSent(s.sessionId)
+            i = i + 1
+        }
+
+        return count
+    }
+
+    fn processHeartbeatWatchdog(currentTimeTs: Int, timeoutSeconds: Int) -> Int {
+        let cutoff = currentTimeTs - timeoutSeconds
+        return this.repository.evictTimedOutSessions(cutoff)
+    }
+
+    fn getPresence(channel: String) -> RoomPresence {
+        return this.repository.getPresence(channel)
+    }
+
+    fn closeSession(sessionId: String) -> Bool {
+        return this.repository.terminateSession(sessionId)
     }
 }

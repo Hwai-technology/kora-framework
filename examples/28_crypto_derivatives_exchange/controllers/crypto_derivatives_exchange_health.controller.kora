@@ -1,0 +1,14 @@
+// Example 28: Crypto Derivatives & Margin Engine
+// Health Check Controller
+
+class CryptoDerivativesExchangeHealthController {
+    init() {}
+
+    fn checkLiveness() -> Bool {
+        return true
+    }
+
+    fn checkReadiness() -> Bool {
+        return true
+    }
+}

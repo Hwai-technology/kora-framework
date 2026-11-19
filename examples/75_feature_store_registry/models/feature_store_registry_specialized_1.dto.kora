@@ -1,0 +1,9 @@
+// Example 75: Real-Time Machine Learning Feature Store
+// Specialized Model 1
+
+model FeatureStoreRegistrySpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

@@ -1,0 +1,9 @@
+// Example 50: Distributed Blob Storage Metadata Engine — Domain Event: BlobObjectCreatedEvent
+// Dedicated Domain Event Specification
+
+model BlobObjectCreatedEvent {
+    bucketName: String
+    objectKey: String
+    contentSizeBytes: Int
+    contentMd5Hash: String
+}

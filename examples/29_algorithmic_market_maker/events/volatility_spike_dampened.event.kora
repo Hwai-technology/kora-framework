@@ -1,0 +1,9 @@
+// Example 29: algorithmic_market_maker — Domain Event: VolatilitySpikeDampenedEvent
+// Dedicated Domain Event Specification
+
+model VolatilitySpikeDampenedEvent {
+    symbol: String
+    observedVola: Int
+    spreadWidenedFactor: Int
+    timestamp: Int
+}

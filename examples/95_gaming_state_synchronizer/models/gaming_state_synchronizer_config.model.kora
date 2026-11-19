@@ -1,0 +1,9 @@
+// Example 95: Multiplayer Game 60Hz Tick State Synchronizer
+// Configuration Model
+
+model GamingStateSynchronizerConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

@@ -1,0 +1,8 @@
+// Example 38: Radiology PACS DICOM Metadata Indexer — Domain Event: PacsSeriesArchivedEvent
+// Dedicated Domain Event Specification
+
+model PacsSeriesArchivedEvent {
+    seriesUid: String
+    storagePath: String
+    compressionRatioBps: Int
+}

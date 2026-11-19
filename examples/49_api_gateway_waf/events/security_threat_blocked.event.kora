@@ -1,0 +1,9 @@
+// Example 49: API Gateway & Web Application Firewall — Domain Event: SecurityThreatBlockedEvent
+// Dedicated Domain Event Specification
+
+model SecurityThreatBlockedEvent {
+    sourceIp: String
+    requestUri: String
+    ruleViolated: String
+    timestamp: Int
+}

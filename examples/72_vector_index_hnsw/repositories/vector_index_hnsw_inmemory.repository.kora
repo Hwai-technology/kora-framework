@@ -1,0 +1,33 @@
+// Example 72: HNSW Vector Index & Approximate Nearest Neighbor
+// Repository Implementation
+
+import { VectorIndexHnswPrimaryRecord } from "../entities/vector_index_hnsw_primary.entity"
+import { VectorIndexHnswRepository } from "../interfaces/vector_index_hnsw_repository.interface"
+
+class VectorIndexHnswInMemoryRepository implements VectorIndexHnswRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<VectorIndexHnswPrimaryRecord> {
+        if id > 0 {
+            return Some(VectorIndexHnswPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: VectorIndexHnswPrimaryRecord) -> Result<VectorIndexHnswPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

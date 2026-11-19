@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 71: Autonomous Drone Swarm Formation Coordinator
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { DroneSwarmMissionPlannerInMemoryRepository } from "./repositories/drone_swarm_mission_planner_inmemory.repository"
+import { DroneSwarmMissionPlannerCoreService } from "./services/drone_swarm_mission_planner_core.service"
+import { DroneSwarmMissionPlannerController } from "./controllers/drone_swarm_mission_planner.controller"
+import { DroneSwarmMissionPlannerRouter } from "./routes/drone_swarm_mission_planner.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = DroneSwarmMissionPlannerInMemoryRepository()
+        let service = DroneSwarmMissionPlannerCoreService(repo)
+        let controller = DroneSwarmMissionPlannerController(service)
+        let router = DroneSwarmMissionPlannerRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

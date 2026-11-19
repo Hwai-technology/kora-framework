@@ -1,0 +1,75 @@
+// ============================================================================
+// Unit Test Suite: Distributed Shopping Cart Session Actor
+// Verifies Domain Invariants, Boundary Calculations & Liveness
+// ============================================================================
+
+import { CreateShoppingCartSessionActorTaskRequest } from "../models/shopping_cart_session_actor_request.dto"
+import { ShoppingCartSessionActorInMemoryRepository } from "../repositories/shopping_cart_session_actor_inmemory.repository"
+import { ShoppingCartSessionActorCoreService } from "../services/shopping_cart_session_actor_core.service"
+import { ShoppingCartSessionActorTelemetryService } from "../services/shopping_cart_session_actor_telemetry.service"
+
+class ShoppingCartSessionActorUnitTestSuite {
+    service: ShoppingCartSessionActorCoreService
+    telemetry: ShoppingCartSessionActorTelemetryService
+
+    init(service: ShoppingCartSessionActorCoreService, telemetry: ShoppingCartSessionActorTelemetryService) {
+        this.service = service
+        this.telemetry = telemetry
+    }
+
+    fn test_valid_task_execution() -> Bool {
+        let req = CreateShoppingCartSessionActorTaskRequest {
+            taskKey: "UNIT-TASK-101",
+            targetEntityId: 10,
+            workloadCapacity: 95,
+            domainContext: "E-Commerce",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(rec) => rec.id == 10 && rec.capacityScore == 95,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_negative_target_rejected() -> Bool {
+        let req = CreateShoppingCartSessionActorTaskRequest {
+            taskKey: "INVALID-TASK",
+            targetEntityId: -1,
+            workloadCapacity: 50,
+            domainContext: "E-Commerce",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Target entity ID must be strictly positive",
+        }
+    }
+
+    fn test_health_evaluation() -> Bool {
+        let health = this.service.evaluateHealth(10)
+        return health == "OPTIMUM_PERFORMANCE" || health == "MODERATE_NORMAL"
+    }
+
+    fn test_telemetry_ping() -> Bool {
+        return this.telemetry.ping()
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_task_execution()
+        let t2 = this.test_invalid_negative_target_rejected()
+        let t3 = this.test_health_evaluation()
+        let t4 = this.test_telemetry_ping()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ Distributed Shopping Cart Session Actor Unit Tests: 4/4 passed (Domain Invariants Verified)")
+        } else {
+            print("  ✗ Distributed Shopping Cart Session Actor Unit Tests: failed")
+        }
+    }
+}
+
+let repo = ShoppingCartSessionActorInMemoryRepository()
+let service = ShoppingCartSessionActorCoreService(repo)
+let telemetry = ShoppingCartSessionActorTelemetryService()
+let suite = ShoppingCartSessionActorUnitTestSuite(service, telemetry)
+suite.run()

@@ -1,0 +1,15 @@
+// Example 90: WebRTC SFU Media Router & SDP Signaling
+// Transport Model: Command Request
+
+model CreateWebrtcSignalingSfuTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryWebrtcSignalingSfuFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

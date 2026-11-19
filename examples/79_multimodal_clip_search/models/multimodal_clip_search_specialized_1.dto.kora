@@ -1,0 +1,9 @@
+// Example 79: Multimodal CLIP Cross-Search Engine
+// Specialized Model 1
+
+model MultimodalClipSearchSpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

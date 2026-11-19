@@ -1,0 +1,22 @@
+// Example 57: Marketplace Vendor Settlement & Escrow Payouts
+// Router & Endpoint Dispatcher
+
+import { CreateMarketplaceVendorSettlementTaskRequest } from "../models/marketplace_vendor_settlement_request.dto"
+import { MarketplaceVendorSettlementResponseDto } from "../models/marketplace_vendor_settlement_response.dto"
+import { MarketplaceVendorSettlementController } from "../controllers/marketplace_vendor_settlement.controller"
+
+class MarketplaceVendorSettlementRouter {
+    controller: MarketplaceVendorSettlementController
+
+    init(controller: MarketplaceVendorSettlementController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateMarketplaceVendorSettlementTaskRequest) -> MarketplaceVendorSettlementResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

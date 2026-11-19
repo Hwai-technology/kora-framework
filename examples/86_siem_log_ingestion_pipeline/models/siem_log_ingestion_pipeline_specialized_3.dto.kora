@@ -1,0 +1,9 @@
+// Example 86: SIEM High-Throughput Log Ingestion & CEF Normalizer
+// Specialized Model 3
+
+model SiemLogIngestionPipelineSpecializedProfile3 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

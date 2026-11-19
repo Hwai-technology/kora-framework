@@ -1,0 +1,9 @@
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher
+// Specialized Model 4
+
+model ModelInferenceGatewaySpecializedProfile4 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

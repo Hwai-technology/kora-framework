@@ -1,0 +1,7 @@
+// Example 72: HNSW Vector Index & Approximate Nearest Neighbor — Enum: IndexBuildQuality
+
+enum IndexBuildQuality {
+    FastLowRecall
+    BalancedStandard
+    UltraHighRecallExhaustive
+}

@@ -1,0 +1,9 @@
+// Example 90: WebRTC SFU Media Router & SDP Signaling — Enum: IceConnectionState
+
+enum IceConnectionState {
+    IceChecking
+    IceConnected
+    IceCompleted
+    IceFailed
+    IceDisconnected
+}

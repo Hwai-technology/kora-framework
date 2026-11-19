@@ -1,0 +1,10 @@
+// Example 57: Marketplace Vendor Settlement & Escrow Payouts
+// Repository Interface
+
+import { MarketplaceVendorSettlementPrimaryRecord } from "../entities/marketplace_vendor_settlement_primary.entity"
+
+interface MarketplaceVendorSettlementRepository {
+    fn findById(id: Int) -> Option<MarketplaceVendorSettlementPrimaryRecord>
+    fn save(record: MarketplaceVendorSettlementPrimaryRecord) -> Result<MarketplaceVendorSettlementPrimaryRecord, String>
+    fn countActive() -> Int
+}

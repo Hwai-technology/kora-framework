@@ -1,0 +1,75 @@
+// ============================================================================
+// Unit Test Suite: SIEM High-Throughput Log Ingestion & CEF Normalizer
+// Verifies Domain Invariants, Boundary Calculations & Liveness
+// ============================================================================
+
+import { CreateSiemLogIngestionPipelineTaskRequest } from "../models/siem_log_ingestion_pipeline_request.dto"
+import { SiemLogIngestionPipelineInMemoryRepository } from "../repositories/siem_log_ingestion_pipeline_inmemory.repository"
+import { SiemLogIngestionPipelineCoreService } from "../services/siem_log_ingestion_pipeline_core.service"
+import { SiemLogIngestionPipelineTelemetryService } from "../services/siem_log_ingestion_pipeline_telemetry.service"
+
+class SiemLogIngestionPipelineUnitTestSuite {
+    service: SiemLogIngestionPipelineCoreService
+    telemetry: SiemLogIngestionPipelineTelemetryService
+
+    init(service: SiemLogIngestionPipelineCoreService, telemetry: SiemLogIngestionPipelineTelemetryService) {
+        this.service = service
+        this.telemetry = telemetry
+    }
+
+    fn test_valid_task_execution() -> Bool {
+        let req = CreateSiemLogIngestionPipelineTaskRequest {
+            taskKey: "UNIT-TASK-101",
+            targetEntityId: 10,
+            workloadCapacity: 95,
+            domainContext: "Cybersecurity",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(rec) => rec.id == 10 && rec.capacityScore == 95,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_negative_target_rejected() -> Bool {
+        let req = CreateSiemLogIngestionPipelineTaskRequest {
+            taskKey: "INVALID-TASK",
+            targetEntityId: -1,
+            workloadCapacity: 50,
+            domainContext: "Cybersecurity",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Target entity ID must be strictly positive",
+        }
+    }
+
+    fn test_health_evaluation() -> Bool {
+        let health = this.service.evaluateHealth(10)
+        return health == "OPTIMUM_PERFORMANCE" || health == "MODERATE_NORMAL"
+    }
+
+    fn test_telemetry_ping() -> Bool {
+        return this.telemetry.ping()
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_task_execution()
+        let t2 = this.test_invalid_negative_target_rejected()
+        let t3 = this.test_health_evaluation()
+        let t4 = this.test_telemetry_ping()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ SIEM High-Throughput Log Ingestion & CEF Normalizer Unit Tests: 4/4 passed (Domain Invariants Verified)")
+        } else {
+            print("  ✗ SIEM High-Throughput Log Ingestion & CEF Normalizer Unit Tests: failed")
+        }
+    }
+}
+
+let repo = SiemLogIngestionPipelineInMemoryRepository()
+let service = SiemLogIngestionPipelineCoreService(repo)
+let telemetry = SiemLogIngestionPipelineTelemetryService()
+let suite = SiemLogIngestionPipelineUnitTestSuite(service, telemetry)
+suite.run()

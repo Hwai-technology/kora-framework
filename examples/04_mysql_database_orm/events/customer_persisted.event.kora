@@ -1,0 +1,7 @@
+// examples/04_mysql_database_orm — Event: CustomerPersistedEvent
+
+model CustomerPersistedEvent {
+    customerId: Int
+    schemaVersion: Int
+    timestamp: Int
+}

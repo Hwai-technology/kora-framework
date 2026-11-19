@@ -1,0 +1,79 @@
+// ============================================================================
+// Unit Test Suite: ICU Real-Time High-Frequency Vitals Monitor
+// Invariants, Clinical Risk Scoring, and HIPAA Boundary Verification
+// ============================================================================
+
+import { CreateIcuVitalsTelemetryRecordRequest } from "../models/icu_vitals_telemetry_request.dto"
+import { IcuVitalsTelemetryInMemoryRepository } from "../repositories/icu_vitals_telemetry_inmemory.repository"
+import { IcuVitalsTelemetryCoreService } from "../services/icu_vitals_telemetry_core.service"
+import { IcuVitalsTelemetryComplianceService } from "../services/icu_vitals_telemetry_compliance.service"
+
+class IcuVitalsTelemetryUnitTestSuite {
+    service: IcuVitalsTelemetryCoreService
+    compliance: IcuVitalsTelemetryComplianceService
+
+    init(service: IcuVitalsTelemetryCoreService, compliance: IcuVitalsTelemetryComplianceService) {
+        this.service = service
+        this.compliance = compliance
+    }
+
+    fn test_valid_clinical_record_processing() -> Bool {
+        let req = CreateIcuVitalsTelemetryRecordRequest {
+            patientId: 101,
+            clinicianId: 202,
+            domainContext: "Clinical Inpatient Encounter",
+            clinicalMetricScore: 75,
+            confidentialNotes: "Vitals stable, continuing observation",
+        }
+        let res = this.service.processClinicalRecord(req)
+        return match res {
+            Ok(rec) => rec.patientId == 101 && rec.clinicalMetricScore == 75,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_negative_score_rejected() -> Bool {
+        let req = CreateIcuVitalsTelemetryRecordRequest {
+            patientId: 102,
+            clinicianId: 202,
+            domainContext: "Error Check",
+            clinicalMetricScore: -5,
+            confidentialNotes: "Invalid payload test",
+        }
+        let res = this.service.processClinicalRecord(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Clinical metric score cannot be negative",
+        }
+    }
+
+    fn test_risk_evaluation() -> Bool {
+        let risk = this.service.evaluateClinicalRisk(101)
+        return risk == "CRITICAL_OBSERVATION" || risk == "MODERATE_ATTENTION"
+    }
+
+    fn test_compliance_authorization() -> Bool {
+        let auth = this.compliance.verifyPhiAccessAuthorization(42, false)
+        let emergencyAuth = this.compliance.verifyPhiAccessAuthorization(-1, true)
+        return auth && emergencyAuth
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_clinical_record_processing()
+        let t2 = this.test_invalid_negative_score_rejected()
+        let t3 = this.test_risk_evaluation()
+        let t4 = this.test_compliance_authorization()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ ICU Real-Time High-Frequency Vitals Monitor Unit Tests: 4/4 passed (HIPAA, Risk & Invariants Verified)")
+        } else {
+            print("  ✗ ICU Real-Time High-Frequency Vitals Monitor Unit Tests: failed")
+        }
+    }
+}
+
+let repo = IcuVitalsTelemetryInMemoryRepository()
+let service = IcuVitalsTelemetryCoreService(repo)
+let compliance = IcuVitalsTelemetryComplianceService()
+let suite = IcuVitalsTelemetryUnitTestSuite(service, compliance)
+suite.run()

@@ -1,0 +1,7 @@
+// Example 64: Smart Electrical Grid Substation Telemetry — Domain Event: GridTelemetryRecordedEvent
+
+model GridTelemetryRecordedEvent {
+    substationId: Int
+    voltageRms: Int
+    frequencyHzBps: Int
+}

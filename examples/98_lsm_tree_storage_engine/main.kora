@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 98: Log-Structured Merge-Tree (LSM-Tree) Engine
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { LsmTreeStorageEngineInMemoryRepository } from "./repositories/lsm_tree_storage_engine_inmemory.repository"
+import { LsmTreeStorageEngineCoreService } from "./services/lsm_tree_storage_engine_core.service"
+import { LsmTreeStorageEngineController } from "./controllers/lsm_tree_storage_engine.controller"
+import { LsmTreeStorageEngineRouter } from "./routes/lsm_tree_storage_engine.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = LsmTreeStorageEngineInMemoryRepository()
+        let service = LsmTreeStorageEngineCoreService(repo)
+        let controller = LsmTreeStorageEngineController(service)
+        let router = LsmTreeStorageEngineRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

@@ -1,0 +1,12 @@
+// Example 27: Real-time Fraud & Anomaly Evaluator
+// Audit Trail Entity
+
+@table("fraud_detection_engine_audit_logs")
+model FraudDetectionEngineAuditLog {
+    @id
+    id: Int
+    recordId: Int
+    action: String
+    performedBy: String
+    timestamp: Int
+}

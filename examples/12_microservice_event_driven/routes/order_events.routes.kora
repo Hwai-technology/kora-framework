@@ -1,5 +1,8 @@
+// ============================================================================
+// Order Event Routing
+// ============================================================================
+
 import { OrderEventsController } from "../controllers/order_events.controller"
-import { DomainEventEntity } from "../entities/domain_event.entity"
 
 class OrderEventsRoutes {
     controller: OrderEventsController
@@ -8,11 +11,9 @@ class OrderEventsRoutes {
         this.controller = controller
     }
 
-    fn publishOrderPlaced() -> Result<DomainEventEntity, String> {
-        return this.controller.publishOrderPlaced()
-    }
-
-    fn getEvents() -> Result<Int, String> {
-        return this.controller.getEvents()
+    fn register() -> Unit {
+        post("/events/orders/publish/:type", this.controller.publish)
+        post("/events/orders/consume/:id", this.controller.consume)
+        get("/events/orders/telemetry", this.controller.telemetry)
     }
 }

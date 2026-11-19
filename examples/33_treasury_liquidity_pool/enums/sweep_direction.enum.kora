@@ -1,0 +1,8 @@
+// Example 33: treasury_liquidity_pool — Enum: SweepDirection
+// Dedicated Domain Enum Specification
+
+enum SweepDirection {
+    SweepSurplusToYield
+    DrawdownReserveToOperating
+    RebalanceEqualWeight
+}

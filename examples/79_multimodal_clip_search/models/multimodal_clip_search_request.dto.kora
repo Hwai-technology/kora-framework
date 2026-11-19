@@ -1,0 +1,15 @@
+// Example 79: Multimodal CLIP Cross-Search Engine
+// Transport Model: Command Request
+
+model CreateMultimodalClipSearchTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryMultimodalClipSearchFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

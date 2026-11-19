@@ -1,0 +1,9 @@
+// Example 96: Video on Demand (VOD) HLS/DASH Transmuxer
+// Specialized Model 5
+
+model VideoOnDemandTransmuxerSpecializedProfile5 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

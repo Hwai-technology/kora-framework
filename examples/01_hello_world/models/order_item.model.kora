@@ -1,0 +1,10 @@
+// ============================================================================
+// Example 01: Core Language Foundations — Model: OrderItem
+// ============================================================================
+
+model OrderItem {
+    sku: String
+    title: String
+    quantity: Int
+    unitPriceCents: Int
+}

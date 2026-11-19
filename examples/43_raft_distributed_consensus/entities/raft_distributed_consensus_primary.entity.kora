@@ -1,0 +1,14 @@
+// Example 43: Raft Distributed Consensus Engine
+// Persistent Database Entity: Cluster Node State
+
+@table("raft_distributed_consensus_node_state")
+model RaftDistributedConsensusNodeState {
+    @id
+    id: Int
+    @unique
+    nodeIdentifier: String
+    currentEpochTerm: Int
+    votedForCandidate: Int
+    isLeader: Bool
+    active: Bool
+}

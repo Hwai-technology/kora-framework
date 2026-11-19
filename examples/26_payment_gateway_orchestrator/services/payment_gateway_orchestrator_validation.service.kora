@@ -1,0 +1,22 @@
+// ============================================================================
+// Payment Request Validation Service
+// ============================================================================
+
+import { CreatePaymentGatewayOrchestratorRequest } from "../models/payment_gateway_orchestrator_request.dto"
+
+class PaymentGatewayOrchestratorValidationService {
+    init() {}
+
+    fn validate(req: CreatePaymentGatewayOrchestratorRequest) -> Result<Bool, String> {
+        if req.amountCents <= 0 {
+            return Err("ERR_INVALID_AMOUNT: Amount must be greater than zero")
+        }
+        if req.idempotencyKey.length() < 8 {
+            return Err("ERR_INVALID_IDEMPOTENCY_KEY: Key must have at least 8 characters")
+        }
+        if req.cardBin.length() != 6 && req.cardBin.length() != 8 {
+            return Err("ERR_INVALID_BIN: Card BIN must be 6 or 8 digits")
+        }
+        return Ok(true)
+    }
+}

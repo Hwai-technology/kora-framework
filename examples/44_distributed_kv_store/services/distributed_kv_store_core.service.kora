@@ -1,0 +1,39 @@
+// Example 44: Distributed Dynamo-Style Key-Value Store
+// Core Domain Service Implementation
+
+import { DistributedKvStoreNodeState } from "../entities/distributed_kv_store_primary.entity"
+import { CreateDistributedKvStoreTaskRequest } from "../models/distributed_kv_store_request.dto"
+import { DistributedKvStoreRepository } from "../interfaces/distributed_kv_store_repository.interface"
+import { DistributedKvStoreConsensusContract } from "../interfaces/distributed_kv_store_service.interface"
+
+class DistributedKvStoreCoreService implements DistributedKvStoreConsensusContract {
+    repo: DistributedKvStoreRepository
+
+    init(repo: DistributedKvStoreRepository) {
+        this.repo = repo
+    }
+
+    fn processConsensusCommand(req: CreateDistributedKvStoreTaskRequest) -> Result<DistributedKvStoreNodeState, String> {
+        if req.originatingNodeId <= 0 {
+            return Err("Originating node ID must be strictly positive")
+        }
+        if req.payloadVolume <= 0 {
+            return Err("Payload volume must be positive")
+        }
+
+        let state = DistributedKvStoreNodeState {
+            id: req.originatingNodeId,
+            nodeIdentifier: "CLUSTER-NODE-" + req.originatingNodeId.toString(),
+            currentEpochTerm: 5,
+            votedForCandidate: req.originatingNodeId,
+            isLeader: true,
+            active: true,
+        }
+        return this.repo.saveNodeState(state)
+    }
+
+    fn evaluateClusterQuorum() -> Bool {
+        let quorum = this.repo.getActiveQuorumCount()
+        return quorum >= 3
+    }
+}

@@ -1,0 +1,8 @@
+// Example 46: Distributed Task Scheduler & Leader Lease — Domain Event: WorkerHeartbeatMissedEvent
+// Dedicated Domain Event Specification
+
+model WorkerHeartbeatMissedEvent {
+    failedWorkerId: Int
+    orphanedJobsReassigned: Int
+    timestamp: Int
+}

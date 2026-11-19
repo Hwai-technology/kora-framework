@@ -1,0 +1,12 @@
+// Example 58: Distributed Shopping Cart Session Actor
+// Persistent Database Entity: Audit Log
+
+@table("shopping_cart_session_actor_audit_logs")
+model ShoppingCartSessionActorAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

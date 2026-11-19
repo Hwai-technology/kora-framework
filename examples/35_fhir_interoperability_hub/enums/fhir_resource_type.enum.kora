@@ -1,0 +1,9 @@
+// Example 35: FHIR R4 & HL7 Interoperability Hub — Enum: FhirResourceType
+// Dedicated Domain Enum Specification
+
+enum FhirResourceType {
+    PatientResource
+    ObservationVitalSigns
+    DiagnosticReportLab
+    MedicationRequestPrescription
+}

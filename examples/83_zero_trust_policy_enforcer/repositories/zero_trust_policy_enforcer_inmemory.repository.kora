@@ -1,0 +1,33 @@
+// Example 83: Zero-Trust Context-Aware Policy Decision Point (PDP)
+// Repository Implementation
+
+import { ZeroTrustPolicyEnforcerPrimaryRecord } from "../entities/zero_trust_policy_enforcer_primary.entity"
+import { ZeroTrustPolicyEnforcerRepository } from "../interfaces/zero_trust_policy_enforcer_repository.interface"
+
+class ZeroTrustPolicyEnforcerInMemoryRepository implements ZeroTrustPolicyEnforcerRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<ZeroTrustPolicyEnforcerPrimaryRecord> {
+        if id > 0 {
+            return Some(ZeroTrustPolicyEnforcerPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: ZeroTrustPolicyEnforcerPrimaryRecord) -> Result<ZeroTrustPolicyEnforcerPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

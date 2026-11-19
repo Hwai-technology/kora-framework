@@ -1,0 +1,16 @@
+// Example 82: OAuth 2.1 & OpenID Connect Authorization Server
+// Transport Model: Standard Response
+
+model Oauth2OidcIdentityServerResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model Oauth2OidcIdentityServerSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

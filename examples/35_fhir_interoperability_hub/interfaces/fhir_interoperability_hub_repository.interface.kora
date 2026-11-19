@@ -1,0 +1,10 @@
+// Example 35: FHIR R4 & HL7 Interoperability Hub
+// Repository Interface
+
+import { FhirInteroperabilityHubClinicalEntity } from "../entities/fhir_interoperability_hub_primary.entity"
+
+interface FhirInteroperabilityHubRepository {
+    fn findByPatientId(patientId: Int) -> Option<FhirInteroperabilityHubClinicalEntity>
+    fn save(entity: FhirInteroperabilityHubClinicalEntity) -> Result<FhirInteroperabilityHubClinicalEntity, String>
+    fn verifyIntegrity(recordId: Int) -> Bool
+}

@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 79: Multimodal CLIP Cross-Search Engine
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { MultimodalClipSearchInMemoryRepository } from "./repositories/multimodal_clip_search_inmemory.repository"
+import { MultimodalClipSearchCoreService } from "./services/multimodal_clip_search_core.service"
+import { MultimodalClipSearchController } from "./controllers/multimodal_clip_search.controller"
+import { MultimodalClipSearchRouter } from "./routes/multimodal_clip_search.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = MultimodalClipSearchInMemoryRepository()
+        let service = MultimodalClipSearchCoreService(repo)
+        let controller = MultimodalClipSearchController(service)
+        let router = MultimodalClipSearchRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

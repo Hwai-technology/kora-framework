@@ -1,0 +1,11 @@
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// Secondary Audit Log Entity
+
+@table("anti_money_laundering_siem_items")
+model AntiMoneyLaunderingSiemItem {
+    @id
+    id: Int
+    parentId: Int
+    itemCode: String
+    amount: Int
+}

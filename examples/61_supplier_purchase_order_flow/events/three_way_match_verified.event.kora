@@ -1,0 +1,7 @@
+// Example 61: Supplier Purchase Order & 3-Way Invoice Matcher — Domain Event: ThreeWayMatchVerifiedEvent
+
+model ThreeWayMatchVerifiedEvent {
+    poNumber: String
+    invoiceNumber: String
+    varianceCents: Int
+}

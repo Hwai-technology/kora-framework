@@ -1,0 +1,22 @@
+// Example 55: Order Fulfillment & Pick-Pack-Ship Workflow
+// Router & Endpoint Dispatcher
+
+import { CreateOrderFulfillmentPipelineTaskRequest } from "../models/order_fulfillment_pipeline_request.dto"
+import { OrderFulfillmentPipelineResponseDto } from "../models/order_fulfillment_pipeline_response.dto"
+import { OrderFulfillmentPipelineController } from "../controllers/order_fulfillment_pipeline.controller"
+
+class OrderFulfillmentPipelineRouter {
+    controller: OrderFulfillmentPipelineController
+
+    init(controller: OrderFulfillmentPipelineController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateOrderFulfillmentPipelineTaskRequest) -> OrderFulfillmentPipelineResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

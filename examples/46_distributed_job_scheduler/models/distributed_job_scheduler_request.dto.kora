@@ -1,0 +1,14 @@
+// Example 46: Distributed Task Scheduler & Leader Lease
+// Transport Model: Command Request
+
+model CreateDistributedJobSchedulerTaskRequest {
+    taskKey: String
+    originatingNodeId: Int
+    payloadVolume: Int
+    targetCluster: String
+}
+
+model QueryDistributedJobSchedulerStatusRequest {
+    resourceKey: String
+    quorumRequired: Int
+}

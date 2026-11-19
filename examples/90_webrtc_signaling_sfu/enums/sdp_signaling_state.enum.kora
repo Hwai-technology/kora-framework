@@ -1,0 +1,8 @@
+// Example 90: WebRTC SFU Media Router & SDP Signaling — Enum: SdpSignalingState
+
+enum SdpSignalingState {
+    SignalingStable
+    HaveLocalOffer
+    HaveRemoteOffer
+    SignalingClosed
+}

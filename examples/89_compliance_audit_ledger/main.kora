@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 89: Immutable Cryptographic Audit Trail (SOC 2 / ISO 27001)
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { ComplianceAuditLedgerInMemoryRepository } from "./repositories/compliance_audit_ledger_inmemory.repository"
+import { ComplianceAuditLedgerCoreService } from "./services/compliance_audit_ledger_core.service"
+import { ComplianceAuditLedgerController } from "./controllers/compliance_audit_ledger.controller"
+import { ComplianceAuditLedgerRouter } from "./routes/compliance_audit_ledger.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = ComplianceAuditLedgerInMemoryRepository()
+        let service = ComplianceAuditLedgerCoreService(repo)
+        let controller = ComplianceAuditLedgerController(service)
+        let router = ComplianceAuditLedgerRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

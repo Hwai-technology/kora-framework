@@ -1,0 +1,10 @@
+// Example 41: Genomic Variant Annotation & Pathogenicity
+// Domain Service Contract
+
+import { GenomicVariantAnnotatorClinicalEntity } from "../entities/genomic_variant_annotator_primary.entity"
+import { CreateGenomicVariantAnnotatorRecordRequest } from "../models/genomic_variant_annotator_request.dto"
+
+interface GenomicVariantAnnotatorDomainContract {
+    fn processClinicalRecord(req: CreateGenomicVariantAnnotatorRecordRequest) -> Result<GenomicVariantAnnotatorClinicalEntity, String>
+    fn evaluateClinicalRisk(patientId: Int) -> String
+}

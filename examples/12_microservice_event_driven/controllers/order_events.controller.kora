@@ -1,5 +1,8 @@
+// ============================================================================
+// Order Events — Presentation Controller Layer
+// ============================================================================
+
 import { EventPublisherService } from "../services/event_publisher.service"
-import { DomainEventEntity } from "../entities/domain_event.entity"
 
 class OrderEventsController {
     service: EventPublisherService
@@ -8,11 +11,41 @@ class OrderEventsController {
         this.service = service
     }
 
-    fn publishOrderPlaced() -> Result<DomainEventEntity, String> {
-        return this.service.publish("ORDER_PLACED", "{\"orderId\": 999, \"amount\": 250}")
+    fn publish(request: Request) -> Response {
+        let eventType = request.params["type"]
+        let partitionKey = request.headers["X-Partition-Key"]
+        let idempotencyKey = request.headers["Idempotency-Key"]
+        let payload = request.body
+
+        let result = this.service.publishOrderEvent(eventType, partitionKey, idempotencyKey, payload)
+        let isSuccess = match result {
+            Ok(env) => true,
+            Err(e) => false,
+        }
+
+        if isSuccess {
+            return match result {
+                Ok(e) => Response.status(202).json(e),
+                Err(err) => Response.status(500).json(err),
+            }
+        }
+
+        let errMsg = match result {
+            Ok(e) => "UNKNOWN",
+            Err(err) => err,
+        }
+        return Response.status(409).json(errMsg)
     }
 
-    fn getEvents() -> Result<Int, String> {
-        return this.service.listRecent()
+    fn consume(request: Request) -> Response {
+        let eventId = request.params["id"]
+        let isPoison = request.headers["X-Simulate-Poison"] == "true"
+        let ack = this.service.processIncomingDelivery(eventId, isPoison)
+        return Response.json(ack)
+    }
+
+    fn telemetry(request: Request) -> Response {
+        let stats = this.service.getTelemetry()
+        return Response.json(stats)
     }
 }

@@ -1,0 +1,9 @@
+// Example 58: Distributed Shopping Cart Session Actor
+// Specialized Model 5
+
+model ShoppingCartSessionActorSpecializedProfile5 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

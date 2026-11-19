@@ -1,0 +1,8 @@
+// Example 35: FHIR R4 & HL7 Interoperability Hub — Domain Event: ResourceValidationFailedEvent
+// Dedicated Domain Event Specification
+
+model ResourceValidationFailedEvent {
+    resourceId: String
+    schemaPath: String
+    validationErrorMessage: String
+}

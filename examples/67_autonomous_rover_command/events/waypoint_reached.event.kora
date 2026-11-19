@@ -1,0 +1,7 @@
+// Example 67: Autonomous Rover Navigation & Obstacle Avoidance — Domain Event: WaypointReachedEvent
+
+model WaypointReachedEvent {
+    roverId: String
+    waypointSequence: Int
+    positionErrorCm: Int
+}

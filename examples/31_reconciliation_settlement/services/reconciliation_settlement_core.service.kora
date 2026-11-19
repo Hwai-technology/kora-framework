@@ -1,0 +1,37 @@
+// Example 31: Inter-Bank Reconciliation & Settlement
+// Core Domain Service Implementation
+
+import { ReconciliationSettlementRecord } from "../entities/reconciliation_settlement_primary.entity"
+import { CreateReconciliationSettlementRequest } from "../models/reconciliation_settlement_request.dto"
+import { ReconciliationSettlementRepository } from "../interfaces/reconciliation_settlement_repository.interface"
+import { ReconciliationSettlementServiceInterface } from "../interfaces/reconciliation_settlement_service.interface"
+
+class ReconciliationSettlementCoreService implements ReconciliationSettlementServiceInterface {
+    repo: ReconciliationSettlementRepository
+
+    init(repo: ReconciliationSettlementRepository) {
+        this.repo = repo
+    }
+
+    fn processRequest(req: CreateReconciliationSettlementRequest) -> Result<ReconciliationSettlementRecord, String> {
+        if req.volume <= 0 {
+            return Err("Volume must be positive")
+        }
+        let record = ReconciliationSettlementRecord {
+            id: req.targetId,
+            reference: req.reference,
+            status: "COMMITTED",
+            balance: req.volume,
+            active: true,
+        }
+        return this.repo.save(record)
+    }
+
+    fn validateState(id: Int) -> Bool {
+        let opt = this.repo.findById(id)
+        return match opt {
+            Some(rec) => rec.active,
+            None => false,
+        }
+    }
+}

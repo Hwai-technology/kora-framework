@@ -1,0 +1,8 @@
+// Example 46: Distributed Task Scheduler & Leader Lease — Domain Event: LeaderLeaseRenewedEvent
+// Dedicated Domain Event Specification
+
+model LeaderLeaseRenewedEvent {
+    leaderNodeId: Int
+    leaseEpoch: Int
+    fencingToken: Int
+}

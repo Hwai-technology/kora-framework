@@ -1,0 +1,14 @@
+// Example 49: API Gateway & Web Application Firewall
+// Persistent Database Entity: Cluster Node State
+
+@table("api_gateway_waf_node_state")
+model ApiGatewayWafNodeState {
+    @id
+    id: Int
+    @unique
+    nodeIdentifier: String
+    currentEpochTerm: Int
+    votedForCandidate: Int
+    isLeader: Bool
+    active: Bool
+}

@@ -1,0 +1,22 @@
+// Example 39: Pharmacy Dispensing & Drug Interaction Checker
+// Router & Endpoint Dispatcher
+
+import { CreatePharmacyInventoryInteractionRecordRequest } from "../models/pharmacy_inventory_interaction_request.dto"
+import { PharmacyInventoryInteractionResponseDto } from "../models/pharmacy_inventory_interaction_response.dto"
+import { PharmacyInventoryInteractionController } from "../controllers/pharmacy_inventory_interaction.controller"
+
+class PharmacyInventoryInteractionRouter {
+    controller: PharmacyInventoryInteractionController
+
+    init(controller: PharmacyInventoryInteractionController) {
+        this.controller = controller
+    }
+
+    fn postRecord(req: CreatePharmacyInventoryInteractionRecordRequest) -> PharmacyInventoryInteractionResponseDto {
+        return this.controller.handleRecordSubmission(req)
+    }
+
+    fn getRiskScore(patientId: Int) -> String {
+        return this.controller.checkPatientRisk(patientId)
+    }
+}

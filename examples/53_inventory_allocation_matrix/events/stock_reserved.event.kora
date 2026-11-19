@@ -1,0 +1,7 @@
+// Example 53: Inventory Allocation Matrix & Multi-Warehouse Stock — Domain Event: StockReservedEvent
+
+model StockReservedEvent {
+    sku: String
+    warehouseId: Int
+    quantity: Int
+}

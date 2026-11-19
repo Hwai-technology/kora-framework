@@ -1,0 +1,13 @@
+// Example 56: Last-Mile Delivery Dispatch & Fleet Geo-Routing
+// Persistent Database Entity: Primary Record
+
+@table("last_mile_delivery_dispatch_records")
+model LastMileDeliveryDispatchPrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

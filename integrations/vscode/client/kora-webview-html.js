@@ -80,14 +80,17 @@ function getWebviewHtml(webview, extensionUri, catalog, nonce) {
     };
     const catalogList = catalog || EXAMPLES_CATALOG;
     const catalogHtml = catalogList.map(ex => `
-        <div class="example-card" data-slug="${ex.slug}" data-action="cloneExample" data-action="cloneExample" data-slug="${ex.slug}">
+        <div class="example-card" data-slug="${ex.slug}" data-name="${(ex.name || '').toLowerCase()}" data-category="${(ex.category || '').toLowerCase()}" data-desc="${(ex.desc || ex.description || '').toLowerCase()}" data-action="cloneExample">
             <div class="example-header">
                 <span class="example-name">${ex.name}</span>
-                <span class="badge ${ex.difficulty.toLowerCase()}">${ex.difficulty}</span>
+                <span style="display: flex; gap: 4px; align-items: center;">
+                    ${ex.file_count ? `<span class="badge" style="background: rgba(255,255,255,0.08); font-size: 10px;">${ex.file_count} files</span>` : ''}
+                    <span class="badge ${(ex.difficulty || 'intermediate').toLowerCase()}">${ex.difficulty || 'Intermediate'}</span>
+                </span>
             </div>
-            <div class="example-desc">${ex.desc}</div>
+            <div class="example-desc">${ex.desc || ex.description || ''}</div>
             <div class="example-footer">
-                <span class="category-tag">${ex.category}</span>
+                <span class="category-tag">${ex.category || 'Architecture'}</span>
                 <button class="btn-clone" data-slug="${ex.slug}" data-action="cloneExample" title="Scaffold into current project">Scaffold Example</button>
             </div>
         </div>
@@ -136,7 +139,7 @@ ${cssContent}
         <button type="button" class="tab-btn" data-tab="copilot" id="tab-nav-copilot" role="tab" aria-selected="false" aria-controls="tab-copilot">Inspector</button>
         <button type="button" class="tab-btn" data-tab="arch" id="tab-nav-arch" role="tab" aria-selected="false" aria-controls="tab-arch">Architecture</button>
         <button type="button" class="tab-btn" data-tab="learn" id="tab-nav-learn" role="tab" aria-selected="false" aria-controls="tab-learn">Learning</button>
-        <button type="button" class="tab-btn" data-tab="examples" id="tab-nav-examples" role="tab" aria-selected="false" aria-controls="tab-examples">Examples (23)</button>
+        <button type="button" class="tab-btn" data-tab="examples" id="tab-nav-examples" role="tab" aria-selected="false" aria-controls="tab-examples">Examples (${catalogList.length})</button>
         <button type="button" class="tab-btn" data-tab="settings" id="tab-nav-settings" role="tab" aria-selected="false" aria-controls="tab-settings">Settings</button>
     </div>
 
@@ -395,7 +398,10 @@ ${cssContent}
 
     <!-- 5. Examples Catalog -->
     <div id="tab-examples" class="section">
-        <div style="margin-bottom: 8px; font-size: 11px; opacity: 0.8;">Click any official reference architecture to scaffold directly into your project:</div>
+        <div style="margin-bottom: 8px; font-size: 11px; opacity: 0.8;">Explore <b>${catalogList.length}</b> dynamically discovered production architectures:</div>
+        <div style="margin-bottom: 10px;">
+            <input type="text" id="example-search-input" placeholder="🔍 Search examples by name, category, or slug..." class="chat-textarea" style="min-height: 28px; max-height: 28px; font-size: 11px; border-radius: 4px; padding: 4px 8px; width: 100%; box-sizing: border-box;" />
+        </div>
         <div id="catalog-list">
             ${catalogHtml}
         </div>

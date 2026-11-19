@@ -1,0 +1,16 @@
+// Example 65: Fleet Telematics & Polygonal Geofence Monitor
+// Transport Model: Standard Response
+
+model FleetTelematicsGeofencingResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model FleetTelematicsGeofencingSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

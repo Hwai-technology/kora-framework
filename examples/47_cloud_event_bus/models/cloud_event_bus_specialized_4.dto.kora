@@ -1,0 +1,9 @@
+// Example 47: Cloud Event Bus & Partitioned Streaming
+// Specialized Model 4
+
+model CloudEventBusSpecializedProfile4 {
+    profileId: String
+    classificationCode: String
+    quorumWeight: Int
+    isActive: Bool
+}

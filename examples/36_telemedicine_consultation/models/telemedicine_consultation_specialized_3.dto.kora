@@ -1,0 +1,9 @@
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions
+// Specialized Model 3
+
+model TelemedicineConsultationSpecializedProfile3 {
+    profileId: String
+    classificationCode: String
+    riskWeight: Int
+    isActive: Bool
+}

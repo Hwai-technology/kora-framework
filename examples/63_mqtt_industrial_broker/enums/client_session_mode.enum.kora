@@ -1,0 +1,6 @@
+// Example 63: MQTT Industrial Telemetry Broker & Topic Tree — Enum: ClientSessionMode
+
+enum ClientSessionMode {
+    CleanSessionTransient
+    PersistentSessionDurable
+}

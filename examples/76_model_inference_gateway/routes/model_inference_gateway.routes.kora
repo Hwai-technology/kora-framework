@@ -1,0 +1,22 @@
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher
+// Router & Endpoint Dispatcher
+
+import { CreateModelInferenceGatewayTaskRequest } from "../models/model_inference_gateway_request.dto"
+import { ModelInferenceGatewayResponseDto } from "../models/model_inference_gateway_response.dto"
+import { ModelInferenceGatewayController } from "../controllers/model_inference_gateway.controller"
+
+class ModelInferenceGatewayRouter {
+    controller: ModelInferenceGatewayController
+
+    init(controller: ModelInferenceGatewayController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateModelInferenceGatewayTaskRequest) -> ModelInferenceGatewayResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

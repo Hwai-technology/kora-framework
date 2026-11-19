@@ -1,0 +1,8 @@
+// Example 77: Prompt Engineering Evaluation & Hallucination Scorer — Enum: EvaluationMetric
+
+enum EvaluationMetric {
+    FaithfulnessFactualCheck
+    ContextPrecisionScore
+    AnswerRelevanceMetric
+    ToxicitySafetyFilter
+}

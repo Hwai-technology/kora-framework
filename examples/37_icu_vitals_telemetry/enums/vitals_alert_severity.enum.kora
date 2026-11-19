@@ -1,0 +1,9 @@
+// Example 37: ICU Real-Time High-Frequency Vitals Monitor — Enum: VitalsAlertSeverity
+// Dedicated Domain Enum Specification
+
+enum VitalsAlertSeverity {
+    NominalStable
+    AdvisoryWarning
+    UrgentAttention
+    CodeBlueEmergency
+}

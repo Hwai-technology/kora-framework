@@ -1,0 +1,38 @@
+// Example 70: Industrial SCADA Modbus Gateway & Water Treatment
+// Presentation Controller
+
+import { CreateWaterTreatmentScadaBridgeTaskRequest } from "../models/water_treatment_scada_bridge_request.dto"
+import { WaterTreatmentScadaBridgeResponseDto } from "../models/water_treatment_scada_bridge_response.dto"
+import { WaterTreatmentScadaBridgeCoreService } from "../services/water_treatment_scada_bridge_core.service"
+
+class WaterTreatmentScadaBridgeController {
+    service: WaterTreatmentScadaBridgeCoreService
+
+    init(service: WaterTreatmentScadaBridgeCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateWaterTreatmentScadaBridgeTaskRequest) -> WaterTreatmentScadaBridgeResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => WaterTreatmentScadaBridgeResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => WaterTreatmentScadaBridgeResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

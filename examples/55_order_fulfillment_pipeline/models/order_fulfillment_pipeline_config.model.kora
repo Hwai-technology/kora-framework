@@ -1,0 +1,9 @@
+// Example 55: Order Fulfillment & Pick-Pack-Ship Workflow
+// Configuration Model
+
+model OrderFulfillmentPipelineConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

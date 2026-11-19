@@ -1,0 +1,13 @@
+// Example 98: Log-Structured Merge-Tree (LSM-Tree) Engine
+// Persistent Database Entity: Primary Record
+
+@table("lsm_tree_storage_engine_records")
+model LsmTreeStorageEnginePrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

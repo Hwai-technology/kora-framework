@@ -1,0 +1,12 @@
+// Example 99: B+ Tree Disk Pager & Index Node Balancer
+// Persistent Database Entity: Audit Log
+
+@table("b_plus_tree_indexer_audit_logs")
+model BPlusTreeIndexerAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

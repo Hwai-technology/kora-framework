@@ -1,0 +1,21 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// Query Controller (Reads & Lookups)
+
+import { TreasuryLiquidityPoolRecord } from "../entities/treasury_liquidity_pool_primary.entity"
+import { TreasuryLiquidityPoolRepository } from "../interfaces/treasury_liquidity_pool_repository.interface"
+
+class TreasuryLiquidityPoolQueryController {
+    repo: TreasuryLiquidityPoolRepository
+
+    init(repo: TreasuryLiquidityPoolRepository) {
+        this.repo = repo
+    }
+
+    fn getById(id: Int) -> Option<TreasuryLiquidityPoolRecord> {
+        return this.repo.findById(id)
+    }
+
+    fn getTotalVolume() -> Int {
+        return this.repo.countAll()
+    }
+}

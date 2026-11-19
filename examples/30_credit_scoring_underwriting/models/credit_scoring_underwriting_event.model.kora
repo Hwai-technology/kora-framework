@@ -1,0 +1,10 @@
+// Example 30: Credit Underwriting & Risk Assessment
+// Domain Event Model
+
+model CreditScoringUnderwritingEvent {
+    eventId: String
+    eventType: String
+    entityId: Int
+    occurredAt: Int
+    payloadHash: String
+}

@@ -1,0 +1,15 @@
+// Example 63: MQTT Industrial Telemetry Broker & Topic Tree
+// Transport Model: Command Request
+
+model CreateMqttIndustrialBrokerTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryMqttIndustrialBrokerFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

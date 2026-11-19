@@ -1,0 +1,7 @@
+// Example 58: Distributed Shopping Cart Session Actor — Domain Event: CartAbandonmentDetectedEvent
+
+model CartAbandonmentDetectedEvent {
+    sessionId: String
+    idleDurationMinutes: Int
+    cartValueCents: Int
+}

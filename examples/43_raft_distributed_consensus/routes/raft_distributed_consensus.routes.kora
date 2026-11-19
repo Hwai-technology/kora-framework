@@ -1,0 +1,22 @@
+// Example 43: Raft Distributed Consensus Engine
+// Router & Endpoint Dispatcher
+
+import { CreateRaftDistributedConsensusTaskRequest } from "../models/raft_distributed_consensus_request.dto"
+import { RaftDistributedConsensusResponseDto } from "../models/raft_distributed_consensus_response.dto"
+import { RaftDistributedConsensusController } from "../controllers/raft_distributed_consensus.controller"
+
+class RaftDistributedConsensusRouter {
+    controller: RaftDistributedConsensusController
+
+    init(controller: RaftDistributedConsensusController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateRaftDistributedConsensusTaskRequest) -> RaftDistributedConsensusResponseDto {
+        return this.controller.handleTaskProposal(req)
+    }
+
+    fn getQuorum() -> Bool {
+        return this.controller.checkQuorumStatus()
+    }
+}

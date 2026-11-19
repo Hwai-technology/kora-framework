@@ -1,0 +1,8 @@
+// Example 37: ICU Real-Time High-Frequency Vitals Monitor — Enum: LeadPlacement
+// Dedicated Domain Enum Specification
+
+enum LeadPlacement {
+    LeadIIStandard
+    PrecordialV5
+    RadialArterialLine
+}

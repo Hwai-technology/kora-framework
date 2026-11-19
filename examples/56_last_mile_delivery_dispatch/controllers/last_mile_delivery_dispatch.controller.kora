@@ -1,0 +1,38 @@
+// Example 56: Last-Mile Delivery Dispatch & Fleet Geo-Routing
+// Presentation Controller
+
+import { CreateLastMileDeliveryDispatchTaskRequest } from "../models/last_mile_delivery_dispatch_request.dto"
+import { LastMileDeliveryDispatchResponseDto } from "../models/last_mile_delivery_dispatch_response.dto"
+import { LastMileDeliveryDispatchCoreService } from "../services/last_mile_delivery_dispatch_core.service"
+
+class LastMileDeliveryDispatchController {
+    service: LastMileDeliveryDispatchCoreService
+
+    init(service: LastMileDeliveryDispatchCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateLastMileDeliveryDispatchTaskRequest) -> LastMileDeliveryDispatchResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => LastMileDeliveryDispatchResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => LastMileDeliveryDispatchResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

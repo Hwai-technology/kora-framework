@@ -1,0 +1,26 @@
+// ============================================================================
+// Payment Commands & Webhook Payload DTOs
+// ============================================================================
+
+model CreatePaymentGatewayOrchestratorRequest {
+    targetId: Int
+    idempotencyKey: String
+    cardBin: String
+    customerCountry: String
+    currency: String
+    amountCents: Int
+    reference: String
+}
+
+model ChallengeVerificationRequest {
+    transactionId: String
+    challengeCode: String
+}
+
+model InboundWebhookPayload {
+    provider: String
+    signature: String
+    transactionId: String
+    eventType: String
+    amountCents: Int
+}

@@ -1,0 +1,13 @@
+// Example 31: Inter-Bank Reconciliation & Settlement
+// Primary Persistent Database Entity
+
+@table("reconciliation_settlement_records")
+model ReconciliationSettlementRecord {
+    @id
+    id: Int
+    @unique
+    reference: String
+    status: String
+    balance: Int
+    active: Bool
+}

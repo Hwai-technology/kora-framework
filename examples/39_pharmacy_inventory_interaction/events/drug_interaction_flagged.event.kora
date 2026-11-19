@@ -1,0 +1,9 @@
+// Example 39: Pharmacy Dispensing & Drug Interaction Checker — Domain Event: DrugInteractionFlaggedEvent
+// Dedicated Domain Event Specification
+
+model DrugInteractionFlaggedEvent {
+    prescriptionId: String
+    drugA: String
+    drugB: String
+    severity: String
+}

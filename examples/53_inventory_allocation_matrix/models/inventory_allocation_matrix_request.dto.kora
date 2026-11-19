@@ -1,0 +1,15 @@
+// Example 53: Inventory Allocation Matrix & Multi-Warehouse Stock
+// Transport Model: Command Request
+
+model CreateInventoryAllocationMatrixTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryInventoryAllocationMatrixFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

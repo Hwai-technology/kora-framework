@@ -1,0 +1,8 @@
+// Example 95: Multiplayer Game 60Hz Tick State Synchronizer — Enum: PlayerGameState
+
+enum PlayerGameState {
+    SpawnedActive
+    InCombatStance
+    RespawningCooldown
+    SpectatorObserving
+}

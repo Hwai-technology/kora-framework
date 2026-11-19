@@ -760,6 +760,25 @@
             });
         }
 
+        const exampleSearchInput = document.getElementById('example-search-input');
+        if (exampleSearchInput) {
+            exampleSearchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                const cards = document.querySelectorAll('.example-card');
+                cards.forEach(card => {
+                    const slug = card.getAttribute('data-slug') || '';
+                    const name = card.getAttribute('data-name') || '';
+                    const cat = card.getAttribute('data-category') || '';
+                    const desc = card.getAttribute('data-desc') || '';
+                    if (!query || slug.includes(query) || name.includes(query) || cat.includes(query) || desc.includes(query)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+
         function handleMentionInput() {
             if (!chatInput) return;
             const cursorPos = chatInput.selectionStart;

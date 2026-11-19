@@ -1,0 +1,15 @@
+// Example 99: B+ Tree Disk Pager & Index Node Balancer
+// Transport Model: Command Request
+
+model CreateBPlusTreeIndexerTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryBPlusTreeIndexerFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

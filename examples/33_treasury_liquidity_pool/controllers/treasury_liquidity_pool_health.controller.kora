@@ -1,0 +1,14 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// Health Check Controller
+
+class TreasuryLiquidityPoolHealthController {
+    init() {}
+
+    fn checkLiveness() -> Bool {
+        return true
+    }
+
+    fn checkReadiness() -> Bool {
+        return true
+    }
+}

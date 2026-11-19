@@ -1,0 +1,7 @@
+// Example 24: Core Banking Ledger & Accounts
+// Notifier Interface
+
+interface FintechCoreBankingNotifier {
+    fn sendAlert(subject: String, level: String) -> Bool
+    fn ping() -> Bool
+}

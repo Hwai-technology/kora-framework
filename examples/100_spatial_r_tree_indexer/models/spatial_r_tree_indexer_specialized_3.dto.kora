@@ -1,0 +1,9 @@
+// Example 100: Spatial 2D R-Tree & k-Nearest Neighbors (k-NN)
+// Specialized Model 3
+
+model SpatialRTreeIndexerSpecializedProfile3 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

@@ -1,0 +1,10 @@
+// Example 74: Retrieval-Augmented Generation (RAG) Document Chunker
+// Repository Interface
+
+import { RagKnowledgePipelinePrimaryRecord } from "../entities/rag_knowledge_pipeline_primary.entity"
+
+interface RagKnowledgePipelineRepository {
+    fn findById(id: Int) -> Option<RagKnowledgePipelinePrimaryRecord>
+    fn save(record: RagKnowledgePipelinePrimaryRecord) -> Result<RagKnowledgePipelinePrimaryRecord, String>
+    fn countActive() -> Int
+}

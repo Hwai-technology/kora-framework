@@ -1,0 +1,26 @@
+// Example 29: Algorithmic Market Maker & Quoting Engine
+// Router & Endpoint Dispatcher
+
+import { CreateAlgorithmicMarketMakerRequest } from "../models/algorithmic_market_maker_request.dto"
+import { AlgorithmicMarketMakerResponse } from "../models/algorithmic_market_maker_response.dto"
+import { AlgorithmicMarketMakerRecord } from "../entities/algorithmic_market_maker_primary.entity"
+import { AlgorithmicMarketMakerCommandController } from "../controllers/algorithmic_market_maker_command.controller"
+import { AlgorithmicMarketMakerQueryController } from "../controllers/algorithmic_market_maker_query.controller"
+
+class AlgorithmicMarketMakerRouter {
+    commandController: AlgorithmicMarketMakerCommandController
+    queryController: AlgorithmicMarketMakerQueryController
+
+    init(commandController: AlgorithmicMarketMakerCommandController, queryController: AlgorithmicMarketMakerQueryController) {
+        this.commandController = commandController
+        this.queryController = queryController
+    }
+
+    fn postRecord(req: CreateAlgorithmicMarketMakerRequest) -> AlgorithmicMarketMakerResponse {
+        return this.commandController.handleCreate(req)
+    }
+
+    fn fetchRecord(id: Int) -> Option<AlgorithmicMarketMakerRecord> {
+        return this.queryController.getById(id)
+    }
+}

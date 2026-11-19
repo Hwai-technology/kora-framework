@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 86: SIEM High-Throughput Log Ingestion & CEF Normalizer
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { SiemLogIngestionPipelineInMemoryRepository } from "./repositories/siem_log_ingestion_pipeline_inmemory.repository"
+import { SiemLogIngestionPipelineCoreService } from "./services/siem_log_ingestion_pipeline_core.service"
+import { SiemLogIngestionPipelineController } from "./controllers/siem_log_ingestion_pipeline.controller"
+import { SiemLogIngestionPipelineRouter } from "./routes/siem_log_ingestion_pipeline.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = SiemLogIngestionPipelineInMemoryRepository()
+        let service = SiemLogIngestionPipelineCoreService(repo)
+        let controller = SiemLogIngestionPipelineController(service)
+        let router = SiemLogIngestionPipelineRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

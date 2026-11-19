@@ -1,0 +1,14 @@
+// Example 29: Algorithmic Market Maker & Quoting Engine
+// Health Check Controller
+
+class AlgorithmicMarketMakerHealthController {
+    init() {}
+
+    fn checkLiveness() -> Bool {
+        return true
+    }
+
+    fn checkReadiness() -> Bool {
+        return true
+    }
+}

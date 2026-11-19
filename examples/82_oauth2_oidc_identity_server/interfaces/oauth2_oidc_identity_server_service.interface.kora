@@ -1,0 +1,10 @@
+// Example 82: OAuth 2.1 & OpenID Connect Authorization Server
+// Domain Service Contract
+
+import { Oauth2OidcIdentityServerPrimaryRecord } from "../entities/oauth2_oidc_identity_server_primary.entity"
+import { CreateOauth2OidcIdentityServerTaskRequest } from "../models/oauth2_oidc_identity_server_request.dto"
+
+interface Oauth2OidcIdentityServerDomainContract {
+    fn executeTask(req: CreateOauth2OidcIdentityServerTaskRequest) -> Result<Oauth2OidcIdentityServerPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

@@ -1,0 +1,8 @@
+// Example 48: Distributed Cache Cluster & Write-Behind — Enum: WritePolicy
+// Dedicated Domain Enum Specification
+
+enum WritePolicy {
+    WriteThroughSynchronous
+    WriteBehindAsynchronous
+    WriteAroundDatabaseDirect
+}

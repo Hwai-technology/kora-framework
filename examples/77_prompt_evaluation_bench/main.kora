@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 77: Prompt Engineering Evaluation & Hallucination Scorer
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { PromptEvaluationBenchInMemoryRepository } from "./repositories/prompt_evaluation_bench_inmemory.repository"
+import { PromptEvaluationBenchCoreService } from "./services/prompt_evaluation_bench_core.service"
+import { PromptEvaluationBenchController } from "./controllers/prompt_evaluation_bench.controller"
+import { PromptEvaluationBenchRouter } from "./routes/prompt_evaluation_bench.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = PromptEvaluationBenchInMemoryRepository()
+        let service = PromptEvaluationBenchCoreService(repo)
+        let controller = PromptEvaluationBenchController(service)
+        let router = PromptEvaluationBenchRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

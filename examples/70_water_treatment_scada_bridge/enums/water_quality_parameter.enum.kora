@@ -1,0 +1,8 @@
+// Example 70: Industrial SCADA Modbus Gateway & Water Treatment — Enum: WaterQualityParameter
+
+enum WaterQualityParameter {
+    FreeChlorineResidual
+    TurbidityNtu
+    PhAcidityAlkalinity
+    ConductivityMicroSiemens
+}

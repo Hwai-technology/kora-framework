@@ -1,0 +1,12 @@
+// Example 57: Marketplace Vendor Settlement & Escrow Payouts
+// Persistent Database Entity: Audit Log
+
+@table("marketplace_vendor_settlement_audit_logs")
+model MarketplaceVendorSettlementAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

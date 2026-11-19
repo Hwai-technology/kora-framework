@@ -1,0 +1,9 @@
+// Example 27: fraud_detection_engine — Enum: FraudRuleType
+// Dedicated Domain Enum Specification
+
+enum FraudRuleType {
+    VelocityBurst
+    GeographicImpossibleTravel
+    DeviceFingerprintMismatch
+    SanctionFuzzyMatch
+}

@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 34: HIPAA Compliant Electronic Health Records
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { HipaaCompliantEhrInMemoryRepository } from "./repositories/hipaa_compliant_ehr_inmemory.repository"
+import { HipaaCompliantEhrCoreService } from "./services/hipaa_compliant_ehr_core.service"
+import { HipaaCompliantEhrController } from "./controllers/hipaa_compliant_ehr.controller"
+import { HipaaCompliantEhrRouter } from "./routes/hipaa_compliant_ehr.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = HipaaCompliantEhrInMemoryRepository()
+        let service = HipaaCompliantEhrCoreService(repo)
+        let controller = HipaaCompliantEhrController(service)
+        let router = HipaaCompliantEhrRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

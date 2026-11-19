@@ -1,0 +1,22 @@
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions
+// Router & Endpoint Dispatcher
+
+import { CreateTelemedicineConsultationRecordRequest } from "../models/telemedicine_consultation_request.dto"
+import { TelemedicineConsultationResponseDto } from "../models/telemedicine_consultation_response.dto"
+import { TelemedicineConsultationController } from "../controllers/telemedicine_consultation.controller"
+
+class TelemedicineConsultationRouter {
+    controller: TelemedicineConsultationController
+
+    init(controller: TelemedicineConsultationController) {
+        this.controller = controller
+    }
+
+    fn postRecord(req: CreateTelemedicineConsultationRecordRequest) -> TelemedicineConsultationResponseDto {
+        return this.controller.handleRecordSubmission(req)
+    }
+
+    fn getRiskScore(patientId: Int) -> String {
+        return this.controller.checkPatientRisk(patientId)
+    }
+}

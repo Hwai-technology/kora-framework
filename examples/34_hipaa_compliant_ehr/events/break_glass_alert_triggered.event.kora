@@ -1,0 +1,9 @@
+// Example 34: HIPAA Compliant Electronic Health Records — Domain Event: BreakGlassAlertTriggeredEvent
+// Dedicated Domain Event Specification
+
+model BreakGlassAlertTriggeredEvent {
+    incidentId: String
+    patientId: Int
+    physicianId: Int
+    emergencyRoomUnit: String
+}

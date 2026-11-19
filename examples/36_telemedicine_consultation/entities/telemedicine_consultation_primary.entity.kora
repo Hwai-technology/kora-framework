@@ -1,0 +1,14 @@
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions
+// Persistent Database Entity: Primary Record
+
+@table("telemedicine_consultation_clinical_records")
+model TelemedicineConsultationClinicalEntity {
+    @id
+    id: Int
+    @unique
+    patientId: Int
+    clinicianId: Int
+    clinicalMetricScore: Int
+    complianceState: String
+    active: Bool
+}

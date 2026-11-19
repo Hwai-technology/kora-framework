@@ -1,0 +1,16 @@
+// Example 60: Faceted Product Catalog Search & Inverted Index
+// Transport Model: Standard Response
+
+model ProductCatalogSearchResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model ProductCatalogSearchSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

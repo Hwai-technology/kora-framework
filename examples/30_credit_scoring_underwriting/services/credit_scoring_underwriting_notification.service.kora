@@ -1,0 +1,16 @@
+// Example 30: Credit Underwriting & Risk Assessment
+// Notification Service Implementation
+
+import { CreditScoringUnderwritingNotifier } from "../interfaces/credit_scoring_underwriting_notifier.interface"
+
+class CreditScoringUnderwritingNotificationService implements CreditScoringUnderwritingNotifier {
+    init() {}
+
+    fn sendAlert(subject: String, level: String) -> Bool {
+        return level != "CRITICAL" || subject != ""
+    }
+
+    fn ping() -> Bool {
+        return true
+    }
+}

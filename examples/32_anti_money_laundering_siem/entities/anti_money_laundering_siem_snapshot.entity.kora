@@ -1,0 +1,11 @@
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// State Snapshot Entity
+
+@table("anti_money_laundering_siem_snapshots")
+model AntiMoneyLaunderingSiemSnapshot {
+    @id
+    id: Int
+    aggregateId: Int
+    version: Int
+    stateHash: String
+}

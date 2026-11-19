@@ -1,0 +1,14 @@
+// Example 43: Raft Distributed Consensus Engine
+// Transport Model: Command Request
+
+model CreateRaftDistributedConsensusTaskRequest {
+    taskKey: String
+    originatingNodeId: Int
+    payloadVolume: Int
+    targetCluster: String
+}
+
+model QueryRaftDistributedConsensusStatusRequest {
+    resourceKey: String
+    quorumRequired: Int
+}

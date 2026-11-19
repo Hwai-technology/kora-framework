@@ -1,0 +1,8 @@
+// Example 89: Immutable Cryptographic Audit Trail (SOC 2 / ISO 27001) — Enum: ComplianceFramework
+
+enum ComplianceFramework {
+    Soc2TypeIiSecurity
+    Iso27001InformationSecurity
+    PciDssCardholderData
+    GdprArticle30Processing
+}

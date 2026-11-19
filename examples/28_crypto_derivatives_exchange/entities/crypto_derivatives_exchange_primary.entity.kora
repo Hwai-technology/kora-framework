@@ -1,0 +1,13 @@
+// Example 28: Crypto Derivatives & Margin Engine
+// Primary Persistent Database Entity
+
+@table("crypto_derivatives_exchange_records")
+model CryptoDerivativesExchangeRecord {
+    @id
+    id: Int
+    @unique
+    reference: String
+    status: String
+    balance: Int
+    active: Bool
+}

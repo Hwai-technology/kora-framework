@@ -1,0 +1,10 @@
+// Example 35: FHIR R4 & HL7 Interoperability Hub
+// Domain Service Contract
+
+import { FhirInteroperabilityHubClinicalEntity } from "../entities/fhir_interoperability_hub_primary.entity"
+import { CreateFhirInteroperabilityHubRecordRequest } from "../models/fhir_interoperability_hub_request.dto"
+
+interface FhirInteroperabilityHubDomainContract {
+    fn processClinicalRecord(req: CreateFhirInteroperabilityHubRecordRequest) -> Result<FhirInteroperabilityHubClinicalEntity, String>
+    fn evaluateClinicalRisk(patientId: Int) -> String
+}

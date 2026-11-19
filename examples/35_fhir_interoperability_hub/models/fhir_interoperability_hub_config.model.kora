@@ -1,0 +1,9 @@
+// Example 35: FHIR R4 & HL7 Interoperability Hub
+// Configuration Model
+
+model FhirInteroperabilityHubServiceConfig {
+    hipaaAuditEnabled: Bool
+    encryptionKeyVersion: Int
+    maxBatchFetchSize: Int
+    environment: String
+}

@@ -1,0 +1,10 @@
+// Example 69: Smart Building HVAC & Air Quality Coordinator
+// Domain Service Contract
+
+import { SmartBuildingHvacControlPrimaryRecord } from "../entities/smart_building_hvac_control_primary.entity"
+import { CreateSmartBuildingHvacControlTaskRequest } from "../models/smart_building_hvac_control_request.dto"
+
+interface SmartBuildingHvacControlDomainContract {
+    fn executeTask(req: CreateSmartBuildingHvacControlTaskRequest) -> Result<SmartBuildingHvacControlPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

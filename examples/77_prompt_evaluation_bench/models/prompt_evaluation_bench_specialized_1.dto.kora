@@ -1,0 +1,9 @@
+// Example 77: Prompt Engineering Evaluation & Hallucination Scorer
+// Specialized Model 1
+
+model PromptEvaluationBenchSpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

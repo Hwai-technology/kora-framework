@@ -1,0 +1,7 @@
+// examples/03_crud_products_api — Event: StockDepletedEvent
+
+model StockDepletedEvent {
+    productId: Int
+    sku: String
+    timestamp: Int
+}

@@ -1,0 +1,7 @@
+// Example 75: Real-Time Machine Learning Feature Store — Domain Event: DataDriftAlarmEvent
+
+model DataDriftAlarmEvent {
+    featureName: String
+    populationStabilityIndexBps: Int
+    driftSeverity: String
+}

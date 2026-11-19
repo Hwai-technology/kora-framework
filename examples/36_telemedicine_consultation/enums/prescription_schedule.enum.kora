@@ -1,0 +1,9 @@
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions — Enum: PrescriptionSchedule
+// Dedicated Domain Enum Specification
+
+enum PrescriptionSchedule {
+    NonControlledLegend
+    ScheduleIICritical
+    ScheduleIIIStandard
+    OverTheCounter
+}

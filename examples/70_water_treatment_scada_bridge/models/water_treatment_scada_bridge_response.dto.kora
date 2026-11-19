@@ -1,0 +1,16 @@
+// Example 70: Industrial SCADA Modbus Gateway & Water Treatment
+// Transport Model: Standard Response
+
+model WaterTreatmentScadaBridgeResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model WaterTreatmentScadaBridgeSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

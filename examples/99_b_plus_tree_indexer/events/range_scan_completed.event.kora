@@ -1,0 +1,7 @@
+// Example 99: B+ Tree Disk Pager & Index Node Balancer — Domain Event: RangeScanCompletedEvent
+
+model RangeScanCompletedEvent {
+    startKey: Int
+    endKey: Int
+    keysFoundCount: Int
+}

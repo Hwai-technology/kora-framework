@@ -1,0 +1,33 @@
+// Example 86: SIEM High-Throughput Log Ingestion & CEF Normalizer
+// Repository Implementation
+
+import { SiemLogIngestionPipelinePrimaryRecord } from "../entities/siem_log_ingestion_pipeline_primary.entity"
+import { SiemLogIngestionPipelineRepository } from "../interfaces/siem_log_ingestion_pipeline_repository.interface"
+
+class SiemLogIngestionPipelineInMemoryRepository implements SiemLogIngestionPipelineRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<SiemLogIngestionPipelinePrimaryRecord> {
+        if id > 0 {
+            return Some(SiemLogIngestionPipelinePrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: SiemLogIngestionPipelinePrimaryRecord) -> Result<SiemLogIngestionPipelinePrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

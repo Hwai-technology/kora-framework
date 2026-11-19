@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 37: ICU Real-Time High-Frequency Vitals Monitor
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { IcuVitalsTelemetryInMemoryRepository } from "./repositories/icu_vitals_telemetry_inmemory.repository"
+import { IcuVitalsTelemetryCoreService } from "./services/icu_vitals_telemetry_core.service"
+import { IcuVitalsTelemetryController } from "./controllers/icu_vitals_telemetry.controller"
+import { IcuVitalsTelemetryRouter } from "./routes/icu_vitals_telemetry.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = IcuVitalsTelemetryInMemoryRepository()
+        let service = IcuVitalsTelemetryCoreService(repo)
+        let controller = IcuVitalsTelemetryController(service)
+        let router = IcuVitalsTelemetryRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

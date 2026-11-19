@@ -1,0 +1,16 @@
+// ============================================================================
+// Example 24: Fintech Core Banking — Database Entity: Account Aggregate
+// Versioned Aggregate Root with Optimistic Concurrency Control
+// ============================================================================
+
+@table("accounts")
+model Account {
+    @id
+    id: Int
+    @unique
+    accountNumber: String
+    balance: Int
+    reservedBalance: Int
+    version: Int
+    status: String
+}

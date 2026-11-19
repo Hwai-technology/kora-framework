@@ -1,0 +1,16 @@
+// Example 37: ICU Real-Time High-Frequency Vitals Monitor
+// Transport Model: Command Requests
+
+model CreateIcuVitalsTelemetryRecordRequest {
+    patientId: Int
+    clinicianId: Int
+    domainContext: String
+    clinicalMetricScore: Int
+    confidentialNotes: String
+}
+
+model QueryIcuVitalsTelemetryFilterRequest {
+    patientId: Int
+    limit: Int
+    includeHistorical: Bool
+}

@@ -1,0 +1,10 @@
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// Primary Repository Interface
+
+import { AntiMoneyLaunderingSiemRecord } from "../entities/anti_money_laundering_siem_primary.entity"
+
+interface AntiMoneyLaunderingSiemRepository {
+    fn findById(id: Int) -> Option<AntiMoneyLaunderingSiemRecord>
+    fn save(record: AntiMoneyLaunderingSiemRecord) -> Result<AntiMoneyLaunderingSiemRecord, String>
+    fn countAll() -> Int
+}

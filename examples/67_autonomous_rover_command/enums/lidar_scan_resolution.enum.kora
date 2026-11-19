@@ -1,0 +1,6 @@
+// Example 67: Autonomous Rover Navigation & Obstacle Avoidance — Enum: LidarScanResolution
+
+enum LidarScanResolution {
+    Standard10Hz360Deg
+    HighDensity20HzPrecision
+}

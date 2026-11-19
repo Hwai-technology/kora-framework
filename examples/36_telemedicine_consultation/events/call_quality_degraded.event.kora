@@ -1,0 +1,8 @@
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions — Domain Event: CallQualityDegradedEvent
+// Dedicated Domain Event Specification
+
+model CallQualityDegradedEvent {
+    sessionId: String
+    packetLossPercent: Int
+    latencyMs: Int
+}

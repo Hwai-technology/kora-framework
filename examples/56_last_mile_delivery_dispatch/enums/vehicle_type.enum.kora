@@ -1,0 +1,8 @@
+// Example 56: Last-Mile Delivery Dispatch & Fleet Geo-Routing — Enum: VehicleType
+
+enum VehicleType {
+    CargoVan
+    ElectricBicycle
+    AutonomousDrone
+    StandardSedan
+}

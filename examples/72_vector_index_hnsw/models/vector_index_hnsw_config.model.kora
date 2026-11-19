@@ -1,0 +1,9 @@
+// Example 72: HNSW Vector Index & Approximate Nearest Neighbor
+// Configuration Model
+
+model VectorIndexHnswConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

@@ -1,0 +1,7 @@
+// Example 93: Live Audio Transcoding & Packet Chunking Pipeline — Enum: AudioCodecType
+
+enum AudioCodecType {
+    OpusHighFidelity
+    AacLowComplexity
+    G711UltraLowDelay
+}

@@ -1,0 +1,22 @@
+// Example 64: Smart Electrical Grid Substation Telemetry
+// Router & Endpoint Dispatcher
+
+import { CreateSmartGridEnergyMonitorTaskRequest } from "../models/smart_grid_energy_monitor_request.dto"
+import { SmartGridEnergyMonitorResponseDto } from "../models/smart_grid_energy_monitor_response.dto"
+import { SmartGridEnergyMonitorController } from "../controllers/smart_grid_energy_monitor.controller"
+
+class SmartGridEnergyMonitorRouter {
+    controller: SmartGridEnergyMonitorController
+
+    init(controller: SmartGridEnergyMonitorController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateSmartGridEnergyMonitorTaskRequest) -> SmartGridEnergyMonitorResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

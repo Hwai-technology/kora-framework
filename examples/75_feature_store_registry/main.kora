@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 75: Real-Time Machine Learning Feature Store
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { FeatureStoreRegistryInMemoryRepository } from "./repositories/feature_store_registry_inmemory.repository"
+import { FeatureStoreRegistryCoreService } from "./services/feature_store_registry_core.service"
+import { FeatureStoreRegistryController } from "./controllers/feature_store_registry.controller"
+import { FeatureStoreRegistryRouter } from "./routes/feature_store_registry.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = FeatureStoreRegistryInMemoryRepository()
+        let service = FeatureStoreRegistryCoreService(repo)
+        let controller = FeatureStoreRegistryController(service)
+        let router = FeatureStoreRegistryRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

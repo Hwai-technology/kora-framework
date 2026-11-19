@@ -1,0 +1,10 @@
+// Example 29: Algorithmic Market Maker & Quoting Engine
+// Domain Event Model
+
+model AlgorithmicMarketMakerEvent {
+    eventId: String
+    eventType: String
+    entityId: Int
+    occurredAt: Int
+    payloadHash: String
+}

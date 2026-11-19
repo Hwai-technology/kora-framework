@@ -1,0 +1,8 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director — Domain Event: CircuitTrippedOpenEvent
+// Dedicated Domain Event Specification
+
+model CircuitTrippedOpenEvent {
+    upstreamCluster: String
+    consecutive5xxErrors: Int
+    cooldownSeconds: Int
+}

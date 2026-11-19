@@ -1,0 +1,8 @@
+// Example 37: ICU Real-Time High-Frequency Vitals Monitor — Domain Event: SensorDisconnectedAlarmEvent
+// Dedicated Domain Event Specification
+
+model SensorDisconnectedAlarmEvent {
+    bedNumber: Int
+    modality: String
+    leadId: String
+}

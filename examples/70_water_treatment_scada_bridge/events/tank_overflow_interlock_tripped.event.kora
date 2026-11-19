@@ -1,0 +1,7 @@
+// Example 70: Industrial SCADA Modbus Gateway & Water Treatment — Domain Event: TankOverflowInterlockTrippedEvent
+
+model TankOverflowInterlockTrippedEvent {
+    tankId: Int
+    levelPercentage: Int
+    inflowValveClosed: Bool
+}

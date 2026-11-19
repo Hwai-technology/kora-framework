@@ -1,0 +1,10 @@
+// Example 77: Prompt Engineering Evaluation & Hallucination Scorer
+// Domain Service Contract
+
+import { PromptEvaluationBenchPrimaryRecord } from "../entities/prompt_evaluation_bench_primary.entity"
+import { CreatePromptEvaluationBenchTaskRequest } from "../models/prompt_evaluation_bench_request.dto"
+
+interface PromptEvaluationBenchDomainContract {
+    fn executeTask(req: CreatePromptEvaluationBenchTaskRequest) -> Result<PromptEvaluationBenchPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

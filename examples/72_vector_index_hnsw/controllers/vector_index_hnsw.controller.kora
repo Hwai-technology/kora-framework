@@ -1,0 +1,38 @@
+// Example 72: HNSW Vector Index & Approximate Nearest Neighbor
+// Presentation Controller
+
+import { CreateVectorIndexHnswTaskRequest } from "../models/vector_index_hnsw_request.dto"
+import { VectorIndexHnswResponseDto } from "../models/vector_index_hnsw_response.dto"
+import { VectorIndexHnswCoreService } from "../services/vector_index_hnsw_core.service"
+
+class VectorIndexHnswController {
+    service: VectorIndexHnswCoreService
+
+    init(service: VectorIndexHnswCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateVectorIndexHnswTaskRequest) -> VectorIndexHnswResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => VectorIndexHnswResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => VectorIndexHnswResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

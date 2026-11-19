@@ -1,0 +1,10 @@
+// Example 61: Supplier Purchase Order & 3-Way Invoice Matcher
+// Domain Service Contract
+
+import { SupplierPurchaseOrderFlowPrimaryRecord } from "../entities/supplier_purchase_order_flow_primary.entity"
+import { CreateSupplierPurchaseOrderFlowTaskRequest } from "../models/supplier_purchase_order_flow_request.dto"
+
+interface SupplierPurchaseOrderFlowDomainContract {
+    fn executeTask(req: CreateSupplierPurchaseOrderFlowTaskRequest) -> Result<SupplierPurchaseOrderFlowPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

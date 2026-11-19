@@ -1,0 +1,108 @@
+// ============================================================================
+// Real-time Multi-Factor Fraud & Anomaly Evaluator Service
+// Evaluates Sliding Velocity, Geolocation Impossible Travel, and Sanctions
+// ============================================================================
+
+import { FraudDetectionEngineRecord } from "../entities/fraud_detection_engine_primary.entity"
+import { CreateFraudDetectionEngineRequest } from "../models/fraud_detection_engine_request.dto"
+import { FraudDetectionEngineRepository } from "../interfaces/fraud_detection_engine_repository.interface"
+import { FraudDetectionEngineServiceInterface } from "../interfaces/fraud_detection_engine_service.interface"
+
+class FraudDetectionEngineCoreService implements FraudDetectionEngineServiceInterface {
+    repo: FraudDetectionEngineRepository
+    evalCounter: Int
+
+    init(repo: FraudDetectionEngineRepository) {
+        this.repo = repo
+        this.evalCounter = 9000
+    }
+
+    fn evaluateRisk(req: CreateFraudDetectionEngineRequest) -> Result<FraudDetectionEngineRecord, String> {
+        // Rule 1: Sanctioned jurisdictions (OFAC Defense) -> Immediate Critical Decline
+        if req.countryCode == "KP" || req.countryCode == "IR" {
+            this.evalCounter = this.evalCounter + 1
+            let rec = FraudDetectionEngineRecord {
+                id: req.targetId,
+                assessmentId: "eval_fraud_" + this.evalCounter.toString(),
+                cardToken: req.cardToken,
+                riskScore: 100,
+                outcome: "DECLINED_SANCTIONS",
+                velocityCount: 1,
+                distanceKm: 0,
+                reason: "CRITICAL: Country listed on global sanctions list",
+                reference: req.reference,
+                active: true,
+            }
+            return this.repo.save(rec)
+        }
+
+        var score = 0
+        var reasonNotes = "NORMAL"
+
+        // Rule 2: High Velocity (> 3 transactions in 10 minutes) -> +35 risk points
+        let velocity = this.repo.recordVelocity(req.cardToken)
+        if velocity > 3 {
+            score = score + 35
+            reasonNotes = "HIGH_VELOCITY_BURST"
+        }
+
+        // Rule 3: Geolocation Impossible Travel (> 800 km/h physical travel speed) -> +50 risk points
+        if req.minutesSinceLastTx > 0 && req.distanceFromLastTxKm > 0 {
+            let speedKmh = (req.distanceFromLastTxKm * 60) / req.minutesSinceLastTx
+            if speedKmh > 800 {
+                score = score + 50
+                reasonNotes = reasonNotes + ";IMPOSSIBLE_TRAVEL_SPEED"
+            }
+        }
+
+        // Rule 4: High-Risk MCC Codes (Gambling 7995, Crypto 6051) -> +25 risk points
+        if req.mccCode == 7995 || req.mccCode == 6051 {
+            score = score + 25
+            reasonNotes = reasonNotes + ";HIGH_RISK_MCC"
+        }
+
+        // Normalize Score to Max 100
+        if score > 100 {
+            score = 100
+        }
+
+        // Decision Outcome Tiers:
+        // Score < 30 -> APPROVED
+        // 30 <= Score < 70 -> STEP_UP_CHALLENGE
+        // Score >= 70 -> DECLINED_FRAUD
+        var decision = "APPROVED"
+        if score >= 70 {
+            decision = "DECLINED_FRAUD"
+        } else if score >= 30 {
+            decision = "STEP_UP_CHALLENGE"
+        }
+
+        this.evalCounter = this.evalCounter + 1
+        let record = FraudDetectionEngineRecord {
+            id: req.targetId,
+            assessmentId: "eval_fraud_" + this.evalCounter.toString(),
+            cardToken: req.cardToken,
+            riskScore: score,
+            outcome: decision,
+            velocityCount: velocity,
+            distanceKm: req.distanceFromLastTxKm,
+            reason: reasonNotes,
+            reference: req.reference,
+            active: true,
+        }
+
+        return this.repo.save(record)
+    }
+
+    fn processRequest(req: CreateFraudDetectionEngineRequest) -> Result<FraudDetectionEngineRecord, String> {
+        return this.evaluateRisk(req)
+    }
+
+    fn validateState(id: Int) -> Bool {
+        let opt = this.repo.findById(id)
+        return match opt {
+            Some(rec) => rec.active,
+            None => false,
+        }
+    }
+}

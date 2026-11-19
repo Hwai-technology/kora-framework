@@ -1,0 +1,8 @@
+// Example 50: Distributed Blob Storage Metadata Engine — Domain Event: CrossRegionReplicationSyncedEvent
+// Dedicated Domain Event Specification
+
+model CrossRegionReplicationSyncedEvent {
+    targetRegion: String
+    objectKey: String
+    replicationLagMs: Int
+}

@@ -1,0 +1,7 @@
+// examples/10_dto_validation_and_types — Event: DtoValidationFailedEvent
+
+model DtoValidationFailedEvent {
+    dtoType: String
+    violationCount: Int
+    summary: String
+}

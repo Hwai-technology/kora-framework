@@ -1,0 +1,10 @@
+// Example 26: Payment Gateway & Webhook Orchestrator
+// Configuration Model
+
+model PaymentGatewayOrchestratorConfig {
+    environment: String
+    maxBatchSize: Int
+    retryAttempts: Int
+    timeoutSeconds: Int
+    enabled: Bool
+}

@@ -1,0 +1,7 @@
+// Example 99: B+ Tree Disk Pager & Index Node Balancer — Enum: NodeBalanceAction
+
+enum NodeBalanceAction {
+    NoActionRequired
+    NodeSplitCreatedNewSibling
+    NodeMergedUnderflow
+}

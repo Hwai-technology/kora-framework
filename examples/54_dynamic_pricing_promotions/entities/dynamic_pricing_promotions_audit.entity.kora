@@ -1,0 +1,12 @@
+// Example 54: Dynamic Pricing Engine & Flash Sale Rate-Limiter
+// Persistent Database Entity: Audit Log
+
+@table("dynamic_pricing_promotions_audit_logs")
+model DynamicPricingPromotionsAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

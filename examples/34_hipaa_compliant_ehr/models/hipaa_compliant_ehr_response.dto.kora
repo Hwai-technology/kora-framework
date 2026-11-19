@@ -1,0 +1,17 @@
+// Example 34: HIPAA Compliant Electronic Health Records
+// Transport Model: Standard Responses
+
+model HipaaCompliantEhrResponseDto {
+    recordId: Int
+    patientId: Int
+    status: String
+    isComplianceVerified: Bool
+    message: String
+}
+
+model HipaaCompliantEhrSummaryDto {
+    patientId: Int
+    totalEntries: Int
+    severityCategory: String
+    lastReviewedTimestamp: Int
+}

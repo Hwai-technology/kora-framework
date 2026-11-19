@@ -1,0 +1,16 @@
+// Example 96: Video on Demand (VOD) HLS/DASH Transmuxer
+// Transport Model: Standard Response
+
+model VideoOnDemandTransmuxerResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model VideoOnDemandTransmuxerSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

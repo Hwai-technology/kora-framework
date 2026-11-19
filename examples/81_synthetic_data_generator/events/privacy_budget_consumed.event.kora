@@ -1,0 +1,6 @@
+// Example 81: Synthetic Tabular Data & Differential Privacy Generator — Domain Event: PrivacyBudgetConsumedEvent
+
+model PrivacyBudgetConsumedEvent {
+    totalEpsilonSpentBps: Int
+    deltaBudgetRemaining: Int
+}

@@ -1,0 +1,17 @@
+// Example 30: Credit Underwriting & Risk Assessment
+// Analytical Aggregations Service
+
+class CreditScoringUnderwritingAnalyticsService {
+    init() {}
+
+    fn computeRiskRatio(volume: Int, reserve: Int) -> Int {
+        if reserve <= 0 {
+            return 999
+        }
+        return volume / reserve
+    }
+
+    fn calculateMovingAverage(current: Int, previous: Int) -> Int {
+        return (current + previous) / 2
+    }
+}

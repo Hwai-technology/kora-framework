@@ -1,0 +1,7 @@
+// Example 81: Synthetic Tabular Data & Differential Privacy Generator — Domain Event: SyntheticDatasetGeneratedEvent
+
+model SyntheticDatasetGeneratedEvent {
+    datasetName: String
+    generatedRowCount: Int
+    epsilonPrivacyBudget: Int
+}

@@ -1,0 +1,12 @@
+// Example 79: Multimodal CLIP Cross-Search Engine
+// Persistent Database Entity: Audit Log
+
+@table("multimodal_clip_search_audit_logs")
+model MultimodalClipSearchAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

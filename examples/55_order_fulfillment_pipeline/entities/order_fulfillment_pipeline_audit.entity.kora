@@ -1,0 +1,12 @@
+// Example 55: Order Fulfillment & Pick-Pack-Ship Workflow
+// Persistent Database Entity: Audit Log
+
+@table("order_fulfillment_pipeline_audit_logs")
+model OrderFulfillmentPipelineAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

@@ -1,0 +1,22 @@
+// Example 103: Probabilistic Bloom & Cuckoo Filter Suite
+// Router & Endpoint Dispatcher
+
+import { CreateBloomCuckooFilterSuiteTaskRequest } from "../models/bloom_cuckoo_filter_suite_request.dto"
+import { BloomCuckooFilterSuiteResponseDto } from "../models/bloom_cuckoo_filter_suite_response.dto"
+import { BloomCuckooFilterSuiteController } from "../controllers/bloom_cuckoo_filter_suite.controller"
+
+class BloomCuckooFilterSuiteRouter {
+    controller: BloomCuckooFilterSuiteController
+
+    init(controller: BloomCuckooFilterSuiteController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateBloomCuckooFilterSuiteTaskRequest) -> BloomCuckooFilterSuiteResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

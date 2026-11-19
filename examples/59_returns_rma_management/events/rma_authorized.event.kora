@@ -1,0 +1,7 @@
+// Example 59: Reverse Logistics & RMA Inspection Engine — Domain Event: RmaAuthorizedEvent
+
+model RmaAuthorizedEvent {
+    rmaId: String
+    originalOrderId: Int
+    customerRefundEstimateCents: Int
+}

@@ -1,0 +1,7 @@
+// Example 103: Probabilistic Bloom & Cuckoo Filter Suite — Enum: ProbabilisticFilterType
+
+enum ProbabilisticFilterType {
+    StandardBloomBitset
+    CountingBloomFilter
+    CuckooFingerprintFilter
+}

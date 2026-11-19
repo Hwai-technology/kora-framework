@@ -1,0 +1,9 @@
+// Example 69: Smart Building HVAC & Air Quality Coordinator
+// Specialized Model 2
+
+model SmartBuildingHvacControlSpecializedProfile2 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

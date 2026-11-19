@@ -1,0 +1,9 @@
+// Example 54: Dynamic Pricing Engine & Flash Sale Rate-Limiter
+// Specialized Model 1
+
+model DynamicPricingPromotionsSpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

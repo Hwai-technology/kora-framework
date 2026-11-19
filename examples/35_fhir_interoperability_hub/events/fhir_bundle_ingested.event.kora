@@ -1,0 +1,9 @@
+// Example 35: FHIR R4 & HL7 Interoperability Hub — Domain Event: FhirBundleIngestedEvent
+// Dedicated Domain Event Specification
+
+model FhirBundleIngestedEvent {
+    bundleId: String
+    resourceCount: Int
+    sourceSystem: String
+    timestamp: Int
+}

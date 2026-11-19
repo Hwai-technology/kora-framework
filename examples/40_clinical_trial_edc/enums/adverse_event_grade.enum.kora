@@ -1,0 +1,10 @@
+// Example 40: Clinical Trial Electronic Data Capture (EDC) — Enum: AdverseEventGrade
+// Dedicated Domain Enum Specification
+
+enum AdverseEventGrade {
+    Grade1Mild
+    Grade2Moderate
+    Grade3Severe
+    Grade4LifeThreatening
+    Grade5Fatal
+}

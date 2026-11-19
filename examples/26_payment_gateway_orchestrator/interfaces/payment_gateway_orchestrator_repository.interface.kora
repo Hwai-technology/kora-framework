@@ -1,0 +1,13 @@
+// ============================================================================
+// Payment Gateway Orchestrator Repository Interface Contract
+// ============================================================================
+
+import { PaymentGatewayOrchestratorRecord } from "../entities/payment_gateway_orchestrator_primary.entity"
+
+interface PaymentGatewayOrchestratorRepository {
+    fn findById(id: Int) -> Option<PaymentGatewayOrchestratorRecord>
+    fn findByIdempotencyKey(key: String) -> Option<PaymentGatewayOrchestratorRecord>
+    fn findByTransactionId(txId: String) -> Option<PaymentGatewayOrchestratorRecord>
+    fn save(record: PaymentGatewayOrchestratorRecord) -> Result<PaymentGatewayOrchestratorRecord, String>
+    fn countAll() -> Int
+}

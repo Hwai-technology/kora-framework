@@ -1,0 +1,38 @@
+// Example 77: Prompt Engineering Evaluation & Hallucination Scorer
+// Presentation Controller
+
+import { CreatePromptEvaluationBenchTaskRequest } from "../models/prompt_evaluation_bench_request.dto"
+import { PromptEvaluationBenchResponseDto } from "../models/prompt_evaluation_bench_response.dto"
+import { PromptEvaluationBenchCoreService } from "../services/prompt_evaluation_bench_core.service"
+
+class PromptEvaluationBenchController {
+    service: PromptEvaluationBenchCoreService
+
+    init(service: PromptEvaluationBenchCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreatePromptEvaluationBenchTaskRequest) -> PromptEvaluationBenchResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => PromptEvaluationBenchResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => PromptEvaluationBenchResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

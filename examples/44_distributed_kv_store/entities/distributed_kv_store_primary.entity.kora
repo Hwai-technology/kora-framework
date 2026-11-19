@@ -1,0 +1,14 @@
+// Example 44: Distributed Dynamo-Style Key-Value Store
+// Persistent Database Entity: Cluster Node State
+
+@table("distributed_kv_store_node_state")
+model DistributedKvStoreNodeState {
+    @id
+    id: Int
+    @unique
+    nodeIdentifier: String
+    currentEpochTerm: Int
+    votedForCandidate: Int
+    isLeader: Bool
+    active: Bool
+}

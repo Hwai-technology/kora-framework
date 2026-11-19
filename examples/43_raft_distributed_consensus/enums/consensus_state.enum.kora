@@ -1,0 +1,9 @@
+// Example 43: Raft Distributed Consensus Engine — Enum: ConsensusState
+// Dedicated Domain Enum Specification
+
+enum ConsensusState {
+    QuorumReached
+    SplitVoteTie
+    TermStaleSteppedDown
+    LogConflictTruncated
+}

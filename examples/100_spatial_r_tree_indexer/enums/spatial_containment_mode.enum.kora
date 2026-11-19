@@ -1,0 +1,7 @@
+// Example 100: Spatial 2D R-Tree & k-Nearest Neighbors (k-NN) — Enum: SpatialContainmentMode
+
+enum SpatialContainmentMode {
+    FullyContainedInside
+    IntersectsOverlapping
+    DisjointDisconnected
+}

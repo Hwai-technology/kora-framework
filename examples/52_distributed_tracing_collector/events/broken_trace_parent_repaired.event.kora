@@ -1,0 +1,8 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector — Domain Event: BrokenTraceParentRepairedEvent
+// Dedicated Domain Event Specification
+
+model BrokenTraceParentRepairedEvent {
+    traceId: String
+    orphanSpanId: String
+    syntheticParentAttached: String
+}

@@ -1,0 +1,9 @@
+// Example 102: Graph Algorithms & Tarjan SCC / PageRank
+// Specialized Model 3
+
+model GraphNetworkAlgorithmsSpecializedProfile3 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

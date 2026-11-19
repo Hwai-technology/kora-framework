@@ -1,0 +1,33 @@
+// Example 55: Order Fulfillment & Pick-Pack-Ship Workflow
+// Repository Implementation
+
+import { OrderFulfillmentPipelinePrimaryRecord } from "../entities/order_fulfillment_pipeline_primary.entity"
+import { OrderFulfillmentPipelineRepository } from "../interfaces/order_fulfillment_pipeline_repository.interface"
+
+class OrderFulfillmentPipelineInMemoryRepository implements OrderFulfillmentPipelineRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<OrderFulfillmentPipelinePrimaryRecord> {
+        if id > 0 {
+            return Some(OrderFulfillmentPipelinePrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: OrderFulfillmentPipelinePrimaryRecord) -> Result<OrderFulfillmentPipelinePrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

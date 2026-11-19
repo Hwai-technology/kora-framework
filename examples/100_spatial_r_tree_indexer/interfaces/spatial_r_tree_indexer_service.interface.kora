@@ -1,0 +1,10 @@
+// Example 100: Spatial 2D R-Tree & k-Nearest Neighbors (k-NN)
+// Domain Service Contract
+
+import { SpatialRTreeIndexerPrimaryRecord } from "../entities/spatial_r_tree_indexer_primary.entity"
+import { CreateSpatialRTreeIndexerTaskRequest } from "../models/spatial_r_tree_indexer_request.dto"
+
+interface SpatialRTreeIndexerDomainContract {
+    fn executeTask(req: CreateSpatialRTreeIndexerTaskRequest) -> Result<SpatialRTreeIndexerPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

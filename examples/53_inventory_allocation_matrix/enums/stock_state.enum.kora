@@ -1,0 +1,8 @@
+// Example 53: Inventory Allocation Matrix & Multi-Warehouse Stock — Enum: StockState
+
+enum StockState {
+    AvailableInStock
+    ReservedSoftHold
+    AllocatedFulfillment
+    OutForDelivery
+}

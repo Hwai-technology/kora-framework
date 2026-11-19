@@ -1,0 +1,15 @@
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher
+// Transport Model: Command Request
+
+model CreateModelInferenceGatewayTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryModelInferenceGatewayFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

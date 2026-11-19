@@ -1,0 +1,14 @@
+// Example 40: Clinical Trial Electronic Data Capture (EDC)
+// Persistent Database Entity: Primary Record
+
+@table("clinical_trial_edc_clinical_records")
+model ClinicalTrialEdcClinicalEntity {
+    @id
+    id: Int
+    @unique
+    patientId: Int
+    clinicianId: Int
+    clinicalMetricScore: Int
+    complianceState: String
+    active: Bool
+}

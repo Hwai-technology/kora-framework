@@ -1,0 +1,9 @@
+// Example 51: Distributed Lock Manager & Fencing Tokens — Domain Event: DistributedLockAcquiredEvent
+// Dedicated Domain Event Specification
+
+model DistributedLockAcquiredEvent {
+    resourceKey: String
+    fencingToken: Int
+    leaseDurationMs: Int
+    holderNodeId: Int
+}

@@ -1,0 +1,9 @@
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher
+// Configuration Model
+
+model ModelInferenceGatewayConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

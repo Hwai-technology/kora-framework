@@ -1,0 +1,17 @@
+// Example 51: Distributed Lock Manager & Fencing Tokens
+// Transport Model: Standard Response
+
+model DistributedLockManagerResponseDto {
+    operationId: String
+    nodeId: Int
+    status: String
+    isQuorumSatisfied: Bool
+    message: String
+}
+
+model DistributedLockManagerTopologySummaryDto {
+    activeClusterNodes: Int
+    leaderTerm: Int
+    healthyReplicasCount: Int
+    clusterState: String
+}

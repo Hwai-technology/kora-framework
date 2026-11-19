@@ -1,0 +1,55 @@
+// Example 96: Video on Demand (VOD) HLS/DASH Transmuxer
+// Core Domain Service Implementation
+
+import { VideoOnDemandTransmuxerPrimaryRecord } from "../entities/video_on_demand_transmuxer_primary.entity"
+import { CreateVideoOnDemandTransmuxerTaskRequest } from "../models/video_on_demand_transmuxer_request.dto"
+import { VideoOnDemandTransmuxerRepository } from "../interfaces/video_on_demand_transmuxer_repository.interface"
+import { VideoOnDemandTransmuxerDomainContract } from "../interfaces/video_on_demand_transmuxer_service.interface"
+
+class VideoOnDemandTransmuxerCoreService implements VideoOnDemandTransmuxerDomainContract {
+    repo: VideoOnDemandTransmuxerRepository
+
+    init(repo: VideoOnDemandTransmuxerRepository) {
+        this.repo = repo
+    }
+
+    fn executeTask(req: CreateVideoOnDemandTransmuxerTaskRequest) -> Result<VideoOnDemandTransmuxerPrimaryRecord, String> {
+        if req.targetEntityId <= 0 {
+            return Err("Target entity ID must be strictly positive")
+        }
+        if req.workloadCapacity <= 0 {
+            return Err("Workload capacity must be strictly positive")
+        }
+
+        let record = VideoOnDemandTransmuxerPrimaryRecord {
+            id: req.targetEntityId,
+            referenceCode: req.taskKey,
+            capacityScore: req.workloadCapacity,
+            operationalStatus: "COMMITTED_HEALTHY",
+            active: true,
+        }
+        return this.repo.save(record)
+    }
+
+    fn evaluateHealth(entityId: Int) -> String {
+        let opt = this.repo.findById(entityId)
+        let isPresent = match opt {
+            Some(r) => true,
+            None => false,
+        }
+        if !isPresent {
+            return "ENTITY_NOT_FOUND"
+        }
+        let record = match opt {
+            Some(r) => r,
+            None => VideoOnDemandTransmuxerPrimaryRecord { id: 0, referenceCode: "", capacityScore: 0, operationalStatus: "", active: false },
+        }
+        if record.capacityScore > 80 {
+            return "OPTIMUM_PERFORMANCE"
+        }
+        if record.capacityScore > 40 {
+            return "MODERATE_NORMAL"
+        }
+        return "LOW_CAPACITY"
+    }
+}

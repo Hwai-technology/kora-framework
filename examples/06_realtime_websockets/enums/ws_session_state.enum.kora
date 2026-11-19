@@ -1,0 +1,11 @@
+// ============================================================================
+// WebSocket Connection Lifecycle State
+// ============================================================================
+
+enum WsSessionState {
+    Handshaking,
+    Authenticated,
+    Active,
+    Draining,
+    Terminated,
+}

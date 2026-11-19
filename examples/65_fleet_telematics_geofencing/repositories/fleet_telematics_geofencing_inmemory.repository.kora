@@ -1,0 +1,33 @@
+// Example 65: Fleet Telematics & Polygonal Geofence Monitor
+// Repository Implementation
+
+import { FleetTelematicsGeofencingPrimaryRecord } from "../entities/fleet_telematics_geofencing_primary.entity"
+import { FleetTelematicsGeofencingRepository } from "../interfaces/fleet_telematics_geofencing_repository.interface"
+
+class FleetTelematicsGeofencingInMemoryRepository implements FleetTelematicsGeofencingRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<FleetTelematicsGeofencingPrimaryRecord> {
+        if id > 0 {
+            return Some(FleetTelematicsGeofencingPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: FleetTelematicsGeofencingPrimaryRecord) -> Result<FleetTelematicsGeofencingPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

@@ -1,0 +1,10 @@
+// ============================================================================
+// Example 25: HFT Order Book — Enum: OrderType
+// ============================================================================
+
+enum OrderType {
+    Limit
+    Market
+    StopLimit
+    ImmediateOrCancel
+}

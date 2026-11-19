@@ -1,0 +1,10 @@
+// Example 25: High-Frequency Trading Order Book
+// Primary Repository Interface
+
+import { HftOrderBookRecord } from "../entities/hft_order_book_primary.entity"
+
+interface HftOrderBookRepository {
+    fn findById(id: Int) -> Option<HftOrderBookRecord>
+    fn save(record: HftOrderBookRecord) -> Result<HftOrderBookRecord, String>
+    fn countAll() -> Int
+}

@@ -1,0 +1,13 @@
+// Example 68: Cold Chain Vaccine Temperature Monitoring
+// Persistent Database Entity: Primary Record
+
+@table("cold_chain_environmental_guard_records")
+model ColdChainEnvironmentalGuardPrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

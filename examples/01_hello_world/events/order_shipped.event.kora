@@ -1,0 +1,10 @@
+// ============================================================================
+// Example 01: Core Language Foundations — Event: OrderShippedEvent
+// ============================================================================
+
+model OrderShippedEvent {
+    orderId: String
+    trackingNumber: String
+    carrier: String
+    estimatedDeliveryTimestamp: Int
+}

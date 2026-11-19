@@ -1,0 +1,9 @@
+// Example 44: Distributed Dynamo-Style Key-Value Store — Enum: ConsistencyLevel
+// Dedicated Domain Enum Specification
+
+enum ConsistencyLevel {
+    OneReplica
+    QuorumMajority
+    AllStrict
+    LocalDatacenterQuorum
+}

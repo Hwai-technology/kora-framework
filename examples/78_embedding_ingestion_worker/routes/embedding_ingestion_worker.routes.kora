@@ -1,0 +1,22 @@
+// Example 78: High-Throughput Vector Embedding Ingestion Pipeline
+// Router & Endpoint Dispatcher
+
+import { CreateEmbeddingIngestionWorkerTaskRequest } from "../models/embedding_ingestion_worker_request.dto"
+import { EmbeddingIngestionWorkerResponseDto } from "../models/embedding_ingestion_worker_response.dto"
+import { EmbeddingIngestionWorkerController } from "../controllers/embedding_ingestion_worker.controller"
+
+class EmbeddingIngestionWorkerRouter {
+    controller: EmbeddingIngestionWorkerController
+
+    init(controller: EmbeddingIngestionWorkerController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateEmbeddingIngestionWorkerTaskRequest) -> EmbeddingIngestionWorkerResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

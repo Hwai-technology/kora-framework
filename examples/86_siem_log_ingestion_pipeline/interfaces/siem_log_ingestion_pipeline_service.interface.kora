@@ -1,0 +1,10 @@
+// Example 86: SIEM High-Throughput Log Ingestion & CEF Normalizer
+// Domain Service Contract
+
+import { SiemLogIngestionPipelinePrimaryRecord } from "../entities/siem_log_ingestion_pipeline_primary.entity"
+import { CreateSiemLogIngestionPipelineTaskRequest } from "../models/siem_log_ingestion_pipeline_request.dto"
+
+interface SiemLogIngestionPipelineDomainContract {
+    fn executeTask(req: CreateSiemLogIngestionPipelineTaskRequest) -> Result<SiemLogIngestionPipelinePrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

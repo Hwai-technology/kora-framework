@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 64: Smart Electrical Grid Substation Telemetry
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { SmartGridEnergyMonitorInMemoryRepository } from "./repositories/smart_grid_energy_monitor_inmemory.repository"
+import { SmartGridEnergyMonitorCoreService } from "./services/smart_grid_energy_monitor_core.service"
+import { SmartGridEnergyMonitorController } from "./controllers/smart_grid_energy_monitor.controller"
+import { SmartGridEnergyMonitorRouter } from "./routes/smart_grid_energy_monitor.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = SmartGridEnergyMonitorInMemoryRepository()
+        let service = SmartGridEnergyMonitorCoreService(repo)
+        let controller = SmartGridEnergyMonitorController(service)
+        let router = SmartGridEnergyMonitorRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

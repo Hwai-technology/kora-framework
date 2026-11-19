@@ -1,0 +1,9 @@
+// Example 55: Order Fulfillment & Pick-Pack-Ship Workflow
+// Specialized Model 4
+
+model OrderFulfillmentPipelineSpecializedProfile4 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

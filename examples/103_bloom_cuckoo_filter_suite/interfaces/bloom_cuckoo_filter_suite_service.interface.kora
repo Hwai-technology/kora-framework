@@ -1,0 +1,10 @@
+// Example 103: Probabilistic Bloom & Cuckoo Filter Suite
+// Domain Service Contract
+
+import { BloomCuckooFilterSuitePrimaryRecord } from "../entities/bloom_cuckoo_filter_suite_primary.entity"
+import { CreateBloomCuckooFilterSuiteTaskRequest } from "../models/bloom_cuckoo_filter_suite_request.dto"
+
+interface BloomCuckooFilterSuiteDomainContract {
+    fn executeTask(req: CreateBloomCuckooFilterSuiteTaskRequest) -> Result<BloomCuckooFilterSuitePrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

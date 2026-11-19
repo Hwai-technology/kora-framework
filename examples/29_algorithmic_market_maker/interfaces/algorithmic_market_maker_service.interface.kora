@@ -1,0 +1,10 @@
+// Example 29: Algorithmic Market Maker & Quoting Engine
+// Domain Service Interface
+
+import { AlgorithmicMarketMakerRecord } from "../entities/algorithmic_market_maker_primary.entity"
+import { CreateAlgorithmicMarketMakerRequest } from "../models/algorithmic_market_maker_request.dto"
+
+interface AlgorithmicMarketMakerServiceInterface {
+    fn processRequest(req: CreateAlgorithmicMarketMakerRequest) -> Result<AlgorithmicMarketMakerRecord, String>
+    fn validateState(id: Int) -> Bool
+}

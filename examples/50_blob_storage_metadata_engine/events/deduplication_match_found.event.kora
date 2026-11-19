@@ -1,0 +1,8 @@
+// Example 50: Distributed Blob Storage Metadata Engine — Domain Event: DeduplicationMatchFoundEvent
+// Dedicated Domain Event Specification
+
+model DeduplicationMatchFoundEvent {
+    sha256Hash: String
+    referencedStorageBlock: String
+    bytesSaved: Int
+}

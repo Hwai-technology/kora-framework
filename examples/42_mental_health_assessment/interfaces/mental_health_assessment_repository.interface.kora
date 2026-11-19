@@ -1,0 +1,10 @@
+// Example 42: Mental Health Longitudinal Assessment Engine
+// Repository Interface
+
+import { MentalHealthAssessmentClinicalEntity } from "../entities/mental_health_assessment_primary.entity"
+
+interface MentalHealthAssessmentRepository {
+    fn findByPatientId(patientId: Int) -> Option<MentalHealthAssessmentClinicalEntity>
+    fn save(entity: MentalHealthAssessmentClinicalEntity) -> Result<MentalHealthAssessmentClinicalEntity, String>
+    fn verifyIntegrity(recordId: Int) -> Bool
+}

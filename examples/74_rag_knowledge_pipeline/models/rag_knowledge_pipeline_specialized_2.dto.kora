@@ -1,0 +1,9 @@
+// Example 74: Retrieval-Augmented Generation (RAG) Document Chunker
+// Specialized Model 2
+
+model RagKnowledgePipelineSpecializedProfile2 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

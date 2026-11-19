@@ -1,0 +1,10 @@
+// Example 78: High-Throughput Vector Embedding Ingestion Pipeline
+// Repository Interface
+
+import { EmbeddingIngestionWorkerPrimaryRecord } from "../entities/embedding_ingestion_worker_primary.entity"
+
+interface EmbeddingIngestionWorkerRepository {
+    fn findById(id: Int) -> Option<EmbeddingIngestionWorkerPrimaryRecord>
+    fn save(record: EmbeddingIngestionWorkerPrimaryRecord) -> Result<EmbeddingIngestionWorkerPrimaryRecord, String>
+    fn countActive() -> Int
+}

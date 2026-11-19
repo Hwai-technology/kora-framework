@@ -1,0 +1,9 @@
+// Example 37: ICU Real-Time High-Frequency Vitals Monitor
+// Specialized Model 1
+
+model IcuVitalsTelemetrySpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    riskWeight: Int
+    isActive: Bool
+}

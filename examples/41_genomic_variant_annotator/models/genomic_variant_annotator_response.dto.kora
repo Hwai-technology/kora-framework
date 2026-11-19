@@ -1,0 +1,17 @@
+// Example 41: Genomic Variant Annotation & Pathogenicity
+// Transport Model: Standard Responses
+
+model GenomicVariantAnnotatorResponseDto {
+    recordId: Int
+    patientId: Int
+    status: String
+    isComplianceVerified: Bool
+    message: String
+}
+
+model GenomicVariantAnnotatorSummaryDto {
+    patientId: Int
+    totalEntries: Int
+    severityCategory: String
+    lastReviewedTimestamp: Int
+}

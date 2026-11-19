@@ -1,0 +1,9 @@
+// Example 31: reconciliation_settlement — Enum: ClearingCycle
+// Dedicated Domain Enum Specification
+
+enum ClearingCycle {
+    ContinuousRealTime
+    EndOfDayBatch
+    NetTwiceDaily
+    WeekendConsolidated
+}

@@ -1,0 +1,10 @@
+// Example 42: Mental Health Longitudinal Assessment Engine — Enum: Phq9SeverityTier
+// Dedicated Domain Enum Specification
+
+enum Phq9SeverityTier {
+    MinimalDepression0To4
+    MildDepression5To9
+    ModerateDepression10To14
+    ModeratelySevere15To19
+    SevereDepression20To27
+}

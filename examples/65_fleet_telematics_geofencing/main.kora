@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 65: Fleet Telematics & Polygonal Geofence Monitor
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { FleetTelematicsGeofencingInMemoryRepository } from "./repositories/fleet_telematics_geofencing_inmemory.repository"
+import { FleetTelematicsGeofencingCoreService } from "./services/fleet_telematics_geofencing_core.service"
+import { FleetTelematicsGeofencingController } from "./controllers/fleet_telematics_geofencing.controller"
+import { FleetTelematicsGeofencingRouter } from "./routes/fleet_telematics_geofencing.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = FleetTelematicsGeofencingInMemoryRepository()
+        let service = FleetTelematicsGeofencingCoreService(repo)
+        let controller = FleetTelematicsGeofencingController(service)
+        let router = FleetTelematicsGeofencingRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

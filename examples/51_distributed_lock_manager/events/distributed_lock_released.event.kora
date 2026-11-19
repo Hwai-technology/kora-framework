@@ -1,0 +1,8 @@
+// Example 51: Distributed Lock Manager & Fencing Tokens — Domain Event: DistributedLockReleasedEvent
+// Dedicated Domain Event Specification
+
+model DistributedLockReleasedEvent {
+    resourceKey: String
+    fencingToken: Int
+    releasedCleanly: Bool
+}

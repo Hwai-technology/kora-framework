@@ -1,0 +1,9 @@
+// Example 34: HIPAA Compliant Electronic Health Records — Domain Event: PhiDataEncryptedEvent
+// Dedicated Domain Event Specification
+
+model PhiDataEncryptedEvent {
+    patientId: Int
+    keyVersion: Int
+    cipherChecksum: String
+    timestamp: Int
+}

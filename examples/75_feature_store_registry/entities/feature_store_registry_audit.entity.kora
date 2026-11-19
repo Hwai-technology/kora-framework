@@ -1,0 +1,12 @@
+// Example 75: Real-Time Machine Learning Feature Store
+// Persistent Database Entity: Audit Log
+
+@table("feature_store_registry_audit_logs")
+model FeatureStoreRegistryAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

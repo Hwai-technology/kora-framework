@@ -1,0 +1,9 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director — Enum: ProxyRoutingStrategy
+// Dedicated Domain Enum Specification
+
+enum ProxyRoutingStrategy {
+    RoundRobinWeighted
+    LeastRequestLoad
+    LocalityPrioritized
+    MaglevConsistentHashing
+}

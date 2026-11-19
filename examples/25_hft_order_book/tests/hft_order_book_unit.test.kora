@@ -1,0 +1,144 @@
+// ============================================================================
+// Unit Test Suite: 25_hft_order_book
+// Rigorous Double Auction Matching, Partial Fills, Circuit Breakers & Crash Recovery
+// ============================================================================
+
+import { OrderPlacementRequest, CancelOrderRequest } from "../models/hft_order_book_request.dto"
+import { HftOrderBookCoreService } from "../services/hft_order_book_core.service"
+
+class HftOrderBookUnitTestSuite {
+    engine: HftOrderBookCoreService
+
+    init(engine: HftOrderBookCoreService) {
+        this.engine = engine
+    }
+
+    fn test_resting_order_placement() -> Bool {
+        // Place initial resting ask at 101, qty 100
+        let sell1 = OrderPlacementRequest {
+            orderId: 101,
+            traderId: 1,
+            side: "SELL",
+            price: 101,
+            quantity: 100,
+            timestamp: 1000,
+        }
+        let res = this.engine.submitLimitOrder(sell1)
+        let depth = this.engine.getOrderBookDepth()
+        return res.status == "RESTING" && depth.bestAsk == 101 && depth.totalAskVolume == 100
+    }
+
+    fn test_partial_fill_across_multiple_levels() -> Bool {
+        // Place secondary resting ask at 102, qty 80
+        let sell2 = OrderPlacementRequest {
+            orderId: 102,
+            traderId: 2,
+            side: "SELL",
+            price: 102,
+            quantity: 80,
+            timestamp: 1005,
+        }
+        this.engine.submitLimitOrder(sell2)
+
+        // Aggressive incoming BUY of 150 shares at 102
+        // Should consume 100 from sell1 (101) + 50 from sell2 (102), leaving 30 in sell2
+        let aggressiveBuy = OrderPlacementRequest {
+            orderId: 201,
+            traderId: 3,
+            side: "BUY",
+            price: 102,
+            quantity: 150,
+            timestamp: 1010,
+        }
+        let matchRes = this.engine.submitLimitOrder(aggressiveBuy)
+
+        let depth = this.engine.getOrderBookDepth()
+        let fullyFilled = matchRes.status == "FILLED"
+        let volumeMatched = matchRes.filledQuantity == 150
+        let residualAskLeaves30 = depth.totalAskVolume == 30
+        let bestAskRemains102 = depth.bestAsk == 102
+
+        return fullyFilled && volumeMatched && residualAskLeaves30 && bestAskRemains102
+    }
+
+    fn test_order_cancellation() -> Bool {
+        // Cancel resting residual order 102
+        let cancelReq = CancelOrderRequest {
+            orderId: 102,
+            traderId: 2,
+            timestamp: 1020,
+        }
+        let cancelled = this.engine.cancelOrder(cancelReq)
+        let depth = this.engine.getOrderBookDepth()
+        return cancelled && depth.totalAskVolume == 0
+    }
+
+    fn test_volatility_circuit_breaker() -> Bool {
+        // Submit outlier price at 140 (anchor is 100, delta = 40 > 25)
+        let outlier = OrderPlacementRequest {
+            orderId: 999,
+            traderId: 9,
+            side: "BUY",
+            price: 140,
+            quantity: 50,
+            timestamp: 1030,
+        }
+        let res = this.engine.submitLimitOrder(outlier)
+        let depth = this.engine.getOrderBookDepth()
+        return res.status == "REJECTED_VOLATILITY_CIRCUIT_BREAKER" && depth.circuitBreakerTripped
+    }
+
+    fn test_crash_recovery_from_snapshot() -> Bool {
+        // Clean engine instance
+        let recoveryEngine = HftOrderBookCoreService()
+
+        // Execute valid trade of 200 shares
+        let sell = OrderPlacementRequest {
+            orderId: 301,
+            traderId: 1,
+            side: "SELL",
+            price: 105,
+            quantity: 200,
+            timestamp: 1000,
+        }
+        recoveryEngine.submitLimitOrder(sell)
+
+        let buy = OrderPlacementRequest {
+            orderId: 302,
+            traderId: 2,
+            side: "BUY",
+            price: 105,
+            quantity: 200,
+            timestamp: 1001,
+        }
+        recoveryEngine.submitLimitOrder(buy)
+
+        // Capture snapshot
+        let snap = recoveryEngine.createSnapshot(1)
+
+        // Simulate crash & fresh engine initialization
+        let crashedEngine = HftOrderBookCoreService()
+        crashedEngine.recoverFromSnapshot(snap)
+
+        let depth = crashedEngine.getOrderBookDepth()
+        return depth.lastTradePrice == 105 && snap.totalVolumeTraded == 200
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_resting_order_placement()
+        let t2 = this.test_partial_fill_across_multiple_levels()
+        let t3 = this.test_order_cancellation()
+        let t4 = this.test_volatility_circuit_breaker()
+        let t5 = this.test_crash_recovery_from_snapshot()
+
+        if t1 && t2 && t3 && t4 && t5 {
+            print("  ✓ HFT Order Book Rigorous Unit Tests: 5/5 passed (Priority, Partial Fills, Halts & Recovery)")
+        } else {
+            print("  ✗ HFT Order Book Rigorous Unit Tests: failed")
+        }
+    }
+}
+
+let engine = HftOrderBookCoreService()
+let suite = HftOrderBookUnitTestSuite(engine)
+suite.run()

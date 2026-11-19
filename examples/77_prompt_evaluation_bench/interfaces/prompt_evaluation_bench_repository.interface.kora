@@ -1,0 +1,10 @@
+// Example 77: Prompt Engineering Evaluation & Hallucination Scorer
+// Repository Interface
+
+import { PromptEvaluationBenchPrimaryRecord } from "../entities/prompt_evaluation_bench_primary.entity"
+
+interface PromptEvaluationBenchRepository {
+    fn findById(id: Int) -> Option<PromptEvaluationBenchPrimaryRecord>
+    fn save(record: PromptEvaluationBenchPrimaryRecord) -> Result<PromptEvaluationBenchPrimaryRecord, String>
+    fn countActive() -> Int
+}

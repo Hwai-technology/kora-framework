@@ -1,0 +1,9 @@
+// Example 58: Distributed Shopping Cart Session Actor
+// Configuration Model
+
+model ShoppingCartSessionActorConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

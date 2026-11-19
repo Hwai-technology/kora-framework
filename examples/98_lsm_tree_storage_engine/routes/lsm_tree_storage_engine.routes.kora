@@ -1,0 +1,22 @@
+// Example 98: Log-Structured Merge-Tree (LSM-Tree) Engine
+// Router & Endpoint Dispatcher
+
+import { CreateLsmTreeStorageEngineTaskRequest } from "../models/lsm_tree_storage_engine_request.dto"
+import { LsmTreeStorageEngineResponseDto } from "../models/lsm_tree_storage_engine_response.dto"
+import { LsmTreeStorageEngineController } from "../controllers/lsm_tree_storage_engine.controller"
+
+class LsmTreeStorageEngineRouter {
+    controller: LsmTreeStorageEngineController
+
+    init(controller: LsmTreeStorageEngineController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateLsmTreeStorageEngineTaskRequest) -> LsmTreeStorageEngineResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

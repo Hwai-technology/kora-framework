@@ -1,0 +1,22 @@
+// Example 97: Lock-Free Michael-Scott Queue & Treiber Stack
+// Router & Endpoint Dispatcher
+
+import { CreateLockFreeCollectionsTaskRequest } from "../models/lock_free_collections_request.dto"
+import { LockFreeCollectionsResponseDto } from "../models/lock_free_collections_response.dto"
+import { LockFreeCollectionsController } from "../controllers/lock_free_collections.controller"
+
+class LockFreeCollectionsRouter {
+    controller: LockFreeCollectionsController
+
+    init(controller: LockFreeCollectionsController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateLockFreeCollectionsTaskRequest) -> LockFreeCollectionsResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

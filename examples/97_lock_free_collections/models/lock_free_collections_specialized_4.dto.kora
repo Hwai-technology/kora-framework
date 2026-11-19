@@ -1,0 +1,9 @@
+// Example 97: Lock-Free Michael-Scott Queue & Treiber Stack
+// Specialized Model 4
+
+model LockFreeCollectionsSpecializedProfile4 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

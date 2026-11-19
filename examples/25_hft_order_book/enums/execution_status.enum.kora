@@ -1,0 +1,11 @@
+// ============================================================================
+// Example 25: HFT Order Book — Enum: ExecutionStatus
+// ============================================================================
+
+enum ExecutionStatus {
+    Resting
+    PartiallyFilled
+    Filled
+    Cancelled
+    RejectedVolatilityHalt
+}

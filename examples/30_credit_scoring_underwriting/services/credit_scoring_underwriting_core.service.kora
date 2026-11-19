@@ -1,0 +1,37 @@
+// Example 30: Credit Underwriting & Risk Assessment
+// Core Domain Service Implementation
+
+import { CreditScoringUnderwritingRecord } from "../entities/credit_scoring_underwriting_primary.entity"
+import { CreateCreditScoringUnderwritingRequest } from "../models/credit_scoring_underwriting_request.dto"
+import { CreditScoringUnderwritingRepository } from "../interfaces/credit_scoring_underwriting_repository.interface"
+import { CreditScoringUnderwritingServiceInterface } from "../interfaces/credit_scoring_underwriting_service.interface"
+
+class CreditScoringUnderwritingCoreService implements CreditScoringUnderwritingServiceInterface {
+    repo: CreditScoringUnderwritingRepository
+
+    init(repo: CreditScoringUnderwritingRepository) {
+        this.repo = repo
+    }
+
+    fn processRequest(req: CreateCreditScoringUnderwritingRequest) -> Result<CreditScoringUnderwritingRecord, String> {
+        if req.volume <= 0 {
+            return Err("Volume must be positive")
+        }
+        let record = CreditScoringUnderwritingRecord {
+            id: req.targetId,
+            reference: req.reference,
+            status: "COMMITTED",
+            balance: req.volume,
+            active: true,
+        }
+        return this.repo.save(record)
+    }
+
+    fn validateState(id: Int) -> Bool {
+        let opt = this.repo.findById(id)
+        return match opt {
+            Some(rec) => rec.active,
+            None => false,
+        }
+    }
+}

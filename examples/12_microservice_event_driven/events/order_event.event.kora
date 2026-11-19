@@ -1,0 +1,25 @@
+// ============================================================================
+// Order Bounded Context Domain Events
+// ============================================================================
+
+model OrderCreatedEvent {
+    orderId: String
+    customerId: String
+    totalAmount: Int
+    currency: String
+    timestamp: Int
+}
+
+model OrderPaymentCapturedEvent {
+    orderId: String
+    paymentId: String
+    amountCaptured: Int
+    timestamp: Int
+}
+
+model OrderDispatchedEvent {
+    orderId: String
+    trackingNumber: String
+    carrier: String
+    timestamp: Int
+}

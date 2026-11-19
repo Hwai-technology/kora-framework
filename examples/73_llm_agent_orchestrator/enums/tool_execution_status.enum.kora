@@ -1,0 +1,7 @@
+// Example 73: Autonomous LLM Agent Orchestrator & Tool Calling — Enum: ToolExecutionStatus
+
+enum ToolExecutionStatus {
+    ToolExecutedSuccess
+    ToolInvocationTimedOut
+    ToolSchemaValidationFailed
+}

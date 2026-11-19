@@ -1,0 +1,9 @@
+// Example 35: FHIR R4 & HL7 Interoperability Hub — Enum: Hl7MessageTrigger
+// Dedicated Domain Enum Specification
+
+enum Hl7MessageTrigger {
+    ADT_A01_Admit
+    ADT_A03_Discharge
+    ORM_O01_Order
+    ORU_R01_ObservationResult
+}

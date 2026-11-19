@@ -1,0 +1,39 @@
+// Example 34: HIPAA Compliant Electronic Health Records
+// Presentation Controller
+
+import { CreateHipaaCompliantEhrRecordRequest } from "../models/hipaa_compliant_ehr_request.dto"
+import { HipaaCompliantEhrResponseDto } from "../models/hipaa_compliant_ehr_response.dto"
+import { HipaaCompliantEhrClinicalEntity } from "../entities/hipaa_compliant_ehr_primary.entity"
+import { HipaaCompliantEhrCoreService } from "../services/hipaa_compliant_ehr_core.service"
+
+class HipaaCompliantEhrController {
+    service: HipaaCompliantEhrCoreService
+
+    init(service: HipaaCompliantEhrCoreService) {
+        this.service = service
+    }
+
+    fn handleRecordSubmission(req: CreateHipaaCompliantEhrRecordRequest) -> HipaaCompliantEhrResponseDto {
+        let outcome = this.service.processClinicalRecord(req)
+        return match outcome {
+            Ok(rec) => HipaaCompliantEhrResponseDto {
+                recordId: rec.id,
+                patientId: rec.patientId,
+                status: "COMMITTED_ENCRYPTED",
+                isComplianceVerified: true,
+                message: "Record persisted under HIPAA safety standards",
+            },
+            Err(reason) => HipaaCompliantEhrResponseDto {
+                recordId: -1,
+                patientId: req.patientId,
+                status: "REJECTED_VALIDATION_ERROR",
+                isComplianceVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkPatientRisk(patientId: Int) -> String {
+        return this.service.evaluateClinicalRisk(patientId)
+    }
+}

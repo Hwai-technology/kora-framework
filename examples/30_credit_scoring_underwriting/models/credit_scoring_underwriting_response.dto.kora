@@ -1,0 +1,16 @@
+// Example 30: Credit Underwriting & Risk Assessment
+// Transport Model: Standard Responses
+
+model CreditScoringUnderwritingResponse {
+    id: Int
+    reference: String
+    success: Bool
+    statusCode: Int
+    message: String
+}
+
+model CreditScoringUnderwritingSummaryDto {
+    totalCount: Int
+    activeVolume: Int
+    healthStatus: String
+}

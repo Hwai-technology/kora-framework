@@ -1,0 +1,8 @@
+// Example 48: Distributed Cache Cluster & Write-Behind — Enum: CacheInvalidationMode
+// Dedicated Domain Enum Specification
+
+enum CacheInvalidationMode {
+    BroadcastInvalidation
+    TtlPassiveExpiration
+    VersionedGenerationalTag
+}

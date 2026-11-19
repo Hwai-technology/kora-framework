@@ -1,0 +1,8 @@
+// Example 34: HIPAA Compliant Electronic Health Records — Domain Event: ConsentRevocationLoggedEvent
+// Dedicated Domain Event Specification
+
+model ConsentRevocationLoggedEvent {
+    patientId: Int
+    revokedCategories: String
+    effectiveTimestamp: Int
+}

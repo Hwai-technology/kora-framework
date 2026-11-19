@@ -1,0 +1,38 @@
+// Example 83: Zero-Trust Context-Aware Policy Decision Point (PDP)
+// Presentation Controller
+
+import { CreateZeroTrustPolicyEnforcerTaskRequest } from "../models/zero_trust_policy_enforcer_request.dto"
+import { ZeroTrustPolicyEnforcerResponseDto } from "../models/zero_trust_policy_enforcer_response.dto"
+import { ZeroTrustPolicyEnforcerCoreService } from "../services/zero_trust_policy_enforcer_core.service"
+
+class ZeroTrustPolicyEnforcerController {
+    service: ZeroTrustPolicyEnforcerCoreService
+
+    init(service: ZeroTrustPolicyEnforcerCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateZeroTrustPolicyEnforcerTaskRequest) -> ZeroTrustPolicyEnforcerResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => ZeroTrustPolicyEnforcerResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => ZeroTrustPolicyEnforcerResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

@@ -1,0 +1,15 @@
+// Example 96: Video on Demand (VOD) HLS/DASH Transmuxer
+// Transport Model: Command Request
+
+model CreateVideoOnDemandTransmuxerTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryVideoOnDemandTransmuxerFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

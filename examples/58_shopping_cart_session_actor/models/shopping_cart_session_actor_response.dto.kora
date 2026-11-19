@@ -1,0 +1,16 @@
+// Example 58: Distributed Shopping Cart Session Actor
+// Transport Model: Standard Response
+
+model ShoppingCartSessionActorResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model ShoppingCartSessionActorSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

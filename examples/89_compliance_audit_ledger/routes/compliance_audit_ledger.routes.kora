@@ -1,0 +1,22 @@
+// Example 89: Immutable Cryptographic Audit Trail (SOC 2 / ISO 27001)
+// Router & Endpoint Dispatcher
+
+import { CreateComplianceAuditLedgerTaskRequest } from "../models/compliance_audit_ledger_request.dto"
+import { ComplianceAuditLedgerResponseDto } from "../models/compliance_audit_ledger_response.dto"
+import { ComplianceAuditLedgerController } from "../controllers/compliance_audit_ledger.controller"
+
+class ComplianceAuditLedgerRouter {
+    controller: ComplianceAuditLedgerController
+
+    init(controller: ComplianceAuditLedgerController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateComplianceAuditLedgerTaskRequest) -> ComplianceAuditLedgerResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

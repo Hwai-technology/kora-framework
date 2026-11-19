@@ -1,0 +1,38 @@
+// Example 64: Smart Electrical Grid Substation Telemetry
+// Presentation Controller
+
+import { CreateSmartGridEnergyMonitorTaskRequest } from "../models/smart_grid_energy_monitor_request.dto"
+import { SmartGridEnergyMonitorResponseDto } from "../models/smart_grid_energy_monitor_response.dto"
+import { SmartGridEnergyMonitorCoreService } from "../services/smart_grid_energy_monitor_core.service"
+
+class SmartGridEnergyMonitorController {
+    service: SmartGridEnergyMonitorCoreService
+
+    init(service: SmartGridEnergyMonitorCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateSmartGridEnergyMonitorTaskRequest) -> SmartGridEnergyMonitorResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => SmartGridEnergyMonitorResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => SmartGridEnergyMonitorResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

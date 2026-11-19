@@ -1,0 +1,10 @@
+// Example 102: Graph Algorithms & Tarjan SCC / PageRank
+// Domain Service Contract
+
+import { GraphNetworkAlgorithmsPrimaryRecord } from "../entities/graph_network_algorithms_primary.entity"
+import { CreateGraphNetworkAlgorithmsTaskRequest } from "../models/graph_network_algorithms_request.dto"
+
+interface GraphNetworkAlgorithmsDomainContract {
+    fn executeTask(req: CreateGraphNetworkAlgorithmsTaskRequest) -> Result<GraphNetworkAlgorithmsPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

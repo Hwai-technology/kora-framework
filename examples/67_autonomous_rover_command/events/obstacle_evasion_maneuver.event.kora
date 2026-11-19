@@ -1,0 +1,7 @@
+// Example 67: Autonomous Rover Navigation & Obstacle Avoidance — Domain Event: ObstacleEvasionManeuverEvent
+
+model ObstacleEvasionManeuverEvent {
+    roverId: String
+    closestObstacleDistanceCm: Int
+    steeringAngleDeltaDeg: Int
+}

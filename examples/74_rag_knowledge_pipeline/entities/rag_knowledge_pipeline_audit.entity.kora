@@ -1,0 +1,12 @@
+// Example 74: Retrieval-Augmented Generation (RAG) Document Chunker
+// Persistent Database Entity: Audit Log
+
+@table("rag_knowledge_pipeline_audit_logs")
+model RagKnowledgePipelineAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

@@ -1,0 +1,26 @@
+// Example 25: High-Frequency Trading Order Book
+// Router & Endpoint Dispatcher
+
+import { CreateHftOrderBookRequest } from "../models/hft_order_book_request.dto"
+import { HftOrderBookResponse } from "../models/hft_order_book_response.dto"
+import { HftOrderBookRecord } from "../entities/hft_order_book_primary.entity"
+import { HftOrderBookCommandController } from "../controllers/hft_order_book_command.controller"
+import { HftOrderBookQueryController } from "../controllers/hft_order_book_query.controller"
+
+class HftOrderBookRouter {
+    commandController: HftOrderBookCommandController
+    queryController: HftOrderBookQueryController
+
+    init(commandController: HftOrderBookCommandController, queryController: HftOrderBookQueryController) {
+        this.commandController = commandController
+        this.queryController = queryController
+    }
+
+    fn postRecord(req: CreateHftOrderBookRequest) -> HftOrderBookResponse {
+        return this.commandController.handleCreate(req)
+    }
+
+    fn fetchRecord(id: Int) -> Option<HftOrderBookRecord> {
+        return this.queryController.getById(id)
+    }
+}

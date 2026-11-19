@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 94: Interactive Vector Whiteboard & Delta Sync
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { InteractiveWhiteboardMeshInMemoryRepository } from "./repositories/interactive_whiteboard_mesh_inmemory.repository"
+import { InteractiveWhiteboardMeshCoreService } from "./services/interactive_whiteboard_mesh_core.service"
+import { InteractiveWhiteboardMeshController } from "./controllers/interactive_whiteboard_mesh.controller"
+import { InteractiveWhiteboardMeshRouter } from "./routes/interactive_whiteboard_mesh.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = InteractiveWhiteboardMeshInMemoryRepository()
+        let service = InteractiveWhiteboardMeshCoreService(repo)
+        let controller = InteractiveWhiteboardMeshController(service)
+        let router = InteractiveWhiteboardMeshRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

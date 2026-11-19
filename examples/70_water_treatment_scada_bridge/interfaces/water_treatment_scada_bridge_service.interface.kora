@@ -1,0 +1,10 @@
+// Example 70: Industrial SCADA Modbus Gateway & Water Treatment
+// Domain Service Contract
+
+import { WaterTreatmentScadaBridgePrimaryRecord } from "../entities/water_treatment_scada_bridge_primary.entity"
+import { CreateWaterTreatmentScadaBridgeTaskRequest } from "../models/water_treatment_scada_bridge_request.dto"
+
+interface WaterTreatmentScadaBridgeDomainContract {
+    fn executeTask(req: CreateWaterTreatmentScadaBridgeTaskRequest) -> Result<WaterTreatmentScadaBridgePrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

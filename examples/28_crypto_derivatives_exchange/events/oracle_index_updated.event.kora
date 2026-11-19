@@ -1,0 +1,9 @@
+// Example 28: crypto_derivatives_exchange — Domain Event: OracleIndexUpdatedEvent
+// Dedicated Domain Event Specification
+
+model OracleIndexUpdatedEvent {
+    symbol: String
+    markPrice: Int
+    indexPrice: Int
+    timestamp: Int
+}

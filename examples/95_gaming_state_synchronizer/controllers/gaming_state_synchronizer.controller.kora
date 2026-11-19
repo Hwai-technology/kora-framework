@@ -1,0 +1,38 @@
+// Example 95: Multiplayer Game 60Hz Tick State Synchronizer
+// Presentation Controller
+
+import { CreateGamingStateSynchronizerTaskRequest } from "../models/gaming_state_synchronizer_request.dto"
+import { GamingStateSynchronizerResponseDto } from "../models/gaming_state_synchronizer_response.dto"
+import { GamingStateSynchronizerCoreService } from "../services/gaming_state_synchronizer_core.service"
+
+class GamingStateSynchronizerController {
+    service: GamingStateSynchronizerCoreService
+
+    init(service: GamingStateSynchronizerCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateGamingStateSynchronizerTaskRequest) -> GamingStateSynchronizerResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => GamingStateSynchronizerResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => GamingStateSynchronizerResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

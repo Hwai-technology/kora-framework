@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 60: Faceted Product Catalog Search & Inverted Index
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { ProductCatalogSearchInMemoryRepository } from "./repositories/product_catalog_search_inmemory.repository"
+import { ProductCatalogSearchCoreService } from "./services/product_catalog_search_core.service"
+import { ProductCatalogSearchController } from "./controllers/product_catalog_search.controller"
+import { ProductCatalogSearchRouter } from "./routes/product_catalog_search.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = ProductCatalogSearchInMemoryRepository()
+        let service = ProductCatalogSearchCoreService(repo)
+        let controller = ProductCatalogSearchController(service)
+        let router = ProductCatalogSearchRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

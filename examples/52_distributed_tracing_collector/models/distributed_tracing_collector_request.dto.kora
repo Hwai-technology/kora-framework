@@ -1,0 +1,14 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector
+// Transport Model: Command Request
+
+model CreateDistributedTracingCollectorTaskRequest {
+    taskKey: String
+    originatingNodeId: Int
+    payloadVolume: Int
+    targetCluster: String
+}
+
+model QueryDistributedTracingCollectorStatusRequest {
+    resourceKey: String
+    quorumRequired: Int
+}

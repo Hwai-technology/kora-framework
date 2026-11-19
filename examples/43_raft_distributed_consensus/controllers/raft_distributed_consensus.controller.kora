@@ -1,0 +1,38 @@
+// Example 43: Raft Distributed Consensus Engine
+// Presentation Controller
+
+import { CreateRaftDistributedConsensusTaskRequest } from "../models/raft_distributed_consensus_request.dto"
+import { RaftDistributedConsensusResponseDto } from "../models/raft_distributed_consensus_response.dto"
+import { RaftDistributedConsensusCoreService } from "../services/raft_distributed_consensus_core.service"
+
+class RaftDistributedConsensusController {
+    service: RaftDistributedConsensusCoreService
+
+    init(service: RaftDistributedConsensusCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskProposal(req: CreateRaftDistributedConsensusTaskRequest) -> RaftDistributedConsensusResponseDto {
+        let outcome = this.service.processConsensusCommand(req)
+        return match outcome {
+            Ok(state) => RaftDistributedConsensusResponseDto {
+                operationId: "CONSENSUS-TX-" + req.taskKey,
+                nodeId: state.id,
+                status: "QUORUM_COMMITTED",
+                isQuorumSatisfied: true,
+                message: "Log entry replicated and committed across cluster quorum",
+            },
+            Err(reason) => RaftDistributedConsensusResponseDto {
+                operationId: "CONSENSUS-FAILED",
+                nodeId: req.originatingNodeId,
+                status: "QUORUM_REJECTED",
+                isQuorumSatisfied: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkQuorumStatus() -> Bool {
+        return this.service.evaluateClusterQuorum()
+    }
+}

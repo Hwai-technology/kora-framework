@@ -1,0 +1,9 @@
+// Example 44: Distributed Dynamo-Style Key-Value Store
+// Configuration Model
+
+model DistributedKvStoreClusterConfig {
+    heartbeatIntervalMs: Int
+    electionTimeoutMs: Int
+    quorumMajoritySize: Int
+    clusterName: String
+}

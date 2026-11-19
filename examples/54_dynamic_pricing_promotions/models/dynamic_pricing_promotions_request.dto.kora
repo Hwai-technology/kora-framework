@@ -1,0 +1,15 @@
+// Example 54: Dynamic Pricing Engine & Flash Sale Rate-Limiter
+// Transport Model: Command Request
+
+model CreateDynamicPricingPromotionsTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryDynamicPricingPromotionsFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

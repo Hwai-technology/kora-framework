@@ -1,0 +1,22 @@
+// Example 71: Autonomous Drone Swarm Formation Coordinator
+// Router & Endpoint Dispatcher
+
+import { CreateDroneSwarmMissionPlannerTaskRequest } from "../models/drone_swarm_mission_planner_request.dto"
+import { DroneSwarmMissionPlannerResponseDto } from "../models/drone_swarm_mission_planner_response.dto"
+import { DroneSwarmMissionPlannerController } from "../controllers/drone_swarm_mission_planner.controller"
+
+class DroneSwarmMissionPlannerRouter {
+    controller: DroneSwarmMissionPlannerController
+
+    init(controller: DroneSwarmMissionPlannerController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateDroneSwarmMissionPlannerTaskRequest) -> DroneSwarmMissionPlannerResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

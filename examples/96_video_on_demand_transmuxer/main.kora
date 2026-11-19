@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 96: Video on Demand (VOD) HLS/DASH Transmuxer
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { VideoOnDemandTransmuxerInMemoryRepository } from "./repositories/video_on_demand_transmuxer_inmemory.repository"
+import { VideoOnDemandTransmuxerCoreService } from "./services/video_on_demand_transmuxer_core.service"
+import { VideoOnDemandTransmuxerController } from "./controllers/video_on_demand_transmuxer.controller"
+import { VideoOnDemandTransmuxerRouter } from "./routes/video_on_demand_transmuxer.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = VideoOnDemandTransmuxerInMemoryRepository()
+        let service = VideoOnDemandTransmuxerCoreService(repo)
+        let controller = VideoOnDemandTransmuxerController(service)
+        let router = VideoOnDemandTransmuxerRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

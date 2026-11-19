@@ -1,0 +1,9 @@
+// Example 40: Clinical Trial Electronic Data Capture (EDC)
+// Specialized Model 1
+
+model ClinicalTrialEdcSpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    riskWeight: Int
+    isActive: Bool
+}

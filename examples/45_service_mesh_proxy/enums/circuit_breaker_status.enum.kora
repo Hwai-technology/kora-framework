@@ -1,0 +1,8 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director — Enum: CircuitBreakerStatus
+// Dedicated Domain Enum Specification
+
+enum CircuitBreakerStatus {
+    ClosedNormalThroughput
+    OpenFailedFast
+    HalfOpenCanaryTrial
+}

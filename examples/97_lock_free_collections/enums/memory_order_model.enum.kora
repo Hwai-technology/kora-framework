@@ -1,0 +1,7 @@
+// Example 97: Lock-Free Michael-Scott Queue & Treiber Stack — Enum: MemoryOrderModel
+
+enum MemoryOrderModel {
+    SequentiallyConsistent
+    AcquireReleaseRelaxed
+    MonotonicCounter
+}

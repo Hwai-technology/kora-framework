@@ -1,0 +1,22 @@
+// Example 73: Autonomous LLM Agent Orchestrator & Tool Calling
+// Router & Endpoint Dispatcher
+
+import { CreateLlmAgentOrchestratorTaskRequest } from "../models/llm_agent_orchestrator_request.dto"
+import { LlmAgentOrchestratorResponseDto } from "../models/llm_agent_orchestrator_response.dto"
+import { LlmAgentOrchestratorController } from "../controllers/llm_agent_orchestrator.controller"
+
+class LlmAgentOrchestratorRouter {
+    controller: LlmAgentOrchestratorController
+
+    init(controller: LlmAgentOrchestratorController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateLlmAgentOrchestratorTaskRequest) -> LlmAgentOrchestratorResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

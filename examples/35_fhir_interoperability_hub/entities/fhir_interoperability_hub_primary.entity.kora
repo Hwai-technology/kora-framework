@@ -1,0 +1,14 @@
+// Example 35: FHIR R4 & HL7 Interoperability Hub
+// Persistent Database Entity: Primary Record
+
+@table("fhir_interoperability_hub_clinical_records")
+model FhirInteroperabilityHubClinicalEntity {
+    @id
+    id: Int
+    @unique
+    patientId: Int
+    clinicianId: Int
+    clinicalMetricScore: Int
+    complianceState: String
+    active: Bool
+}

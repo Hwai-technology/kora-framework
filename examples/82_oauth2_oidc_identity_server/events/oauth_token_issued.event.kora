@@ -1,0 +1,7 @@
+// Example 82: OAuth 2.1 & OpenID Connect Authorization Server — Domain Event: OauthTokenIssuedEvent
+
+model OauthTokenIssuedEvent {
+    clientAppId: String
+    userSubject: String
+    grantedScopes: String
+}

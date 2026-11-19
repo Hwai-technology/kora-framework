@@ -1,0 +1,10 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// Primary Repository Interface
+
+import { TreasuryLiquidityPoolRecord } from "../entities/treasury_liquidity_pool_primary.entity"
+
+interface TreasuryLiquidityPoolRepository {
+    fn findById(id: Int) -> Option<TreasuryLiquidityPoolRecord>
+    fn save(record: TreasuryLiquidityPoolRecord) -> Result<TreasuryLiquidityPoolRecord, String>
+    fn countAll() -> Int
+}

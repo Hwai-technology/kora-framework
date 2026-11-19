@@ -1,0 +1,10 @@
+// Example 31: Inter-Bank Reconciliation & Settlement
+// Domain Service Interface
+
+import { ReconciliationSettlementRecord } from "../entities/reconciliation_settlement_primary.entity"
+import { CreateReconciliationSettlementRequest } from "../models/reconciliation_settlement_request.dto"
+
+interface ReconciliationSettlementServiceInterface {
+    fn processRequest(req: CreateReconciliationSettlementRequest) -> Result<ReconciliationSettlementRecord, String>
+    fn validateState(id: Int) -> Bool
+}

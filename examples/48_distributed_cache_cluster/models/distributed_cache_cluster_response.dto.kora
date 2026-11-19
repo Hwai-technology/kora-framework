@@ -1,0 +1,17 @@
+// Example 48: Distributed Cache Cluster & Write-Behind
+// Transport Model: Standard Response
+
+model DistributedCacheClusterResponseDto {
+    operationId: String
+    nodeId: Int
+    status: String
+    isQuorumSatisfied: Bool
+    message: String
+}
+
+model DistributedCacheClusterTopologySummaryDto {
+    activeClusterNodes: Int
+    leaderTerm: Int
+    healthyReplicasCount: Int
+    clusterState: String
+}

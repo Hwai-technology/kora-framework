@@ -1,0 +1,10 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director
+// Domain Service Contract
+
+import { ServiceMeshProxyNodeState } from "../entities/service_mesh_proxy_primary.entity"
+import { CreateServiceMeshProxyTaskRequest } from "../models/service_mesh_proxy_request.dto"
+
+interface ServiceMeshProxyConsensusContract {
+    fn processConsensusCommand(req: CreateServiceMeshProxyTaskRequest) -> Result<ServiceMeshProxyNodeState, String>
+    fn evaluateClusterQuorum() -> Bool
+}

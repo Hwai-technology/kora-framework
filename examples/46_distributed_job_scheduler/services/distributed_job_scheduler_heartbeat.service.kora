@@ -1,0 +1,14 @@
+// Example 46: Distributed Task Scheduler & Leader Lease
+// Cluster Heartbeat & Liveness Service
+
+class DistributedJobSchedulerHeartbeatService {
+    init() {}
+
+    fn pingPeer(peerId: Int) -> Bool {
+        return peerId > 0
+    }
+
+    fn calculateElectionTimeout(baseMs: Int, jitterMs: Int) -> Int {
+        return baseMs + jitterMs
+    }
+}

@@ -1,0 +1,9 @@
+// Example 65: Fleet Telematics & Polygonal Geofence Monitor
+// Specialized Model 3
+
+model FleetTelematicsGeofencingSpecializedProfile3 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

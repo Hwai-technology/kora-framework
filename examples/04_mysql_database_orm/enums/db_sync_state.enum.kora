@@ -1,0 +1,7 @@
+// examples/04_mysql_database_orm — Enum: DbSyncState
+
+enum DbSyncState {
+    Synced
+    PendingReplica
+    StaleConflict
+}

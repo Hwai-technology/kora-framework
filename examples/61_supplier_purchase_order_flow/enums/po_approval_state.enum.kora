@@ -1,0 +1,8 @@
+// Example 61: Supplier Purchase Order & 3-Way Invoice Matcher — Enum: PoApprovalState
+
+enum PoApprovalState {
+    PendingDepartmentReview
+    ApprovedFinanceSigned
+    DispatchedToSupplier
+    RejectedOverBudget
+}

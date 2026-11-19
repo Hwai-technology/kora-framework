@@ -1,0 +1,13 @@
+// Example 35: FHIR R4 & HL7 Interoperability Hub
+// Persistent Database Entity: Audit Trail Log
+
+@table("fhir_interoperability_hub_audit_trail")
+model FhirInteroperabilityHubAuditTrail {
+    @id
+    id: Int
+    recordId: Int
+    performedByStaffId: Int
+    actionTaken: String
+    tamperProofHash: String
+    timestamp: Int
+}

@@ -1,0 +1,15 @@
+// Example 62: Customer Loyalty Rewards Ledger & Tier Upgrades
+// Transport Model: Command Request
+
+model CreateCustomerLoyaltyRewardsTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryCustomerLoyaltyRewardsFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

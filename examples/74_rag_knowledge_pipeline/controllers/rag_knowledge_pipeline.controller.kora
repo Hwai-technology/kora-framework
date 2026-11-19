@@ -1,0 +1,38 @@
+// Example 74: Retrieval-Augmented Generation (RAG) Document Chunker
+// Presentation Controller
+
+import { CreateRagKnowledgePipelineTaskRequest } from "../models/rag_knowledge_pipeline_request.dto"
+import { RagKnowledgePipelineResponseDto } from "../models/rag_knowledge_pipeline_response.dto"
+import { RagKnowledgePipelineCoreService } from "../services/rag_knowledge_pipeline_core.service"
+
+class RagKnowledgePipelineController {
+    service: RagKnowledgePipelineCoreService
+
+    init(service: RagKnowledgePipelineCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateRagKnowledgePipelineTaskRequest) -> RagKnowledgePipelineResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => RagKnowledgePipelineResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => RagKnowledgePipelineResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

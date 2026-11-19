@@ -1,0 +1,14 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector
+// Cluster Heartbeat & Liveness Service
+
+class DistributedTracingCollectorHeartbeatService {
+    init() {}
+
+    fn pingPeer(peerId: Int) -> Bool {
+        return peerId > 0
+    }
+
+    fn calculateElectionTimeout(baseMs: Int, jitterMs: Int) -> Int {
+        return baseMs + jitterMs
+    }
+}

@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 81: Synthetic Tabular Data & Differential Privacy Generator
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { SyntheticDataGeneratorInMemoryRepository } from "./repositories/synthetic_data_generator_inmemory.repository"
+import { SyntheticDataGeneratorCoreService } from "./services/synthetic_data_generator_core.service"
+import { SyntheticDataGeneratorController } from "./controllers/synthetic_data_generator.controller"
+import { SyntheticDataGeneratorRouter } from "./routes/synthetic_data_generator.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = SyntheticDataGeneratorInMemoryRepository()
+        let service = SyntheticDataGeneratorCoreService(repo)
+        let controller = SyntheticDataGeneratorController(service)
+        let router = SyntheticDataGeneratorRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

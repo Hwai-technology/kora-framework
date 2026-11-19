@@ -1,0 +1,10 @@
+// Example 55: Order Fulfillment & Pick-Pack-Ship Workflow
+// Domain Service Contract
+
+import { OrderFulfillmentPipelinePrimaryRecord } from "../entities/order_fulfillment_pipeline_primary.entity"
+import { CreateOrderFulfillmentPipelineTaskRequest } from "../models/order_fulfillment_pipeline_request.dto"
+
+interface OrderFulfillmentPipelineDomainContract {
+    fn executeTask(req: CreateOrderFulfillmentPipelineTaskRequest) -> Result<OrderFulfillmentPipelinePrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

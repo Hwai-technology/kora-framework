@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 87: FIDO2 / WebAuthn Passkey Registration & Attestation
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { HardwareSecurityTokenFido2InMemoryRepository } from "./repositories/hardware_security_token_fido2_inmemory.repository"
+import { HardwareSecurityTokenFido2CoreService } from "./services/hardware_security_token_fido2_core.service"
+import { HardwareSecurityTokenFido2Controller } from "./controllers/hardware_security_token_fido2.controller"
+import { HardwareSecurityTokenFido2Router } from "./routes/hardware_security_token_fido2.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = HardwareSecurityTokenFido2InMemoryRepository()
+        let service = HardwareSecurityTokenFido2CoreService(repo)
+        let controller = HardwareSecurityTokenFido2Controller(service)
+        let router = HardwareSecurityTokenFido2Router(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

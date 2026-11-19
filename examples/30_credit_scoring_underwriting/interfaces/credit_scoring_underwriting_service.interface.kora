@@ -1,0 +1,10 @@
+// Example 30: Credit Underwriting & Risk Assessment
+// Domain Service Interface
+
+import { CreditScoringUnderwritingRecord } from "../entities/credit_scoring_underwriting_primary.entity"
+import { CreateCreditScoringUnderwritingRequest } from "../models/credit_scoring_underwriting_request.dto"
+
+interface CreditScoringUnderwritingServiceInterface {
+    fn processRequest(req: CreateCreditScoringUnderwritingRequest) -> Result<CreditScoringUnderwritingRecord, String>
+    fn validateState(id: Int) -> Bool
+}

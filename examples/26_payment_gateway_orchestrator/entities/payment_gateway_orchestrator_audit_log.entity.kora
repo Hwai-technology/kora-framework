@@ -1,0 +1,12 @@
+// Example 26: Payment Gateway & Webhook Orchestrator
+// Audit Trail Entity
+
+@table("payment_gateway_orchestrator_audit_logs")
+model PaymentGatewayOrchestratorAuditLog {
+    @id
+    id: Int
+    recordId: Int
+    action: String
+    performedBy: String
+    timestamp: Int
+}

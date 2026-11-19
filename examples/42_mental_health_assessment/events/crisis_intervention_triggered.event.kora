@@ -1,0 +1,8 @@
+// Example 42: Mental Health Longitudinal Assessment Engine — Domain Event: CrisisInterventionTriggeredEvent
+// Dedicated Domain Event Specification
+
+model CrisisInterventionTriggeredEvent {
+    patientId: Int
+    item9ScoreCritical: Int
+    crisisCounselorNotified: Bool
+}

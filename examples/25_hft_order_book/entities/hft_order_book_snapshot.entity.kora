@@ -1,0 +1,11 @@
+// Example 25: High-Frequency Trading Order Book
+// State Snapshot Entity
+
+@table("hft_order_book_snapshots")
+model HftOrderBookSnapshot {
+    @id
+    id: Int
+    aggregateId: Int
+    version: Int
+    stateHash: String
+}

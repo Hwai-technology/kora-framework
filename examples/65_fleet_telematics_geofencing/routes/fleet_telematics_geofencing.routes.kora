@@ -1,0 +1,22 @@
+// Example 65: Fleet Telematics & Polygonal Geofence Monitor
+// Router & Endpoint Dispatcher
+
+import { CreateFleetTelematicsGeofencingTaskRequest } from "../models/fleet_telematics_geofencing_request.dto"
+import { FleetTelematicsGeofencingResponseDto } from "../models/fleet_telematics_geofencing_response.dto"
+import { FleetTelematicsGeofencingController } from "../controllers/fleet_telematics_geofencing.controller"
+
+class FleetTelematicsGeofencingRouter {
+    controller: FleetTelematicsGeofencingController
+
+    init(controller: FleetTelematicsGeofencingController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateFleetTelematicsGeofencingTaskRequest) -> FleetTelematicsGeofencingResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

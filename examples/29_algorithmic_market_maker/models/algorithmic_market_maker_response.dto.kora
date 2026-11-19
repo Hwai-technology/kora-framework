@@ -1,0 +1,16 @@
+// Example 29: Algorithmic Market Maker & Quoting Engine
+// Transport Model: Standard Responses
+
+model AlgorithmicMarketMakerResponse {
+    id: Int
+    reference: String
+    success: Bool
+    statusCode: Int
+    message: String
+}
+
+model AlgorithmicMarketMakerSummaryDto {
+    totalCount: Int
+    activeVolume: Int
+    healthStatus: String
+}

@@ -1,0 +1,9 @@
+// Example 82: OAuth 2.1 & OpenID Connect Authorization Server
+// Specialized Model 6
+
+model Oauth2OidcIdentityServerSpecializedProfile6 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

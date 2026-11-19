@@ -1,0 +1,16 @@
+// Example 89: Immutable Cryptographic Audit Trail (SOC 2 / ISO 27001)
+// Transport Model: Standard Response
+
+model ComplianceAuditLedgerResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model ComplianceAuditLedgerSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

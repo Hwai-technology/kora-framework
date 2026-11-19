@@ -1,0 +1,7 @@
+// Example 84: Threat Intelligence STIX/TAXII Indicator Parser — Domain Event: IocIndicatorMatchedEvent
+
+model IocIndicatorMatchedEvent {
+    networkFlowIp: String
+    threatActorAttribution: String
+    confidenceScore: Int
+}

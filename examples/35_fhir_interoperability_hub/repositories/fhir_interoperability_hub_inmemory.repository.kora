@@ -1,0 +1,34 @@
+// Example 35: FHIR R4 & HL7 Interoperability Hub
+// Repository Implementation
+
+import { FhirInteroperabilityHubClinicalEntity } from "../entities/fhir_interoperability_hub_primary.entity"
+import { FhirInteroperabilityHubRepository } from "../interfaces/fhir_interoperability_hub_repository.interface"
+
+class FhirInteroperabilityHubInMemoryRepository implements FhirInteroperabilityHubRepository {
+    init() {}
+
+    fn findByPatientId(patientId: Int) -> Option<FhirInteroperabilityHubClinicalEntity> {
+        if patientId > 0 {
+            return Some(FhirInteroperabilityHubClinicalEntity {
+                id: patientId + 1000,
+                patientId: patientId,
+                clinicianId: 42,
+                clinicalMetricScore: 85,
+                complianceState: "HIPAA_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(entity: FhirInteroperabilityHubClinicalEntity) -> Result<FhirInteroperabilityHubClinicalEntity, String> {
+        if entity.patientId <= 0 {
+            return Err("Invalid patient identifier")
+        }
+        return Ok(entity)
+    }
+
+    fn verifyIntegrity(recordId: Int) -> Bool {
+        return recordId > 0
+    }
+}

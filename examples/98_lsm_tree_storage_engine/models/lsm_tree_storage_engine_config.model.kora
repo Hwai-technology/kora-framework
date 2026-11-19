@@ -1,0 +1,9 @@
+// Example 98: Log-Structured Merge-Tree (LSM-Tree) Engine
+// Configuration Model
+
+model LsmTreeStorageEngineConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

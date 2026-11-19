@@ -21,6 +21,103 @@ function isCloudEndpoint(urlStr) {
  * Kora Assistant Webview View Provider
  * Manages the AI Copilot side panel, chat sessions, diff reviews, and compiler diagnostics.
  */
+function getDiscoveredCatalog(extensionUri) {
+    // 1. Dynamic live scan from open workspace
+    try {
+        if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
+            for (const folder of vscode.workspace.workspaceFolders) {
+                const examplesDir = path.join(folder.uri.fsPath, 'examples');
+                if (fs.existsSync(examplesDir) && fs.statSync(examplesDir).isDirectory()) {
+                    const entries = fs.readdirSync(examplesDir, { withFileTypes: true });
+                    const dynamicList = [];
+                    for (const entry of entries) {
+                        if (entry.isDirectory() && !entry.name.startsWith('.')) {
+                            const entryPath = path.join(examplesDir, entry.name);
+                            const readmePath = path.join(entryPath, 'README.md');
+                            let name = entry.name;
+                            let desc = '';
+                            let category = 'Production Applications';
+                            let difficulty = 'Intermediate';
+                            if (fs.existsSync(readmePath)) {
+                                const content = fs.readFileSync(readmePath, 'utf8');
+                                for (const line of content.split('\n')) {
+                                    const trimmed = line.trim();
+                                    if (trimmed.startsWith('# ') && name === entry.name) {
+                                        const raw = trimmed.substring(2).trim();
+                                        const pos = raw.indexOf(':');
+                                        name = pos !== -1 ? raw.substring(pos + 1).trim() : raw;
+                                    }
+                                    if (trimmed.startsWith('Category:') || trimmed.startsWith('**Category**:')) {
+                                        category = trimmed.split(':')[1].replace(/\*/g, '').trim();
+                                    }
+                                    if (trimmed.startsWith('Difficulty:') || trimmed.startsWith('**Difficulty**:')) {
+                                        difficulty = trimmed.split(':')[1].replace(/\*/g, '').trim();
+                                    }
+                                    if (!desc && trimmed && !trimmed.startsWith('#') && !trimmed.startsWith('---') && !trimmed.startsWith('```') && !trimmed.startsWith('>')) {
+                                        desc = trimmed;
+                                    }
+                                }
+                            }
+                            let fileCount = 0;
+                            const countFiles = (dir) => {
+                                try {
+                                    const subEntries = fs.readdirSync(dir, { withFileTypes: true });
+                                    for (const se of subEntries) {
+                                        if (se.isDirectory() && !se.name.startsWith('.')) countFiles(path.join(dir, se.name));
+                                        else if (se.name.endsWith('.kora') || se.name.endsWith('.kr')) fileCount++;
+                                    }
+                                } catch (e) {}
+                            };
+                            countFiles(entryPath);
+                            if (fileCount > 0) {
+                                dynamicList.push({
+                                    slug: entry.name,
+                                    name,
+                                    category,
+                                    difficulty,
+                                    desc: desc || `Production-grade Kora implementation in ${category}`,
+                                    file_count: fileCount
+                                });
+                            }
+                        }
+                    }
+                    if (dynamicList.length > 0) {
+                        // Natural sorting by numeric prefix
+                        dynamicList.sort((a, b) => {
+                            const numA = parseInt(a.slug.match(/^\d+/)?.[0] || '999999', 10);
+                            const numB = parseInt(b.slug.match(/^\d+/)?.[0] || '999999', 10);
+                            if (numA !== numB) return numA - numB;
+                            return a.slug.localeCompare(b.slug);
+                        });
+                        return dynamicList;
+                    }
+                }
+            }
+        }
+    } catch (e) {}
+
+    // 2. Try reading catalog.json from extension knowledge
+    try {
+        const catalogPath = path.join(extensionUri.fsPath, 'knowledge', 'examples', 'catalog.json');
+        if (fs.existsSync(catalogPath)) {
+            const raw = fs.readFileSync(catalogPath, 'utf8');
+            const parsed = JSON.parse(raw);
+            if (parsed && Array.isArray(parsed.examples) && parsed.examples.length > 0) {
+                return parsed.examples.map(ex => ({
+                    slug: ex.slug,
+                    name: ex.name,
+                    category: ex.category,
+                    difficulty: ex.difficulty,
+                    desc: ex.description || ex.desc || '',
+                    file_count: ex.file_count || 0
+                }));
+            }
+        }
+    } catch (e) {}
+
+    return EXAMPLES_CATALOG;
+}
+
 function analyzeKoraDocument(document) {
     if (!document) return null;
     const text = document.getText();
@@ -1350,7 +1447,8 @@ class KoraAssistantViewProvider {
 
     getHtmlForWebview(webview) {
         const nonce = getNonce();
-        return getWebviewHtml(webview, this.extensionUri, EXAMPLES_CATALOG, nonce);
+        const catalog = getDiscoveredCatalog(this.extensionUri);
+        return getWebviewHtml(webview, this.extensionUri, catalog, nonce);
     }
 }
 

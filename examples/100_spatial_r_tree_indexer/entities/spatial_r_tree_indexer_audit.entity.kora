@@ -1,0 +1,12 @@
+// Example 100: Spatial 2D R-Tree & k-Nearest Neighbors (k-NN)
+// Persistent Database Entity: Audit Log
+
+@table("spatial_r_tree_indexer_audit_logs")
+model SpatialRTreeIndexerAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

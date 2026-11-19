@@ -1,0 +1,9 @@
+// Example 31: reconciliation_settlement — Domain Event: ReconBatchBalancedEvent
+// Dedicated Domain Event Specification
+
+model ReconBatchBalancedEvent {
+    batchId: String
+    matchedCount: Int
+    totalBalancedVolume: Int
+    timestamp: Int
+}

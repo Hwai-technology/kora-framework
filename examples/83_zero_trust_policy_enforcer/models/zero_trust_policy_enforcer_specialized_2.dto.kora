@@ -1,0 +1,9 @@
+// Example 83: Zero-Trust Context-Aware Policy Decision Point (PDP)
+// Specialized Model 2
+
+model ZeroTrustPolicyEnforcerSpecializedProfile2 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

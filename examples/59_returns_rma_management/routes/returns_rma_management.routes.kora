@@ -1,0 +1,22 @@
+// Example 59: Reverse Logistics & RMA Inspection Engine
+// Router & Endpoint Dispatcher
+
+import { CreateReturnsRmaManagementTaskRequest } from "../models/returns_rma_management_request.dto"
+import { ReturnsRmaManagementResponseDto } from "../models/returns_rma_management_response.dto"
+import { ReturnsRmaManagementController } from "../controllers/returns_rma_management.controller"
+
+class ReturnsRmaManagementRouter {
+    controller: ReturnsRmaManagementController
+
+    init(controller: ReturnsRmaManagementController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateReturnsRmaManagementTaskRequest) -> ReturnsRmaManagementResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

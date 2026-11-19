@@ -1,0 +1,9 @@
+// Example 49: API Gateway & Web Application Firewall — Enum: ThreatClassification
+// Dedicated Domain Enum Specification
+
+enum ThreatClassification {
+    SqlInjectionSuspected
+    CrossSiteScriptingXSS
+    CredentialStuffingAttack
+    NormalSafeTraffic
+}

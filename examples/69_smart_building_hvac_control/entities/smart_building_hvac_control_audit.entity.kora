@@ -1,0 +1,12 @@
+// Example 69: Smart Building HVAC & Air Quality Coordinator
+// Persistent Database Entity: Audit Log
+
+@table("smart_building_hvac_control_audit_logs")
+model SmartBuildingHvacControlAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

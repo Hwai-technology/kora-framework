@@ -1,0 +1,22 @@
+// Example 100: Spatial 2D R-Tree & k-Nearest Neighbors (k-NN)
+// Router & Endpoint Dispatcher
+
+import { CreateSpatialRTreeIndexerTaskRequest } from "../models/spatial_r_tree_indexer_request.dto"
+import { SpatialRTreeIndexerResponseDto } from "../models/spatial_r_tree_indexer_response.dto"
+import { SpatialRTreeIndexerController } from "../controllers/spatial_r_tree_indexer.controller"
+
+class SpatialRTreeIndexerRouter {
+    controller: SpatialRTreeIndexerController
+
+    init(controller: SpatialRTreeIndexerController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateSpatialRTreeIndexerTaskRequest) -> SpatialRTreeIndexerResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

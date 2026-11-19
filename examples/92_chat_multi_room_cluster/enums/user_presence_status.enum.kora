@@ -1,0 +1,8 @@
+// Example 92: Multi-Room WebSocket Chat & Presence Cluster — Enum: UserPresenceStatus
+
+enum UserPresenceStatus {
+    OnlineActive
+    IdleAwayShortTerm
+    DoNotDisturbMuted
+    OfflineDisconnected
+}

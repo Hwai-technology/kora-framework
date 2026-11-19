@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 72: HNSW Vector Index & Approximate Nearest Neighbor
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { VectorIndexHnswInMemoryRepository } from "./repositories/vector_index_hnsw_inmemory.repository"
+import { VectorIndexHnswCoreService } from "./services/vector_index_hnsw_core.service"
+import { VectorIndexHnswController } from "./controllers/vector_index_hnsw.controller"
+import { VectorIndexHnswRouter } from "./routes/vector_index_hnsw.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = VectorIndexHnswInMemoryRepository()
+        let service = VectorIndexHnswCoreService(repo)
+        let controller = VectorIndexHnswController(service)
+        let router = VectorIndexHnswRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

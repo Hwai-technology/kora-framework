@@ -1,0 +1,15 @@
+// Example 58: Distributed Shopping Cart Session Actor
+// Transport Model: Command Request
+
+model CreateShoppingCartSessionActorTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryShoppingCartSessionActorFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

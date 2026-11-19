@@ -1,0 +1,8 @@
+// Example 48: Distributed Cache Cluster & Write-Behind — Domain Event: CacheClusterRebalancedEvent
+// Dedicated Domain Event Specification
+
+model CacheClusterRebalancedEvent {
+    keysMigrated: Int
+    sourceNode: Int
+    targetNode: Int
+}

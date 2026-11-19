@@ -1,0 +1,10 @@
+// Example 84: Threat Intelligence STIX/TAXII Indicator Parser
+// Repository Interface
+
+import { ThreatIntelFeedAggregatorPrimaryRecord } from "../entities/threat_intel_feed_aggregator_primary.entity"
+
+interface ThreatIntelFeedAggregatorRepository {
+    fn findById(id: Int) -> Option<ThreatIntelFeedAggregatorPrimaryRecord>
+    fn save(record: ThreatIntelFeedAggregatorPrimaryRecord) -> Result<ThreatIntelFeedAggregatorPrimaryRecord, String>
+    fn countActive() -> Int
+}

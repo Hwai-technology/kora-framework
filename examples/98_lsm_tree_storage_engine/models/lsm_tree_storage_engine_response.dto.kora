@@ -1,0 +1,16 @@
+// Example 98: Log-Structured Merge-Tree (LSM-Tree) Engine
+// Transport Model: Standard Response
+
+model LsmTreeStorageEngineResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model LsmTreeStorageEngineSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

@@ -1,0 +1,7 @@
+// Example 56: Last-Mile Delivery Dispatch & Fleet Geo-Routing — Domain Event: DeliveryDispatchedEvent
+
+model DeliveryDispatchedEvent {
+    dispatchId: String
+    courierId: Int
+    stopCount: Int
+}

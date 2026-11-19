@@ -1,0 +1,13 @@
+// Example 29: Algorithmic Market Maker & Quoting Engine
+// Primary Persistent Database Entity
+
+@table("algorithmic_market_maker_records")
+model AlgorithmicMarketMakerRecord {
+    @id
+    id: Int
+    @unique
+    reference: String
+    status: String
+    balance: Int
+    active: Bool
+}

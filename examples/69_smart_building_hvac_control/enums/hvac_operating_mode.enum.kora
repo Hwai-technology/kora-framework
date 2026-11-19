@@ -1,0 +1,8 @@
+// Example 69: Smart Building HVAC & Air Quality Coordinator — Enum: HvacOperatingMode
+
+enum HvacOperatingMode {
+    OccupiedComfortCooling
+    OccupiedHeating
+    EconomizerFreshAirFlush
+    UnoccupiedNightSetback
+}

@@ -1,0 +1,13 @@
+// Example 51: Distributed Lock Manager & Fencing Tokens
+// Persistent Database Entity: Replicated Log
+
+@table("distributed_lock_manager_replicated_logs")
+model DistributedLockManagerReplicatedLogEntry {
+    @id
+    id: Int
+    logIndex: Int
+    termNumber: Int
+    commandPayload: String
+    committedQuorum: Bool
+    timestamp: Int
+}

@@ -1,0 +1,7 @@
+// Example 59: Reverse Logistics & RMA Inspection Engine — Domain Event: ReturnItemInspectedEvent
+
+model ReturnItemInspectedEvent {
+    rmaId: String
+    inspectorStaffId: Int
+    dispositionDecision: String
+}

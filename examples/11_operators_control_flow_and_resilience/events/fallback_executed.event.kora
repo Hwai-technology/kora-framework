@@ -1,0 +1,7 @@
+// examples/11_operators_control_flow_and_resilience — Event: FallbackExecutedEvent
+
+model FallbackExecutedEvent {
+    jobId: String
+    fallbackStrategy: String
+    timestamp: Int
+}

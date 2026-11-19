@@ -1,0 +1,33 @@
+// Example 96: Video on Demand (VOD) HLS/DASH Transmuxer
+// Repository Implementation
+
+import { VideoOnDemandTransmuxerPrimaryRecord } from "../entities/video_on_demand_transmuxer_primary.entity"
+import { VideoOnDemandTransmuxerRepository } from "../interfaces/video_on_demand_transmuxer_repository.interface"
+
+class VideoOnDemandTransmuxerInMemoryRepository implements VideoOnDemandTransmuxerRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<VideoOnDemandTransmuxerPrimaryRecord> {
+        if id > 0 {
+            return Some(VideoOnDemandTransmuxerPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: VideoOnDemandTransmuxerPrimaryRecord) -> Result<VideoOnDemandTransmuxerPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

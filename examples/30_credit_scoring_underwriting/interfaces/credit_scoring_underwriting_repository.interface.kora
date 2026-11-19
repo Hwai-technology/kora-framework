@@ -1,0 +1,10 @@
+// Example 30: Credit Underwriting & Risk Assessment
+// Primary Repository Interface
+
+import { CreditScoringUnderwritingRecord } from "../entities/credit_scoring_underwriting_primary.entity"
+
+interface CreditScoringUnderwritingRepository {
+    fn findById(id: Int) -> Option<CreditScoringUnderwritingRecord>
+    fn save(record: CreditScoringUnderwritingRecord) -> Result<CreditScoringUnderwritingRecord, String>
+    fn countAll() -> Int
+}

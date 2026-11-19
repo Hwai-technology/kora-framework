@@ -1,0 +1,10 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector — Enum: SpanKind
+// Dedicated Domain Enum Specification
+
+enum SpanKind {
+    ServerEntrypoint
+    ClientExternalCall
+    ProducerMessagePublish
+    ConsumerMessageProcess
+    InternalCalculation
+}

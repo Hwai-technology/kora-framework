@@ -1,0 +1,8 @@
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions — Enum: VideoCodecProfile
+// Dedicated Domain Enum Specification
+
+enum VideoCodecProfile {
+    Vp9HighDefinition
+    H264Baseline
+    Av1UltraResilient
+}

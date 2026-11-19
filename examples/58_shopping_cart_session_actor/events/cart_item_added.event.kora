@@ -1,0 +1,7 @@
+// Example 58: Distributed Shopping Cart Session Actor — Domain Event: CartItemAddedEvent
+
+model CartItemAddedEvent {
+    sessionId: String
+    sku: String
+    quantity: Int
+}

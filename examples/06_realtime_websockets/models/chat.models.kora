@@ -1,17 +1,51 @@
 // ============================================================================
-// Realtime Chat & WebSocket Models
+// Realtime WebSockets — Frame, Session & Protocol Data Schemas
 // ============================================================================
 
-import { ChatMessage } from "../entities/chat_message.entity"
+model WsFrame {
+    fin: Bool
+    opcode: Int
+    masked: Bool
+    maskKey: Int
+    payloadLength: Int
+    payload: String
+}
 
-model SendMessageRequest {
-    sender: String
-    room: String
-    content: String
+model WsSession {
+    sessionId: String
+    userId: String
+    clientIp: String
+    channel: String
+    lastHeartbeatTs: Int
+    messagesSent: Int
+    messagesReceived: Int
+    active: Bool
 }
 
 model RoomPresence {
     room: String
     activeMembers: Int
+    topic: String
+    lastActivityTs: Int
 }
 
+model BroadcastEnvelope {
+    messageId: String
+    channel: String
+    senderId: String
+    payload: String
+    timestamp: Int
+}
+
+model UpgradeRequest {
+    token: String
+    clientIp: String
+    targetChannel: String
+}
+
+model UpgradeResponse {
+    accepted: Bool
+    sessionId: String
+    assignedChannel: String
+    errorCode: String
+}

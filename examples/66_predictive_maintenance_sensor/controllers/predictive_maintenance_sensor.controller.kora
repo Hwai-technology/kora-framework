@@ -1,0 +1,38 @@
+// Example 66: Predictive Industrial Equipment Maintenance
+// Presentation Controller
+
+import { CreatePredictiveMaintenanceSensorTaskRequest } from "../models/predictive_maintenance_sensor_request.dto"
+import { PredictiveMaintenanceSensorResponseDto } from "../models/predictive_maintenance_sensor_response.dto"
+import { PredictiveMaintenanceSensorCoreService } from "../services/predictive_maintenance_sensor_core.service"
+
+class PredictiveMaintenanceSensorController {
+    service: PredictiveMaintenanceSensorCoreService
+
+    init(service: PredictiveMaintenanceSensorCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreatePredictiveMaintenanceSensorTaskRequest) -> PredictiveMaintenanceSensorResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => PredictiveMaintenanceSensorResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => PredictiveMaintenanceSensorResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

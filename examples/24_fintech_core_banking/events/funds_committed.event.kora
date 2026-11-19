@@ -1,0 +1,13 @@
+// ============================================================================
+// Example 24: Fintech Core Banking — Event: FundsCommittedEvent
+// Segregated Domain Event for Finalized Ledger Credit
+// ============================================================================
+
+model FundsCommittedEvent {
+    eventId: String
+    sagaId: String
+    destinationAccountId: Int
+    creditedAmount: Int
+    newBalance: Int
+    timestamp: Int
+}

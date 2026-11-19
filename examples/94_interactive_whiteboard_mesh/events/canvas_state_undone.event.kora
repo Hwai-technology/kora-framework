@@ -1,0 +1,7 @@
+// Example 94: Interactive Vector Whiteboard & Delta Sync — Domain Event: CanvasStateUndoneEvent
+
+model CanvasStateUndoneEvent {
+    boardId: String
+    revertedStrokeId: String
+    undoStackDepth: Int
+}

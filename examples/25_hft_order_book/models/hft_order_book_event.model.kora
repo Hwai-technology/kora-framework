@@ -1,0 +1,10 @@
+// Example 25: High-Frequency Trading Order Book
+// Domain Event Model
+
+model HftOrderBookEvent {
+    eventId: String
+    eventType: String
+    entityId: Int
+    occurredAt: Int
+    payloadHash: String
+}

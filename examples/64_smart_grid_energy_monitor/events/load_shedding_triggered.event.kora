@@ -1,0 +1,7 @@
+// Example 64: Smart Electrical Grid Substation Telemetry — Domain Event: LoadSheddingTriggeredEvent
+
+model LoadSheddingTriggeredEvent {
+    substationId: Int
+    shedMegawatts: Int
+    affectedFeedersCount: Int
+}

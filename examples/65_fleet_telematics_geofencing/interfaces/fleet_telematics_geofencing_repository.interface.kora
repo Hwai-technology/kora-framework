@@ -1,0 +1,10 @@
+// Example 65: Fleet Telematics & Polygonal Geofence Monitor
+// Repository Interface
+
+import { FleetTelematicsGeofencingPrimaryRecord } from "../entities/fleet_telematics_geofencing_primary.entity"
+
+interface FleetTelematicsGeofencingRepository {
+    fn findById(id: Int) -> Option<FleetTelematicsGeofencingPrimaryRecord>
+    fn save(record: FleetTelematicsGeofencingPrimaryRecord) -> Result<FleetTelematicsGeofencingPrimaryRecord, String>
+    fn countActive() -> Int
+}

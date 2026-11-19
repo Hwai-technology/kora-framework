@@ -1,0 +1,9 @@
+// Example 50: Distributed Blob Storage Metadata Engine
+// Configuration Model
+
+model BlobStorageMetadataEngineClusterConfig {
+    heartbeatIntervalMs: Int
+    electionTimeoutMs: Int
+    quorumMajoritySize: Int
+    clusterName: String
+}

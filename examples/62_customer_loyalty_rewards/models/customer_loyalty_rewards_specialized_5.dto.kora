@@ -1,0 +1,9 @@
+// Example 62: Customer Loyalty Rewards Ledger & Tier Upgrades
+// Specialized Model 5
+
+model CustomerLoyaltyRewardsSpecializedProfile5 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

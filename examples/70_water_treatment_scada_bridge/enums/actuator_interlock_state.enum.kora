@@ -1,0 +1,7 @@
+// Example 70: Industrial SCADA Modbus Gateway & Water Treatment — Enum: ActuatorInterlockState
+
+enum ActuatorInterlockState {
+    InterlockEngagedSafe
+    InterlockOverriddenManual
+    FaultAlarmShutdown
+}

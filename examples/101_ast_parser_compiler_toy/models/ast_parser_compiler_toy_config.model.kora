@@ -1,0 +1,9 @@
+// Example 101: Pratt Parsing & Bytecode Virtual Machine
+// Configuration Model
+
+model AstParserCompilerToyConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

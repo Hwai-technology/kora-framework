@@ -1,0 +1,16 @@
+// Example 57: Marketplace Vendor Settlement & Escrow Payouts
+// Transport Model: Standard Response
+
+model MarketplaceVendorSettlementResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model MarketplaceVendorSettlementSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

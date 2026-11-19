@@ -1,0 +1,10 @@
+// Example 59: Reverse Logistics & RMA Inspection Engine
+// Repository Interface
+
+import { ReturnsRmaManagementPrimaryRecord } from "../entities/returns_rma_management_primary.entity"
+
+interface ReturnsRmaManagementRepository {
+    fn findById(id: Int) -> Option<ReturnsRmaManagementPrimaryRecord>
+    fn save(record: ReturnsRmaManagementPrimaryRecord) -> Result<ReturnsRmaManagementPrimaryRecord, String>
+    fn countActive() -> Int
+}

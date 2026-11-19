@@ -1,0 +1,7 @@
+// Example 100: Spatial 2D R-Tree & k-Nearest Neighbors (k-NN) — Domain Event: KnnSearchEvaluatedEvent
+
+model KnnSearchEvaluatedEvent {
+    queryPointX: Int
+    queryPointY: Int
+    kNeighborsFound: Int
+}

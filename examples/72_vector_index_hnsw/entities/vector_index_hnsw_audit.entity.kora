@@ -1,0 +1,12 @@
+// Example 72: HNSW Vector Index & Approximate Nearest Neighbor
+// Persistent Database Entity: Audit Log
+
+@table("vector_index_hnsw_audit_logs")
+model VectorIndexHnswAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

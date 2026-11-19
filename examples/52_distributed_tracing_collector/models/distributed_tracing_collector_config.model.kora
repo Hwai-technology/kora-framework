@@ -1,0 +1,9 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector
+// Configuration Model
+
+model DistributedTracingCollectorClusterConfig {
+    heartbeatIntervalMs: Int
+    electionTimeoutMs: Int
+    quorumMajoritySize: Int
+    clusterName: String
+}

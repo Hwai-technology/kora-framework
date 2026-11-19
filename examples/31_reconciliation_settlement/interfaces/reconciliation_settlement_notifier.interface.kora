@@ -1,0 +1,7 @@
+// Example 31: Inter-Bank Reconciliation & Settlement
+// Notifier Interface
+
+interface ReconciliationSettlementNotifier {
+    fn sendAlert(subject: String, level: String) -> Bool
+    fn ping() -> Bool
+}

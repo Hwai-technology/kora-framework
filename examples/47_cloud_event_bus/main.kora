@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 47: Cloud Event Bus & Partitioned Streaming
+// Application Container & Cluster Bootstrap
+// ============================================================================
+
+import { CloudEventBusClusterRepository } from "./repositories/cloud_event_bus_cluster.repository"
+import { CloudEventBusCoreService } from "./services/cloud_event_bus_core.service"
+import { CloudEventBusController } from "./controllers/cloud_event_bus.controller"
+import { CloudEventBusRouter } from "./routes/cloud_event_bus.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = CloudEventBusClusterRepository()
+        let service = CloudEventBusCoreService(repo)
+        let controller = CloudEventBusController(service)
+        let router = CloudEventBusRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

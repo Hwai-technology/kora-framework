@@ -1,0 +1,79 @@
+// ============================================================================
+// Unit Test Suite: Clinical Trial Electronic Data Capture (EDC)
+// Invariants, Clinical Risk Scoring, and HIPAA Boundary Verification
+// ============================================================================
+
+import { CreateClinicalTrialEdcRecordRequest } from "../models/clinical_trial_edc_request.dto"
+import { ClinicalTrialEdcInMemoryRepository } from "../repositories/clinical_trial_edc_inmemory.repository"
+import { ClinicalTrialEdcCoreService } from "../services/clinical_trial_edc_core.service"
+import { ClinicalTrialEdcComplianceService } from "../services/clinical_trial_edc_compliance.service"
+
+class ClinicalTrialEdcUnitTestSuite {
+    service: ClinicalTrialEdcCoreService
+    compliance: ClinicalTrialEdcComplianceService
+
+    init(service: ClinicalTrialEdcCoreService, compliance: ClinicalTrialEdcComplianceService) {
+        this.service = service
+        this.compliance = compliance
+    }
+
+    fn test_valid_clinical_record_processing() -> Bool {
+        let req = CreateClinicalTrialEdcRecordRequest {
+            patientId: 101,
+            clinicianId: 202,
+            domainContext: "Clinical Inpatient Encounter",
+            clinicalMetricScore: 75,
+            confidentialNotes: "Vitals stable, continuing observation",
+        }
+        let res = this.service.processClinicalRecord(req)
+        return match res {
+            Ok(rec) => rec.patientId == 101 && rec.clinicalMetricScore == 75,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_negative_score_rejected() -> Bool {
+        let req = CreateClinicalTrialEdcRecordRequest {
+            patientId: 102,
+            clinicianId: 202,
+            domainContext: "Error Check",
+            clinicalMetricScore: -5,
+            confidentialNotes: "Invalid payload test",
+        }
+        let res = this.service.processClinicalRecord(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Clinical metric score cannot be negative",
+        }
+    }
+
+    fn test_risk_evaluation() -> Bool {
+        let risk = this.service.evaluateClinicalRisk(101)
+        return risk == "CRITICAL_OBSERVATION" || risk == "MODERATE_ATTENTION"
+    }
+
+    fn test_compliance_authorization() -> Bool {
+        let auth = this.compliance.verifyPhiAccessAuthorization(42, false)
+        let emergencyAuth = this.compliance.verifyPhiAccessAuthorization(-1, true)
+        return auth && emergencyAuth
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_clinical_record_processing()
+        let t2 = this.test_invalid_negative_score_rejected()
+        let t3 = this.test_risk_evaluation()
+        let t4 = this.test_compliance_authorization()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ Clinical Trial Electronic Data Capture (EDC) Unit Tests: 4/4 passed (HIPAA, Risk & Invariants Verified)")
+        } else {
+            print("  ✗ Clinical Trial Electronic Data Capture (EDC) Unit Tests: failed")
+        }
+    }
+}
+
+let repo = ClinicalTrialEdcInMemoryRepository()
+let service = ClinicalTrialEdcCoreService(repo)
+let compliance = ClinicalTrialEdcComplianceService()
+let suite = ClinicalTrialEdcUnitTestSuite(service, compliance)
+suite.run()

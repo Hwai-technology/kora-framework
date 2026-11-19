@@ -1,0 +1,15 @@
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// Transport Model: Command & Query Requests
+
+model CreateAntiMoneyLaunderingSiemRequest {
+    reference: String
+    targetId: Int
+    volume: Int
+    currency: String
+}
+
+model FilterAntiMoneyLaunderingSiemRequest {
+    status: String
+    limit: Int
+    offset: Int
+}

@@ -1,40 +1,77 @@
 // ============================================================================
-// Load Test Suite: 12_microservice_event_driven
-// Publishes 1,000 domain events to event store and drains event bus upon teardown
+// Load & Fault Tolerance Test Suite: 12_microservice_event_driven
+// Stresses 200 Distributed Outbox Events with Injected Poison Failures
 // ============================================================================
 
-import { DomainEventEntity } from "../entities/domain_event.entity"
 import { EventStoreRepository } from "../repositories/event_store.repository"
 import { EventPublisherService } from "../services/event_publisher.service"
 
 class MicroserviceLoadTestSuite {
+    repo: EventStoreRepository
     service: EventPublisherService
 
-    init(service: EventPublisherService) {
-        this.service = service
+    init() {
+        this.repo = EventStoreRepository()
+        this.service = EventPublisherService(this.repo)
     }
 
-    fn run_load_stress(iterations: Int) -> Int {
-        var processed = 0
-        for i in 0..iterations {
-            let res = this.service.publish("METRIC_CAPTURED", "{\"data\": 1}")
-            match res {
-                Ok(evt) => { processed += 1; },
-                Err(e) => {},
+    fn runLoadSuite() -> Bool {
+        var total = 200
+        var i = 0
+
+        // 1. Publish 200 events into transactional outbox
+        while i < total {
+            let key = "load_idemp_key_" + i.toString()
+            let res = this.service.publishOrderEvent("OrderStreamEvent", "partition_0", key, "{\"idx\": 1}")
+            let isOk = match res {
+                Ok(e) => true,
+                Err(err) => false,
             }
+            if !isOk {
+                return false
+            }
+            i = i + 1
         }
-        return processed
+
+        // 2. Consume events: every 10th event is a poison pill (20 poison pills total)
+        var j = 0
+        var poisonCount = 0
+        while j < total {
+            let eid = "evt_" + (5001 + j).toString()
+            let isPoison = j % 10 == 0
+
+            if isPoison {
+                poisonCount = poisonCount + 1
+                // Fail 3 times to force DLQ routing
+                this.service.processIncomingDelivery(eid, true)
+                this.service.processIncomingDelivery(eid, true)
+                let finalAck = this.service.processIncomingDelivery(eid, true)
+                if !finalAck.routedToDlq {
+                    return false
+                }
+            } else {
+                let ack = this.service.processIncomingDelivery(eid, false)
+                if !ack.success {
+                    return false
+                }
+            }
+            j = j + 1
+        }
+
+        let telemetry = this.service.getTelemetry()
+        let expectedDelivered = total - poisonCount
+        return telemetry.totalPublished == total && telemetry.totalDelivered == expectedDelivered && telemetry.totalDeadLettered == poisonCount
     }
 
-    fn teardown() -> Unit {
-        print("  ✓ Microservice Teardown: 1,000 domain events flushed from bus and topics purged")
+    fn run() -> Unit {
+        let passed = this.runLoadSuite()
+        if passed {
+            print("  ✓ Microservice 200-Event Fault Tolerance & DLQ Load Test: PASSED")
+        } else {
+            print("  ✗ Microservice 200-Event Fault Tolerance & DLQ Load Test: FAILED")
+        }
     }
 }
 
-let db = Database()
-let repo = EventStoreRepository(db)
-let service = EventPublisherService(repo)
-let load_suite = MicroserviceLoadTestSuite(service)
-let total = load_suite.run_load_stress(1000)
-print("  ✓ Microservice Load Test: 1,000 events published under load")
-load_suite.teardown()
+let loadSuite = MicroserviceLoadTestSuite()
+loadSuite.run()

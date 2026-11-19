@@ -1,0 +1,10 @@
+// Example 41: Genomic Variant Annotation & Pathogenicity
+// Repository Interface
+
+import { GenomicVariantAnnotatorClinicalEntity } from "../entities/genomic_variant_annotator_primary.entity"
+
+interface GenomicVariantAnnotatorRepository {
+    fn findByPatientId(patientId: Int) -> Option<GenomicVariantAnnotatorClinicalEntity>
+    fn save(entity: GenomicVariantAnnotatorClinicalEntity) -> Result<GenomicVariantAnnotatorClinicalEntity, String>
+    fn verifyIntegrity(recordId: Int) -> Bool
+}

@@ -1,0 +1,10 @@
+// Example 60: Faceted Product Catalog Search & Inverted Index
+// Repository Interface
+
+import { ProductCatalogSearchPrimaryRecord } from "../entities/product_catalog_search_primary.entity"
+
+interface ProductCatalogSearchRepository {
+    fn findById(id: Int) -> Option<ProductCatalogSearchPrimaryRecord>
+    fn save(record: ProductCatalogSearchPrimaryRecord) -> Result<ProductCatalogSearchPrimaryRecord, String>
+    fn countActive() -> Int
+}

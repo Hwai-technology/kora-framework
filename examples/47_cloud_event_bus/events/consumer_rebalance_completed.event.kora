@@ -1,0 +1,8 @@
+// Example 47: Cloud Event Bus & Partitioned Streaming — Domain Event: ConsumerRebalanceCompletedEvent
+// Dedicated Domain Event Specification
+
+model ConsumerRebalanceCompletedEvent {
+    groupId: String
+    generationId: Int
+    memberCount: Int
+}

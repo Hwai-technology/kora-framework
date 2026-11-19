@@ -1,0 +1,8 @@
+// Example 43: Raft Distributed Consensus Engine — Domain Event: HeartbeatTimedOutEvent
+// Dedicated Domain Event Specification
+
+model HeartbeatTimedOutEvent {
+    followerId: Int
+    currentTerm: Int
+    elapsedElectionTimeoutMs: Int
+}

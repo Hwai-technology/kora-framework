@@ -1,0 +1,8 @@
+// Example 40: Clinical Trial Electronic Data Capture (EDC) — Enum: BlindingStatus
+// Dedicated Domain Enum Specification
+
+enum BlindingStatus {
+    DoubleBlindedActive
+    OpenLabelPermitted
+    EmergencyUnblindedCodeBroken
+}

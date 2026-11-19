@@ -1,0 +1,33 @@
+// Example 90: WebRTC SFU Media Router & SDP Signaling
+// Repository Implementation
+
+import { WebrtcSignalingSfuPrimaryRecord } from "../entities/webrtc_signaling_sfu_primary.entity"
+import { WebrtcSignalingSfuRepository } from "../interfaces/webrtc_signaling_sfu_repository.interface"
+
+class WebrtcSignalingSfuInMemoryRepository implements WebrtcSignalingSfuRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<WebrtcSignalingSfuPrimaryRecord> {
+        if id > 0 {
+            return Some(WebrtcSignalingSfuPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: WebrtcSignalingSfuPrimaryRecord) -> Result<WebrtcSignalingSfuPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

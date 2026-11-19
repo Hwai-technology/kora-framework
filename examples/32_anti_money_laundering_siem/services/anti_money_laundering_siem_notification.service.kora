@@ -1,0 +1,16 @@
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// Notification Service Implementation
+
+import { AntiMoneyLaunderingSiemNotifier } from "../interfaces/anti_money_laundering_siem_notifier.interface"
+
+class AntiMoneyLaunderingSiemNotificationService implements AntiMoneyLaunderingSiemNotifier {
+    init() {}
+
+    fn sendAlert(subject: String, level: String) -> Bool {
+        return level != "CRITICAL" || subject != ""
+    }
+
+    fn ping() -> Bool {
+        return true
+    }
+}

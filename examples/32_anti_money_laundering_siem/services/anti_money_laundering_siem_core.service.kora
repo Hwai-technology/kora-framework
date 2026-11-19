@@ -1,0 +1,37 @@
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// Core Domain Service Implementation
+
+import { AntiMoneyLaunderingSiemRecord } from "../entities/anti_money_laundering_siem_primary.entity"
+import { CreateAntiMoneyLaunderingSiemRequest } from "../models/anti_money_laundering_siem_request.dto"
+import { AntiMoneyLaunderingSiemRepository } from "../interfaces/anti_money_laundering_siem_repository.interface"
+import { AntiMoneyLaunderingSiemServiceInterface } from "../interfaces/anti_money_laundering_siem_service.interface"
+
+class AntiMoneyLaunderingSiemCoreService implements AntiMoneyLaunderingSiemServiceInterface {
+    repo: AntiMoneyLaunderingSiemRepository
+
+    init(repo: AntiMoneyLaunderingSiemRepository) {
+        this.repo = repo
+    }
+
+    fn processRequest(req: CreateAntiMoneyLaunderingSiemRequest) -> Result<AntiMoneyLaunderingSiemRecord, String> {
+        if req.volume <= 0 {
+            return Err("Volume must be positive")
+        }
+        let record = AntiMoneyLaunderingSiemRecord {
+            id: req.targetId,
+            reference: req.reference,
+            status: "COMMITTED",
+            balance: req.volume,
+            active: true,
+        }
+        return this.repo.save(record)
+    }
+
+    fn validateState(id: Int) -> Bool {
+        let opt = this.repo.findById(id)
+        return match opt {
+            Some(rec) => rec.active,
+            None => false,
+        }
+    }
+}

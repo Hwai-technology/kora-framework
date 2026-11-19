@@ -1,0 +1,9 @@
+// Example 51: Distributed Lock Manager & Fencing Tokens — Enum: LockAcquisitionResult
+// Dedicated Domain Enum Specification
+
+enum LockAcquisitionResult {
+    AcquiredQuorumSuccess
+    LockContentionBusy
+    LockQuorumTimeout
+    DeadlockCycleDetected
+}

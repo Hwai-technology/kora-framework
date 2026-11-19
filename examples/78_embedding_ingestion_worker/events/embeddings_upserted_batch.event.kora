@@ -1,0 +1,7 @@
+// Example 78: High-Throughput Vector Embedding Ingestion Pipeline — Domain Event: EmbeddingsUpsertedBatchEvent
+
+model EmbeddingsUpsertedBatchEvent {
+    vectorCount: Int
+    destinationCollection: String
+    durationMs: Int
+}

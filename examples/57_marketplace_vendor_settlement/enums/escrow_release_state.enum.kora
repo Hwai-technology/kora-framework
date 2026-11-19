@@ -1,0 +1,8 @@
+// Example 57: Marketplace Vendor Settlement & Escrow Payouts — Enum: EscrowReleaseState
+
+enum EscrowReleaseState {
+    FundsHeldPendingDelivery
+    AutoReleasedTimeElapsed
+    DisputedBuyerClaim
+    DisbursedToVendor
+}

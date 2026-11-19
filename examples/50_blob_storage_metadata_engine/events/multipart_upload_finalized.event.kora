@@ -1,0 +1,8 @@
+// Example 50: Distributed Blob Storage Metadata Engine — Domain Event: MultipartUploadFinalizedEvent
+// Dedicated Domain Event Specification
+
+model MultipartUploadFinalizedEvent {
+    uploadId: String
+    totalPartCount: Int
+    aggregatedSize: Int
+}

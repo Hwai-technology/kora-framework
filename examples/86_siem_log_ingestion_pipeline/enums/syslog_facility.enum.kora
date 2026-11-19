@@ -1,0 +1,8 @@
+// Example 86: SIEM High-Throughput Log Ingestion & CEF Normalizer — Enum: SyslogFacility
+
+enum SyslogFacility {
+    AuthPrivSecurity
+    KernelMessages
+    DaemonSystem
+    LocalUse0Enterprise
+}

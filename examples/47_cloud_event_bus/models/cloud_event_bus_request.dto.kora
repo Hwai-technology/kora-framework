@@ -1,0 +1,14 @@
+// Example 47: Cloud Event Bus & Partitioned Streaming
+// Transport Model: Command Request
+
+model CreateCloudEventBusTaskRequest {
+    taskKey: String
+    originatingNodeId: Int
+    payloadVolume: Int
+    targetCluster: String
+}
+
+model QueryCloudEventBusStatusRequest {
+    resourceKey: String
+    quorumRequired: Int
+}

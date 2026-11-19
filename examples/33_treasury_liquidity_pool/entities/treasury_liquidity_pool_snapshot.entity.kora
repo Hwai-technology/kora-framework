@@ -1,0 +1,11 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// State Snapshot Entity
+
+@table("treasury_liquidity_pool_snapshots")
+model TreasuryLiquidityPoolSnapshot {
+    @id
+    id: Int
+    aggregateId: Int
+    version: Int
+    stateHash: String
+}

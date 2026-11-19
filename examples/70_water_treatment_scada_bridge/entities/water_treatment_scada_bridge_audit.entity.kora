@@ -1,0 +1,12 @@
+// Example 70: Industrial SCADA Modbus Gateway & Water Treatment
+// Persistent Database Entity: Audit Log
+
+@table("water_treatment_scada_bridge_audit_logs")
+model WaterTreatmentScadaBridgeAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

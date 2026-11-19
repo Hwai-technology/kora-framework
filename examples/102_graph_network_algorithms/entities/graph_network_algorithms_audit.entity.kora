@@ -1,0 +1,12 @@
+// Example 102: Graph Algorithms & Tarjan SCC / PageRank
+// Persistent Database Entity: Audit Log
+
+@table("graph_network_algorithms_audit_logs")
+model GraphNetworkAlgorithmsAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

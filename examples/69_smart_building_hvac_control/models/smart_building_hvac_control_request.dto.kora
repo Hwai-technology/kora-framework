@@ -1,0 +1,15 @@
+// Example 69: Smart Building HVAC & Air Quality Coordinator
+// Transport Model: Command Request
+
+model CreateSmartBuildingHvacControlTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QuerySmartBuildingHvacControlFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

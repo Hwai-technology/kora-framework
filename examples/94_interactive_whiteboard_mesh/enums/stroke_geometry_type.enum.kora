@@ -1,0 +1,8 @@
+// Example 94: Interactive Vector Whiteboard & Delta Sync — Enum: StrokeGeometryType
+
+enum StrokeGeometryType {
+    FreehandBezierCurve
+    StraightArrowConnector
+    RectangleBoundingBox
+    TextAnnotationLabel
+}

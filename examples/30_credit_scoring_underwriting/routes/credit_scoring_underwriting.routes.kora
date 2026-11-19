@@ -1,0 +1,26 @@
+// Example 30: Credit Underwriting & Risk Assessment
+// Router & Endpoint Dispatcher
+
+import { CreateCreditScoringUnderwritingRequest } from "../models/credit_scoring_underwriting_request.dto"
+import { CreditScoringUnderwritingResponse } from "../models/credit_scoring_underwriting_response.dto"
+import { CreditScoringUnderwritingRecord } from "../entities/credit_scoring_underwriting_primary.entity"
+import { CreditScoringUnderwritingCommandController } from "../controllers/credit_scoring_underwriting_command.controller"
+import { CreditScoringUnderwritingQueryController } from "../controllers/credit_scoring_underwriting_query.controller"
+
+class CreditScoringUnderwritingRouter {
+    commandController: CreditScoringUnderwritingCommandController
+    queryController: CreditScoringUnderwritingQueryController
+
+    init(commandController: CreditScoringUnderwritingCommandController, queryController: CreditScoringUnderwritingQueryController) {
+        this.commandController = commandController
+        this.queryController = queryController
+    }
+
+    fn postRecord(req: CreateCreditScoringUnderwritingRequest) -> CreditScoringUnderwritingResponse {
+        return this.commandController.handleCreate(req)
+    }
+
+    fn fetchRecord(id: Int) -> Option<CreditScoringUnderwritingRecord> {
+        return this.queryController.getById(id)
+    }
+}

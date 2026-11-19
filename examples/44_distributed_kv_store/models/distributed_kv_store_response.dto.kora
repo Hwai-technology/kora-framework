@@ -1,0 +1,17 @@
+// Example 44: Distributed Dynamo-Style Key-Value Store
+// Transport Model: Standard Response
+
+model DistributedKvStoreResponseDto {
+    operationId: String
+    nodeId: Int
+    status: String
+    isQuorumSatisfied: Bool
+    message: String
+}
+
+model DistributedKvStoreTopologySummaryDto {
+    activeClusterNodes: Int
+    leaderTerm: Int
+    healthyReplicasCount: Int
+    clusterState: String
+}

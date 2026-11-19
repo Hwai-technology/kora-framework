@@ -1,0 +1,11 @@
+// Example 28: Crypto Derivatives & Margin Engine
+// State Snapshot Entity
+
+@table("crypto_derivatives_exchange_snapshots")
+model CryptoDerivativesExchangeSnapshot {
+    @id
+    id: Int
+    aggregateId: Int
+    version: Int
+    stateHash: String
+}

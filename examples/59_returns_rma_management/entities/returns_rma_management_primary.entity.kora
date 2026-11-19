@@ -1,0 +1,13 @@
+// Example 59: Reverse Logistics & RMA Inspection Engine
+// Persistent Database Entity: Primary Record
+
+@table("returns_rma_management_records")
+model ReturnsRmaManagementPrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

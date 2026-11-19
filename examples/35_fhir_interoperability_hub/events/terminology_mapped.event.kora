@@ -1,0 +1,8 @@
+// Example 35: FHIR R4 & HL7 Interoperability Hub — Domain Event: TerminologyMappedEvent
+// Dedicated Domain Event Specification
+
+model TerminologyMappedEvent {
+    sourceCode: String
+    targetLoincCode: String
+    snomedConceptId: String
+}

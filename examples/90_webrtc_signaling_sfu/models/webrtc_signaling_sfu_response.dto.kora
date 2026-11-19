@@ -1,0 +1,16 @@
+// Example 90: WebRTC SFU Media Router & SDP Signaling
+// Transport Model: Standard Response
+
+model WebrtcSignalingSfuResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model WebrtcSignalingSfuSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

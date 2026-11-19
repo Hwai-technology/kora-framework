@@ -1,0 +1,10 @@
+// Example 47: Cloud Event Bus & Partitioned Streaming
+// Repository Interface
+
+import { CloudEventBusNodeState } from "../entities/cloud_event_bus_primary.entity"
+
+interface CloudEventBusRepository {
+    fn findNodeById(nodeId: Int) -> Option<CloudEventBusNodeState>
+    fn saveNodeState(state: CloudEventBusNodeState) -> Result<CloudEventBusNodeState, String>
+    fn getActiveQuorumCount() -> Int
+}

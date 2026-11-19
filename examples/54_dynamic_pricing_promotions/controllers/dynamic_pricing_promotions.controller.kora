@@ -1,0 +1,38 @@
+// Example 54: Dynamic Pricing Engine & Flash Sale Rate-Limiter
+// Presentation Controller
+
+import { CreateDynamicPricingPromotionsTaskRequest } from "../models/dynamic_pricing_promotions_request.dto"
+import { DynamicPricingPromotionsResponseDto } from "../models/dynamic_pricing_promotions_response.dto"
+import { DynamicPricingPromotionsCoreService } from "../services/dynamic_pricing_promotions_core.service"
+
+class DynamicPricingPromotionsController {
+    service: DynamicPricingPromotionsCoreService
+
+    init(service: DynamicPricingPromotionsCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateDynamicPricingPromotionsTaskRequest) -> DynamicPricingPromotionsResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => DynamicPricingPromotionsResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => DynamicPricingPromotionsResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

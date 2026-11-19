@@ -1,0 +1,22 @@
+// Example 102: Graph Algorithms & Tarjan SCC / PageRank
+// Router & Endpoint Dispatcher
+
+import { CreateGraphNetworkAlgorithmsTaskRequest } from "../models/graph_network_algorithms_request.dto"
+import { GraphNetworkAlgorithmsResponseDto } from "../models/graph_network_algorithms_response.dto"
+import { GraphNetworkAlgorithmsController } from "../controllers/graph_network_algorithms.controller"
+
+class GraphNetworkAlgorithmsRouter {
+    controller: GraphNetworkAlgorithmsController
+
+    init(controller: GraphNetworkAlgorithmsController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateGraphNetworkAlgorithmsTaskRequest) -> GraphNetworkAlgorithmsResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

@@ -1,0 +1,38 @@
+// Example 96: Video on Demand (VOD) HLS/DASH Transmuxer
+// Presentation Controller
+
+import { CreateVideoOnDemandTransmuxerTaskRequest } from "../models/video_on_demand_transmuxer_request.dto"
+import { VideoOnDemandTransmuxerResponseDto } from "../models/video_on_demand_transmuxer_response.dto"
+import { VideoOnDemandTransmuxerCoreService } from "../services/video_on_demand_transmuxer_core.service"
+
+class VideoOnDemandTransmuxerController {
+    service: VideoOnDemandTransmuxerCoreService
+
+    init(service: VideoOnDemandTransmuxerCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateVideoOnDemandTransmuxerTaskRequest) -> VideoOnDemandTransmuxerResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => VideoOnDemandTransmuxerResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => VideoOnDemandTransmuxerResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

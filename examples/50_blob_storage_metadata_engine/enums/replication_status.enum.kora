@@ -1,0 +1,8 @@
+// Example 50: Distributed Blob Storage Metadata Engine — Enum: ReplicationStatus
+// Dedicated Domain Enum Specification
+
+enum ReplicationStatus {
+    LocalCommittedOnly
+    CrossRegionReplicating
+    GloballyConsistent
+}

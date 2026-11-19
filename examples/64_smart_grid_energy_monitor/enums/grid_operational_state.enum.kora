@@ -1,0 +1,8 @@
+// Example 64: Smart Electrical Grid Substation Telemetry — Enum: GridOperationalState
+
+enum GridOperationalState {
+    NormalBalanced
+    UnderfrequencyShedding
+    OvervoltageDumping
+    IslandedAutonomous
+}

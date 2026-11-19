@@ -1,0 +1,45 @@
+// ============================================================================
+// Example 24: Fintech Core Banking — Models & DTOs
+// Advanced Financial Engineering: Sagas, CQRS, & Optimistic Concurrency
+// ============================================================================
+
+model TransferSagaCommand {
+    sagaId: String
+    idempotencyKey: String
+    sourceAccountId: Int
+    destinationAccountId: Int
+    amount: Int
+    expectedSourceVersion: Int
+}
+
+model DepositCommand {
+    accountId: Int
+    amount: Int
+    idempotencyKey: String
+}
+
+model AccountDto {
+    id: Int
+    accountNumber: String
+    balance: Int
+    reservedBalance: Int
+    version: Int
+    status: String
+}
+
+model SagaExecutionResult {
+    sagaId: String
+    status: String
+    executedAmount: Int
+    compensated: Bool
+    finalSourceBalance: Int
+    finalDestBalance: Int
+    errorMessage: String
+}
+
+model AuditVerificationSummary {
+    totalAccountsAudited: Int
+    totalSystemMoney: Int
+    conservationInvariantHolds: Bool
+    discrepancyAmount: Int
+}

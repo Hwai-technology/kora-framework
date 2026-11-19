@@ -1,0 +1,9 @@
+// Example 53: Inventory Allocation Matrix & Multi-Warehouse Stock
+// Configuration Model
+
+model InventoryAllocationMatrixConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

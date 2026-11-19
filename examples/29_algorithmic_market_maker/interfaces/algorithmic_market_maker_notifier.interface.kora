@@ -1,0 +1,7 @@
+// Example 29: Algorithmic Market Maker & Quoting Engine
+// Notifier Interface
+
+interface AlgorithmicMarketMakerNotifier {
+    fn sendAlert(subject: String, level: String) -> Bool
+    fn ping() -> Bool
+}

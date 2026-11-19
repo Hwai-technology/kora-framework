@@ -1,0 +1,29 @@
+// ============================================================================
+// Example 29: Algorithmic Market Maker & Quoting Engine
+// Application Container & Dependency Container Bootstrap
+// ============================================================================
+
+import { AlgorithmicMarketMakerPrimaryRepository } from "./repositories/algorithmic_market_maker_primary.repository"
+import { AlgorithmicMarketMakerCoreService } from "./services/algorithmic_market_maker_core.service"
+import { AlgorithmicMarketMakerCommandController } from "./controllers/algorithmic_market_maker_command.controller"
+import { AlgorithmicMarketMakerQueryController } from "./controllers/algorithmic_market_maker_query.controller"
+import { AlgorithmicMarketMakerRouter } from "./routes/algorithmic_market_maker.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = AlgorithmicMarketMakerPrimaryRepository()
+        let service = AlgorithmicMarketMakerCoreService(repo)
+        let commandCtrl = AlgorithmicMarketMakerCommandController(service)
+        let queryCtrl = AlgorithmicMarketMakerQueryController(repo)
+        let router = AlgorithmicMarketMakerRouter(commandCtrl, queryCtrl)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

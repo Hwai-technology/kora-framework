@@ -1,0 +1,38 @@
+// Example 53: Inventory Allocation Matrix & Multi-Warehouse Stock
+// Presentation Controller
+
+import { CreateInventoryAllocationMatrixTaskRequest } from "../models/inventory_allocation_matrix_request.dto"
+import { InventoryAllocationMatrixResponseDto } from "../models/inventory_allocation_matrix_response.dto"
+import { InventoryAllocationMatrixCoreService } from "../services/inventory_allocation_matrix_core.service"
+
+class InventoryAllocationMatrixController {
+    service: InventoryAllocationMatrixCoreService
+
+    init(service: InventoryAllocationMatrixCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateInventoryAllocationMatrixTaskRequest) -> InventoryAllocationMatrixResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => InventoryAllocationMatrixResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => InventoryAllocationMatrixResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

@@ -1,0 +1,7 @@
+// Example 92: Multi-Room WebSocket Chat & Presence Cluster — Domain Event: PresenceStatusChangedEvent
+
+model PresenceStatusChangedEvent {
+    userId: Int
+    newPresence: String
+    lastHeartbeatTimestamp: Int
+}

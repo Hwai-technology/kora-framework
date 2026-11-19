@@ -1,0 +1,10 @@
+// Example 60: Faceted Product Catalog Search & Inverted Index
+// Domain Service Contract
+
+import { ProductCatalogSearchPrimaryRecord } from "../entities/product_catalog_search_primary.entity"
+import { CreateProductCatalogSearchTaskRequest } from "../models/product_catalog_search_request.dto"
+
+interface ProductCatalogSearchDomainContract {
+    fn executeTask(req: CreateProductCatalogSearchTaskRequest) -> Result<ProductCatalogSearchPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

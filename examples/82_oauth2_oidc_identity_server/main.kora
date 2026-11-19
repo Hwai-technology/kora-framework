@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 82: OAuth 2.1 & OpenID Connect Authorization Server
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { Oauth2OidcIdentityServerInMemoryRepository } from "./repositories/oauth2_oidc_identity_server_inmemory.repository"
+import { Oauth2OidcIdentityServerCoreService } from "./services/oauth2_oidc_identity_server_core.service"
+import { Oauth2OidcIdentityServerController } from "./controllers/oauth2_oidc_identity_server.controller"
+import { Oauth2OidcIdentityServerRouter } from "./routes/oauth2_oidc_identity_server.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = Oauth2OidcIdentityServerInMemoryRepository()
+        let service = Oauth2OidcIdentityServerCoreService(repo)
+        let controller = Oauth2OidcIdentityServerController(service)
+        let router = Oauth2OidcIdentityServerRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

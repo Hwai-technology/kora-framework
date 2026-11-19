@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: kora_ws_redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "kora_secret_redis_pass"]
+    volumes:
+      - redis_ws_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "kora_secret_redis_pass", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  websocket_gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kora_ws_gateway
+    ports:
+      - "7582:7582"
+    environment:
+      - WS_PORT=7582
+      - WS_HEARTBEAT_INTERVAL_MS=30000
+      - WS_HEARTBEAT_TIMEOUT_MS=60000
+      - REDIS_URL=redis://:kora_secret_redis_pass@redis:6379/0
+      - JWT_SECRET=super_secret_kora_ws_token_key_32chars
+    depends_on:
+      redis:
+        condition: service_healthy
+
+volumes:
+  redis_ws_data:

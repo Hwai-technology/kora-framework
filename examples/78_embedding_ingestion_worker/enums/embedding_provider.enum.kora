@@ -1,0 +1,8 @@
+// Example 78: High-Throughput Vector Embedding Ingestion Pipeline — Enum: EmbeddingProvider
+
+enum EmbeddingProvider {
+    OpenAiAda002
+    TextEmbedding3Large
+    CohereEmbedV3
+    LocalHuggingFaceBge
+}

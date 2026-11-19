@@ -1,0 +1,7 @@
+// examples/11_operators_control_flow_and_resilience — Event: RetryAttemptedEvent
+
+model RetryAttemptedEvent {
+    jobId: String
+    attemptNumber: Int
+    delayMs: Int
+}

@@ -1,0 +1,7 @@
+// examples/07_async_actors_concurrency — Enum: TaskPriority
+
+enum TaskPriority {
+    BackgroundLow
+    InteractiveNormal
+    RealtimeCritical
+}

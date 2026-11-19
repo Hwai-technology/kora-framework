@@ -1,0 +1,12 @@
+// Example 83: Zero-Trust Context-Aware Policy Decision Point (PDP)
+// Persistent Database Entity: Audit Log
+
+@table("zero_trust_policy_enforcer_audit_logs")
+model ZeroTrustPolicyEnforcerAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

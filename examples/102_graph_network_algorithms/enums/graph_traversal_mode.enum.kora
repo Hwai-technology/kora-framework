@@ -1,0 +1,7 @@
+// Example 102: Graph Algorithms & Tarjan SCC / PageRank — Enum: GraphTraversalMode
+
+enum GraphTraversalMode {
+    BreadthFirstSearchBFS
+    DepthFirstSearchDFS
+    DijkstraShortestPath
+}

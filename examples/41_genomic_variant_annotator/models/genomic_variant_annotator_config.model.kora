@@ -1,0 +1,9 @@
+// Example 41: Genomic Variant Annotation & Pathogenicity
+// Configuration Model
+
+model GenomicVariantAnnotatorServiceConfig {
+    hipaaAuditEnabled: Bool
+    encryptionKeyVersion: Int
+    maxBatchFetchSize: Int
+    environment: String
+}

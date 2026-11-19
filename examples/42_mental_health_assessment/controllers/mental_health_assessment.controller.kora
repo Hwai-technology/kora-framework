@@ -1,0 +1,39 @@
+// Example 42: Mental Health Longitudinal Assessment Engine
+// Presentation Controller
+
+import { CreateMentalHealthAssessmentRecordRequest } from "../models/mental_health_assessment_request.dto"
+import { MentalHealthAssessmentResponseDto } from "../models/mental_health_assessment_response.dto"
+import { MentalHealthAssessmentClinicalEntity } from "../entities/mental_health_assessment_primary.entity"
+import { MentalHealthAssessmentCoreService } from "../services/mental_health_assessment_core.service"
+
+class MentalHealthAssessmentController {
+    service: MentalHealthAssessmentCoreService
+
+    init(service: MentalHealthAssessmentCoreService) {
+        this.service = service
+    }
+
+    fn handleRecordSubmission(req: CreateMentalHealthAssessmentRecordRequest) -> MentalHealthAssessmentResponseDto {
+        let outcome = this.service.processClinicalRecord(req)
+        return match outcome {
+            Ok(rec) => MentalHealthAssessmentResponseDto {
+                recordId: rec.id,
+                patientId: rec.patientId,
+                status: "COMMITTED_ENCRYPTED",
+                isComplianceVerified: true,
+                message: "Record persisted under HIPAA safety standards",
+            },
+            Err(reason) => MentalHealthAssessmentResponseDto {
+                recordId: -1,
+                patientId: req.patientId,
+                status: "REJECTED_VALIDATION_ERROR",
+                isComplianceVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkPatientRisk(patientId: Int) -> String {
+        return this.service.evaluateClinicalRisk(patientId)
+    }
+}

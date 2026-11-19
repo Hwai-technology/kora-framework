@@ -1,0 +1,8 @@
+// Example 51: Distributed Lock Manager & Fencing Tokens — Domain Event: LockContentionRejectedEvent
+// Dedicated Domain Event Specification
+
+model LockContentionRejectedEvent {
+    resourceKey: String
+    requestingNodeId: Int
+    activeHolderNodeId: Int
+}

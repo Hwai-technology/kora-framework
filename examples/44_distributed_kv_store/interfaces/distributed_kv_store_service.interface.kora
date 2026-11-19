@@ -1,0 +1,10 @@
+// Example 44: Distributed Dynamo-Style Key-Value Store
+// Domain Service Contract
+
+import { DistributedKvStoreNodeState } from "../entities/distributed_kv_store_primary.entity"
+import { CreateDistributedKvStoreTaskRequest } from "../models/distributed_kv_store_request.dto"
+
+interface DistributedKvStoreConsensusContract {
+    fn processConsensusCommand(req: CreateDistributedKvStoreTaskRequest) -> Result<DistributedKvStoreNodeState, String>
+    fn evaluateClusterQuorum() -> Bool
+}

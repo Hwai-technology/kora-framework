@@ -1,0 +1,10 @@
+// Example 34: HIPAA Compliant Electronic Health Records
+// Domain Service Contract
+
+import { HipaaCompliantEhrClinicalEntity } from "../entities/hipaa_compliant_ehr_primary.entity"
+import { CreateHipaaCompliantEhrRecordRequest } from "../models/hipaa_compliant_ehr_request.dto"
+
+interface HipaaCompliantEhrDomainContract {
+    fn processClinicalRecord(req: CreateHipaaCompliantEhrRecordRequest) -> Result<HipaaCompliantEhrClinicalEntity, String>
+    fn evaluateClinicalRisk(patientId: Int) -> String
+}

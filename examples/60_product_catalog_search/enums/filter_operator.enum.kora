@@ -1,0 +1,7 @@
+// Example 60: Faceted Product Catalog Search & Inverted Index — Enum: FilterOperator
+
+enum FilterOperator {
+    ExactMatchTerm
+    RangeGreaterThanOrEqual
+    AnyOfTermsMultiSelect
+}

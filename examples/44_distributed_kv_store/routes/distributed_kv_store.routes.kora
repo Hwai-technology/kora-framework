@@ -1,0 +1,22 @@
+// Example 44: Distributed Dynamo-Style Key-Value Store
+// Router & Endpoint Dispatcher
+
+import { CreateDistributedKvStoreTaskRequest } from "../models/distributed_kv_store_request.dto"
+import { DistributedKvStoreResponseDto } from "../models/distributed_kv_store_response.dto"
+import { DistributedKvStoreController } from "../controllers/distributed_kv_store.controller"
+
+class DistributedKvStoreRouter {
+    controller: DistributedKvStoreController
+
+    init(controller: DistributedKvStoreController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateDistributedKvStoreTaskRequest) -> DistributedKvStoreResponseDto {
+        return this.controller.handleTaskProposal(req)
+    }
+
+    fn getQuorum() -> Bool {
+        return this.controller.checkQuorumStatus()
+    }
+}

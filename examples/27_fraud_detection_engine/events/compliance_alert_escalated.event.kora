@@ -1,0 +1,9 @@
+// Example 27: fraud_detection_engine — Domain Event: ComplianceAlertEscalatedEvent
+// Dedicated Domain Event Specification
+
+model ComplianceAlertEscalatedEvent {
+    alertId: String
+    caseId: String
+    assignedTeam: String
+    severityLevel: String
+}

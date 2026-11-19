@@ -1,0 +1,13 @@
+// Example 49: API Gateway & Web Application Firewall
+// Persistent Database Entity: Replicated Log
+
+@table("api_gateway_waf_replicated_logs")
+model ApiGatewayWafReplicatedLogEntry {
+    @id
+    id: Int
+    logIndex: Int
+    termNumber: Int
+    commandPayload: String
+    committedQuorum: Bool
+    timestamp: Int
+}

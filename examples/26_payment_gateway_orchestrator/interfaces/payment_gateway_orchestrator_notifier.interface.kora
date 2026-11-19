@@ -1,0 +1,7 @@
+// Example 26: Payment Gateway & Webhook Orchestrator
+// Notifier Interface
+
+interface PaymentGatewayOrchestratorNotifier {
+    fn sendAlert(subject: String, level: String) -> Bool
+    fn ping() -> Bool
+}

@@ -1,0 +1,22 @@
+// Example 82: OAuth 2.1 & OpenID Connect Authorization Server
+// Router & Endpoint Dispatcher
+
+import { CreateOauth2OidcIdentityServerTaskRequest } from "../models/oauth2_oidc_identity_server_request.dto"
+import { Oauth2OidcIdentityServerResponseDto } from "../models/oauth2_oidc_identity_server_response.dto"
+import { Oauth2OidcIdentityServerController } from "../controllers/oauth2_oidc_identity_server.controller"
+
+class Oauth2OidcIdentityServerRouter {
+    controller: Oauth2OidcIdentityServerController
+
+    init(controller: Oauth2OidcIdentityServerController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateOauth2OidcIdentityServerTaskRequest) -> Oauth2OidcIdentityServerResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

@@ -1,0 +1,16 @@
+// Example 28: Crypto Derivatives & Margin Engine
+// Transport Model: Standard Responses
+
+model CryptoDerivativesExchangeResponse {
+    id: Int
+    reference: String
+    success: Bool
+    statusCode: Int
+    message: String
+}
+
+model CryptoDerivativesExchangeSummaryDto {
+    totalCount: Int
+    activeVolume: Int
+    healthStatus: String
+}

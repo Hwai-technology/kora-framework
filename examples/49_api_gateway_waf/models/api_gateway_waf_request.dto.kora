@@ -1,0 +1,14 @@
+// Example 49: API Gateway & Web Application Firewall
+// Transport Model: Command Request
+
+model CreateApiGatewayWafTaskRequest {
+    taskKey: String
+    originatingNodeId: Int
+    payloadVolume: Int
+    targetCluster: String
+}
+
+model QueryApiGatewayWafStatusRequest {
+    resourceKey: String
+    quorumRequired: Int
+}

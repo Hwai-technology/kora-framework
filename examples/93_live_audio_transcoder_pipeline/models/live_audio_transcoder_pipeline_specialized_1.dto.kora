@@ -1,0 +1,9 @@
+// Example 93: Live Audio Transcoding & Packet Chunking Pipeline
+// Specialized Model 1
+
+model LiveAudioTranscoderPipelineSpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

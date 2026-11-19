@@ -1,0 +1,8 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector — Enum: SpanStatusCode
+// Dedicated Domain Enum Specification
+
+enum SpanStatusCode {
+    StatusUnset
+    StatusOkSuccess
+    StatusErrorFailure
+}

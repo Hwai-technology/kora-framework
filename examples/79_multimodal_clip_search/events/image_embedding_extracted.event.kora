@@ -1,0 +1,6 @@
+// Example 79: Multimodal CLIP Cross-Search Engine — Domain Event: ImageEmbeddingExtractedEvent
+
+model ImageEmbeddingExtractedEvent {
+    imageFileHash: String
+    dimensionCount: Int
+}

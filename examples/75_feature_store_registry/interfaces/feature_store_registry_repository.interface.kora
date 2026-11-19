@@ -1,0 +1,10 @@
+// Example 75: Real-Time Machine Learning Feature Store
+// Repository Interface
+
+import { FeatureStoreRegistryPrimaryRecord } from "../entities/feature_store_registry_primary.entity"
+
+interface FeatureStoreRegistryRepository {
+    fn findById(id: Int) -> Option<FeatureStoreRegistryPrimaryRecord>
+    fn save(record: FeatureStoreRegistryPrimaryRecord) -> Result<FeatureStoreRegistryPrimaryRecord, String>
+    fn countActive() -> Int
+}

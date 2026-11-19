@@ -1,0 +1,16 @@
+// Example 102: Graph Algorithms & Tarjan SCC / PageRank
+// Transport Model: Standard Response
+
+model GraphNetworkAlgorithmsResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model GraphNetworkAlgorithmsSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

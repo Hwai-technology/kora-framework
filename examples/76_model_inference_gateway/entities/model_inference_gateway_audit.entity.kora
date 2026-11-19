@@ -1,0 +1,12 @@
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher
+// Persistent Database Entity: Audit Log
+
+@table("model_inference_gateway_audit_logs")
+model ModelInferenceGatewayAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

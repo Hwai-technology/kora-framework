@@ -1,0 +1,38 @@
+// Example 63: MQTT Industrial Telemetry Broker & Topic Tree
+// Presentation Controller
+
+import { CreateMqttIndustrialBrokerTaskRequest } from "../models/mqtt_industrial_broker_request.dto"
+import { MqttIndustrialBrokerResponseDto } from "../models/mqtt_industrial_broker_response.dto"
+import { MqttIndustrialBrokerCoreService } from "../services/mqtt_industrial_broker_core.service"
+
+class MqttIndustrialBrokerController {
+    service: MqttIndustrialBrokerCoreService
+
+    init(service: MqttIndustrialBrokerCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateMqttIndustrialBrokerTaskRequest) -> MqttIndustrialBrokerResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => MqttIndustrialBrokerResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => MqttIndustrialBrokerResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

@@ -1,0 +1,13 @@
+// Example 62: Customer Loyalty Rewards Ledger & Tier Upgrades
+// Persistent Database Entity: Primary Record
+
+@table("customer_loyalty_rewards_records")
+model CustomerLoyaltyRewardsPrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

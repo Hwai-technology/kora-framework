@@ -1,0 +1,15 @@
+// Example 80: AI Workflow Directed Acyclic Graph (DAG) Engine
+// Transport Model: Command Request
+
+model CreateAiWorkflowDagEngineTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryAiWorkflowDagEngineFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

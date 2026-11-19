@@ -1,0 +1,38 @@
+// Example 49: API Gateway & Web Application Firewall
+// Presentation Controller
+
+import { CreateApiGatewayWafTaskRequest } from "../models/api_gateway_waf_request.dto"
+import { ApiGatewayWafResponseDto } from "../models/api_gateway_waf_response.dto"
+import { ApiGatewayWafCoreService } from "../services/api_gateway_waf_core.service"
+
+class ApiGatewayWafController {
+    service: ApiGatewayWafCoreService
+
+    init(service: ApiGatewayWafCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskProposal(req: CreateApiGatewayWafTaskRequest) -> ApiGatewayWafResponseDto {
+        let outcome = this.service.processConsensusCommand(req)
+        return match outcome {
+            Ok(state) => ApiGatewayWafResponseDto {
+                operationId: "CONSENSUS-TX-" + req.taskKey,
+                nodeId: state.id,
+                status: "QUORUM_COMMITTED",
+                isQuorumSatisfied: true,
+                message: "Log entry replicated and committed across cluster quorum",
+            },
+            Err(reason) => ApiGatewayWafResponseDto {
+                operationId: "CONSENSUS-FAILED",
+                nodeId: req.originatingNodeId,
+                status: "QUORUM_REJECTED",
+                isQuorumSatisfied: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkQuorumStatus() -> Bool {
+        return this.service.evaluateClusterQuorum()
+    }
+}

@@ -1,0 +1,8 @@
+// Example 49: API Gateway & Web Application Firewall — Domain Event: IpReputationBlacklistedEvent
+// Dedicated Domain Event Specification
+
+model IpReputationBlacklistedEvent {
+    bannedIp: String
+    reputationScore: Int
+    banDurationSeconds: Int
+}

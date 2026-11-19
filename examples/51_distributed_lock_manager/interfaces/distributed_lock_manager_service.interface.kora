@@ -1,0 +1,10 @@
+// Example 51: Distributed Lock Manager & Fencing Tokens
+// Domain Service Contract
+
+import { DistributedLockManagerNodeState } from "../entities/distributed_lock_manager_primary.entity"
+import { CreateDistributedLockManagerTaskRequest } from "../models/distributed_lock_manager_request.dto"
+
+interface DistributedLockManagerConsensusContract {
+    fn processConsensusCommand(req: CreateDistributedLockManagerTaskRequest) -> Result<DistributedLockManagerNodeState, String>
+    fn evaluateClusterQuorum() -> Bool
+}

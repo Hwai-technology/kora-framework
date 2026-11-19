@@ -1,0 +1,10 @@
+// Example 42: Mental Health Longitudinal Assessment Engine
+// Domain Service Contract
+
+import { MentalHealthAssessmentClinicalEntity } from "../entities/mental_health_assessment_primary.entity"
+import { CreateMentalHealthAssessmentRecordRequest } from "../models/mental_health_assessment_request.dto"
+
+interface MentalHealthAssessmentDomainContract {
+    fn processClinicalRecord(req: CreateMentalHealthAssessmentRecordRequest) -> Result<MentalHealthAssessmentClinicalEntity, String>
+    fn evaluateClinicalRisk(patientId: Int) -> String
+}

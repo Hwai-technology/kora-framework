@@ -1,0 +1,8 @@
+// Example 42: Mental Health Longitudinal Assessment Engine — Domain Event: CarePlanAdjustedEvent
+// Dedicated Domain Event Specification
+
+model CarePlanAdjustedEvent {
+    patientId: Int
+    recommendedTherapyModal: String
+    psychiatristReviewRequired: Bool
+}

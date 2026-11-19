@@ -1,0 +1,22 @@
+// Example 35: FHIR R4 & HL7 Interoperability Hub
+// Router & Endpoint Dispatcher
+
+import { CreateFhirInteroperabilityHubRecordRequest } from "../models/fhir_interoperability_hub_request.dto"
+import { FhirInteroperabilityHubResponseDto } from "../models/fhir_interoperability_hub_response.dto"
+import { FhirInteroperabilityHubController } from "../controllers/fhir_interoperability_hub.controller"
+
+class FhirInteroperabilityHubRouter {
+    controller: FhirInteroperabilityHubController
+
+    init(controller: FhirInteroperabilityHubController) {
+        this.controller = controller
+    }
+
+    fn postRecord(req: CreateFhirInteroperabilityHubRecordRequest) -> FhirInteroperabilityHubResponseDto {
+        return this.controller.handleRecordSubmission(req)
+    }
+
+    fn getRiskScore(patientId: Int) -> String {
+        return this.controller.checkPatientRisk(patientId)
+    }
+}

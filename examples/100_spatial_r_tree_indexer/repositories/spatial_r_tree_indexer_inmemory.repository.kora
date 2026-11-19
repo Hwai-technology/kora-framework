@@ -1,0 +1,33 @@
+// Example 100: Spatial 2D R-Tree & k-Nearest Neighbors (k-NN)
+// Repository Implementation
+
+import { SpatialRTreeIndexerPrimaryRecord } from "../entities/spatial_r_tree_indexer_primary.entity"
+import { SpatialRTreeIndexerRepository } from "../interfaces/spatial_r_tree_indexer_repository.interface"
+
+class SpatialRTreeIndexerInMemoryRepository implements SpatialRTreeIndexerRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<SpatialRTreeIndexerPrimaryRecord> {
+        if id > 0 {
+            return Some(SpatialRTreeIndexerPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: SpatialRTreeIndexerPrimaryRecord) -> Result<SpatialRTreeIndexerPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

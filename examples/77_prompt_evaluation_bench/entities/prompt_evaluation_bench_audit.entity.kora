@@ -1,0 +1,12 @@
+// Example 77: Prompt Engineering Evaluation & Hallucination Scorer
+// Persistent Database Entity: Audit Log
+
+@table("prompt_evaluation_bench_audit_logs")
+model PromptEvaluationBenchAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

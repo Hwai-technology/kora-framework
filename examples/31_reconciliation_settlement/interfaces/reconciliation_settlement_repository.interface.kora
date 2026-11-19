@@ -1,0 +1,10 @@
+// Example 31: Inter-Bank Reconciliation & Settlement
+// Primary Repository Interface
+
+import { ReconciliationSettlementRecord } from "../entities/reconciliation_settlement_primary.entity"
+
+interface ReconciliationSettlementRepository {
+    fn findById(id: Int) -> Option<ReconciliationSettlementRecord>
+    fn save(record: ReconciliationSettlementRecord) -> Result<ReconciliationSettlementRecord, String>
+    fn countAll() -> Int
+}

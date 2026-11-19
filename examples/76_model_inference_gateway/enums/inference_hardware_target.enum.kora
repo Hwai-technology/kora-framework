@@ -1,0 +1,8 @@
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher — Enum: InferenceHardwareTarget
+
+enum InferenceHardwareTarget {
+    NvidiaCudaGpu
+    AppleMetalSilicon
+    ArmNeonCpuFallback
+    GoogleTpuCloud
+}

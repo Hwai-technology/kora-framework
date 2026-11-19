@@ -1,0 +1,38 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector
+// Presentation Controller
+
+import { CreateDistributedTracingCollectorTaskRequest } from "../models/distributed_tracing_collector_request.dto"
+import { DistributedTracingCollectorResponseDto } from "../models/distributed_tracing_collector_response.dto"
+import { DistributedTracingCollectorCoreService } from "../services/distributed_tracing_collector_core.service"
+
+class DistributedTracingCollectorController {
+    service: DistributedTracingCollectorCoreService
+
+    init(service: DistributedTracingCollectorCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskProposal(req: CreateDistributedTracingCollectorTaskRequest) -> DistributedTracingCollectorResponseDto {
+        let outcome = this.service.processConsensusCommand(req)
+        return match outcome {
+            Ok(state) => DistributedTracingCollectorResponseDto {
+                operationId: "CONSENSUS-TX-" + req.taskKey,
+                nodeId: state.id,
+                status: "QUORUM_COMMITTED",
+                isQuorumSatisfied: true,
+                message: "Log entry replicated and committed across cluster quorum",
+            },
+            Err(reason) => DistributedTracingCollectorResponseDto {
+                operationId: "CONSENSUS-FAILED",
+                nodeId: req.originatingNodeId,
+                status: "QUORUM_REJECTED",
+                isQuorumSatisfied: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkQuorumStatus() -> Bool {
+        return this.service.evaluateClusterQuorum()
+    }
+}

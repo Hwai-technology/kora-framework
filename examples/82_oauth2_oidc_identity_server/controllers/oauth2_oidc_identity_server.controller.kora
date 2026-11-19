@@ -1,0 +1,38 @@
+// Example 82: OAuth 2.1 & OpenID Connect Authorization Server
+// Presentation Controller
+
+import { CreateOauth2OidcIdentityServerTaskRequest } from "../models/oauth2_oidc_identity_server_request.dto"
+import { Oauth2OidcIdentityServerResponseDto } from "../models/oauth2_oidc_identity_server_response.dto"
+import { Oauth2OidcIdentityServerCoreService } from "../services/oauth2_oidc_identity_server_core.service"
+
+class Oauth2OidcIdentityServerController {
+    service: Oauth2OidcIdentityServerCoreService
+
+    init(service: Oauth2OidcIdentityServerCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateOauth2OidcIdentityServerTaskRequest) -> Oauth2OidcIdentityServerResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => Oauth2OidcIdentityServerResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => Oauth2OidcIdentityServerResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

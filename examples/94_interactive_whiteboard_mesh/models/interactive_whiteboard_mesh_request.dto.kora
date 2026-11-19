@@ -1,0 +1,15 @@
+// Example 94: Interactive Vector Whiteboard & Delta Sync
+// Transport Model: Command Request
+
+model CreateInteractiveWhiteboardMeshTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryInteractiveWhiteboardMeshFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

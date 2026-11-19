@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 48: Distributed Cache Cluster & Write-Behind
+// Application Container & Cluster Bootstrap
+// ============================================================================
+
+import { DistributedCacheClusterClusterRepository } from "./repositories/distributed_cache_cluster_cluster.repository"
+import { DistributedCacheClusterCoreService } from "./services/distributed_cache_cluster_core.service"
+import { DistributedCacheClusterController } from "./controllers/distributed_cache_cluster.controller"
+import { DistributedCacheClusterRouter } from "./routes/distributed_cache_cluster.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = DistributedCacheClusterClusterRepository()
+        let service = DistributedCacheClusterCoreService(repo)
+        let controller = DistributedCacheClusterController(service)
+        let router = DistributedCacheClusterRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

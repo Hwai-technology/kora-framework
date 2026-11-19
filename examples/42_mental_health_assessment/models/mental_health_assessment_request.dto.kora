@@ -1,0 +1,16 @@
+// Example 42: Mental Health Longitudinal Assessment Engine
+// Transport Model: Command Requests
+
+model CreateMentalHealthAssessmentRecordRequest {
+    patientId: Int
+    clinicianId: Int
+    domainContext: String
+    clinicalMetricScore: Int
+    confidentialNotes: String
+}
+
+model QueryMentalHealthAssessmentFilterRequest {
+    patientId: Int
+    limit: Int
+    includeHistorical: Bool
+}

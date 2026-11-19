@@ -1,0 +1,7 @@
+// Example 87: FIDO2 / WebAuthn Passkey Registration & Attestation — Domain Event: PasskeyAuthenticationVerifiedEvent
+
+model PasskeyAuthenticationVerifiedEvent {
+    credentialIdHash: String
+    signatureCounter: Int
+    isValid: Bool
+}

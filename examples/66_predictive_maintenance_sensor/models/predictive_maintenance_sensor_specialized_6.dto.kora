@@ -1,0 +1,9 @@
+// Example 66: Predictive Industrial Equipment Maintenance
+// Specialized Model 6
+
+model PredictiveMaintenanceSensorSpecializedProfile6 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

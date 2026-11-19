@@ -1,0 +1,15 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// Transport Model: Command & Query Requests
+
+model CreateTreasuryLiquidityPoolRequest {
+    reference: String
+    targetId: Int
+    volume: Int
+    currency: String
+}
+
+model FilterTreasuryLiquidityPoolRequest {
+    status: String
+    limit: Int
+    offset: Int
+}

@@ -1,0 +1,7 @@
+// Example 91: CRDT Collaborative Real-Time Document Editor — Enum: CrdtOperationType
+
+enum CrdtOperationType {
+    InsertCharItem
+    DeleteCharItem
+    UpdateFormattingSpan
+}

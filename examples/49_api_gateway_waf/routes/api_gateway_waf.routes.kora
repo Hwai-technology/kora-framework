@@ -1,0 +1,22 @@
+// Example 49: API Gateway & Web Application Firewall
+// Router & Endpoint Dispatcher
+
+import { CreateApiGatewayWafTaskRequest } from "../models/api_gateway_waf_request.dto"
+import { ApiGatewayWafResponseDto } from "../models/api_gateway_waf_response.dto"
+import { ApiGatewayWafController } from "../controllers/api_gateway_waf.controller"
+
+class ApiGatewayWafRouter {
+    controller: ApiGatewayWafController
+
+    init(controller: ApiGatewayWafController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateApiGatewayWafTaskRequest) -> ApiGatewayWafResponseDto {
+        return this.controller.handleTaskProposal(req)
+    }
+
+    fn getQuorum() -> Bool {
+        return this.controller.checkQuorumStatus()
+    }
+}

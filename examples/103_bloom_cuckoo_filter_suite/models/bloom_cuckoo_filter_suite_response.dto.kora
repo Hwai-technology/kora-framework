@@ -1,0 +1,16 @@
+// Example 103: Probabilistic Bloom & Cuckoo Filter Suite
+// Transport Model: Standard Response
+
+model BloomCuckooFilterSuiteResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model BloomCuckooFilterSuiteSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

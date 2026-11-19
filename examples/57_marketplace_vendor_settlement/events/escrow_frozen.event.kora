@@ -1,0 +1,7 @@
+// Example 57: Marketplace Vendor Settlement & Escrow Payouts — Domain Event: EscrowFrozenEvent
+
+model EscrowFrozenEvent {
+    orderId: Int
+    disputeTicketId: String
+    heldAmountCents: Int
+}

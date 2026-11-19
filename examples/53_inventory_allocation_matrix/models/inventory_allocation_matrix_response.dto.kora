@@ -1,0 +1,16 @@
+// Example 53: Inventory Allocation Matrix & Multi-Warehouse Stock
+// Transport Model: Standard Response
+
+model InventoryAllocationMatrixResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model InventoryAllocationMatrixSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

@@ -1,0 +1,7 @@
+// Example 95: Multiplayer Game 60Hz Tick State Synchronizer — Domain Event: ClientInputReconciledEvent
+
+model ClientInputReconciledEvent {
+    playerId: Int
+    predictedPositionDriftCm: Int
+    rewindTicksApplied: Int
+}

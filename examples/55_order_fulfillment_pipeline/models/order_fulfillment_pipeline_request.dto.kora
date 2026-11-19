@@ -1,0 +1,15 @@
+// Example 55: Order Fulfillment & Pick-Pack-Ship Workflow
+// Transport Model: Command Request
+
+model CreateOrderFulfillmentPipelineTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryOrderFulfillmentPipelineFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

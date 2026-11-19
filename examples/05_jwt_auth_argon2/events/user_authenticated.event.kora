@@ -1,0 +1,8 @@
+// examples/05_jwt_auth_argon2 — Event: UserAuthenticatedEvent
+
+model UserAuthenticatedEvent {
+    userId: Int
+    tokenJti: String
+    ipAddressHash: String
+    timestamp: Int
+}

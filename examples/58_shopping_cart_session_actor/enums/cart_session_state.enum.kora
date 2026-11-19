@@ -1,0 +1,8 @@
+// Example 58: Distributed Shopping Cart Session Actor — Enum: CartSessionState
+
+enum CartSessionState {
+    ActiveBrowsing
+    CheckoutInitiated
+    AbandonedIdle
+    ConvertedToOrder
+}

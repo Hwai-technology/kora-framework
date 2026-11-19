@@ -1,0 +1,8 @@
+// Example 39: Pharmacy Dispensing & Drug Interaction Checker — Domain Event: BatchRecallInitiatedEvent
+// Dedicated Domain Event Specification
+
+model BatchRecallInitiatedEvent {
+    lotNumber: String
+    manufacturer: String
+    affectedQuantity: Int
+}

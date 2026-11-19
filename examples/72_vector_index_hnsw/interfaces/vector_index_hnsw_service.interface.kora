@@ -1,0 +1,10 @@
+// Example 72: HNSW Vector Index & Approximate Nearest Neighbor
+// Domain Service Contract
+
+import { VectorIndexHnswPrimaryRecord } from "../entities/vector_index_hnsw_primary.entity"
+import { CreateVectorIndexHnswTaskRequest } from "../models/vector_index_hnsw_request.dto"
+
+interface VectorIndexHnswDomainContract {
+    fn executeTask(req: CreateVectorIndexHnswTaskRequest) -> Result<VectorIndexHnswPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

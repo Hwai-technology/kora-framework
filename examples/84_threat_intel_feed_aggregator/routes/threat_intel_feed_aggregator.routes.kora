@@ -1,0 +1,22 @@
+// Example 84: Threat Intelligence STIX/TAXII Indicator Parser
+// Router & Endpoint Dispatcher
+
+import { CreateThreatIntelFeedAggregatorTaskRequest } from "../models/threat_intel_feed_aggregator_request.dto"
+import { ThreatIntelFeedAggregatorResponseDto } from "../models/threat_intel_feed_aggregator_response.dto"
+import { ThreatIntelFeedAggregatorController } from "../controllers/threat_intel_feed_aggregator.controller"
+
+class ThreatIntelFeedAggregatorRouter {
+    controller: ThreatIntelFeedAggregatorController
+
+    init(controller: ThreatIntelFeedAggregatorController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateThreatIntelFeedAggregatorTaskRequest) -> ThreatIntelFeedAggregatorResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

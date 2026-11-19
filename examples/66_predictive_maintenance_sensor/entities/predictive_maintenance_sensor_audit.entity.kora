@@ -1,0 +1,12 @@
+// Example 66: Predictive Industrial Equipment Maintenance
+// Persistent Database Entity: Audit Log
+
+@table("predictive_maintenance_sensor_audit_logs")
+model PredictiveMaintenanceSensorAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

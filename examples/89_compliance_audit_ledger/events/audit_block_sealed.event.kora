@@ -1,0 +1,7 @@
+// Example 89: Immutable Cryptographic Audit Trail (SOC 2 / ISO 27001) — Domain Event: AuditBlockSealedEvent
+
+model AuditBlockSealedEvent {
+    blockSequenceNumber: Int
+    merkleRootHash: String
+    sealedTimestamp: Int
+}

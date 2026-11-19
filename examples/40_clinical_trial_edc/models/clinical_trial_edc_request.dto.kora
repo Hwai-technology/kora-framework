@@ -1,0 +1,16 @@
+// Example 40: Clinical Trial Electronic Data Capture (EDC)
+// Transport Model: Command Requests
+
+model CreateClinicalTrialEdcRecordRequest {
+    patientId: Int
+    clinicianId: Int
+    domainContext: String
+    clinicalMetricScore: Int
+    confidentialNotes: String
+}
+
+model QueryClinicalTrialEdcFilterRequest {
+    patientId: Int
+    limit: Int
+    includeHistorical: Bool
+}

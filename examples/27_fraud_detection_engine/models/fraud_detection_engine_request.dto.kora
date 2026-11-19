@@ -1,0 +1,22 @@
+// ============================================================================
+// Fraud Evaluation Request & Telemetry DTOs
+// ============================================================================
+
+model CreateFraudDetectionEngineRequest {
+    targetId: Int
+    cardToken: String
+    amountCents: Int
+    currency: String
+    mccCode: Int
+    countryCode: String
+    distanceFromLastTxKm: Int
+    minutesSinceLastTx: Int
+    reference: String
+}
+
+model FraudEvaluationSummary {
+    assessmentId: String
+    riskScore: Int
+    outcome: String
+    flags: Vector<String>
+}

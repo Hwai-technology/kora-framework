@@ -1,0 +1,7 @@
+// Example 68: Cold Chain Vaccine Temperature Monitoring — Domain Event: TemperatureExcursionRecordedEvent
+
+model TemperatureExcursionRecordedEvent {
+    containerId: String
+    observedTempMilliCelsius: Int
+    durationMinutes: Int
+}

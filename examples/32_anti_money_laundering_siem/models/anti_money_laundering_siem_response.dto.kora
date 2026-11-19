@@ -1,0 +1,16 @@
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// Transport Model: Standard Responses
+
+model AntiMoneyLaunderingSiemResponse {
+    id: Int
+    reference: String
+    success: Bool
+    statusCode: Int
+    message: String
+}
+
+model AntiMoneyLaunderingSiemSummaryDto {
+    totalCount: Int
+    activeVolume: Int
+    healthStatus: String
+}

@@ -1,0 +1,22 @@
+// Example 41: Genomic Variant Annotation & Pathogenicity
+// Router & Endpoint Dispatcher
+
+import { CreateGenomicVariantAnnotatorRecordRequest } from "../models/genomic_variant_annotator_request.dto"
+import { GenomicVariantAnnotatorResponseDto } from "../models/genomic_variant_annotator_response.dto"
+import { GenomicVariantAnnotatorController } from "../controllers/genomic_variant_annotator.controller"
+
+class GenomicVariantAnnotatorRouter {
+    controller: GenomicVariantAnnotatorController
+
+    init(controller: GenomicVariantAnnotatorController) {
+        this.controller = controller
+    }
+
+    fn postRecord(req: CreateGenomicVariantAnnotatorRecordRequest) -> GenomicVariantAnnotatorResponseDto {
+        return this.controller.handleRecordSubmission(req)
+    }
+
+    fn getRiskScore(patientId: Int) -> String {
+        return this.controller.checkPatientRisk(patientId)
+    }
+}

@@ -1,0 +1,9 @@
+// Example 92: Multi-Room WebSocket Chat & Presence Cluster
+// Configuration Model
+
+model ChatMultiRoomClusterConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

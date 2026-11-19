@@ -1,0 +1,8 @@
+// Example 39: Pharmacy Dispensing & Drug Interaction Checker — Domain Event: ControlledSubstanceAuditedEvent
+// Dedicated Domain Event Specification
+
+model ControlledSubstanceAuditedEvent {
+    safeVaultId: String
+    currentPillCount: Int
+    pharmacistSignature: String
+}

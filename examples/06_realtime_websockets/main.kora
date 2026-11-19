@@ -1,22 +1,30 @@
 // ============================================================================
-// Example 06: Realtime WebSockets & Chat Engine — Main Entrypoint
-// Pure Layered Clean Architecture: App -> Middleware -> Routes -> Controller -> Service -> Repository -> Database
-// Encapsulated within Application Class Container
+// Example 06: Realtime WebSockets & Event Streaming Gateway
+// Pure Clean Architecture: Container -> Routes -> Controller -> Service -> Repository
 // ============================================================================
 
-import { LoggerMiddleware } from "./middleware/logger.middleware"
-import { AuthMiddleware } from "./middleware/auth.middleware"
+import { ChatRepository } from "./repositories/chat.repository"
+import { ChatService } from "./services/chat_hub.service"
+import { ChatController } from "./controllers/chat.controller"
 import { ChatRoutes } from "./routes/chat.routes"
 
 class Application {
-    init() {}
+    repo: ChatRepository
+    service: ChatService
+    controller: ChatController
+    routes: ChatRoutes
+
+    init() {
+        this.repo = ChatRepository()
+        this.service = ChatService(this.repo)
+        this.controller = ChatController(this.service)
+        this.routes = ChatRoutes(this.controller)
+    }
 
     fn bootstrap() -> Unit {
         let app = run()
-        app.use(LoggerMiddleware)
-        app.use(AuthMiddleware)
-        app.use(ChatRoutes)
-        app.listen(3000)
+        this.routes.register()
+        app.listen(7582)
     }
 }
 

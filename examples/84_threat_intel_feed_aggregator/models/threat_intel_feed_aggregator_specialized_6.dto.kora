@@ -1,0 +1,9 @@
+// Example 84: Threat Intelligence STIX/TAXII Indicator Parser
+// Specialized Model 6
+
+model ThreatIntelFeedAggregatorSpecializedProfile6 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

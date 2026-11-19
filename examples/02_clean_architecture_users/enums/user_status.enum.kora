@@ -1,0 +1,8 @@
+// examples/02_clean_architecture_users — Enum: UserStatus
+
+enum UserStatus {
+    PendingVerification
+    Active
+    Suspended
+    Deactivated
+}

@@ -1,0 +1,10 @@
+// Example 98: Log-Structured Merge-Tree (LSM-Tree) Engine
+// Domain Service Contract
+
+import { LsmTreeStorageEnginePrimaryRecord } from "../entities/lsm_tree_storage_engine_primary.entity"
+import { CreateLsmTreeStorageEngineTaskRequest } from "../models/lsm_tree_storage_engine_request.dto"
+
+interface LsmTreeStorageEngineDomainContract {
+    fn executeTask(req: CreateLsmTreeStorageEngineTaskRequest) -> Result<LsmTreeStorageEnginePrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

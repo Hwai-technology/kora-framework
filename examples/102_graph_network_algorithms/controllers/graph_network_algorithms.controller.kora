@@ -1,0 +1,38 @@
+// Example 102: Graph Algorithms & Tarjan SCC / PageRank
+// Presentation Controller
+
+import { CreateGraphNetworkAlgorithmsTaskRequest } from "../models/graph_network_algorithms_request.dto"
+import { GraphNetworkAlgorithmsResponseDto } from "../models/graph_network_algorithms_response.dto"
+import { GraphNetworkAlgorithmsCoreService } from "../services/graph_network_algorithms_core.service"
+
+class GraphNetworkAlgorithmsController {
+    service: GraphNetworkAlgorithmsCoreService
+
+    init(service: GraphNetworkAlgorithmsCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateGraphNetworkAlgorithmsTaskRequest) -> GraphNetworkAlgorithmsResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => GraphNetworkAlgorithmsResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => GraphNetworkAlgorithmsResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

@@ -1,0 +1,13 @@
+// Example 40: Clinical Trial Electronic Data Capture (EDC)
+// Persistent Database Entity: Audit Trail Log
+
+@table("clinical_trial_edc_audit_trail")
+model ClinicalTrialEdcAuditTrail {
+    @id
+    id: Int
+    recordId: Int
+    performedByStaffId: Int
+    actionTaken: String
+    tamperProofHash: String
+    timestamp: Int
+}

@@ -1,0 +1,32 @@
+// ============================================================================
+// Distributed Event Envelope, Idempotency & Acknowledgment DTOs
+// ============================================================================
+
+model EventEnvelope {
+    eventId: String
+    correlationId: String
+    idempotencyKey: String
+    eventType: String
+    partitionKey: String
+    payload: String
+    sequenceNumber: Int
+    attempts: Int
+    status: String
+    timestamp: Int
+}
+
+model ConsumerAck {
+    eventId: String
+    success: Bool
+    retryAfterMs: Int
+    routedToDlq: Bool
+    errorReason: String
+}
+
+model OutboxTelemetry {
+    totalPublished: Int
+    totalDelivered: Int
+    totalRetries: Int
+    totalDeadLettered: Int
+    outboxPending: Int
+}

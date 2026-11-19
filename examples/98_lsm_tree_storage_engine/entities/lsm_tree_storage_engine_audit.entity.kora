@@ -1,0 +1,12 @@
+// Example 98: Log-Structured Merge-Tree (LSM-Tree) Engine
+// Persistent Database Entity: Audit Log
+
+@table("lsm_tree_storage_engine_audit_logs")
+model LsmTreeStorageEngineAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

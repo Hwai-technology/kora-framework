@@ -1,0 +1,22 @@
+// Example 46: Distributed Task Scheduler & Leader Lease
+// Router & Endpoint Dispatcher
+
+import { CreateDistributedJobSchedulerTaskRequest } from "../models/distributed_job_scheduler_request.dto"
+import { DistributedJobSchedulerResponseDto } from "../models/distributed_job_scheduler_response.dto"
+import { DistributedJobSchedulerController } from "../controllers/distributed_job_scheduler.controller"
+
+class DistributedJobSchedulerRouter {
+    controller: DistributedJobSchedulerController
+
+    init(controller: DistributedJobSchedulerController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateDistributedJobSchedulerTaskRequest) -> DistributedJobSchedulerResponseDto {
+        return this.controller.handleTaskProposal(req)
+    }
+
+    fn getQuorum() -> Bool {
+        return this.controller.checkQuorumStatus()
+    }
+}

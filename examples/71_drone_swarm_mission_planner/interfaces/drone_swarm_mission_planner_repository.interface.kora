@@ -1,0 +1,10 @@
+// Example 71: Autonomous Drone Swarm Formation Coordinator
+// Repository Interface
+
+import { DroneSwarmMissionPlannerPrimaryRecord } from "../entities/drone_swarm_mission_planner_primary.entity"
+
+interface DroneSwarmMissionPlannerRepository {
+    fn findById(id: Int) -> Option<DroneSwarmMissionPlannerPrimaryRecord>
+    fn save(record: DroneSwarmMissionPlannerPrimaryRecord) -> Result<DroneSwarmMissionPlannerPrimaryRecord, String>
+    fn countActive() -> Int
+}

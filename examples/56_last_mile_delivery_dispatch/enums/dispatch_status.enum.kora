@@ -1,0 +1,8 @@
+// Example 56: Last-Mile Delivery Dispatch & Fleet Geo-Routing — Enum: DispatchStatus
+
+enum DispatchStatus {
+    AssignedRoutePending
+    InTransitDelivery
+    DeliveredProofCaptured
+    AttemptFailedCustomerAbsent
+}

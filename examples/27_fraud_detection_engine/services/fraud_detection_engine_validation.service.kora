@@ -1,0 +1,18 @@
+// Example 27: Real-time Fraud & Anomaly Evaluator
+// Validation Rules Engine
+
+import { CreateFraudDetectionEngineRequest } from "../models/fraud_detection_engine_request.dto"
+
+class FraudDetectionEngineValidationService {
+    init() {}
+
+    fn validateInput(req: CreateFraudDetectionEngineRequest) -> Result<Bool, String> {
+        if req.reference == "" {
+            return Err("Reference code is mandatory")
+        }
+        if req.volume < 10 {
+            return Err("Volume below minimum threshold")
+        }
+        return Ok(true)
+    }
+}

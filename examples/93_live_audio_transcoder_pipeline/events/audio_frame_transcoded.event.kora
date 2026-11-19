@@ -1,0 +1,7 @@
+// Example 93: Live Audio Transcoding & Packet Chunking Pipeline — Domain Event: AudioFrameTranscodedEvent
+
+model AudioFrameTranscodedEvent {
+    streamId: String
+    inputSampleRateHz: Int
+    encodedBitrateKbps: Int
+}

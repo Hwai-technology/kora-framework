@@ -1,0 +1,10 @@
+// Example 92: Multi-Room WebSocket Chat & Presence Cluster
+// Repository Interface
+
+import { ChatMultiRoomClusterPrimaryRecord } from "../entities/chat_multi_room_cluster_primary.entity"
+
+interface ChatMultiRoomClusterRepository {
+    fn findById(id: Int) -> Option<ChatMultiRoomClusterPrimaryRecord>
+    fn save(record: ChatMultiRoomClusterPrimaryRecord) -> Result<ChatMultiRoomClusterPrimaryRecord, String>
+    fn countActive() -> Int
+}

@@ -1,0 +1,15 @@
+// Example 91: CRDT Collaborative Real-Time Document Editor
+// Transport Model: Command Request
+
+model CreateCollaborativeCrdtDocTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryCollaborativeCrdtDocFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

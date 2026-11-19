@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 51: Distributed Lock Manager & Fencing Tokens
+// Application Container & Cluster Bootstrap
+// ============================================================================
+
+import { DistributedLockManagerClusterRepository } from "./repositories/distributed_lock_manager_cluster.repository"
+import { DistributedLockManagerCoreService } from "./services/distributed_lock_manager_core.service"
+import { DistributedLockManagerController } from "./controllers/distributed_lock_manager.controller"
+import { DistributedLockManagerRouter } from "./routes/distributed_lock_manager.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = DistributedLockManagerClusterRepository()
+        let service = DistributedLockManagerCoreService(repo)
+        let controller = DistributedLockManagerController(service)
+        let router = DistributedLockManagerRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

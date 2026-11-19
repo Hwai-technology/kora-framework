@@ -1,0 +1,10 @@
+// Example 75: Real-Time Machine Learning Feature Store
+// Domain Service Contract
+
+import { FeatureStoreRegistryPrimaryRecord } from "../entities/feature_store_registry_primary.entity"
+import { CreateFeatureStoreRegistryTaskRequest } from "../models/feature_store_registry_request.dto"
+
+interface FeatureStoreRegistryDomainContract {
+    fn executeTask(req: CreateFeatureStoreRegistryTaskRequest) -> Result<FeatureStoreRegistryPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

@@ -1,0 +1,9 @@
+// Example 43: Raft Distributed Consensus Engine — Enum: NodeRole
+// Dedicated Domain Enum Specification
+
+enum NodeRole {
+    Follower
+    Candidate
+    Leader
+    NonVotingObserver
+}

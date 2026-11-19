@@ -1,0 +1,12 @@
+// Example 78: High-Throughput Vector Embedding Ingestion Pipeline
+// Persistent Database Entity: Audit Log
+
+@table("embedding_ingestion_worker_audit_logs")
+model EmbeddingIngestionWorkerAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

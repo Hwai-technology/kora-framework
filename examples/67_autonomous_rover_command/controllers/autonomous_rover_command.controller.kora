@@ -1,0 +1,38 @@
+// Example 67: Autonomous Rover Navigation & Obstacle Avoidance
+// Presentation Controller
+
+import { CreateAutonomousRoverCommandTaskRequest } from "../models/autonomous_rover_command_request.dto"
+import { AutonomousRoverCommandResponseDto } from "../models/autonomous_rover_command_response.dto"
+import { AutonomousRoverCommandCoreService } from "../services/autonomous_rover_command_core.service"
+
+class AutonomousRoverCommandController {
+    service: AutonomousRoverCommandCoreService
+
+    init(service: AutonomousRoverCommandCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateAutonomousRoverCommandTaskRequest) -> AutonomousRoverCommandResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => AutonomousRoverCommandResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => AutonomousRoverCommandResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

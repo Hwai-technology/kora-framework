@@ -1,0 +1,9 @@
+// Example 51: Distributed Lock Manager & Fencing Tokens
+// Specialized Model 1
+
+model DistributedLockManagerSpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    quorumWeight: Int
+    isActive: Bool
+}

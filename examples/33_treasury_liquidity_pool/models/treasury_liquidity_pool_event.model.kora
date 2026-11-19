@@ -1,0 +1,10 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// Domain Event Model
+
+model TreasuryLiquidityPoolEvent {
+    eventId: String
+    eventType: String
+    entityId: Int
+    occurredAt: Int
+    payloadHash: String
+}

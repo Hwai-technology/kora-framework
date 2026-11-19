@@ -1,0 +1,30 @@
+// ============================================================================
+// Example 25: HFT Order Book — Command Controller
+// ============================================================================
+
+import { OrderPlacementRequest, CancelOrderRequest, MatchExecutionResult, OrderBookDepthDto, MatchEngineSnapshot } from "../models/hft_order_book_request.dto"
+import { HftOrderBookCoreService } from "../services/hft_order_book_core.service"
+
+class HftOrderBookCommandController {
+    service: HftOrderBookCoreService
+
+    init(service: HftOrderBookCoreService) {
+        this.service = service
+    }
+
+    fn placeOrder(req: OrderPlacementRequest) -> MatchExecutionResult {
+        return this.service.submitLimitOrder(req)
+    }
+
+    fn cancel(req: CancelOrderRequest) -> Bool {
+        return this.service.cancelOrder(req)
+    }
+
+    fn inspectDepth() -> OrderBookDepthDto {
+        return this.service.getOrderBookDepth()
+    }
+
+    fn snapshot(id: Int) -> MatchEngineSnapshot {
+        return this.service.createSnapshot(id)
+    }
+}

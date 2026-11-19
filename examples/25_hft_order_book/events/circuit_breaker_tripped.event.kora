@@ -1,0 +1,12 @@
+// ============================================================================
+// Example 25: HFT Order Book — Event: CircuitBreakerTrippedEvent
+// ============================================================================
+
+model CircuitBreakerTrippedEvent {
+    eventId: String
+    triggeringOrderId: Int
+    offendingPrice: Int
+    anchorPrice: Int
+    deviationPercentage: Int
+    timestamp: Int
+}

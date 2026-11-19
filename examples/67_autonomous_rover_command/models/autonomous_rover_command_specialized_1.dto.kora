@@ -1,0 +1,9 @@
+// Example 67: Autonomous Rover Navigation & Obstacle Avoidance
+// Specialized Model 1
+
+model AutonomousRoverCommandSpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

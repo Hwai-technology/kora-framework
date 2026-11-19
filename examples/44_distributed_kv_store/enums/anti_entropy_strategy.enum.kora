@@ -1,0 +1,8 @@
+// Example 44: Distributed Dynamo-Style Key-Value Store — Enum: AntiEntropyStrategy
+// Dedicated Domain Enum Specification
+
+enum AntiEntropyStrategy {
+    MerkleTreeExchange
+    BackgroundGossipPing
+    ReadRepairOnMismatch
+}

@@ -1,0 +1,33 @@
+// Example 53: Inventory Allocation Matrix & Multi-Warehouse Stock
+// Repository Implementation
+
+import { InventoryAllocationMatrixPrimaryRecord } from "../entities/inventory_allocation_matrix_primary.entity"
+import { InventoryAllocationMatrixRepository } from "../interfaces/inventory_allocation_matrix_repository.interface"
+
+class InventoryAllocationMatrixInMemoryRepository implements InventoryAllocationMatrixRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<InventoryAllocationMatrixPrimaryRecord> {
+        if id > 0 {
+            return Some(InventoryAllocationMatrixPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: InventoryAllocationMatrixPrimaryRecord) -> Result<InventoryAllocationMatrixPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

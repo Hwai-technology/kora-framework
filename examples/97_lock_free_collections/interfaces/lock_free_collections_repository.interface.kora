@@ -1,0 +1,10 @@
+// Example 97: Lock-Free Michael-Scott Queue & Treiber Stack
+// Repository Interface
+
+import { LockFreeCollectionsPrimaryRecord } from "../entities/lock_free_collections_primary.entity"
+
+interface LockFreeCollectionsRepository {
+    fn findById(id: Int) -> Option<LockFreeCollectionsPrimaryRecord>
+    fn save(record: LockFreeCollectionsPrimaryRecord) -> Result<LockFreeCollectionsPrimaryRecord, String>
+    fn countActive() -> Int
+}

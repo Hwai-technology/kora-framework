@@ -1,0 +1,16 @@
+// Example 25: High-Frequency Trading Order Book
+// Transport Model: Standard Responses
+
+model HftOrderBookResponse {
+    id: Int
+    reference: String
+    success: Bool
+    statusCode: Int
+    message: String
+}
+
+model HftOrderBookSummaryDto {
+    totalCount: Int
+    activeVolume: Int
+    healthStatus: String
+}

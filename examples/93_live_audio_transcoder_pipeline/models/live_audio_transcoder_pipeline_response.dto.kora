@@ -1,0 +1,16 @@
+// Example 93: Live Audio Transcoding & Packet Chunking Pipeline
+// Transport Model: Standard Response
+
+model LiveAudioTranscoderPipelineResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model LiveAudioTranscoderPipelineSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

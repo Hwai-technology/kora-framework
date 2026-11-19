@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 90: WebRTC SFU Media Router & SDP Signaling
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { WebrtcSignalingSfuInMemoryRepository } from "./repositories/webrtc_signaling_sfu_inmemory.repository"
+import { WebrtcSignalingSfuCoreService } from "./services/webrtc_signaling_sfu_core.service"
+import { WebrtcSignalingSfuController } from "./controllers/webrtc_signaling_sfu.controller"
+import { WebrtcSignalingSfuRouter } from "./routes/webrtc_signaling_sfu.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = WebrtcSignalingSfuInMemoryRepository()
+        let service = WebrtcSignalingSfuCoreService(repo)
+        let controller = WebrtcSignalingSfuController(service)
+        let router = WebrtcSignalingSfuRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

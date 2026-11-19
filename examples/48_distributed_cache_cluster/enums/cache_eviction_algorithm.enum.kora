@@ -1,0 +1,8 @@
+// Example 48: Distributed Cache Cluster & Write-Behind — Enum: CacheEvictionAlgorithm
+// Dedicated Domain Enum Specification
+
+enum CacheEvictionAlgorithm {
+    LeastRecentlyUsedLRU
+    LeastFrequentlyUsedLFU
+    AdaptiveReplacementARC
+}

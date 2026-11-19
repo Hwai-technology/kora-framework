@@ -1,0 +1,7 @@
+// Example 72: HNSW Vector Index & Approximate Nearest Neighbor — Domain Event: VectorNodeIndexedEvent
+
+model VectorNodeIndexedEvent {
+    vectorId: String
+    layerCount: Int
+    neighborEdgesAdded: Int
+}

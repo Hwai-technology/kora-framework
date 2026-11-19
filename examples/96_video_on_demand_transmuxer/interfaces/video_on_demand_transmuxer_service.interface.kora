@@ -1,0 +1,10 @@
+// Example 96: Video on Demand (VOD) HLS/DASH Transmuxer
+// Domain Service Contract
+
+import { VideoOnDemandTransmuxerPrimaryRecord } from "../entities/video_on_demand_transmuxer_primary.entity"
+import { CreateVideoOnDemandTransmuxerTaskRequest } from "../models/video_on_demand_transmuxer_request.dto"
+
+interface VideoOnDemandTransmuxerDomainContract {
+    fn executeTask(req: CreateVideoOnDemandTransmuxerTaskRequest) -> Result<VideoOnDemandTransmuxerPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

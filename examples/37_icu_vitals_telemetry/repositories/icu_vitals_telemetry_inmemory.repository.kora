@@ -1,0 +1,34 @@
+// Example 37: ICU Real-Time High-Frequency Vitals Monitor
+// Repository Implementation
+
+import { IcuVitalsTelemetryClinicalEntity } from "../entities/icu_vitals_telemetry_primary.entity"
+import { IcuVitalsTelemetryRepository } from "../interfaces/icu_vitals_telemetry_repository.interface"
+
+class IcuVitalsTelemetryInMemoryRepository implements IcuVitalsTelemetryRepository {
+    init() {}
+
+    fn findByPatientId(patientId: Int) -> Option<IcuVitalsTelemetryClinicalEntity> {
+        if patientId > 0 {
+            return Some(IcuVitalsTelemetryClinicalEntity {
+                id: patientId + 1000,
+                patientId: patientId,
+                clinicianId: 42,
+                clinicalMetricScore: 85,
+                complianceState: "HIPAA_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(entity: IcuVitalsTelemetryClinicalEntity) -> Result<IcuVitalsTelemetryClinicalEntity, String> {
+        if entity.patientId <= 0 {
+            return Err("Invalid patient identifier")
+        }
+        return Ok(entity)
+    }
+
+    fn verifyIntegrity(recordId: Int) -> Bool {
+        return recordId > 0
+    }
+}

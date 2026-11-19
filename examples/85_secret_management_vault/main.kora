@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 85: Secret Management Vault & Dynamic Credentials
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { SecretManagementVaultInMemoryRepository } from "./repositories/secret_management_vault_inmemory.repository"
+import { SecretManagementVaultCoreService } from "./services/secret_management_vault_core.service"
+import { SecretManagementVaultController } from "./controllers/secret_management_vault.controller"
+import { SecretManagementVaultRouter } from "./routes/secret_management_vault.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = SecretManagementVaultInMemoryRepository()
+        let service = SecretManagementVaultCoreService(repo)
+        let controller = SecretManagementVaultController(service)
+        let router = SecretManagementVaultRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

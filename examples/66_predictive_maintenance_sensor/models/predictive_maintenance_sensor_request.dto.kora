@@ -1,0 +1,15 @@
+// Example 66: Predictive Industrial Equipment Maintenance
+// Transport Model: Command Request
+
+model CreatePredictiveMaintenanceSensorTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryPredictiveMaintenanceSensorFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

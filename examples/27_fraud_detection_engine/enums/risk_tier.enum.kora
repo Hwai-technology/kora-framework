@@ -1,0 +1,9 @@
+// Example 27: fraud_detection_engine — Enum: RiskTier
+// Dedicated Domain Enum Specification
+
+enum RiskTier {
+    LowRisk
+    ElevatedWatchlist
+    HighSuspicion
+    AutoBlockCritical
+}

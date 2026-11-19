@@ -1,0 +1,33 @@
+// Example 60: Faceted Product Catalog Search & Inverted Index
+// Repository Implementation
+
+import { ProductCatalogSearchPrimaryRecord } from "../entities/product_catalog_search_primary.entity"
+import { ProductCatalogSearchRepository } from "../interfaces/product_catalog_search_repository.interface"
+
+class ProductCatalogSearchInMemoryRepository implements ProductCatalogSearchRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<ProductCatalogSearchPrimaryRecord> {
+        if id > 0 {
+            return Some(ProductCatalogSearchPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: ProductCatalogSearchPrimaryRecord) -> Result<ProductCatalogSearchPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

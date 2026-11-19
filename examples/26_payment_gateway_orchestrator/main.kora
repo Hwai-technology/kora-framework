@@ -1,0 +1,29 @@
+// ============================================================================
+// Example 26: Payment Gateway & Webhook Orchestrator
+// Application Container & Dependency Container Bootstrap
+// ============================================================================
+
+import { PaymentGatewayOrchestratorPrimaryRepository } from "./repositories/payment_gateway_orchestrator_primary.repository"
+import { PaymentGatewayOrchestratorCoreService } from "./services/payment_gateway_orchestrator_core.service"
+import { PaymentGatewayOrchestratorCommandController } from "./controllers/payment_gateway_orchestrator_command.controller"
+import { PaymentGatewayOrchestratorQueryController } from "./controllers/payment_gateway_orchestrator_query.controller"
+import { PaymentGatewayOrchestratorRouter } from "./routes/payment_gateway_orchestrator.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = PaymentGatewayOrchestratorPrimaryRepository()
+        let service = PaymentGatewayOrchestratorCoreService(repo)
+        let commandCtrl = PaymentGatewayOrchestratorCommandController(service)
+        let queryCtrl = PaymentGatewayOrchestratorQueryController(repo)
+        let router = PaymentGatewayOrchestratorRouter(commandCtrl, queryCtrl)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

@@ -1,0 +1,14 @@
+// Example 44: Distributed Dynamo-Style Key-Value Store
+// Transport Model: Command Request
+
+model CreateDistributedKvStoreTaskRequest {
+    taskKey: String
+    originatingNodeId: Int
+    payloadVolume: Int
+    targetCluster: String
+}
+
+model QueryDistributedKvStoreStatusRequest {
+    resourceKey: String
+    quorumRequired: Int
+}

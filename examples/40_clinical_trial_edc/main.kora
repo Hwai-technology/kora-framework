@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 40: Clinical Trial Electronic Data Capture (EDC)
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { ClinicalTrialEdcInMemoryRepository } from "./repositories/clinical_trial_edc_inmemory.repository"
+import { ClinicalTrialEdcCoreService } from "./services/clinical_trial_edc_core.service"
+import { ClinicalTrialEdcController } from "./controllers/clinical_trial_edc.controller"
+import { ClinicalTrialEdcRouter } from "./routes/clinical_trial_edc.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = ClinicalTrialEdcInMemoryRepository()
+        let service = ClinicalTrialEdcCoreService(repo)
+        let controller = ClinicalTrialEdcController(service)
+        let router = ClinicalTrialEdcRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

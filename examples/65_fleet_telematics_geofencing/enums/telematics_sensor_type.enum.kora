@@ -1,0 +1,7 @@
+// Example 65: Fleet Telematics & Polygonal Geofence Monitor — Enum: TelematicsSensorType
+
+enum TelematicsSensorType {
+    GpsCoordinates
+    Obd2DiagnosticCodes
+    CanBusEngineStatus
+}

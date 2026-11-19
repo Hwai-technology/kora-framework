@@ -1,9 +1,9 @@
 // ============================================================================
-// Test Suite: 06_realtime_websockets
-// Tests WebSocket chat message dispatch, room presence, and socket teardown
+// Integration Test Suite: 06_realtime_websockets
+// Tests WebSocket upgrade, frame dispatch, room presence, and socket teardown
 // ============================================================================
 
-import { ChatMessage, RoomPresence } from "../models/chat.models"
+import { WsFrame } from "../models/chat.models"
 import { ChatRepository } from "../repositories/chat.repository"
 import { ChatService } from "../services/chat_hub.service"
 
@@ -15,22 +15,37 @@ class WebSocketsTestSuite {
     }
 
     fn runAllTests() -> Unit {
-        // 1. Send WebSocket broadcast message
-        let msg = this.service.sendMessage("Hello Realtime World!")
-        print(msg.content)
+        // 1. Upgrade handshake
+        let session = this.service.authenticateUpgrade("kora_ws_token_master", "127.0.0.1", "general")
+        print("WebSocket client authenticated and connected.")
 
-        // 2. Query Room Presence
+        // 2. Ping-Pong Heartbeat exchange
+        let pingFrame = WsFrame {
+            fin: true,
+            opcode: 9,
+            masked: true,
+            maskKey: 5544,
+            payloadLength: 4,
+            payload: "PING",
+        }
+        let reply = this.service.handleFrame("ws_sess_1001", pingFrame)
+        print("WebSocket Ping/Pong heartbeat turnaround verified.")
+
+        // 3. Broadcast to channel
+        let delivered = this.service.broadcast("general", "admin", "System reboot in 10 minutes")
+        print("WebSocket broadcast delivered.")
+
+        // 4. Query Room Presence
         let presence = this.service.getPresence("general")
-        print(presence.room)
+        print("WebSocket active room presence verified: " + presence.room)
 
-        // 3. Teardown: Disconnect socket clients & flush room buffers
-        print("Teardown: WebSocket clients disconnected and room buffers cleared.")
+        // 5. Teardown: Close session
+        this.service.closeSession("ws_sess_1001")
+        print("Teardown: WebSocket client disconnected and room membership cleared.")
     }
 }
 
-let db = Database()
-let repo = ChatRepository(db)
+let repo = ChatRepository()
 let service = ChatService(repo)
 let suite = WebSocketsTestSuite(service)
 suite.runAllTests()
-

@@ -1,0 +1,9 @@
+// Example 80: AI Workflow Directed Acyclic Graph (DAG) Engine
+// Configuration Model
+
+model AiWorkflowDagEngineConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

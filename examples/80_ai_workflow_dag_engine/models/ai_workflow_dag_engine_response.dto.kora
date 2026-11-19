@@ -1,0 +1,16 @@
+// Example 80: AI Workflow Directed Acyclic Graph (DAG) Engine
+// Transport Model: Standard Response
+
+model AiWorkflowDagEngineResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model AiWorkflowDagEngineSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

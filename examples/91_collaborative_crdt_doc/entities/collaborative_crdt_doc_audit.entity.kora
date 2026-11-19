@@ -1,0 +1,12 @@
+// Example 91: CRDT Collaborative Real-Time Document Editor
+// Persistent Database Entity: Audit Log
+
+@table("collaborative_crdt_doc_audit_logs")
+model CollaborativeCrdtDocAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

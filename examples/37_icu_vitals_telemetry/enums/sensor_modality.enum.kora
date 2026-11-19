@@ -1,0 +1,9 @@
+// Example 37: ICU Real-Time High-Frequency Vitals Monitor — Enum: SensorModality
+// Dedicated Domain Enum Specification
+
+enum SensorModality {
+    ElectrocardiogramECG
+    PulseOximeterSpO2
+    NonInvasiveBloodPressure
+    CapnographyEtCO2
+}

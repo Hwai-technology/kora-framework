@@ -1,0 +1,33 @@
+// Example 66: Predictive Industrial Equipment Maintenance
+// Repository Implementation
+
+import { PredictiveMaintenanceSensorPrimaryRecord } from "../entities/predictive_maintenance_sensor_primary.entity"
+import { PredictiveMaintenanceSensorRepository } from "../interfaces/predictive_maintenance_sensor_repository.interface"
+
+class PredictiveMaintenanceSensorInMemoryRepository implements PredictiveMaintenanceSensorRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<PredictiveMaintenanceSensorPrimaryRecord> {
+        if id > 0 {
+            return Some(PredictiveMaintenanceSensorPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: PredictiveMaintenanceSensorPrimaryRecord) -> Result<PredictiveMaintenanceSensorPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

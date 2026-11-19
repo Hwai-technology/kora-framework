@@ -1,0 +1,15 @@
+// Example 84: Threat Intelligence STIX/TAXII Indicator Parser
+// Transport Model: Command Request
+
+model CreateThreatIntelFeedAggregatorTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryThreatIntelFeedAggregatorFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

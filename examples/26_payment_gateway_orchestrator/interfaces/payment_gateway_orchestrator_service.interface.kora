@@ -1,0 +1,13 @@
+// ============================================================================
+// Payment Gateway Orchestrator Service Interface Contract
+// ============================================================================
+
+import { PaymentGatewayOrchestratorRecord } from "../entities/payment_gateway_orchestrator_primary.entity"
+import { CreatePaymentGatewayOrchestratorRequest, ChallengeVerificationRequest, InboundWebhookPayload } from "../models/payment_gateway_orchestrator_request.dto"
+
+interface PaymentGatewayOrchestratorServiceInterface {
+    fn processRequest(req: CreatePaymentGatewayOrchestratorRequest) -> Result<PaymentGatewayOrchestratorRecord, String>
+    fn completeChallenge(req: ChallengeVerificationRequest) -> Result<PaymentGatewayOrchestratorRecord, String>
+    fn processWebhook(payload: InboundWebhookPayload) -> Result<PaymentGatewayOrchestratorRecord, String>
+    fn validateState(id: Int) -> Bool
+}

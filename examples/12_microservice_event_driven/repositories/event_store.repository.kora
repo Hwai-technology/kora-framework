@@ -1,29 +1,120 @@
-import { DomainEventEntity } from "../entities/domain_event.entity"
-import { EventStoreRepositoryInterface } from "../interfaces/event_store.repository.interface"
+// ============================================================================
+// Transactional Outbox, Idempotency Cache & DLQ Repository
+// ============================================================================
 
-class EventStoreRepository implements EventStoreRepositoryInterface {
-    db: Database
+import { EventEnvelope, OutboxTelemetry } from "../models/event_envelope.model"
 
-    init(db: Database) {
-        this.db = db
+class EventStoreRepository {
+    outbox: Vector<EventEnvelope>
+    seenKeys: Vector<String>
+    dlq: Vector<EventEnvelope>
+    deliveredCount: Int
+    retriedCount: Int
+
+    init() {
+        this.outbox = Vector<EventEnvelope>()
+        this.seenKeys = Vector<String>()
+        this.dlq = Vector<EventEnvelope>()
+        this.deliveredCount = 0
+        this.retriedCount = 0
     }
 
-    fn saveEvent(eventType: String, payload: String) -> Result<DomainEventEntity, String> {
-        if eventType == "" {
-            return Err("Event type cannot be empty")
+    fn isIdempotencyKeySeen(key: String) -> Bool {
+        var i = 0
+        while i < this.seenKeys.length() {
+            if this.seenKeys[i] == key {
+                return true
+            }
+            i = i + 1
         }
-        let sql = "INSERT INTO domain_events (eventType, payload, active) VALUES (?1, ?2, true)"
-        let res = this.db.execute(sql)
-        return Ok(DomainEventEntity {
-            id: 1,
-            eventType: eventType,
-            payload: payload,
-            active: true,
-        })
+        return false
     }
 
-    fn getLatestEvents(limit: Int) -> Result<Int, String> {
-        let sql = "SELECT * FROM domain_events ORDER BY id DESC LIMIT 50"
-        return this.db.query(sql)
+    fn saveToOutbox(envelope: EventEnvelope) -> Result<EventEnvelope, String> {
+        if this.isIdempotencyKeySeen(envelope.idempotencyKey) {
+            return Err("ERR_DUPLICATE_IDEMPOTENCY_KEY: Replay command suppressed")
+        }
+        this.seenKeys.push(envelope.idempotencyKey)
+        this.outbox.push(envelope)
+        return Ok(envelope)
+    }
+
+    fn findById(eventId: String) -> Option<EventEnvelope> {
+        var i = 0
+        while i < this.outbox.length() {
+            let e = this.outbox[i]
+            if e.eventId == eventId {
+                return Some(e)
+            }
+            i = i + 1
+        }
+        return None
+    }
+
+    fn markDelivered(eventId: String) -> Bool {
+        var i = 0
+        while i < this.outbox.length() {
+            let e = this.outbox[i]
+            if e.eventId == eventId {
+                e.status = "Delivered"
+                this.deliveredCount = this.deliveredCount + 1
+                return true
+            }
+            i = i + 1
+        }
+        return false
+    }
+
+    fn recordRetryAttempt(eventId: String) -> Int {
+        var i = 0
+        while i < this.outbox.length() {
+            let e = this.outbox[i]
+            if e.eventId == eventId {
+                e.attempts = e.attempts + 1
+                e.status = "Retrying"
+                this.retriedCount = this.retriedCount + 1
+                return e.attempts
+            }
+            i = i + 1
+        }
+        return 0
+    }
+
+    fn moveToDeadLetterQueue(eventId: String, reason: String) -> Bool {
+        var i = 0
+        while i < this.outbox.length() {
+            let e = this.outbox[i]
+            if e.eventId == eventId {
+                e.status = "DeadLettered"
+                this.dlq.push(e)
+                return true
+            }
+            i = i + 1
+        }
+        return false
+    }
+
+    fn getDlqCount() -> Int {
+        return this.dlq.length()
+    }
+
+    fn getTelemetry() -> OutboxTelemetry {
+        var pending = 0
+        var i = 0
+        while i < this.outbox.length() {
+            let e = this.outbox[i]
+            if e.status == "PendingOutbox" || e.status == "Retrying" {
+                pending = pending + 1
+            }
+            i = i + 1
+        }
+
+        return OutboxTelemetry {
+            totalPublished: this.outbox.length(),
+            totalDelivered: this.deliveredCount,
+            totalRetries: this.retriedCount,
+            totalDeadLettered: this.dlq.length(),
+            outboxPending: pending,
+        }
     }
 }

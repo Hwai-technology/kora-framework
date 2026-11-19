@@ -1,0 +1,150 @@
+// ============================================================================
+// Unit Test Suite: 27_fraud_detection_engine
+// Verifies Sanctions Defense, Impossible Travel, Velocity Burst, and Risk Tiers
+// ============================================================================
+
+import { CreateFraudDetectionEngineRequest } from "../models/fraud_detection_engine_request.dto"
+import { FraudDetectionEnginePrimaryRepository } from "../repositories/fraud_detection_engine_primary.repository"
+import { FraudDetectionEngineCoreService } from "../services/fraud_detection_engine_core.service"
+
+class FraudDetectionUnitTestSuite {
+    service: FraudDetectionEngineCoreService
+
+    init() {
+        let repo = FraudDetectionEnginePrimaryRepository()
+        this.service = FraudDetectionEngineCoreService(repo)
+    }
+
+    // 1. Critical Defense: Sanctioned jurisdiction triggers immediate 100-score block
+    fn test_sanctions_instant_decline() -> Bool {
+        let req = CreateFraudDetectionEngineRequest {
+            targetId: 201,
+            cardToken: "card_sanctions_001",
+            amountCents: 5000,
+            currency: "USD",
+            mccCode: 5411,
+            countryCode: "KP",
+            distanceFromLastTxKm: 0,
+            minutesSinceLastTx: 0,
+            reference: "TX-SANCT-01",
+        }
+        let res = this.service.evaluateRisk(req)
+        return match res {
+            Ok(rec) => rec.riskScore == 100 && rec.outcome == "DECLINED_SANCTIONS",
+            Err(e) => false,
+        }
+    }
+
+    // 2. Geolocation Impossible Travel: 6,000 km in 30 minutes (> 12,000 km/h) -> +50 score
+    fn test_impossible_travel_anomaly() -> Bool {
+        let req = CreateFraudDetectionEngineRequest {
+            targetId: 202,
+            cardToken: "card_traveler_002",
+            amountCents: 4500,
+            currency: "USD",
+            mccCode: 5411,
+            countryCode: "US",
+            distanceFromLastTxKm: 6000,
+            minutesSinceLastTx: 30,
+            reference: "TX-TRAVEL-02",
+        }
+        let res = this.service.evaluateRisk(req)
+        return match res {
+            Ok(rec) => rec.riskScore == 50 && rec.outcome == "STEP_UP_CHALLENGE",
+            Err(e) => false,
+        }
+    }
+
+    // 3. Combined Risk Threshold: High Velocity + High-Risk MCC Crypto (35 + 25 = 60) -> STEP_UP
+    fn test_velocity_and_mcc_scoring() -> Bool {
+        // Fire 4 rapid transactions to trigger velocity burst (> 3)
+        let token = "card_burst_003"
+        this.service.evaluateRisk(CreateFraudDetectionEngineRequest {
+            targetId: 203,
+            cardToken: token,
+            amountCents: 1000,
+            currency: "USD",
+            mccCode: 5411,
+            countryCode: "US",
+            distanceFromLastTxKm: 0,
+            minutesSinceLastTx: 0,
+            reference: "TX-BURST-1",
+        })
+        this.service.evaluateRisk(CreateFraudDetectionEngineRequest {
+            targetId: 204,
+            cardToken: token,
+            amountCents: 1000,
+            currency: "USD",
+            mccCode: 5411,
+            countryCode: "US",
+            distanceFromLastTxKm: 0,
+            minutesSinceLastTx: 0,
+            reference: "TX-BURST-2",
+        })
+        this.service.evaluateRisk(CreateFraudDetectionEngineRequest {
+            targetId: 205,
+            cardToken: token,
+            amountCents: 1000,
+            currency: "USD",
+            mccCode: 5411,
+            countryCode: "US",
+            distanceFromLastTxKm: 0,
+            minutesSinceLastTx: 0,
+            reference: "TX-BURST-3",
+        })
+
+        // 4th transaction at Crypto Exchange (MCC 6051)
+        let res4 = this.service.evaluateRisk(CreateFraudDetectionEngineRequest {
+            targetId: 206,
+            cardToken: token,
+            amountCents: 50000,
+            currency: "USD",
+            mccCode: 6051,
+            countryCode: "US",
+            distanceFromLastTxKm: 0,
+            minutesSinceLastTx: 0,
+            reference: "TX-BURST-4",
+        })
+
+        return match res4 {
+            Ok(rec) => rec.riskScore == 60 && rec.outcome == "STEP_UP_CHALLENGE" && rec.velocityCount == 4,
+            Err(e) => false,
+        }
+    }
+
+    // 4. Low-Risk Clean Transaction -> APPROVED (Score 0)
+    fn test_clean_transaction_approved() -> Bool {
+        let req = CreateFraudDetectionEngineRequest {
+            targetId: 207,
+            cardToken: "card_clean_004",
+            amountCents: 2500,
+            currency: "USD",
+            mccCode: 5411,
+            countryCode: "US",
+            distanceFromLastTxKm: 5,
+            minutesSinceLastTx: 60,
+            reference: "TX-CLEAN-01",
+        }
+        let res = this.service.evaluateRisk(req)
+        return match res {
+            Ok(rec) => rec.riskScore == 0 && rec.outcome == "APPROVED",
+            Err(e) => false,
+        }
+    }
+
+    fn runAll() -> Unit {
+        let t1 = this.test_sanctions_instant_decline()
+        let t2 = this.test_impossible_travel_anomaly()
+        let t3 = this.test_velocity_and_mcc_scoring()
+        let t4 = this.test_clean_transaction_approved()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ Real-time Fraud Detection Multi-Factor Unit Tests: 4/4 passed")
+        } else {
+            print("  ✗ Real-time Fraud Detection Multi-Factor Unit Tests: FAILED")
+        }
+    }
+}
+
+let suite = FraudDetectionUnitTestSuite()
+suite.runAll()

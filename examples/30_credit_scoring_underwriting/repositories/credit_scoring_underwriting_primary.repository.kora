@@ -1,0 +1,33 @@
+// Example 30: Credit Underwriting & Risk Assessment
+// Primary Repository Implementation
+
+import { CreditScoringUnderwritingRecord } from "../entities/credit_scoring_underwriting_primary.entity"
+import { CreditScoringUnderwritingRepository } from "../interfaces/credit_scoring_underwriting_repository.interface"
+
+class CreditScoringUnderwritingPrimaryRepository implements CreditScoringUnderwritingRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<CreditScoringUnderwritingRecord> {
+        if id > 0 {
+            return Some(CreditScoringUnderwritingRecord {
+                id: id,
+                reference: "REF-" + id.toString(),
+                status: "ACTIVE",
+                balance: 100000,
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: CreditScoringUnderwritingRecord) -> Result<CreditScoringUnderwritingRecord, String> {
+        if record.id < 0 {
+            return Err("Invalid record id")
+        }
+        return Ok(record)
+    }
+
+    fn countAll() -> Int {
+        return 42
+    }
+}

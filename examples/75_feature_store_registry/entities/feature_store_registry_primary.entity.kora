@@ -1,0 +1,13 @@
+// Example 75: Real-Time Machine Learning Feature Store
+// Persistent Database Entity: Primary Record
+
+@table("feature_store_registry_records")
+model FeatureStoreRegistryPrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

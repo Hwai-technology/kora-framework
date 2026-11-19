@@ -1,0 +1,7 @@
+// Example 94: Interactive Vector Whiteboard & Delta Sync — Enum: BoardAccessPermission
+
+enum BoardAccessPermission {
+    OwnerModerator
+    EditorActiveDraw
+    ViewerReadOnly
+}

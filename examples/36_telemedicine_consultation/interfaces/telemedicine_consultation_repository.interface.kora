@@ -1,0 +1,10 @@
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions
+// Repository Interface
+
+import { TelemedicineConsultationClinicalEntity } from "../entities/telemedicine_consultation_primary.entity"
+
+interface TelemedicineConsultationRepository {
+    fn findByPatientId(patientId: Int) -> Option<TelemedicineConsultationClinicalEntity>
+    fn save(entity: TelemedicineConsultationClinicalEntity) -> Result<TelemedicineConsultationClinicalEntity, String>
+    fn verifyIntegrity(recordId: Int) -> Bool
+}

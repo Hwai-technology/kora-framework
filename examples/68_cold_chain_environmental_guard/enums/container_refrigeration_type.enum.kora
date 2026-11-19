@@ -1,0 +1,7 @@
+// Example 68: Cold Chain Vaccine Temperature Monitoring — Enum: ContainerRefrigerationType
+
+enum ContainerRefrigerationType {
+    DryIceUltraLowMinus80C
+    StandardMedical2To8C
+    AmbientControlled20C
+}

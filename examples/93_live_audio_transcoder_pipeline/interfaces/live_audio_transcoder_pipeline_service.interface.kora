@@ -1,0 +1,10 @@
+// Example 93: Live Audio Transcoding & Packet Chunking Pipeline
+// Domain Service Contract
+
+import { LiveAudioTranscoderPipelinePrimaryRecord } from "../entities/live_audio_transcoder_pipeline_primary.entity"
+import { CreateLiveAudioTranscoderPipelineTaskRequest } from "../models/live_audio_transcoder_pipeline_request.dto"
+
+interface LiveAudioTranscoderPipelineDomainContract {
+    fn executeTask(req: CreateLiveAudioTranscoderPipelineTaskRequest) -> Result<LiveAudioTranscoderPipelinePrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

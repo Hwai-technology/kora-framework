@@ -1,0 +1,10 @@
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions — Enum: ConsultationState
+// Dedicated Domain Enum Specification
+
+enum ConsultationState {
+    WaitingRoomScheduled
+    InCallActive
+    PausedReconnecting
+    CompletedSigned
+    NoShowCancelled
+}

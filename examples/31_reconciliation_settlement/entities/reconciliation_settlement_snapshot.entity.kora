@@ -1,0 +1,11 @@
+// Example 31: Inter-Bank Reconciliation & Settlement
+// State Snapshot Entity
+
+@table("reconciliation_settlement_snapshots")
+model ReconciliationSettlementSnapshot {
+    @id
+    id: Int
+    aggregateId: Int
+    version: Int
+    stateHash: String
+}

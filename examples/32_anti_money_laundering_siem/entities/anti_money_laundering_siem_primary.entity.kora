@@ -1,0 +1,13 @@
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// Primary Persistent Database Entity
+
+@table("anti_money_laundering_siem_records")
+model AntiMoneyLaunderingSiemRecord {
+    @id
+    id: Int
+    @unique
+    reference: String
+    status: String
+    balance: Int
+    active: Bool
+}

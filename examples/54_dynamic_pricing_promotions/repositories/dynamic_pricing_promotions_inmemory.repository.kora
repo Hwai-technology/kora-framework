@@ -1,0 +1,33 @@
+// Example 54: Dynamic Pricing Engine & Flash Sale Rate-Limiter
+// Repository Implementation
+
+import { DynamicPricingPromotionsPrimaryRecord } from "../entities/dynamic_pricing_promotions_primary.entity"
+import { DynamicPricingPromotionsRepository } from "../interfaces/dynamic_pricing_promotions_repository.interface"
+
+class DynamicPricingPromotionsInMemoryRepository implements DynamicPricingPromotionsRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<DynamicPricingPromotionsPrimaryRecord> {
+        if id > 0 {
+            return Some(DynamicPricingPromotionsPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: DynamicPricingPromotionsPrimaryRecord) -> Result<DynamicPricingPromotionsPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

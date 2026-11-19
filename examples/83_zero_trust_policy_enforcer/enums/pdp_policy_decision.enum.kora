@@ -1,0 +1,8 @@
+// Example 83: Zero-Trust Context-Aware Policy Decision Point (PDP) — Enum: PdpPolicyDecision
+
+enum PdpPolicyDecision {
+    PermitAccessUnrestricted
+    DenyAccessExplicit
+    ChallengeStepUpMfaRequired
+    RemediateDevicePostureFirst
+}

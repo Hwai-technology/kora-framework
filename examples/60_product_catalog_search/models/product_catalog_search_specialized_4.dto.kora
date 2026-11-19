@@ -1,0 +1,9 @@
+// Example 60: Faceted Product Catalog Search & Inverted Index
+// Specialized Model 4
+
+model ProductCatalogSearchSpecializedProfile4 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

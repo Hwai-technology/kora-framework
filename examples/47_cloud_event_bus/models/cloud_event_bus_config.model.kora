@@ -1,0 +1,9 @@
+// Example 47: Cloud Event Bus & Partitioned Streaming
+// Configuration Model
+
+model CloudEventBusClusterConfig {
+    heartbeatIntervalMs: Int
+    electionTimeoutMs: Int
+    quorumMajoritySize: Int
+    clusterName: String
+}

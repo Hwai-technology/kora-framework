@@ -1,0 +1,39 @@
+// Example 48: Distributed Cache Cluster & Write-Behind
+// Core Domain Service Implementation
+
+import { DistributedCacheClusterNodeState } from "../entities/distributed_cache_cluster_primary.entity"
+import { CreateDistributedCacheClusterTaskRequest } from "../models/distributed_cache_cluster_request.dto"
+import { DistributedCacheClusterRepository } from "../interfaces/distributed_cache_cluster_repository.interface"
+import { DistributedCacheClusterConsensusContract } from "../interfaces/distributed_cache_cluster_service.interface"
+
+class DistributedCacheClusterCoreService implements DistributedCacheClusterConsensusContract {
+    repo: DistributedCacheClusterRepository
+
+    init(repo: DistributedCacheClusterRepository) {
+        this.repo = repo
+    }
+
+    fn processConsensusCommand(req: CreateDistributedCacheClusterTaskRequest) -> Result<DistributedCacheClusterNodeState, String> {
+        if req.originatingNodeId <= 0 {
+            return Err("Originating node ID must be strictly positive")
+        }
+        if req.payloadVolume <= 0 {
+            return Err("Payload volume must be positive")
+        }
+
+        let state = DistributedCacheClusterNodeState {
+            id: req.originatingNodeId,
+            nodeIdentifier: "CLUSTER-NODE-" + req.originatingNodeId.toString(),
+            currentEpochTerm: 5,
+            votedForCandidate: req.originatingNodeId,
+            isLeader: true,
+            active: true,
+        }
+        return this.repo.saveNodeState(state)
+    }
+
+    fn evaluateClusterQuorum() -> Bool {
+        let quorum = this.repo.getActiveQuorumCount()
+        return quorum >= 3
+    }
+}

@@ -1,0 +1,10 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// Configuration Model
+
+model TreasuryLiquidityPoolConfig {
+    environment: String
+    maxBatchSize: Int
+    retryAttempts: Int
+    timeoutSeconds: Int
+    enabled: Bool
+}

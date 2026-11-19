@@ -1,0 +1,12 @@
+// ============================================================================
+// Example 24: Fintech Core Banking — Enum: CurrencyCode
+// Segregated Currency Types with ISO 4217 Invariants
+// ============================================================================
+
+enum CurrencyCode {
+    USD
+    EUR
+    GBP
+    CHF
+    JPY
+}

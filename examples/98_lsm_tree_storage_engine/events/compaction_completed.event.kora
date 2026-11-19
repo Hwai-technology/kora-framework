@@ -1,0 +1,7 @@
+// Example 98: Log-Structured Merge-Tree (LSM-Tree) Engine — Domain Event: CompactionCompletedEvent
+
+model CompactionCompletedEvent {
+    inputSstablesCount: Int
+    outputSstablesCount: Int
+    spaceSavedBytes: Int
+}

@@ -1,0 +1,10 @@
+// Example 100: Spatial 2D R-Tree & k-Nearest Neighbors (k-NN)
+// Repository Interface
+
+import { SpatialRTreeIndexerPrimaryRecord } from "../entities/spatial_r_tree_indexer_primary.entity"
+
+interface SpatialRTreeIndexerRepository {
+    fn findById(id: Int) -> Option<SpatialRTreeIndexerPrimaryRecord>
+    fn save(record: SpatialRTreeIndexerPrimaryRecord) -> Result<SpatialRTreeIndexerPrimaryRecord, String>
+    fn countActive() -> Int
+}

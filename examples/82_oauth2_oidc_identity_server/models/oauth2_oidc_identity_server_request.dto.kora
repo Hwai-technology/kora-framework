@@ -1,0 +1,15 @@
+// Example 82: OAuth 2.1 & OpenID Connect Authorization Server
+// Transport Model: Command Request
+
+model CreateOauth2OidcIdentityServerTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryOauth2OidcIdentityServerFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

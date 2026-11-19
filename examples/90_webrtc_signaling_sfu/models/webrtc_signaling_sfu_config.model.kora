@@ -1,0 +1,9 @@
+// Example 90: WebRTC SFU Media Router & SDP Signaling
+// Configuration Model
+
+model WebrtcSignalingSfuConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

@@ -1,0 +1,8 @@
+// Example 73: Autonomous LLM Agent Orchestrator & Tool Calling — Enum: AgentReasoningStep
+
+enum AgentReasoningStep {
+    ThoughtObservation
+    ToolActionExecution
+    FinalAnswerProduced
+    SafetyGuardrailBlocked
+}

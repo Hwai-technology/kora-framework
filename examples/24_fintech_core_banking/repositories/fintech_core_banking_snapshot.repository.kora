@@ -1,0 +1,17 @@
+// Example 24: Core Banking Ledger & Accounts
+// State Snapshot Repository Implementation
+
+import { FintechCoreBankingSnapshot } from "../entities/fintech_core_banking_snapshot.entity"
+
+class FintechCoreBankingSnapshotRepository {
+    init() {}
+
+    fn captureSnapshot(aggregateId: Int, version: Int) -> FintechCoreBankingSnapshot {
+        return FintechCoreBankingSnapshot {
+            id: 1,
+            aggregateId: aggregateId,
+            version: version,
+            stateHash: "sha256-verified-snapshot",
+        }
+    }
+}

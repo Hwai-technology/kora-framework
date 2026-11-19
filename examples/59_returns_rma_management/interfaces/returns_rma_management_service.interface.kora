@@ -1,0 +1,10 @@
+// Example 59: Reverse Logistics & RMA Inspection Engine
+// Domain Service Contract
+
+import { ReturnsRmaManagementPrimaryRecord } from "../entities/returns_rma_management_primary.entity"
+import { CreateReturnsRmaManagementTaskRequest } from "../models/returns_rma_management_request.dto"
+
+interface ReturnsRmaManagementDomainContract {
+    fn executeTask(req: CreateReturnsRmaManagementTaskRequest) -> Result<ReturnsRmaManagementPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

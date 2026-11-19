@@ -1,0 +1,12 @@
+// Example 80: AI Workflow Directed Acyclic Graph (DAG) Engine
+// Persistent Database Entity: Audit Log
+
+@table("ai_workflow_dag_engine_audit_logs")
+model AiWorkflowDagEngineAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

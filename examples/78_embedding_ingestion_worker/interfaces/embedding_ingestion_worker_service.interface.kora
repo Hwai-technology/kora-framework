@@ -1,0 +1,10 @@
+// Example 78: High-Throughput Vector Embedding Ingestion Pipeline
+// Domain Service Contract
+
+import { EmbeddingIngestionWorkerPrimaryRecord } from "../entities/embedding_ingestion_worker_primary.entity"
+import { CreateEmbeddingIngestionWorkerTaskRequest } from "../models/embedding_ingestion_worker_request.dto"
+
+interface EmbeddingIngestionWorkerDomainContract {
+    fn executeTask(req: CreateEmbeddingIngestionWorkerTaskRequest) -> Result<EmbeddingIngestionWorkerPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

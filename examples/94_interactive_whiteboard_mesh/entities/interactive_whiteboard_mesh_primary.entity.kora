@@ -1,0 +1,13 @@
+// Example 94: Interactive Vector Whiteboard & Delta Sync
+// Persistent Database Entity: Primary Record
+
+@table("interactive_whiteboard_mesh_records")
+model InteractiveWhiteboardMeshPrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

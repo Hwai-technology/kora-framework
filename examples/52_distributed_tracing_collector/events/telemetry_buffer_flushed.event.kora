@@ -1,0 +1,8 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector — Domain Event: TelemetryBufferFlushedEvent
+// Dedicated Domain Event Specification
+
+model TelemetryBufferFlushedEvent {
+    exporterDestination: String
+    exportedSpanCount: Int
+    durationMs: Int
+}

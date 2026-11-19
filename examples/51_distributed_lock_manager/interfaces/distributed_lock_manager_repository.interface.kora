@@ -1,0 +1,10 @@
+// Example 51: Distributed Lock Manager & Fencing Tokens
+// Repository Interface
+
+import { DistributedLockManagerNodeState } from "../entities/distributed_lock_manager_primary.entity"
+
+interface DistributedLockManagerRepository {
+    fn findNodeById(nodeId: Int) -> Option<DistributedLockManagerNodeState>
+    fn saveNodeState(state: DistributedLockManagerNodeState) -> Result<DistributedLockManagerNodeState, String>
+    fn getActiveQuorumCount() -> Int
+}

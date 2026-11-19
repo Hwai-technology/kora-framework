@@ -1,0 +1,10 @@
+// Example 37: ICU Real-Time High-Frequency Vitals Monitor
+// Repository Interface
+
+import { IcuVitalsTelemetryClinicalEntity } from "../entities/icu_vitals_telemetry_primary.entity"
+
+interface IcuVitalsTelemetryRepository {
+    fn findByPatientId(patientId: Int) -> Option<IcuVitalsTelemetryClinicalEntity>
+    fn save(entity: IcuVitalsTelemetryClinicalEntity) -> Result<IcuVitalsTelemetryClinicalEntity, String>
+    fn verifyIntegrity(recordId: Int) -> Bool
+}

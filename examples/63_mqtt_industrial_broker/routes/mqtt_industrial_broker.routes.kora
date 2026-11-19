@@ -1,0 +1,22 @@
+// Example 63: MQTT Industrial Telemetry Broker & Topic Tree
+// Router & Endpoint Dispatcher
+
+import { CreateMqttIndustrialBrokerTaskRequest } from "../models/mqtt_industrial_broker_request.dto"
+import { MqttIndustrialBrokerResponseDto } from "../models/mqtt_industrial_broker_response.dto"
+import { MqttIndustrialBrokerController } from "../controllers/mqtt_industrial_broker.controller"
+
+class MqttIndustrialBrokerRouter {
+    controller: MqttIndustrialBrokerController
+
+    init(controller: MqttIndustrialBrokerController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateMqttIndustrialBrokerTaskRequest) -> MqttIndustrialBrokerResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

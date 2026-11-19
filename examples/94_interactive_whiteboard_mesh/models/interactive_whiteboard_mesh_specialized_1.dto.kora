@@ -1,0 +1,9 @@
+// Example 94: Interactive Vector Whiteboard & Delta Sync
+// Specialized Model 1
+
+model InteractiveWhiteboardMeshSpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

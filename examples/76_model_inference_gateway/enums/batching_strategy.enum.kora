@@ -1,0 +1,6 @@
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher — Enum: BatchingStrategy
+
+enum BatchingStrategy {
+    DynamicQueueMicroBatch
+    DirectSingleStreamLowLatency
+}

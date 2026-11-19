@@ -1,0 +1,12 @@
+// Example 101: Pratt Parsing & Bytecode Virtual Machine
+// Persistent Database Entity: Audit Log
+
+@table("ast_parser_compiler_toy_audit_logs")
+model AstParserCompilerToyAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

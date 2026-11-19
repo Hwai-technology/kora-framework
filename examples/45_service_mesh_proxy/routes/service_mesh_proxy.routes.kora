@@ -1,0 +1,22 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director
+// Router & Endpoint Dispatcher
+
+import { CreateServiceMeshProxyTaskRequest } from "../models/service_mesh_proxy_request.dto"
+import { ServiceMeshProxyResponseDto } from "../models/service_mesh_proxy_response.dto"
+import { ServiceMeshProxyController } from "../controllers/service_mesh_proxy.controller"
+
+class ServiceMeshProxyRouter {
+    controller: ServiceMeshProxyController
+
+    init(controller: ServiceMeshProxyController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateServiceMeshProxyTaskRequest) -> ServiceMeshProxyResponseDto {
+        return this.controller.handleTaskProposal(req)
+    }
+
+    fn getQuorum() -> Bool {
+        return this.controller.checkQuorumStatus()
+    }
+}

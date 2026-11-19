@@ -1,0 +1,10 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector
+// Domain Service Contract
+
+import { DistributedTracingCollectorNodeState } from "../entities/distributed_tracing_collector_primary.entity"
+import { CreateDistributedTracingCollectorTaskRequest } from "../models/distributed_tracing_collector_request.dto"
+
+interface DistributedTracingCollectorConsensusContract {
+    fn processConsensusCommand(req: CreateDistributedTracingCollectorTaskRequest) -> Result<DistributedTracingCollectorNodeState, String>
+    fn evaluateClusterQuorum() -> Bool
+}

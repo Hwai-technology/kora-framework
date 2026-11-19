@@ -1,0 +1,9 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director
+// Configuration Model
+
+model ServiceMeshProxyClusterConfig {
+    heartbeatIntervalMs: Int
+    electionTimeoutMs: Int
+    quorumMajoritySize: Int
+    clusterName: String
+}

@@ -1,0 +1,12 @@
+// Example 82: OAuth 2.1 & OpenID Connect Authorization Server
+// Persistent Database Entity: Audit Log
+
+@table("oauth2_oidc_identity_server_audit_logs")
+model Oauth2OidcIdentityServerAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

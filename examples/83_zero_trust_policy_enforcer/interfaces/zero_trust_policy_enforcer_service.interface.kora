@@ -1,0 +1,10 @@
+// Example 83: Zero-Trust Context-Aware Policy Decision Point (PDP)
+// Domain Service Contract
+
+import { ZeroTrustPolicyEnforcerPrimaryRecord } from "../entities/zero_trust_policy_enforcer_primary.entity"
+import { CreateZeroTrustPolicyEnforcerTaskRequest } from "../models/zero_trust_policy_enforcer_request.dto"
+
+interface ZeroTrustPolicyEnforcerDomainContract {
+    fn executeTask(req: CreateZeroTrustPolicyEnforcerTaskRequest) -> Result<ZeroTrustPolicyEnforcerPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

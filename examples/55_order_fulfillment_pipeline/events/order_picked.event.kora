@@ -1,0 +1,7 @@
+// Example 55: Order Fulfillment & Pick-Pack-Ship Workflow — Domain Event: OrderPickedEvent
+
+model OrderPickedEvent {
+    orderId: Int
+    pickerStaffId: Int
+    itemCount: Int
+}

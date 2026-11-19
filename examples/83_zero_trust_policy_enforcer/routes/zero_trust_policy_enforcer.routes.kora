@@ -1,0 +1,22 @@
+// Example 83: Zero-Trust Context-Aware Policy Decision Point (PDP)
+// Router & Endpoint Dispatcher
+
+import { CreateZeroTrustPolicyEnforcerTaskRequest } from "../models/zero_trust_policy_enforcer_request.dto"
+import { ZeroTrustPolicyEnforcerResponseDto } from "../models/zero_trust_policy_enforcer_response.dto"
+import { ZeroTrustPolicyEnforcerController } from "../controllers/zero_trust_policy_enforcer.controller"
+
+class ZeroTrustPolicyEnforcerRouter {
+    controller: ZeroTrustPolicyEnforcerController
+
+    init(controller: ZeroTrustPolicyEnforcerController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateZeroTrustPolicyEnforcerTaskRequest) -> ZeroTrustPolicyEnforcerResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

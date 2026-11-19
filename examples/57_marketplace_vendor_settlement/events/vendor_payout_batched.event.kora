@@ -1,0 +1,7 @@
+// Example 57: Marketplace Vendor Settlement & Escrow Payouts — Domain Event: VendorPayoutBatchedEvent
+
+model VendorPayoutBatchedEvent {
+    vendorId: Int
+    netDisbursementCents: Int
+    commissionRetainedCents: Int
+}

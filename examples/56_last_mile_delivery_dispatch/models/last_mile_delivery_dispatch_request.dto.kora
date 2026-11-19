@@ -1,0 +1,15 @@
+// Example 56: Last-Mile Delivery Dispatch & Fleet Geo-Routing
+// Transport Model: Command Request
+
+model CreateLastMileDeliveryDispatchTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryLastMileDeliveryDispatchFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

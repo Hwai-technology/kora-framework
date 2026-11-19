@@ -1,0 +1,21 @@
+// Example 28: Crypto Derivatives & Margin Engine
+// Query Controller (Reads & Lookups)
+
+import { CryptoDerivativesExchangeRecord } from "../entities/crypto_derivatives_exchange_primary.entity"
+import { CryptoDerivativesExchangeRepository } from "../interfaces/crypto_derivatives_exchange_repository.interface"
+
+class CryptoDerivativesExchangeQueryController {
+    repo: CryptoDerivativesExchangeRepository
+
+    init(repo: CryptoDerivativesExchangeRepository) {
+        this.repo = repo
+    }
+
+    fn getById(id: Int) -> Option<CryptoDerivativesExchangeRecord> {
+        return this.repo.findById(id)
+    }
+
+    fn getTotalVolume() -> Int {
+        return this.repo.countAll()
+    }
+}

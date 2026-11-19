@@ -1,0 +1,16 @@
+// Example 71: Autonomous Drone Swarm Formation Coordinator
+// Transport Model: Standard Response
+
+model DroneSwarmMissionPlannerResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model DroneSwarmMissionPlannerSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

@@ -1,0 +1,16 @@
+// Example 74: Retrieval-Augmented Generation (RAG) Document Chunker
+// Transport Model: Standard Response
+
+model RagKnowledgePipelineResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model RagKnowledgePipelineSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

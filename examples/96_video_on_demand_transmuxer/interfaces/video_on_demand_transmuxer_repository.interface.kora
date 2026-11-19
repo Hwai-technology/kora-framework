@@ -1,0 +1,10 @@
+// Example 96: Video on Demand (VOD) HLS/DASH Transmuxer
+// Repository Interface
+
+import { VideoOnDemandTransmuxerPrimaryRecord } from "../entities/video_on_demand_transmuxer_primary.entity"
+
+interface VideoOnDemandTransmuxerRepository {
+    fn findById(id: Int) -> Option<VideoOnDemandTransmuxerPrimaryRecord>
+    fn save(record: VideoOnDemandTransmuxerPrimaryRecord) -> Result<VideoOnDemandTransmuxerPrimaryRecord, String>
+    fn countActive() -> Int
+}

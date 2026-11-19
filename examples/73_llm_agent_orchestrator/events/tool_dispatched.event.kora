@@ -1,0 +1,7 @@
+// Example 73: Autonomous LLM Agent Orchestrator & Tool Calling — Domain Event: ToolDispatchedEvent
+
+model ToolDispatchedEvent {
+    toolName: String
+    executionDurationMs: Int
+    responseSizeBytes: Int
+}

@@ -1,0 +1,14 @@
+// Example 51: Distributed Lock Manager & Fencing Tokens
+// Persistent Database Entity: Cluster Node State
+
+@table("distributed_lock_manager_node_state")
+model DistributedLockManagerNodeState {
+    @id
+    id: Int
+    @unique
+    nodeIdentifier: String
+    currentEpochTerm: Int
+    votedForCandidate: Int
+    isLeader: Bool
+    active: Bool
+}

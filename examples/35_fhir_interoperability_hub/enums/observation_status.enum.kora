@@ -1,0 +1,9 @@
+// Example 35: FHIR R4 & HL7 Interoperability Hub — Enum: ObservationStatus
+// Dedicated Domain Enum Specification
+
+enum ObservationStatus {
+    RegisteredPreliminary
+    FinalVerified
+    AmendedCorrected
+    EnteredInError
+}

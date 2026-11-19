@@ -1,0 +1,15 @@
+// Example 100: Spatial 2D R-Tree & k-Nearest Neighbors (k-NN)
+// Transport Model: Command Request
+
+model CreateSpatialRTreeIndexerTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QuerySpatialRTreeIndexerFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

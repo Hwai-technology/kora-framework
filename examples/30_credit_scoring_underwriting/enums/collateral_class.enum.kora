@@ -1,0 +1,9 @@
+// Example 30: credit_scoring_underwriting — Enum: CollateralClass
+// Dedicated Domain Enum Specification
+
+enum CollateralClass {
+    UnsecuredPersonal
+    RealEstateResidential
+    CommercialEquipment
+    LiquidCashSecured
+}

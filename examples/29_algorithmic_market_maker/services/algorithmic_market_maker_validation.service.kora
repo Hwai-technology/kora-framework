@@ -1,0 +1,18 @@
+// Example 29: Algorithmic Market Maker & Quoting Engine
+// Validation Rules Engine
+
+import { CreateAlgorithmicMarketMakerRequest } from "../models/algorithmic_market_maker_request.dto"
+
+class AlgorithmicMarketMakerValidationService {
+    init() {}
+
+    fn validateInput(req: CreateAlgorithmicMarketMakerRequest) -> Result<Bool, String> {
+        if req.reference == "" {
+            return Err("Reference code is mandatory")
+        }
+        if req.volume < 10 {
+            return Err("Volume below minimum threshold")
+        }
+        return Ok(true)
+    }
+}

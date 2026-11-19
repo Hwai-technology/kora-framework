@@ -1,0 +1,10 @@
+// Example 94: Interactive Vector Whiteboard & Delta Sync
+// Repository Interface
+
+import { InteractiveWhiteboardMeshPrimaryRecord } from "../entities/interactive_whiteboard_mesh_primary.entity"
+
+interface InteractiveWhiteboardMeshRepository {
+    fn findById(id: Int) -> Option<InteractiveWhiteboardMeshPrimaryRecord>
+    fn save(record: InteractiveWhiteboardMeshPrimaryRecord) -> Result<InteractiveWhiteboardMeshPrimaryRecord, String>
+    fn countActive() -> Int
+}

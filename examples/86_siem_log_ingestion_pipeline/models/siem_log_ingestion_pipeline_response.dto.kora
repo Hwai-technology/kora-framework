@@ -1,0 +1,16 @@
+// Example 86: SIEM High-Throughput Log Ingestion & CEF Normalizer
+// Transport Model: Standard Response
+
+model SiemLogIngestionPipelineResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model SiemLogIngestionPipelineSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

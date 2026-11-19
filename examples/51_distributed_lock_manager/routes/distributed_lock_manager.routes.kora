@@ -1,0 +1,22 @@
+// Example 51: Distributed Lock Manager & Fencing Tokens
+// Router & Endpoint Dispatcher
+
+import { CreateDistributedLockManagerTaskRequest } from "../models/distributed_lock_manager_request.dto"
+import { DistributedLockManagerResponseDto } from "../models/distributed_lock_manager_response.dto"
+import { DistributedLockManagerController } from "../controllers/distributed_lock_manager.controller"
+
+class DistributedLockManagerRouter {
+    controller: DistributedLockManagerController
+
+    init(controller: DistributedLockManagerController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateDistributedLockManagerTaskRequest) -> DistributedLockManagerResponseDto {
+        return this.controller.handleTaskProposal(req)
+    }
+
+    fn getQuorum() -> Bool {
+        return this.controller.checkQuorumStatus()
+    }
+}

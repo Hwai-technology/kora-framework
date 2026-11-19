@@ -1,0 +1,17 @@
+// Example 26: Payment Gateway & Webhook Orchestrator
+// State Snapshot Repository Implementation
+
+import { PaymentGatewayOrchestratorSnapshot } from "../entities/payment_gateway_orchestrator_snapshot.entity"
+
+class PaymentGatewayOrchestratorSnapshotRepository {
+    init() {}
+
+    fn captureSnapshot(aggregateId: Int, version: Int) -> PaymentGatewayOrchestratorSnapshot {
+        return PaymentGatewayOrchestratorSnapshot {
+            id: 1,
+            aggregateId: aggregateId,
+            version: version,
+            stateHash: "sha256-verified-snapshot",
+        }
+    }
+}

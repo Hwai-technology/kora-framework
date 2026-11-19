@@ -1,0 +1,55 @@
+// Example 84: Threat Intelligence STIX/TAXII Indicator Parser
+// Core Domain Service Implementation
+
+import { ThreatIntelFeedAggregatorPrimaryRecord } from "../entities/threat_intel_feed_aggregator_primary.entity"
+import { CreateThreatIntelFeedAggregatorTaskRequest } from "../models/threat_intel_feed_aggregator_request.dto"
+import { ThreatIntelFeedAggregatorRepository } from "../interfaces/threat_intel_feed_aggregator_repository.interface"
+import { ThreatIntelFeedAggregatorDomainContract } from "../interfaces/threat_intel_feed_aggregator_service.interface"
+
+class ThreatIntelFeedAggregatorCoreService implements ThreatIntelFeedAggregatorDomainContract {
+    repo: ThreatIntelFeedAggregatorRepository
+
+    init(repo: ThreatIntelFeedAggregatorRepository) {
+        this.repo = repo
+    }
+
+    fn executeTask(req: CreateThreatIntelFeedAggregatorTaskRequest) -> Result<ThreatIntelFeedAggregatorPrimaryRecord, String> {
+        if req.targetEntityId <= 0 {
+            return Err("Target entity ID must be strictly positive")
+        }
+        if req.workloadCapacity <= 0 {
+            return Err("Workload capacity must be strictly positive")
+        }
+
+        let record = ThreatIntelFeedAggregatorPrimaryRecord {
+            id: req.targetEntityId,
+            referenceCode: req.taskKey,
+            capacityScore: req.workloadCapacity,
+            operationalStatus: "COMMITTED_HEALTHY",
+            active: true,
+        }
+        return this.repo.save(record)
+    }
+
+    fn evaluateHealth(entityId: Int) -> String {
+        let opt = this.repo.findById(entityId)
+        let isPresent = match opt {
+            Some(r) => true,
+            None => false,
+        }
+        if !isPresent {
+            return "ENTITY_NOT_FOUND"
+        }
+        let record = match opt {
+            Some(r) => r,
+            None => ThreatIntelFeedAggregatorPrimaryRecord { id: 0, referenceCode: "", capacityScore: 0, operationalStatus: "", active: false },
+        }
+        if record.capacityScore > 80 {
+            return "OPTIMUM_PERFORMANCE"
+        }
+        if record.capacityScore > 40 {
+            return "MODERATE_NORMAL"
+        }
+        return "LOW_CAPACITY"
+    }
+}

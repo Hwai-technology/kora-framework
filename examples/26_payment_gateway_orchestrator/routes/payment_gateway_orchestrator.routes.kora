@@ -1,0 +1,26 @@
+// Example 26: Payment Gateway & Webhook Orchestrator
+// Router & Endpoint Dispatcher
+
+import { CreatePaymentGatewayOrchestratorRequest } from "../models/payment_gateway_orchestrator_request.dto"
+import { PaymentGatewayOrchestratorResponse } from "../models/payment_gateway_orchestrator_response.dto"
+import { PaymentGatewayOrchestratorRecord } from "../entities/payment_gateway_orchestrator_primary.entity"
+import { PaymentGatewayOrchestratorCommandController } from "../controllers/payment_gateway_orchestrator_command.controller"
+import { PaymentGatewayOrchestratorQueryController } from "../controllers/payment_gateway_orchestrator_query.controller"
+
+class PaymentGatewayOrchestratorRouter {
+    commandController: PaymentGatewayOrchestratorCommandController
+    queryController: PaymentGatewayOrchestratorQueryController
+
+    init(commandController: PaymentGatewayOrchestratorCommandController, queryController: PaymentGatewayOrchestratorQueryController) {
+        this.commandController = commandController
+        this.queryController = queryController
+    }
+
+    fn postRecord(req: CreatePaymentGatewayOrchestratorRequest) -> PaymentGatewayOrchestratorResponse {
+        return this.commandController.handleCreate(req)
+    }
+
+    fn fetchRecord(id: Int) -> Option<PaymentGatewayOrchestratorRecord> {
+        return this.queryController.getById(id)
+    }
+}

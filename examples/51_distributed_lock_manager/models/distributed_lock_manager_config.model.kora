@@ -1,0 +1,9 @@
+// Example 51: Distributed Lock Manager & Fencing Tokens
+// Configuration Model
+
+model DistributedLockManagerClusterConfig {
+    heartbeatIntervalMs: Int
+    electionTimeoutMs: Int
+    quorumMajoritySize: Int
+    clusterName: String
+}

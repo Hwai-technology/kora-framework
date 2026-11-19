@@ -1,0 +1,7 @@
+// Example 66: Predictive Industrial Equipment Maintenance — Domain Event: MaintenanceOrderCreatedEvent
+
+model MaintenanceOrderCreatedEvent {
+    equipmentId: String
+    urgencyLevel: String
+    technicianId: Int
+}

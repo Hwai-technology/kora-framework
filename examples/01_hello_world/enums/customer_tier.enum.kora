@@ -1,0 +1,10 @@
+// ============================================================================
+// Example 01: Core Language Foundations — Enum: CustomerTier
+// ============================================================================
+
+enum CustomerTier {
+    Standard
+    Premium
+    VIP
+    Enterprise
+}

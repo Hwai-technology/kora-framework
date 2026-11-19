@@ -1,0 +1,21 @@
+// Example 25: High-Frequency Trading Order Book
+// Query Controller (Reads & Lookups)
+
+import { HftOrderBookRecord } from "../entities/hft_order_book_primary.entity"
+import { HftOrderBookRepository } from "../interfaces/hft_order_book_repository.interface"
+
+class HftOrderBookQueryController {
+    repo: HftOrderBookRepository
+
+    init(repo: HftOrderBookRepository) {
+        this.repo = repo
+    }
+
+    fn getById(id: Int) -> Option<HftOrderBookRecord> {
+        return this.repo.findById(id)
+    }
+
+    fn getTotalVolume() -> Int {
+        return this.repo.countAll()
+    }
+}

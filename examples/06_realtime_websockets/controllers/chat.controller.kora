@@ -1,8 +1,10 @@
 // ============================================================================
-// Realtime Chat — Presentation Controller Layer
+// Realtime WebSocket — Presentation Controller Layer
+// Handles HTTP Upgrade Handshake, REST Pub/Sub, and Presence Telemetry
 // ============================================================================
 
 import { ChatService } from "../services/chat_hub.service"
+import { UpgradeResponse } from "../models/chat.models"
 
 class ChatController {
     service: ChatService
@@ -11,14 +13,57 @@ class ChatController {
         this.service = service
     }
 
-    fn presence(request: Request) -> Response {
-        let room = request.params["room"]
-        let result = this.service.getPresence(room)
-        return Response.json(result)
+    fn upgrade(request: Request) -> Response {
+        let token = request.headers["Authorization"]
+        let clientIp = request.ip
+        let channelOpt = request.query("channel")
+        let channel = match channelOpt {
+            Some(c) => c,
+            None => "general",
+        }
+
+        let optSession = this.service.authenticateUpgrade(token, clientIp, channel)
+        let isSuccess = match optSession {
+            Some(s) => true,
+            None => false,
+        }
+
+        if !isSuccess {
+            return Response.status(401).json(UpgradeResponse {
+                accepted: false,
+                sessionId: "NONE",
+                assignedChannel: "NONE",
+                errorCode: "ERR_INVALID_WS_BEARER_TOKEN",
+            })
+        }
+
+        let sid = match optSession {
+            Some(s) => s.sessionId,
+            None => "UNKNOWN",
+        }
+        let ch = match optSession {
+            Some(s) => s.channel,
+            None => "UNKNOWN",
+        }
+
+        return Response.status(101).json(UpgradeResponse {
+            accepted: true,
+            sessionId: sid,
+            assignedChannel: ch,
+            errorCode: "NONE",
+        })
     }
 
-    fn sendMessage(request: Request) -> Response {
-        let result = this.service.sendMessage(request.body)
+    fn broadcast(request: Request) -> Response {
+        let channel = request.params["channel"]
+        let senderId = request.headers["X-Sender-Id"]
+        let deliveredCount = this.service.broadcast(channel, senderId, request.body)
+        return Response.json("Delivered to " + deliveredCount.toString() + " active subscribers")
+    }
+
+    fn presence(request: Request) -> Response {
+        let channel = request.params["channel"]
+        let result = this.service.getPresence(channel)
         return Response.json(result)
     }
 }

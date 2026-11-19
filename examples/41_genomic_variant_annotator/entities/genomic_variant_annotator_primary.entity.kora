@@ -1,0 +1,14 @@
+// Example 41: Genomic Variant Annotation & Pathogenicity
+// Persistent Database Entity: Primary Record
+
+@table("genomic_variant_annotator_clinical_records")
+model GenomicVariantAnnotatorClinicalEntity {
+    @id
+    id: Int
+    @unique
+    patientId: Int
+    clinicianId: Int
+    clinicalMetricScore: Int
+    complianceState: String
+    active: Bool
+}

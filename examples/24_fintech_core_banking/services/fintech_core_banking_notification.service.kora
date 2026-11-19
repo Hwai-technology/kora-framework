@@ -1,0 +1,16 @@
+// Example 24: Core Banking Ledger & Accounts
+// Notification Service Implementation
+
+import { FintechCoreBankingNotifier } from "../interfaces/fintech_core_banking_notifier.interface"
+
+class FintechCoreBankingNotificationService implements FintechCoreBankingNotifier {
+    init() {}
+
+    fn sendAlert(subject: String, level: String) -> Bool {
+        return level != "CRITICAL" || subject != ""
+    }
+
+    fn ping() -> Bool {
+        return true
+    }
+}

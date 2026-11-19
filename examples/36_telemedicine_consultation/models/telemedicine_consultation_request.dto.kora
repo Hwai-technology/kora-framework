@@ -1,0 +1,16 @@
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions
+// Transport Model: Command Requests
+
+model CreateTelemedicineConsultationRecordRequest {
+    patientId: Int
+    clinicianId: Int
+    domainContext: String
+    clinicalMetricScore: Int
+    confidentialNotes: String
+}
+
+model QueryTelemedicineConsultationFilterRequest {
+    patientId: Int
+    limit: Int
+    includeHistorical: Bool
+}

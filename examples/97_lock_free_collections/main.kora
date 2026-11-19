@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 97: Lock-Free Michael-Scott Queue & Treiber Stack
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { LockFreeCollectionsInMemoryRepository } from "./repositories/lock_free_collections_inmemory.repository"
+import { LockFreeCollectionsCoreService } from "./services/lock_free_collections_core.service"
+import { LockFreeCollectionsController } from "./controllers/lock_free_collections.controller"
+import { LockFreeCollectionsRouter } from "./routes/lock_free_collections.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = LockFreeCollectionsInMemoryRepository()
+        let service = LockFreeCollectionsCoreService(repo)
+        let controller = LockFreeCollectionsController(service)
+        let router = LockFreeCollectionsRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

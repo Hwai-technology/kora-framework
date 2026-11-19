@@ -1,0 +1,38 @@
+// Example 44: Distributed Dynamo-Style Key-Value Store
+// Presentation Controller
+
+import { CreateDistributedKvStoreTaskRequest } from "../models/distributed_kv_store_request.dto"
+import { DistributedKvStoreResponseDto } from "../models/distributed_kv_store_response.dto"
+import { DistributedKvStoreCoreService } from "../services/distributed_kv_store_core.service"
+
+class DistributedKvStoreController {
+    service: DistributedKvStoreCoreService
+
+    init(service: DistributedKvStoreCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskProposal(req: CreateDistributedKvStoreTaskRequest) -> DistributedKvStoreResponseDto {
+        let outcome = this.service.processConsensusCommand(req)
+        return match outcome {
+            Ok(state) => DistributedKvStoreResponseDto {
+                operationId: "CONSENSUS-TX-" + req.taskKey,
+                nodeId: state.id,
+                status: "QUORUM_COMMITTED",
+                isQuorumSatisfied: true,
+                message: "Log entry replicated and committed across cluster quorum",
+            },
+            Err(reason) => DistributedKvStoreResponseDto {
+                operationId: "CONSENSUS-FAILED",
+                nodeId: req.originatingNodeId,
+                status: "QUORUM_REJECTED",
+                isQuorumSatisfied: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkQuorumStatus() -> Bool {
+        return this.service.evaluateClusterQuorum()
+    }
+}

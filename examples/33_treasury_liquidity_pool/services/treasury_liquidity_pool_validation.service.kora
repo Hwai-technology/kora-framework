@@ -1,0 +1,18 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// Validation Rules Engine
+
+import { CreateTreasuryLiquidityPoolRequest } from "../models/treasury_liquidity_pool_request.dto"
+
+class TreasuryLiquidityPoolValidationService {
+    init() {}
+
+    fn validateInput(req: CreateTreasuryLiquidityPoolRequest) -> Result<Bool, String> {
+        if req.reference == "" {
+            return Err("Reference code is mandatory")
+        }
+        if req.volume < 10 {
+            return Err("Volume below minimum threshold")
+        }
+        return Ok(true)
+    }
+}

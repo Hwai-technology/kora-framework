@@ -1,0 +1,29 @@
+// ============================================================================
+// Example 27: Real-time Fraud & Anomaly Evaluator
+// Application Container & Dependency Container Bootstrap
+// ============================================================================
+
+import { FraudDetectionEnginePrimaryRepository } from "./repositories/fraud_detection_engine_primary.repository"
+import { FraudDetectionEngineCoreService } from "./services/fraud_detection_engine_core.service"
+import { FraudDetectionEngineCommandController } from "./controllers/fraud_detection_engine_command.controller"
+import { FraudDetectionEngineQueryController } from "./controllers/fraud_detection_engine_query.controller"
+import { FraudDetectionEngineRouter } from "./routes/fraud_detection_engine.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = FraudDetectionEnginePrimaryRepository()
+        let service = FraudDetectionEngineCoreService(repo)
+        let commandCtrl = FraudDetectionEngineCommandController(service)
+        let queryCtrl = FraudDetectionEngineQueryController(repo)
+        let router = FraudDetectionEngineRouter(commandCtrl, queryCtrl)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

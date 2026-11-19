@@ -1,0 +1,9 @@
+// Example 103: Probabilistic Bloom & Cuckoo Filter Suite
+// Specialized Model 2
+
+model BloomCuckooFilterSuiteSpecializedProfile2 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

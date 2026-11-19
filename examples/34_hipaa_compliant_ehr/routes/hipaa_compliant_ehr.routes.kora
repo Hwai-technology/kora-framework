@@ -1,0 +1,22 @@
+// Example 34: HIPAA Compliant Electronic Health Records
+// Router & Endpoint Dispatcher
+
+import { CreateHipaaCompliantEhrRecordRequest } from "../models/hipaa_compliant_ehr_request.dto"
+import { HipaaCompliantEhrResponseDto } from "../models/hipaa_compliant_ehr_response.dto"
+import { HipaaCompliantEhrController } from "../controllers/hipaa_compliant_ehr.controller"
+
+class HipaaCompliantEhrRouter {
+    controller: HipaaCompliantEhrController
+
+    init(controller: HipaaCompliantEhrController) {
+        this.controller = controller
+    }
+
+    fn postRecord(req: CreateHipaaCompliantEhrRecordRequest) -> HipaaCompliantEhrResponseDto {
+        return this.controller.handleRecordSubmission(req)
+    }
+
+    fn getRiskScore(patientId: Int) -> String {
+        return this.controller.checkPatientRisk(patientId)
+    }
+}

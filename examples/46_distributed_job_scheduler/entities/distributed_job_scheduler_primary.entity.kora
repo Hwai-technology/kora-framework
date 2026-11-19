@@ -1,0 +1,14 @@
+// Example 46: Distributed Task Scheduler & Leader Lease
+// Persistent Database Entity: Cluster Node State
+
+@table("distributed_job_scheduler_node_state")
+model DistributedJobSchedulerNodeState {
+    @id
+    id: Int
+    @unique
+    nodeIdentifier: String
+    currentEpochTerm: Int
+    votedForCandidate: Int
+    isLeader: Bool
+    active: Bool
+}

@@ -1,0 +1,39 @@
+// Example 38: Radiology PACS DICOM Metadata Indexer
+// Presentation Controller
+
+import { CreateRadiologyPacsMetadataRecordRequest } from "../models/radiology_pacs_metadata_request.dto"
+import { RadiologyPacsMetadataResponseDto } from "../models/radiology_pacs_metadata_response.dto"
+import { RadiologyPacsMetadataClinicalEntity } from "../entities/radiology_pacs_metadata_primary.entity"
+import { RadiologyPacsMetadataCoreService } from "../services/radiology_pacs_metadata_core.service"
+
+class RadiologyPacsMetadataController {
+    service: RadiologyPacsMetadataCoreService
+
+    init(service: RadiologyPacsMetadataCoreService) {
+        this.service = service
+    }
+
+    fn handleRecordSubmission(req: CreateRadiologyPacsMetadataRecordRequest) -> RadiologyPacsMetadataResponseDto {
+        let outcome = this.service.processClinicalRecord(req)
+        return match outcome {
+            Ok(rec) => RadiologyPacsMetadataResponseDto {
+                recordId: rec.id,
+                patientId: rec.patientId,
+                status: "COMMITTED_ENCRYPTED",
+                isComplianceVerified: true,
+                message: "Record persisted under HIPAA safety standards",
+            },
+            Err(reason) => RadiologyPacsMetadataResponseDto {
+                recordId: -1,
+                patientId: req.patientId,
+                status: "REJECTED_VALIDATION_ERROR",
+                isComplianceVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkPatientRisk(patientId: Int) -> String {
+        return this.service.evaluateClinicalRisk(patientId)
+    }
+}

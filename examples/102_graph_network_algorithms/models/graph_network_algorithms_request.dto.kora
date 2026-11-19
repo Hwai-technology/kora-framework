@@ -1,0 +1,15 @@
+// Example 102: Graph Algorithms & Tarjan SCC / PageRank
+// Transport Model: Command Request
+
+model CreateGraphNetworkAlgorithmsTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryGraphNetworkAlgorithmsFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

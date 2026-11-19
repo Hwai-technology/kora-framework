@@ -1,0 +1,38 @@
+// Example 61: Supplier Purchase Order & 3-Way Invoice Matcher
+// Presentation Controller
+
+import { CreateSupplierPurchaseOrderFlowTaskRequest } from "../models/supplier_purchase_order_flow_request.dto"
+import { SupplierPurchaseOrderFlowResponseDto } from "../models/supplier_purchase_order_flow_response.dto"
+import { SupplierPurchaseOrderFlowCoreService } from "../services/supplier_purchase_order_flow_core.service"
+
+class SupplierPurchaseOrderFlowController {
+    service: SupplierPurchaseOrderFlowCoreService
+
+    init(service: SupplierPurchaseOrderFlowCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateSupplierPurchaseOrderFlowTaskRequest) -> SupplierPurchaseOrderFlowResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => SupplierPurchaseOrderFlowResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => SupplierPurchaseOrderFlowResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

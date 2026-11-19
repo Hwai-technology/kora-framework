@@ -1,0 +1,184 @@
+// ============================================================================
+// Unit Test Suite: 26_payment_gateway_orchestrator
+// Verifies Smart Routing, PSD2 3DS SCA, Idempotency, and Webhook HMAC
+// ============================================================================
+
+import { CreatePaymentGatewayOrchestratorRequest, ChallengeVerificationRequest, InboundWebhookPayload } from "../models/payment_gateway_orchestrator_request.dto"
+import { PaymentGatewayOrchestratorPrimaryRepository } from "../repositories/payment_gateway_orchestrator_primary.repository"
+import { PaymentGatewayOrchestratorCoreService } from "../services/payment_gateway_orchestrator_core.service"
+import { PaymentGatewayOrchestratorValidationService } from "../services/payment_gateway_orchestrator_validation.service"
+
+class PaymentGatewayOrchestratorUnitTestSuite {
+    service: PaymentGatewayOrchestratorCoreService
+    validator: PaymentGatewayOrchestratorValidationService
+
+    init() {
+        let repo = PaymentGatewayOrchestratorPrimaryRepository()
+        this.service = PaymentGatewayOrchestratorCoreService(repo)
+        this.validator = PaymentGatewayOrchestratorValidationService()
+    }
+
+    // 1. Acquirer Smart Routing: High ticket (> $10k) routes to ADYEN
+    fn test_smart_routing_high_ticket_adyen() -> Bool {
+        let req = CreatePaymentGatewayOrchestratorRequest {
+            targetId: 101,
+            idempotencyKey: "idemp_high_ticket_001",
+            cardBin: "411111",
+            customerCountry: "US",
+            currency: "USD",
+            amountCents: 2500000,
+            reference: "INVOICE-CORP-99",
+        }
+        let res = this.service.processRequest(req)
+        return match res {
+            Ok(rec) => rec.provider == "ADYEN" && rec.status == "AUTHORIZED",
+            Err(e) => false,
+        }
+    }
+
+    // 2. Acquirer Smart Routing: European transactions route to STRIPE
+    fn test_smart_routing_european_stripe() -> Bool {
+        let req = CreatePaymentGatewayOrchestratorRequest {
+            targetId: 102,
+            idempotencyKey: "idemp_eu_low_002",
+            cardBin: "520000",
+            customerCountry: "DE",
+            currency: "EUR",
+            amountCents: 3500,
+            reference: "ORDER-EU-12",
+        }
+        let res = this.service.processRequest(req)
+        return match res {
+            Ok(rec) => rec.provider == "STRIPE" && rec.threeDsStatus == "FRICTIONLESS",
+            Err(e) => false,
+        }
+    }
+
+    // 3. PSD2 3D Secure 2.0: EUR amount > 5000 cents requires Challenge
+    fn test_psd2_3ds_challenge_enforced() -> Bool {
+        let req = CreatePaymentGatewayOrchestratorRequest {
+            targetId: 103,
+            idempotencyKey: "idemp_eu_high_003",
+            cardBin: "520000",
+            customerCountry: "FR",
+            currency: "EUR",
+            amountCents: 12500,
+            reference: "ORDER-EU-HIGH",
+        }
+        let res = this.service.processRequest(req)
+        let isChallenged = match res {
+            Ok(rec) => rec.threeDsStatus == "CHALLENGE_REQUIRED" && rec.status == "PENDING_3DS_CHALLENGE",
+            Err(e) => false,
+        }
+        if !isChallenged {
+            return false
+        }
+
+        let txId = match res {
+            Ok(rec) => rec.transactionId,
+            Err(e) => "NONE",
+        }
+
+        // Pass Challenge
+        let chalReq = ChallengeVerificationRequest {
+            transactionId: txId,
+            challengeCode: "SCA-PASS-99",
+        }
+        let chalRes = this.service.completeChallenge(chalReq)
+        return match chalRes {
+            Ok(rec) => rec.status == "AUTHORIZED" && rec.threeDsStatus == "AUTHENTICATED",
+            Err(e) => false,
+        }
+    }
+
+    // 4. Idempotency Gate: Replaying identical key returns original transaction
+    fn test_idempotency_gate_replay() -> Bool {
+        let req = CreatePaymentGatewayOrchestratorRequest {
+            targetId: 104,
+            idempotencyKey: "idemp_exact_key_dup",
+            cardBin: "411111",
+            customerCountry: "US",
+            currency: "USD",
+            amountCents: 5000,
+            reference: "ORDER-DUP-1",
+        }
+        let res1 = this.service.processRequest(req)
+        let res2 = this.service.processRequest(req)
+
+        let tx1 = match res1 {
+            Ok(r) => r.transactionId,
+            Err(e) => "T1",
+        }
+        let tx2 = match res2 {
+            Ok(r) => r.transactionId,
+            Err(e) => "T2",
+        }
+        return tx1 == tx2
+    }
+
+    // 5. Inbound Webhook HMAC Signature Defense: Tampered signature rejected
+    fn test_webhook_hmac_defense() -> Bool {
+        // First create transaction
+        let req = CreatePaymentGatewayOrchestratorRequest {
+            targetId: 105,
+            idempotencyKey: "idemp_webhook_test_001",
+            cardBin: "411111",
+            customerCountry: "US",
+            currency: "USD",
+            amountCents: 8000,
+            reference: "ORDER-WH-1",
+        }
+        let res = this.service.processRequest(req)
+        let txId = match res {
+            Ok(r) => r.transactionId,
+            Err(e) => "NONE",
+        }
+
+        // Invalid signature
+        let tampered = InboundWebhookPayload {
+            provider: "STRIPE",
+            signature: "invalid_tampered_sig_123",
+            transactionId: txId,
+            eventType: "PAYMENT_CAPTURED",
+            amountCents: 8000,
+        }
+        let tamperedRes = this.service.processWebhook(tampered)
+        let isRejected = match tamperedRes {
+            Ok(r) => false,
+            Err(err) => err == "ERR_INVALID_WEBHOOK_SIGNATURE: Tampered payload rejected",
+        }
+
+        // Valid HMAC signature
+        let valid = InboundWebhookPayload {
+            provider: "STRIPE",
+            signature: "sha256=a5b6c7d8e9f0123456789abcdef",
+            transactionId: txId,
+            eventType: "PAYMENT_CAPTURED",
+            amountCents: 8000,
+        }
+        let validRes = this.service.processWebhook(valid)
+        let isCaptured = match validRes {
+            Ok(r) => r.status == "CAPTURED",
+            Err(err) => false,
+        }
+
+        return isRejected && isCaptured
+    }
+
+    fn runAll() -> Unit {
+        let t1 = this.test_smart_routing_high_ticket_adyen()
+        let t2 = this.test_smart_routing_european_stripe()
+        let t3 = this.test_psd2_3ds_challenge_enforced()
+        let t4 = this.test_idempotency_gate_replay()
+        let t5 = this.test_webhook_hmac_defense()
+
+        if t1 && t2 && t3 && t4 && t5 {
+            print("  ✓ Payment Gateway & Webhook Orchestrator Unit Tests: 5/5 passed")
+        } else {
+            print("  ✗ Payment Gateway & Webhook Orchestrator Unit Tests: FAILED")
+        }
+    }
+}
+
+let suite = PaymentGatewayOrchestratorUnitTestSuite()
+suite.runAll()

@@ -1,0 +1,18 @@
+// Example 28: Crypto Derivatives & Margin Engine
+// Validation Rules Engine
+
+import { CreateCryptoDerivativesExchangeRequest } from "../models/crypto_derivatives_exchange_request.dto"
+
+class CryptoDerivativesExchangeValidationService {
+    init() {}
+
+    fn validateInput(req: CreateCryptoDerivativesExchangeRequest) -> Result<Bool, String> {
+        if req.reference == "" {
+            return Err("Reference code is mandatory")
+        }
+        if req.volume < 10 {
+            return Err("Volume below minimum threshold")
+        }
+        return Ok(true)
+    }
+}

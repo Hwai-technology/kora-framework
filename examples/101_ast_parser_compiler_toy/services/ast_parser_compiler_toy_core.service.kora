@@ -1,0 +1,55 @@
+// Example 101: Pratt Parsing & Bytecode Virtual Machine
+// Core Domain Service Implementation
+
+import { AstParserCompilerToyPrimaryRecord } from "../entities/ast_parser_compiler_toy_primary.entity"
+import { CreateAstParserCompilerToyTaskRequest } from "../models/ast_parser_compiler_toy_request.dto"
+import { AstParserCompilerToyRepository } from "../interfaces/ast_parser_compiler_toy_repository.interface"
+import { AstParserCompilerToyDomainContract } from "../interfaces/ast_parser_compiler_toy_service.interface"
+
+class AstParserCompilerToyCoreService implements AstParserCompilerToyDomainContract {
+    repo: AstParserCompilerToyRepository
+
+    init(repo: AstParserCompilerToyRepository) {
+        this.repo = repo
+    }
+
+    fn executeTask(req: CreateAstParserCompilerToyTaskRequest) -> Result<AstParserCompilerToyPrimaryRecord, String> {
+        if req.targetEntityId <= 0 {
+            return Err("Target entity ID must be strictly positive")
+        }
+        if req.workloadCapacity <= 0 {
+            return Err("Workload capacity must be strictly positive")
+        }
+
+        let record = AstParserCompilerToyPrimaryRecord {
+            id: req.targetEntityId,
+            referenceCode: req.taskKey,
+            capacityScore: req.workloadCapacity,
+            operationalStatus: "COMMITTED_HEALTHY",
+            active: true,
+        }
+        return this.repo.save(record)
+    }
+
+    fn evaluateHealth(entityId: Int) -> String {
+        let opt = this.repo.findById(entityId)
+        let isPresent = match opt {
+            Some(r) => true,
+            None => false,
+        }
+        if !isPresent {
+            return "ENTITY_NOT_FOUND"
+        }
+        let record = match opt {
+            Some(r) => r,
+            None => AstParserCompilerToyPrimaryRecord { id: 0, referenceCode: "", capacityScore: 0, operationalStatus: "", active: false },
+        }
+        if record.capacityScore > 80 {
+            return "OPTIMUM_PERFORMANCE"
+        }
+        if record.capacityScore > 40 {
+            return "MODERATE_NORMAL"
+        }
+        return "LOW_CAPACITY"
+    }
+}

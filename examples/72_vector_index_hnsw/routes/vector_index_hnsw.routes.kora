@@ -1,0 +1,22 @@
+// Example 72: HNSW Vector Index & Approximate Nearest Neighbor
+// Router & Endpoint Dispatcher
+
+import { CreateVectorIndexHnswTaskRequest } from "../models/vector_index_hnsw_request.dto"
+import { VectorIndexHnswResponseDto } from "../models/vector_index_hnsw_response.dto"
+import { VectorIndexHnswController } from "../controllers/vector_index_hnsw.controller"
+
+class VectorIndexHnswRouter {
+    controller: VectorIndexHnswController
+
+    init(controller: VectorIndexHnswController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateVectorIndexHnswTaskRequest) -> VectorIndexHnswResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

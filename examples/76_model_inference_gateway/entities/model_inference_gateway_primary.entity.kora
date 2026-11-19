@@ -1,0 +1,13 @@
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher
+// Persistent Database Entity: Primary Record
+
+@table("model_inference_gateway_records")
+model ModelInferenceGatewayPrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

@@ -1,0 +1,9 @@
+// Example 102: Graph Algorithms & Tarjan SCC / PageRank
+// Configuration Model
+
+model GraphNetworkAlgorithmsConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

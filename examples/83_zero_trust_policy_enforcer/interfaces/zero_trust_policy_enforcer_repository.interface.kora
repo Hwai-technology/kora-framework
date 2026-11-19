@@ -1,0 +1,10 @@
+// Example 83: Zero-Trust Context-Aware Policy Decision Point (PDP)
+// Repository Interface
+
+import { ZeroTrustPolicyEnforcerPrimaryRecord } from "../entities/zero_trust_policy_enforcer_primary.entity"
+
+interface ZeroTrustPolicyEnforcerRepository {
+    fn findById(id: Int) -> Option<ZeroTrustPolicyEnforcerPrimaryRecord>
+    fn save(record: ZeroTrustPolicyEnforcerPrimaryRecord) -> Result<ZeroTrustPolicyEnforcerPrimaryRecord, String>
+    fn countActive() -> Int
+}

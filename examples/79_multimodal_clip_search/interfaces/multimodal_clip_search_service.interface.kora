@@ -1,0 +1,10 @@
+// Example 79: Multimodal CLIP Cross-Search Engine
+// Domain Service Contract
+
+import { MultimodalClipSearchPrimaryRecord } from "../entities/multimodal_clip_search_primary.entity"
+import { CreateMultimodalClipSearchTaskRequest } from "../models/multimodal_clip_search_request.dto"
+
+interface MultimodalClipSearchDomainContract {
+    fn executeTask(req: CreateMultimodalClipSearchTaskRequest) -> Result<MultimodalClipSearchPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

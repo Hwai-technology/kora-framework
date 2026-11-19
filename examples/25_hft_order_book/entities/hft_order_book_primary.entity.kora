@@ -1,0 +1,15 @@
+// ============================================================================
+// Example 25: HFT Order Book — Entity: ActiveOrder
+// ============================================================================
+
+@table("active_orders")
+model ActiveOrder {
+    @id
+    orderId: Int
+    traderId: Int
+    side: String
+    price: Int
+    remainingQuantity: Int
+    timestamp: Int
+    status: String
+}

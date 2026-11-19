@@ -1,0 +1,10 @@
+// Example 27: fraud_detection_engine — Domain Event: AnomalyDetectedEvent
+// Dedicated Domain Event Specification
+
+model AnomalyDetectedEvent {
+    anomalyId: String
+    subjectId: String
+    riskScore: Int
+    triggeredRule: String
+    timestamp: Int
+}

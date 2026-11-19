@@ -1,0 +1,9 @@
+// Example 101: Pratt Parsing & Bytecode Virtual Machine
+// Specialized Model 2
+
+model AstParserCompilerToySpecializedProfile2 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

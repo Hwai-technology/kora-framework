@@ -1,0 +1,7 @@
+// Example 91: CRDT Collaborative Real-Time Document Editor — Domain Event: CursorPositionBroadcastedEvent
+
+model CursorPositionBroadcastedEvent {
+    peerId: String
+    docId: String
+    cursorIndex: Int
+}

@@ -1,0 +1,11 @@
+// Example 26: Payment Gateway & Webhook Orchestrator
+// Secondary Audit Log Entity
+
+@table("payment_gateway_orchestrator_items")
+model PaymentGatewayOrchestratorItem {
+    @id
+    id: Int
+    parentId: Int
+    itemCode: String
+    amount: Int
+}

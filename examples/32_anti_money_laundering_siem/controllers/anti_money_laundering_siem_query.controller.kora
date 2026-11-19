@@ -1,0 +1,21 @@
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// Query Controller (Reads & Lookups)
+
+import { AntiMoneyLaunderingSiemRecord } from "../entities/anti_money_laundering_siem_primary.entity"
+import { AntiMoneyLaunderingSiemRepository } from "../interfaces/anti_money_laundering_siem_repository.interface"
+
+class AntiMoneyLaunderingSiemQueryController {
+    repo: AntiMoneyLaunderingSiemRepository
+
+    init(repo: AntiMoneyLaunderingSiemRepository) {
+        this.repo = repo
+    }
+
+    fn getById(id: Int) -> Option<AntiMoneyLaunderingSiemRecord> {
+        return this.repo.findById(id)
+    }
+
+    fn getTotalVolume() -> Int {
+        return this.repo.countAll()
+    }
+}

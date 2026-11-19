@@ -1,0 +1,13 @@
+// Example 46: Distributed Task Scheduler & Leader Lease
+// Persistent Database Entity: Replicated Log
+
+@table("distributed_job_scheduler_replicated_logs")
+model DistributedJobSchedulerReplicatedLogEntry {
+    @id
+    id: Int
+    logIndex: Int
+    termNumber: Int
+    commandPayload: String
+    committedQuorum: Bool
+    timestamp: Int
+}

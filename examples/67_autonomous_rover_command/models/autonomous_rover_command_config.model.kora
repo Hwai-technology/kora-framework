@@ -1,0 +1,9 @@
+// Example 67: Autonomous Rover Navigation & Obstacle Avoidance
+// Configuration Model
+
+model AutonomousRoverCommandConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

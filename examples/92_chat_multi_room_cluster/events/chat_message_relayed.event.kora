@@ -1,0 +1,8 @@
+// Example 92: Multi-Room WebSocket Chat & Presence Cluster — Domain Event: ChatMessageRelayedEvent
+
+model ChatMessageRelayedEvent {
+    channelId: String
+    senderUserId: Int
+    messageId: String
+    timestamp: Int
+}

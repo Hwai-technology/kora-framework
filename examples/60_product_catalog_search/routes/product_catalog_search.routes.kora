@@ -1,0 +1,22 @@
+// Example 60: Faceted Product Catalog Search & Inverted Index
+// Router & Endpoint Dispatcher
+
+import { CreateProductCatalogSearchTaskRequest } from "../models/product_catalog_search_request.dto"
+import { ProductCatalogSearchResponseDto } from "../models/product_catalog_search_response.dto"
+import { ProductCatalogSearchController } from "../controllers/product_catalog_search.controller"
+
+class ProductCatalogSearchRouter {
+    controller: ProductCatalogSearchController
+
+    init(controller: ProductCatalogSearchController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateProductCatalogSearchTaskRequest) -> ProductCatalogSearchResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

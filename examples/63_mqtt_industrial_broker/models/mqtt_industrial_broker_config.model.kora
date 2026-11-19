@@ -1,0 +1,9 @@
+// Example 63: MQTT Industrial Telemetry Broker & Topic Tree
+// Configuration Model
+
+model MqttIndustrialBrokerConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

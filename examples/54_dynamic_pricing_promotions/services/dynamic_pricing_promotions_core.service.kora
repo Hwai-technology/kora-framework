@@ -1,0 +1,55 @@
+// Example 54: Dynamic Pricing Engine & Flash Sale Rate-Limiter
+// Core Domain Service Implementation
+
+import { DynamicPricingPromotionsPrimaryRecord } from "../entities/dynamic_pricing_promotions_primary.entity"
+import { CreateDynamicPricingPromotionsTaskRequest } from "../models/dynamic_pricing_promotions_request.dto"
+import { DynamicPricingPromotionsRepository } from "../interfaces/dynamic_pricing_promotions_repository.interface"
+import { DynamicPricingPromotionsDomainContract } from "../interfaces/dynamic_pricing_promotions_service.interface"
+
+class DynamicPricingPromotionsCoreService implements DynamicPricingPromotionsDomainContract {
+    repo: DynamicPricingPromotionsRepository
+
+    init(repo: DynamicPricingPromotionsRepository) {
+        this.repo = repo
+    }
+
+    fn executeTask(req: CreateDynamicPricingPromotionsTaskRequest) -> Result<DynamicPricingPromotionsPrimaryRecord, String> {
+        if req.targetEntityId <= 0 {
+            return Err("Target entity ID must be strictly positive")
+        }
+        if req.workloadCapacity <= 0 {
+            return Err("Workload capacity must be strictly positive")
+        }
+
+        let record = DynamicPricingPromotionsPrimaryRecord {
+            id: req.targetEntityId,
+            referenceCode: req.taskKey,
+            capacityScore: req.workloadCapacity,
+            operationalStatus: "COMMITTED_HEALTHY",
+            active: true,
+        }
+        return this.repo.save(record)
+    }
+
+    fn evaluateHealth(entityId: Int) -> String {
+        let opt = this.repo.findById(entityId)
+        let isPresent = match opt {
+            Some(r) => true,
+            None => false,
+        }
+        if !isPresent {
+            return "ENTITY_NOT_FOUND"
+        }
+        let record = match opt {
+            Some(r) => r,
+            None => DynamicPricingPromotionsPrimaryRecord { id: 0, referenceCode: "", capacityScore: 0, operationalStatus: "", active: false },
+        }
+        if record.capacityScore > 80 {
+            return "OPTIMUM_PERFORMANCE"
+        }
+        if record.capacityScore > 40 {
+            return "MODERATE_NORMAL"
+        }
+        return "LOW_CAPACITY"
+    }
+}

@@ -1,0 +1,17 @@
+// ============================================================================
+// Example 24: Fintech Core Banking — Database Entity: LedgerJournalEvent
+// Event Sourcing Journal with Immutable Audit Log
+// ============================================================================
+
+@table("ledger_journal_events")
+model LedgerJournalEvent {
+    @id
+    id: Int
+    eventType: String
+    accountId: Int
+    deltaAmount: Int
+    resultingBalance: Int
+    sagaId: String
+    sequenceNumber: Int
+    timestamp: Int
+}

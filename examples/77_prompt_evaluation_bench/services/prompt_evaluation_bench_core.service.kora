@@ -1,0 +1,55 @@
+// Example 77: Prompt Engineering Evaluation & Hallucination Scorer
+// Core Domain Service Implementation
+
+import { PromptEvaluationBenchPrimaryRecord } from "../entities/prompt_evaluation_bench_primary.entity"
+import { CreatePromptEvaluationBenchTaskRequest } from "../models/prompt_evaluation_bench_request.dto"
+import { PromptEvaluationBenchRepository } from "../interfaces/prompt_evaluation_bench_repository.interface"
+import { PromptEvaluationBenchDomainContract } from "../interfaces/prompt_evaluation_bench_service.interface"
+
+class PromptEvaluationBenchCoreService implements PromptEvaluationBenchDomainContract {
+    repo: PromptEvaluationBenchRepository
+
+    init(repo: PromptEvaluationBenchRepository) {
+        this.repo = repo
+    }
+
+    fn executeTask(req: CreatePromptEvaluationBenchTaskRequest) -> Result<PromptEvaluationBenchPrimaryRecord, String> {
+        if req.targetEntityId <= 0 {
+            return Err("Target entity ID must be strictly positive")
+        }
+        if req.workloadCapacity <= 0 {
+            return Err("Workload capacity must be strictly positive")
+        }
+
+        let record = PromptEvaluationBenchPrimaryRecord {
+            id: req.targetEntityId,
+            referenceCode: req.taskKey,
+            capacityScore: req.workloadCapacity,
+            operationalStatus: "COMMITTED_HEALTHY",
+            active: true,
+        }
+        return this.repo.save(record)
+    }
+
+    fn evaluateHealth(entityId: Int) -> String {
+        let opt = this.repo.findById(entityId)
+        let isPresent = match opt {
+            Some(r) => true,
+            None => false,
+        }
+        if !isPresent {
+            return "ENTITY_NOT_FOUND"
+        }
+        let record = match opt {
+            Some(r) => r,
+            None => PromptEvaluationBenchPrimaryRecord { id: 0, referenceCode: "", capacityScore: 0, operationalStatus: "", active: false },
+        }
+        if record.capacityScore > 80 {
+            return "OPTIMUM_PERFORMANCE"
+        }
+        if record.capacityScore > 40 {
+            return "MODERATE_NORMAL"
+        }
+        return "LOW_CAPACITY"
+    }
+}

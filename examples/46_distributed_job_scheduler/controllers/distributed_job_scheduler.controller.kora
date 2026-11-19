@@ -1,0 +1,38 @@
+// Example 46: Distributed Task Scheduler & Leader Lease
+// Presentation Controller
+
+import { CreateDistributedJobSchedulerTaskRequest } from "../models/distributed_job_scheduler_request.dto"
+import { DistributedJobSchedulerResponseDto } from "../models/distributed_job_scheduler_response.dto"
+import { DistributedJobSchedulerCoreService } from "../services/distributed_job_scheduler_core.service"
+
+class DistributedJobSchedulerController {
+    service: DistributedJobSchedulerCoreService
+
+    init(service: DistributedJobSchedulerCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskProposal(req: CreateDistributedJobSchedulerTaskRequest) -> DistributedJobSchedulerResponseDto {
+        let outcome = this.service.processConsensusCommand(req)
+        return match outcome {
+            Ok(state) => DistributedJobSchedulerResponseDto {
+                operationId: "CONSENSUS-TX-" + req.taskKey,
+                nodeId: state.id,
+                status: "QUORUM_COMMITTED",
+                isQuorumSatisfied: true,
+                message: "Log entry replicated and committed across cluster quorum",
+            },
+            Err(reason) => DistributedJobSchedulerResponseDto {
+                operationId: "CONSENSUS-FAILED",
+                nodeId: req.originatingNodeId,
+                status: "QUORUM_REJECTED",
+                isQuorumSatisfied: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkQuorumStatus() -> Bool {
+        return this.service.evaluateClusterQuorum()
+    }
+}

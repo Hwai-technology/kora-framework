@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 84: Threat Intelligence STIX/TAXII Indicator Parser
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { ThreatIntelFeedAggregatorInMemoryRepository } from "./repositories/threat_intel_feed_aggregator_inmemory.repository"
+import { ThreatIntelFeedAggregatorCoreService } from "./services/threat_intel_feed_aggregator_core.service"
+import { ThreatIntelFeedAggregatorController } from "./controllers/threat_intel_feed_aggregator.controller"
+import { ThreatIntelFeedAggregatorRouter } from "./routes/threat_intel_feed_aggregator.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = ThreatIntelFeedAggregatorInMemoryRepository()
+        let service = ThreatIntelFeedAggregatorCoreService(repo)
+        let controller = ThreatIntelFeedAggregatorController(service)
+        let router = ThreatIntelFeedAggregatorRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

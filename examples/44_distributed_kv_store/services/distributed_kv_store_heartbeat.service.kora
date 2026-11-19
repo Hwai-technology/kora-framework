@@ -1,0 +1,14 @@
+// Example 44: Distributed Dynamo-Style Key-Value Store
+// Cluster Heartbeat & Liveness Service
+
+class DistributedKvStoreHeartbeatService {
+    init() {}
+
+    fn pingPeer(peerId: Int) -> Bool {
+        return peerId > 0
+    }
+
+    fn calculateElectionTimeout(baseMs: Int, jitterMs: Int) -> Int {
+        return baseMs + jitterMs
+    }
+}

@@ -1,0 +1,9 @@
+// Example 40: Clinical Trial Electronic Data Capture (EDC) — Enum: TrialPhase
+// Dedicated Domain Enum Specification
+
+enum TrialPhase {
+    PhaseIPharmacokinetics
+    PhaseIIEfficacySafety
+    PhaseIIIComparativeLargeScale
+    PhaseIVPostMarketing
+}

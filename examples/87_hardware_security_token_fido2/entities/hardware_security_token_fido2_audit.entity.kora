@@ -1,0 +1,12 @@
+// Example 87: FIDO2 / WebAuthn Passkey Registration & Attestation
+// Persistent Database Entity: Audit Log
+
+@table("hardware_security_token_fido2_audit_logs")
+model HardwareSecurityTokenFido2AuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

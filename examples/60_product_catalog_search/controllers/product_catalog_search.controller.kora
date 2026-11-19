@@ -1,0 +1,38 @@
+// Example 60: Faceted Product Catalog Search & Inverted Index
+// Presentation Controller
+
+import { CreateProductCatalogSearchTaskRequest } from "../models/product_catalog_search_request.dto"
+import { ProductCatalogSearchResponseDto } from "../models/product_catalog_search_response.dto"
+import { ProductCatalogSearchCoreService } from "../services/product_catalog_search_core.service"
+
+class ProductCatalogSearchController {
+    service: ProductCatalogSearchCoreService
+
+    init(service: ProductCatalogSearchCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateProductCatalogSearchTaskRequest) -> ProductCatalogSearchResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => ProductCatalogSearchResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => ProductCatalogSearchResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

@@ -1,0 +1,16 @@
+// Example 77: Prompt Engineering Evaluation & Hallucination Scorer
+// Transport Model: Standard Response
+
+model PromptEvaluationBenchResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model PromptEvaluationBenchSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

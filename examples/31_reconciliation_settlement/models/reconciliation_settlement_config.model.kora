@@ -1,0 +1,10 @@
+// Example 31: Inter-Bank Reconciliation & Settlement
+// Configuration Model
+
+model ReconciliationSettlementConfig {
+    environment: String
+    maxBatchSize: Int
+    retryAttempts: Int
+    timeoutSeconds: Int
+    enabled: Bool
+}

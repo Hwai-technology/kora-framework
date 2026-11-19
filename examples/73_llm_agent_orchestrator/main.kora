@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 73: Autonomous LLM Agent Orchestrator & Tool Calling
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { LlmAgentOrchestratorInMemoryRepository } from "./repositories/llm_agent_orchestrator_inmemory.repository"
+import { LlmAgentOrchestratorCoreService } from "./services/llm_agent_orchestrator_core.service"
+import { LlmAgentOrchestratorController } from "./controllers/llm_agent_orchestrator.controller"
+import { LlmAgentOrchestratorRouter } from "./routes/llm_agent_orchestrator.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = LlmAgentOrchestratorInMemoryRepository()
+        let service = LlmAgentOrchestratorCoreService(repo)
+        let controller = LlmAgentOrchestratorController(service)
+        let router = LlmAgentOrchestratorRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

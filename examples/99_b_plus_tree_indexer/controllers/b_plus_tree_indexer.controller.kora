@@ -1,0 +1,38 @@
+// Example 99: B+ Tree Disk Pager & Index Node Balancer
+// Presentation Controller
+
+import { CreateBPlusTreeIndexerTaskRequest } from "../models/b_plus_tree_indexer_request.dto"
+import { BPlusTreeIndexerResponseDto } from "../models/b_plus_tree_indexer_response.dto"
+import { BPlusTreeIndexerCoreService } from "../services/b_plus_tree_indexer_core.service"
+
+class BPlusTreeIndexerController {
+    service: BPlusTreeIndexerCoreService
+
+    init(service: BPlusTreeIndexerCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateBPlusTreeIndexerTaskRequest) -> BPlusTreeIndexerResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => BPlusTreeIndexerResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => BPlusTreeIndexerResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

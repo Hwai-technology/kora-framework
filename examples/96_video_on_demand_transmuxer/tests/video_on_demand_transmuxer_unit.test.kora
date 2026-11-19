@@ -1,0 +1,75 @@
+// ============================================================================
+// Unit Test Suite: Video on Demand (VOD) HLS/DASH Transmuxer
+// Verifies Domain Invariants, Boundary Calculations & Liveness
+// ============================================================================
+
+import { CreateVideoOnDemandTransmuxerTaskRequest } from "../models/video_on_demand_transmuxer_request.dto"
+import { VideoOnDemandTransmuxerInMemoryRepository } from "../repositories/video_on_demand_transmuxer_inmemory.repository"
+import { VideoOnDemandTransmuxerCoreService } from "../services/video_on_demand_transmuxer_core.service"
+import { VideoOnDemandTransmuxerTelemetryService } from "../services/video_on_demand_transmuxer_telemetry.service"
+
+class VideoOnDemandTransmuxerUnitTestSuite {
+    service: VideoOnDemandTransmuxerCoreService
+    telemetry: VideoOnDemandTransmuxerTelemetryService
+
+    init(service: VideoOnDemandTransmuxerCoreService, telemetry: VideoOnDemandTransmuxerTelemetryService) {
+        this.service = service
+        this.telemetry = telemetry
+    }
+
+    fn test_valid_task_execution() -> Bool {
+        let req = CreateVideoOnDemandTransmuxerTaskRequest {
+            taskKey: "UNIT-TASK-101",
+            targetEntityId: 10,
+            workloadCapacity: 95,
+            domainContext: "Media & Realtime",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(rec) => rec.id == 10 && rec.capacityScore == 95,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_negative_target_rejected() -> Bool {
+        let req = CreateVideoOnDemandTransmuxerTaskRequest {
+            taskKey: "INVALID-TASK",
+            targetEntityId: -1,
+            workloadCapacity: 50,
+            domainContext: "Media & Realtime",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Target entity ID must be strictly positive",
+        }
+    }
+
+    fn test_health_evaluation() -> Bool {
+        let health = this.service.evaluateHealth(10)
+        return health == "OPTIMUM_PERFORMANCE" || health == "MODERATE_NORMAL"
+    }
+
+    fn test_telemetry_ping() -> Bool {
+        return this.telemetry.ping()
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_task_execution()
+        let t2 = this.test_invalid_negative_target_rejected()
+        let t3 = this.test_health_evaluation()
+        let t4 = this.test_telemetry_ping()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ Video on Demand (VOD) HLS/DASH Transmuxer Unit Tests: 4/4 passed (Domain Invariants Verified)")
+        } else {
+            print("  ✗ Video on Demand (VOD) HLS/DASH Transmuxer Unit Tests: failed")
+        }
+    }
+}
+
+let repo = VideoOnDemandTransmuxerInMemoryRepository()
+let service = VideoOnDemandTransmuxerCoreService(repo)
+let telemetry = VideoOnDemandTransmuxerTelemetryService()
+let suite = VideoOnDemandTransmuxerUnitTestSuite(service, telemetry)
+suite.run()

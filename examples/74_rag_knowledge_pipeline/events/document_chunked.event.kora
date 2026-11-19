@@ -1,0 +1,7 @@
+// Example 74: Retrieval-Augmented Generation (RAG) Document Chunker — Domain Event: DocumentChunkedEvent
+
+model DocumentChunkedEvent {
+    documentId: String
+    chunksCreated: Int
+    tokenAverageSize: Int
+}

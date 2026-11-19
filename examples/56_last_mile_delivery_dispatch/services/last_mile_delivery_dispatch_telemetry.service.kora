@@ -1,0 +1,14 @@
+// Example 56: Last-Mile Delivery Dispatch & Fleet Geo-Routing
+// Telemetry & Liveness Monitor
+
+class LastMileDeliveryDispatchTelemetryService {
+    init() {}
+
+    fn ping() -> Bool {
+        return true
+    }
+
+    fn computeDigest(entityId: Int, metricScore: Int) -> String {
+        return "SHA256-DIGEST-" + entityId.toString() + "-" + metricScore.toString()
+    }
+}

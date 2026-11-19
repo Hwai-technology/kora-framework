@@ -1,0 +1,13 @@
+// Example 34: HIPAA Compliant Electronic Health Records
+// Persistent Database Entity: Audit Trail Log
+
+@table("hipaa_compliant_ehr_audit_trail")
+model HipaaCompliantEhrAuditTrail {
+    @id
+    id: Int
+    recordId: Int
+    performedByStaffId: Int
+    actionTaken: String
+    tamperProofHash: String
+    timestamp: Int
+}

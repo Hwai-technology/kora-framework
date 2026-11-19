@@ -1,0 +1,14 @@
+// Example 42: Mental Health Longitudinal Assessment Engine
+// Persistent Database Entity: Primary Record
+
+@table("mental_health_assessment_clinical_records")
+model MentalHealthAssessmentClinicalEntity {
+    @id
+    id: Int
+    @unique
+    patientId: Int
+    clinicianId: Int
+    clinicalMetricScore: Int
+    complianceState: String
+    active: Bool
+}

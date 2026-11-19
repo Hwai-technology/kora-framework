@@ -1,0 +1,12 @@
+// ============================================================================
+// Example 24: Fintech Core Banking — Event: AccountFrozenEvent
+// Compliance Interception Domain Event
+// ============================================================================
+
+model AccountFrozenEvent {
+    eventId: String
+    accountId: Int
+    initiatingAuthority: String
+    sanctionReference: String
+    timestamp: Int
+}

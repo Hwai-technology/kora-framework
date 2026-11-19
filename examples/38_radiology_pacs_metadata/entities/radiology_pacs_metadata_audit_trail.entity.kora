@@ -1,0 +1,13 @@
+// Example 38: Radiology PACS DICOM Metadata Indexer
+// Persistent Database Entity: Audit Trail Log
+
+@table("radiology_pacs_metadata_audit_trail")
+model RadiologyPacsMetadataAuditTrail {
+    @id
+    id: Int
+    recordId: Int
+    performedByStaffId: Int
+    actionTaken: String
+    tamperProofHash: String
+    timestamp: Int
+}

@@ -1,0 +1,9 @@
+// Example 70: Industrial SCADA Modbus Gateway & Water Treatment
+// Specialized Model 7
+
+model WaterTreatmentScadaBridgeSpecializedProfile7 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

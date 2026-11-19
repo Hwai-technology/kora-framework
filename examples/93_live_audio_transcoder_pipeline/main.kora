@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 93: Live Audio Transcoding & Packet Chunking Pipeline
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { LiveAudioTranscoderPipelineInMemoryRepository } from "./repositories/live_audio_transcoder_pipeline_inmemory.repository"
+import { LiveAudioTranscoderPipelineCoreService } from "./services/live_audio_transcoder_pipeline_core.service"
+import { LiveAudioTranscoderPipelineController } from "./controllers/live_audio_transcoder_pipeline.controller"
+import { LiveAudioTranscoderPipelineRouter } from "./routes/live_audio_transcoder_pipeline.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = LiveAudioTranscoderPipelineInMemoryRepository()
+        let service = LiveAudioTranscoderPipelineCoreService(repo)
+        let controller = LiveAudioTranscoderPipelineController(service)
+        let router = LiveAudioTranscoderPipelineRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

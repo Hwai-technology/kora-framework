@@ -1,0 +1,22 @@
+// Example 77: Prompt Engineering Evaluation & Hallucination Scorer
+// Router & Endpoint Dispatcher
+
+import { CreatePromptEvaluationBenchTaskRequest } from "../models/prompt_evaluation_bench_request.dto"
+import { PromptEvaluationBenchResponseDto } from "../models/prompt_evaluation_bench_response.dto"
+import { PromptEvaluationBenchController } from "../controllers/prompt_evaluation_bench.controller"
+
+class PromptEvaluationBenchRouter {
+    controller: PromptEvaluationBenchController
+
+    init(controller: PromptEvaluationBenchController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreatePromptEvaluationBenchTaskRequest) -> PromptEvaluationBenchResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

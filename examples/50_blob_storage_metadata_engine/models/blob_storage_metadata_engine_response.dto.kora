@@ -1,0 +1,17 @@
+// Example 50: Distributed Blob Storage Metadata Engine
+// Transport Model: Standard Response
+
+model BlobStorageMetadataEngineResponseDto {
+    operationId: String
+    nodeId: Int
+    status: String
+    isQuorumSatisfied: Bool
+    message: String
+}
+
+model BlobStorageMetadataEngineTopologySummaryDto {
+    activeClusterNodes: Int
+    leaderTerm: Int
+    healthyReplicasCount: Int
+    clusterState: String
+}

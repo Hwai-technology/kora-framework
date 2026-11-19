@@ -1,0 +1,9 @@
+// Example 96: Video on Demand (VOD) HLS/DASH Transmuxer
+// Configuration Model
+
+model VideoOnDemandTransmuxerConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

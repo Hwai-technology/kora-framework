@@ -1,0 +1,17 @@
+// Example 46: Distributed Task Scheduler & Leader Lease
+// Transport Model: Standard Response
+
+model DistributedJobSchedulerResponseDto {
+    operationId: String
+    nodeId: Int
+    status: String
+    isQuorumSatisfied: Bool
+    message: String
+}
+
+model DistributedJobSchedulerTopologySummaryDto {
+    activeClusterNodes: Int
+    leaderTerm: Int
+    healthyReplicasCount: Int
+    clusterState: String
+}

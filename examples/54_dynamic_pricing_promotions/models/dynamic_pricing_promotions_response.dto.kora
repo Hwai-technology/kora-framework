@@ -1,0 +1,16 @@
+// Example 54: Dynamic Pricing Engine & Flash Sale Rate-Limiter
+// Transport Model: Standard Response
+
+model DynamicPricingPromotionsResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model DynamicPricingPromotionsSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

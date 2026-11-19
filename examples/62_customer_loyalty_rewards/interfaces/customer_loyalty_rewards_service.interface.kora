@@ -1,0 +1,10 @@
+// Example 62: Customer Loyalty Rewards Ledger & Tier Upgrades
+// Domain Service Contract
+
+import { CustomerLoyaltyRewardsPrimaryRecord } from "../entities/customer_loyalty_rewards_primary.entity"
+import { CreateCustomerLoyaltyRewardsTaskRequest } from "../models/customer_loyalty_rewards_request.dto"
+
+interface CustomerLoyaltyRewardsDomainContract {
+    fn executeTask(req: CreateCustomerLoyaltyRewardsTaskRequest) -> Result<CustomerLoyaltyRewardsPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

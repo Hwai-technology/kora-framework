@@ -1,0 +1,10 @@
+// Example 93: Live Audio Transcoding & Packet Chunking Pipeline
+// Repository Interface
+
+import { LiveAudioTranscoderPipelinePrimaryRecord } from "../entities/live_audio_transcoder_pipeline_primary.entity"
+
+interface LiveAudioTranscoderPipelineRepository {
+    fn findById(id: Int) -> Option<LiveAudioTranscoderPipelinePrimaryRecord>
+    fn save(record: LiveAudioTranscoderPipelinePrimaryRecord) -> Result<LiveAudioTranscoderPipelinePrimaryRecord, String>
+    fn countActive() -> Int
+}

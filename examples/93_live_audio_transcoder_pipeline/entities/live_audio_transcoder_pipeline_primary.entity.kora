@@ -1,0 +1,13 @@
+// Example 93: Live Audio Transcoding & Packet Chunking Pipeline
+// Persistent Database Entity: Primary Record
+
+@table("live_audio_transcoder_pipeline_records")
+model LiveAudioTranscoderPipelinePrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

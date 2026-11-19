@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 62: Customer Loyalty Rewards Ledger & Tier Upgrades
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { CustomerLoyaltyRewardsInMemoryRepository } from "./repositories/customer_loyalty_rewards_inmemory.repository"
+import { CustomerLoyaltyRewardsCoreService } from "./services/customer_loyalty_rewards_core.service"
+import { CustomerLoyaltyRewardsController } from "./controllers/customer_loyalty_rewards.controller"
+import { CustomerLoyaltyRewardsRouter } from "./routes/customer_loyalty_rewards.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = CustomerLoyaltyRewardsInMemoryRepository()
+        let service = CustomerLoyaltyRewardsCoreService(repo)
+        let controller = CustomerLoyaltyRewardsController(service)
+        let router = CustomerLoyaltyRewardsRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

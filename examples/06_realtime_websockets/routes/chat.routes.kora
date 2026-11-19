@@ -1,5 +1,5 @@
 // ============================================================================
-// Realtime Chat — Modular Routes Definition Layer
+// Realtime WebSocket & Pub/Sub Routes
 // ============================================================================
 
 import { ChatController } from "../controllers/chat.controller"
@@ -11,11 +11,9 @@ class ChatRoutes {
         this.controller = controller
     }
 
-    fn presence(request: Request) -> Response {
-        return this.controller.presence(request)
-    }
-
-    fn sendMessage(request: Request) -> Response {
-        return this.controller.sendMessage(request)
+    fn register() -> Unit {
+        get("/ws/connect", this.controller.upgrade)
+        post("/ws/broadcast/:channel", this.controller.broadcast)
+        get("/ws/presence/:channel", this.controller.presence)
     }
 }

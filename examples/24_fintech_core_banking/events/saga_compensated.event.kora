@@ -1,0 +1,14 @@
+// ============================================================================
+// Example 24: Fintech Core Banking — Event: SagaCompensatedEvent
+// Segregated Domain Event for Rollback & Asset Invariant Restoration
+// ============================================================================
+
+model SagaCompensatedEvent {
+    eventId: String
+    sagaId: String
+    sourceAccountId: Int
+    releasedAmount: Int
+    reason: String
+    restoredBalance: Int
+    timestamp: Int
+}

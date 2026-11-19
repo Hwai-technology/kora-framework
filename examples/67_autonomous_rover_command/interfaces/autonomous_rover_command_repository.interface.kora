@@ -1,0 +1,10 @@
+// Example 67: Autonomous Rover Navigation & Obstacle Avoidance
+// Repository Interface
+
+import { AutonomousRoverCommandPrimaryRecord } from "../entities/autonomous_rover_command_primary.entity"
+
+interface AutonomousRoverCommandRepository {
+    fn findById(id: Int) -> Option<AutonomousRoverCommandPrimaryRecord>
+    fn save(record: AutonomousRoverCommandPrimaryRecord) -> Result<AutonomousRoverCommandPrimaryRecord, String>
+    fn countActive() -> Int
+}

@@ -1,0 +1,8 @@
+// Example 61: Supplier Purchase Order & 3-Way Invoice Matcher — Enum: ThreeWayMatchStatus
+
+enum ThreeWayMatchStatus {
+    PerfectThreeWayMatch
+    QuantityVarianceDetected
+    PriceVarianceOverTolerance
+    UnmatchedMissingReceipt
+}

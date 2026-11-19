@@ -1,0 +1,15 @@
+// Example 70: Industrial SCADA Modbus Gateway & Water Treatment
+// Transport Model: Command Request
+
+model CreateWaterTreatmentScadaBridgeTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryWaterTreatmentScadaBridgeFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

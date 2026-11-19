@@ -1,0 +1,7 @@
+// Example 86: SIEM High-Throughput Log Ingestion & CEF Normalizer — Enum: SiemEventSeverity
+
+enum SiemEventSeverity {
+    Informational0
+    Warning4
+    CriticalEmergency7
+}

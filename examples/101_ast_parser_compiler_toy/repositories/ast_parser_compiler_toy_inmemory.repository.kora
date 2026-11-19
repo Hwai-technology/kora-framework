@@ -1,0 +1,33 @@
+// Example 101: Pratt Parsing & Bytecode Virtual Machine
+// Repository Implementation
+
+import { AstParserCompilerToyPrimaryRecord } from "../entities/ast_parser_compiler_toy_primary.entity"
+import { AstParserCompilerToyRepository } from "../interfaces/ast_parser_compiler_toy_repository.interface"
+
+class AstParserCompilerToyInMemoryRepository implements AstParserCompilerToyRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<AstParserCompilerToyPrimaryRecord> {
+        if id > 0 {
+            return Some(AstParserCompilerToyPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: AstParserCompilerToyPrimaryRecord) -> Result<AstParserCompilerToyPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

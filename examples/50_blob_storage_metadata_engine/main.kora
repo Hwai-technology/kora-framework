@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 50: Distributed Blob Storage Metadata Engine
+// Application Container & Cluster Bootstrap
+// ============================================================================
+
+import { BlobStorageMetadataEngineClusterRepository } from "./repositories/blob_storage_metadata_engine_cluster.repository"
+import { BlobStorageMetadataEngineCoreService } from "./services/blob_storage_metadata_engine_core.service"
+import { BlobStorageMetadataEngineController } from "./controllers/blob_storage_metadata_engine.controller"
+import { BlobStorageMetadataEngineRouter } from "./routes/blob_storage_metadata_engine.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = BlobStorageMetadataEngineClusterRepository()
+        let service = BlobStorageMetadataEngineCoreService(repo)
+        let controller = BlobStorageMetadataEngineController(service)
+        let router = BlobStorageMetadataEngineRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

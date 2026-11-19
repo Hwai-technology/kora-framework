@@ -1,0 +1,9 @@
+// Example 28: crypto_derivatives_exchange — Domain Event: FundingRateSettledEvent
+// Dedicated Domain Event Specification
+
+model FundingRateSettledEvent {
+    contractSymbol: String
+    rateBasisPoints: Int
+    totalFundingTransferred: Int
+    timestamp: Int
+}

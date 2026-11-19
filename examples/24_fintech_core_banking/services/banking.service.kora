@@ -1,0 +1,269 @@
+// ============================================================================
+// Example 24: Fintech Core Banking — Service: BankingService
+// Implements Distributed Saga, Optimistic Concurrency, & Financial Conservation
+// ============================================================================
+
+import { Account } from "../entities/account.entity"
+import { LedgerJournalEvent } from "../entities/ledger_entry.entity"
+import { TransferSagaCommand, SagaExecutionResult, AuditVerificationSummary } from "../models/banking.dto"
+import { BankingRepository } from "../interfaces/banking.repository.interface"
+
+class BankingService implements BankingRepository {
+    repo: BankingRepository
+    journalSequence: Int
+
+    init(repo: BankingRepository) {
+        this.repo = repo
+        this.journalSequence = 1000
+    }
+
+    fn findAccountById(id: Int) -> Option<Account> {
+        return this.repo.findAccountById(id)
+    }
+
+    fn saveAccountOptimistic(account: Account, expectedVersion: Int) -> Result<Account, String> {
+        return this.repo.saveAccountOptimistic(account, expectedVersion)
+    }
+
+    fn appendJournalEvent(event: LedgerJournalEvent) -> Result<LedgerJournalEvent, String> {
+        return this.repo.appendJournalEvent(event)
+    }
+
+    fn checkIdempotency(key: String) -> Option<String> {
+        return this.repo.checkIdempotency(key)
+    }
+
+    fn recordIdempotency(key: String, payload: String) -> Bool {
+        return this.repo.recordIdempotency(key, payload)
+    }
+
+    fn getTotalSystemAssets() -> Int {
+        return this.repo.getTotalSystemAssets()
+    }
+
+    fn executeTransferSaga(cmd: TransferSagaCommand) -> SagaExecutionResult {
+        // Step 1: Idempotency Gate
+        let cached = this.repo.checkIdempotency(cmd.idempotencyKey)
+        let isCached = match cached {
+            Some(res) => true,
+            None => false,
+        }
+        if isCached {
+            return SagaExecutionResult {
+                sagaId: cmd.sagaId,
+                status: "IDEMPOTENT_DUPLICATE_IGNORED",
+                executedAmount: cmd.amount,
+                compensated: false,
+                finalSourceBalance: 0,
+                finalDestBalance: 0,
+                errorMessage: "Transaction already processed",
+            }
+        }
+
+        // Basic Domain Validations
+        if cmd.amount <= 0 {
+            return SagaExecutionResult {
+                sagaId: cmd.sagaId,
+                status: "REJECTED_INVALID_AMOUNT",
+                executedAmount: 0,
+                compensated: false,
+                finalSourceBalance: 0,
+                finalDestBalance: 0,
+                errorMessage: "Transfer amount must be strictly positive",
+            }
+        }
+
+        if cmd.sourceAccountId == cmd.destinationAccountId {
+            return SagaExecutionResult {
+                sagaId: cmd.sagaId,
+                status: "REJECTED_SELF_TRANSFER",
+                executedAmount: 0,
+                compensated: false,
+                finalSourceBalance: 0,
+                finalDestBalance: 0,
+                errorMessage: "Self-transfer is forbidden",
+            }
+        }
+
+        let sourceOpt = this.repo.findAccountById(cmd.sourceAccountId)
+        let source = match sourceOpt {
+            Some(s) => s,
+            None => Account { id: -1, accountNumber: "", balance: 0, reservedBalance: 0, version: 0, status: "" },
+        }
+
+        if source.id < 0 {
+            return SagaExecutionResult {
+                sagaId: cmd.sagaId,
+                status: "FAILED_SOURCE_NOT_FOUND",
+                executedAmount: 0,
+                compensated: false,
+                finalSourceBalance: 0,
+                finalDestBalance: 0,
+                errorMessage: "Source account does not exist",
+            }
+        }
+
+        if source.status == "FROZEN" {
+            return SagaExecutionResult {
+                sagaId: cmd.sagaId,
+                status: "FAILED_SOURCE_FROZEN",
+                executedAmount: 0,
+                compensated: false,
+                finalSourceBalance: source.balance,
+                finalDestBalance: 0,
+                errorMessage: "Source account is frozen by compliance",
+            }
+        }
+
+        if source.balance < cmd.amount {
+            return SagaExecutionResult {
+                sagaId: cmd.sagaId,
+                status: "FAILED_INSUFFICIENT_FUNDS",
+                executedAmount: 0,
+                compensated: false,
+                finalSourceBalance: source.balance,
+                finalDestBalance: 0,
+                errorMessage: "Insufficient available balance",
+            }
+        }
+
+        // Step 2: Optimistic Locking & Fund Reservation on Source Account
+        let reservedSource = Account {
+            id: source.id,
+            accountNumber: source.accountNumber,
+            balance: source.balance - cmd.amount,
+            reservedBalance: source.reservedBalance + cmd.amount,
+            version: source.version + 1,
+            status: source.status,
+        }
+
+        let sourceSaveRes = this.repo.saveAccountOptimistic(reservedSource, cmd.expectedSourceVersion)
+        let sourceCommitted = match sourceSaveRes {
+            Ok(acc) => true,
+            Err(e) => false,
+        }
+
+        if !sourceCommitted {
+            return SagaExecutionResult {
+                sagaId: cmd.sagaId,
+                status: "FAILED_OPTIMISTIC_LOCK_CONFLICT",
+                executedAmount: 0,
+                compensated: false,
+                finalSourceBalance: source.balance,
+                finalDestBalance: 0,
+                errorMessage: "Concurrent modification detected: source version mismatch",
+            }
+        }
+
+        this.journalSequence += 1
+        this.repo.appendJournalEvent(LedgerJournalEvent {
+            id: this.journalSequence,
+            eventType: "FUNDS_RESERVED",
+            accountId: source.id,
+            deltaAmount: -cmd.amount,
+            resultingBalance: reservedSource.balance,
+            sagaId: cmd.sagaId,
+            sequenceNumber: this.journalSequence,
+            timestamp: 1700000000,
+        })
+
+        // Step 3: Destination Account Lookup & Credit Attempt
+        let destOpt = this.repo.findAccountById(cmd.destinationAccountId)
+        let dest = match destOpt {
+            Some(d) => d,
+            None => Account { id: -1, accountNumber: "", balance: 0, reservedBalance: 0, version: 0, status: "" },
+        }
+
+        var shouldCompensate = false
+        var failReason = ""
+
+        if dest.id < 0 {
+            shouldCompensate = true
+            failReason = "Destination account does not exist"
+        } else if dest.status == "FROZEN" {
+            shouldCompensate = true
+            failReason = "Destination account is frozen"
+        }
+
+        // Step 4: Saga Compensation Branch (Rollback & Asset Conservation)
+        if shouldCompensate {
+            let compensatedSource = Account {
+                id: source.id,
+                accountNumber: source.accountNumber,
+                balance: reservedSource.balance + cmd.amount,
+                reservedBalance: reservedSource.reservedBalance - cmd.amount,
+                version: reservedSource.version + 1,
+                status: reservedSource.status,
+            }
+            this.repo.saveAccountOptimistic(compensatedSource, reservedSource.version)
+
+            this.journalSequence += 1
+            this.repo.appendJournalEvent(LedgerJournalEvent {
+                id: this.journalSequence,
+                eventType: "SAGA_COMPENSATION_REVERSAL",
+                accountId: source.id,
+                deltaAmount: cmd.amount,
+                resultingBalance: compensatedSource.balance,
+                sagaId: cmd.sagaId,
+                sequenceNumber: this.journalSequence,
+                timestamp: 1700000001,
+            })
+
+            return SagaExecutionResult {
+                sagaId: cmd.sagaId,
+                status: "SAGA_COMPENSATED_AND_ROLLED_BACK",
+                executedAmount: 0,
+                compensated: true,
+                finalSourceBalance: compensatedSource.balance,
+                finalDestBalance: 0,
+                errorMessage: failReason,
+            }
+        }
+
+        // Step 5: Successful Destination Credit & Source Reservation Finalization
+        let creditedDest = Account {
+            id: dest.id,
+            accountNumber: dest.accountNumber,
+            balance: dest.balance + cmd.amount,
+            reservedBalance: dest.reservedBalance,
+            version: dest.version + 1,
+            status: dest.status,
+        }
+        this.repo.saveAccountOptimistic(creditedDest, dest.version)
+
+        let finalizedSource = Account {
+            id: source.id,
+            accountNumber: source.accountNumber,
+            balance: reservedSource.balance,
+            reservedBalance: reservedSource.reservedBalance - cmd.amount,
+            version: reservedSource.version + 1,
+            status: reservedSource.status,
+        }
+        this.repo.saveAccountOptimistic(finalizedSource, reservedSource.version)
+
+        this.journalSequence += 1
+        this.repo.appendJournalEvent(LedgerJournalEvent {
+            id: this.journalSequence,
+            eventType: "FUNDS_COMMITTED_CREDIT",
+            accountId: dest.id,
+            deltaAmount: cmd.amount,
+            resultingBalance: creditedDest.balance,
+            sagaId: cmd.sagaId,
+            sequenceNumber: this.journalSequence,
+            timestamp: 1700000002,
+        })
+
+        // Record Idempotency Key
+        this.repo.recordIdempotency(cmd.idempotencyKey, "COMPLETED")
+
+        return SagaExecutionResult {
+            sagaId: cmd.sagaId,
+            status: "SAGA_COMMITTED_SUCCESSFULLY",
+            executedAmount: cmd.amount,
+            compensated: false,
+            finalSourceBalance: finalizedSource.balance,
+            finalDestBalance: creditedDest.balance,
+            errorMessage: "",
+        }
+    }
+}

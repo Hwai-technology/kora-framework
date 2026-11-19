@@ -1,0 +1,22 @@
+// Example 101: Pratt Parsing & Bytecode Virtual Machine
+// Router & Endpoint Dispatcher
+
+import { CreateAstParserCompilerToyTaskRequest } from "../models/ast_parser_compiler_toy_request.dto"
+import { AstParserCompilerToyResponseDto } from "../models/ast_parser_compiler_toy_response.dto"
+import { AstParserCompilerToyController } from "../controllers/ast_parser_compiler_toy.controller"
+
+class AstParserCompilerToyRouter {
+    controller: AstParserCompilerToyController
+
+    init(controller: AstParserCompilerToyController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateAstParserCompilerToyTaskRequest) -> AstParserCompilerToyResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

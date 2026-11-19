@@ -1,0 +1,8 @@
+// Example 62: Customer Loyalty Rewards Ledger & Tier Upgrades — Enum: LoyaltyTierStatus
+
+enum LoyaltyTierStatus {
+    BronzeEntry
+    SilverFrequent
+    GoldExecutive
+    PlatinumTitanium
+}

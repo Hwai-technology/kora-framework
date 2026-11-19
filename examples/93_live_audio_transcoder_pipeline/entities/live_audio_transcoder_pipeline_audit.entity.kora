@@ -1,0 +1,12 @@
+// Example 93: Live Audio Transcoding & Packet Chunking Pipeline
+// Persistent Database Entity: Audit Log
+
+@table("live_audio_transcoder_pipeline_audit_logs")
+model LiveAudioTranscoderPipelineAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

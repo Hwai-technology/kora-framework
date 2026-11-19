@@ -1,0 +1,10 @@
+// ============================================================================
+// Example 01: Core Language Foundations — Event: OrderCancelledEvent
+// ============================================================================
+
+model OrderCancelledEvent {
+    orderId: String
+    cancellationReason: String
+    refundInitiated: Bool
+    timestamp: Int
+}

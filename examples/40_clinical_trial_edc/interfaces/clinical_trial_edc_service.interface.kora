@@ -1,0 +1,10 @@
+// Example 40: Clinical Trial Electronic Data Capture (EDC)
+// Domain Service Contract
+
+import { ClinicalTrialEdcClinicalEntity } from "../entities/clinical_trial_edc_primary.entity"
+import { CreateClinicalTrialEdcRecordRequest } from "../models/clinical_trial_edc_request.dto"
+
+interface ClinicalTrialEdcDomainContract {
+    fn processClinicalRecord(req: CreateClinicalTrialEdcRecordRequest) -> Result<ClinicalTrialEdcClinicalEntity, String>
+    fn evaluateClinicalRisk(patientId: Int) -> String
+}

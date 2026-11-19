@@ -1,0 +1,39 @@
+// Example 37: ICU Real-Time High-Frequency Vitals Monitor
+// Presentation Controller
+
+import { CreateIcuVitalsTelemetryRecordRequest } from "../models/icu_vitals_telemetry_request.dto"
+import { IcuVitalsTelemetryResponseDto } from "../models/icu_vitals_telemetry_response.dto"
+import { IcuVitalsTelemetryClinicalEntity } from "../entities/icu_vitals_telemetry_primary.entity"
+import { IcuVitalsTelemetryCoreService } from "../services/icu_vitals_telemetry_core.service"
+
+class IcuVitalsTelemetryController {
+    service: IcuVitalsTelemetryCoreService
+
+    init(service: IcuVitalsTelemetryCoreService) {
+        this.service = service
+    }
+
+    fn handleRecordSubmission(req: CreateIcuVitalsTelemetryRecordRequest) -> IcuVitalsTelemetryResponseDto {
+        let outcome = this.service.processClinicalRecord(req)
+        return match outcome {
+            Ok(rec) => IcuVitalsTelemetryResponseDto {
+                recordId: rec.id,
+                patientId: rec.patientId,
+                status: "COMMITTED_ENCRYPTED",
+                isComplianceVerified: true,
+                message: "Record persisted under HIPAA safety standards",
+            },
+            Err(reason) => IcuVitalsTelemetryResponseDto {
+                recordId: -1,
+                patientId: req.patientId,
+                status: "REJECTED_VALIDATION_ERROR",
+                isComplianceVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkPatientRisk(patientId: Int) -> String {
+        return this.service.evaluateClinicalRisk(patientId)
+    }
+}

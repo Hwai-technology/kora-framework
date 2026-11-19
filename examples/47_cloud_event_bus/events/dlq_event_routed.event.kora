@@ -1,0 +1,8 @@
+// Example 47: Cloud Event Bus & Partitioned Streaming — Domain Event: DlqEventRoutedEvent
+// Dedicated Domain Event Specification
+
+model DlqEventRoutedEvent {
+    originalTopic: String
+    poisonPillReason: String
+    sourcePartition: Int
+}

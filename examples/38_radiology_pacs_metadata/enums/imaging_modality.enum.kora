@@ -1,0 +1,9 @@
+// Example 38: Radiology PACS DICOM Metadata Indexer — Enum: ImagingModality
+// Dedicated Domain Enum Specification
+
+enum ImagingModality {
+    ComputedTomographyCT
+    MagneticResonanceMRI
+    DigitalRadiographyCR
+    UltrasoundUS
+}

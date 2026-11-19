@@ -1,0 +1,8 @@
+// Example 42: Mental Health Longitudinal Assessment Engine — Enum: AssessmentCadence
+// Dedicated Domain Enum Specification
+
+enum AssessmentCadence {
+    IntakeInitialBaseline
+    WeeklyProgressTracking
+    MonthlyLongitudinalReview
+}

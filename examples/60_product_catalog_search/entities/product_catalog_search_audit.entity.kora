@@ -1,0 +1,12 @@
+// Example 60: Faceted Product Catalog Search & Inverted Index
+// Persistent Database Entity: Audit Log
+
+@table("product_catalog_search_audit_logs")
+model ProductCatalogSearchAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

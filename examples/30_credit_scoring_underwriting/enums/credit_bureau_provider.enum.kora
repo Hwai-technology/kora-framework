@@ -1,0 +1,9 @@
+// Example 30: credit_scoring_underwriting — Enum: CreditBureauProvider
+// Dedicated Domain Enum Specification
+
+enum CreditBureauProvider {
+    EquifaxStandard
+    ExperianGlobal
+    TransUnionConsumer
+    InternalAlternativeScore
+}

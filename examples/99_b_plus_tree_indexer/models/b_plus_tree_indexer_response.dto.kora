@@ -1,0 +1,16 @@
+// Example 99: B+ Tree Disk Pager & Index Node Balancer
+// Transport Model: Standard Response
+
+model BPlusTreeIndexerResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model BPlusTreeIndexerSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

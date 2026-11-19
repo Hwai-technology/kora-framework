@@ -1,0 +1,9 @@
+// Example 81: Synthetic Tabular Data & Differential Privacy Generator
+// Specialized Model 2
+
+model SyntheticDataGeneratorSpecializedProfile2 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

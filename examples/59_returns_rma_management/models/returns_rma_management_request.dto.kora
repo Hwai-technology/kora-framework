@@ -1,0 +1,15 @@
+// Example 59: Reverse Logistics & RMA Inspection Engine
+// Transport Model: Command Request
+
+model CreateReturnsRmaManagementTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryReturnsRmaManagementFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

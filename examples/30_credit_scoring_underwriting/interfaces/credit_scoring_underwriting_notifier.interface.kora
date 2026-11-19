@@ -1,0 +1,7 @@
+// Example 30: Credit Underwriting & Risk Assessment
+// Notifier Interface
+
+interface CreditScoringUnderwritingNotifier {
+    fn sendAlert(subject: String, level: String) -> Bool
+    fn ping() -> Bool
+}

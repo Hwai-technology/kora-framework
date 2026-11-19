@@ -1,0 +1,6 @@
+// Example 78: High-Throughput Vector Embedding Ingestion Pipeline — Enum: RateLimitThrottlePolicy
+
+enum RateLimitThrottlePolicy {
+    ExponentialBackoffSleep
+    CircuitBreakerPauseIngestion
+}

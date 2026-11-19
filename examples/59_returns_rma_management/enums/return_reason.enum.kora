@@ -1,0 +1,8 @@
+// Example 59: Reverse Logistics & RMA Inspection Engine — Enum: ReturnReason
+
+enum ReturnReason {
+    DefectiveHardware
+    WrongItemDelivered
+    BuyerRemorse
+    LateDeliveryArrived
+}

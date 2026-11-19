@@ -1,0 +1,18 @@
+// Example 24: Core Banking Ledger & Accounts
+// Validation Rules Engine
+
+import { CreateFintechCoreBankingRequest } from "../models/fintech_core_banking_request.dto"
+
+class FintechCoreBankingValidationService {
+    init() {}
+
+    fn validateInput(req: CreateFintechCoreBankingRequest) -> Result<Bool, String> {
+        if req.reference == "" {
+            return Err("Reference code is mandatory")
+        }
+        if req.volume < 10 {
+            return Err("Volume below minimum threshold")
+        }
+        return Ok(true)
+    }
+}

@@ -1,0 +1,22 @@
+// Example 48: Distributed Cache Cluster & Write-Behind
+// Router & Endpoint Dispatcher
+
+import { CreateDistributedCacheClusterTaskRequest } from "../models/distributed_cache_cluster_request.dto"
+import { DistributedCacheClusterResponseDto } from "../models/distributed_cache_cluster_response.dto"
+import { DistributedCacheClusterController } from "../controllers/distributed_cache_cluster.controller"
+
+class DistributedCacheClusterRouter {
+    controller: DistributedCacheClusterController
+
+    init(controller: DistributedCacheClusterController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateDistributedCacheClusterTaskRequest) -> DistributedCacheClusterResponseDto {
+        return this.controller.handleTaskProposal(req)
+    }
+
+    fn getQuorum() -> Bool {
+        return this.controller.checkQuorumStatus()
+    }
+}

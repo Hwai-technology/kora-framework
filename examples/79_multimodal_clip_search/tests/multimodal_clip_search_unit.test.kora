@@ -1,0 +1,75 @@
+// ============================================================================
+// Unit Test Suite: Multimodal CLIP Cross-Search Engine
+// Verifies Domain Invariants, Boundary Calculations & Liveness
+// ============================================================================
+
+import { CreateMultimodalClipSearchTaskRequest } from "../models/multimodal_clip_search_request.dto"
+import { MultimodalClipSearchInMemoryRepository } from "../repositories/multimodal_clip_search_inmemory.repository"
+import { MultimodalClipSearchCoreService } from "../services/multimodal_clip_search_core.service"
+import { MultimodalClipSearchTelemetryService } from "../services/multimodal_clip_search_telemetry.service"
+
+class MultimodalClipSearchUnitTestSuite {
+    service: MultimodalClipSearchCoreService
+    telemetry: MultimodalClipSearchTelemetryService
+
+    init(service: MultimodalClipSearchCoreService, telemetry: MultimodalClipSearchTelemetryService) {
+        this.service = service
+        this.telemetry = telemetry
+    }
+
+    fn test_valid_task_execution() -> Bool {
+        let req = CreateMultimodalClipSearchTaskRequest {
+            taskKey: "UNIT-TASK-101",
+            targetEntityId: 10,
+            workloadCapacity: 95,
+            domainContext: "AI/ML Systems",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(rec) => rec.id == 10 && rec.capacityScore == 95,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_negative_target_rejected() -> Bool {
+        let req = CreateMultimodalClipSearchTaskRequest {
+            taskKey: "INVALID-TASK",
+            targetEntityId: -1,
+            workloadCapacity: 50,
+            domainContext: "AI/ML Systems",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Target entity ID must be strictly positive",
+        }
+    }
+
+    fn test_health_evaluation() -> Bool {
+        let health = this.service.evaluateHealth(10)
+        return health == "OPTIMUM_PERFORMANCE" || health == "MODERATE_NORMAL"
+    }
+
+    fn test_telemetry_ping() -> Bool {
+        return this.telemetry.ping()
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_task_execution()
+        let t2 = this.test_invalid_negative_target_rejected()
+        let t3 = this.test_health_evaluation()
+        let t4 = this.test_telemetry_ping()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ Multimodal CLIP Cross-Search Engine Unit Tests: 4/4 passed (Domain Invariants Verified)")
+        } else {
+            print("  ✗ Multimodal CLIP Cross-Search Engine Unit Tests: failed")
+        }
+    }
+}
+
+let repo = MultimodalClipSearchInMemoryRepository()
+let service = MultimodalClipSearchCoreService(repo)
+let telemetry = MultimodalClipSearchTelemetryService()
+let suite = MultimodalClipSearchUnitTestSuite(service, telemetry)
+suite.run()

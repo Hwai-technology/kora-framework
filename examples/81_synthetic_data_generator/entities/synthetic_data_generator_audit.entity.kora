@@ -1,0 +1,12 @@
+// Example 81: Synthetic Tabular Data & Differential Privacy Generator
+// Persistent Database Entity: Audit Log
+
+@table("synthetic_data_generator_audit_logs")
+model SyntheticDataGeneratorAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

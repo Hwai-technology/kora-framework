@@ -1,0 +1,15 @@
+// Example 83: Zero-Trust Context-Aware Policy Decision Point (PDP)
+// Transport Model: Command Request
+
+model CreateZeroTrustPolicyEnforcerTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryZeroTrustPolicyEnforcerFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

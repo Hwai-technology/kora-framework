@@ -1,0 +1,10 @@
+// Example 84: Threat Intelligence STIX/TAXII Indicator Parser
+// Domain Service Contract
+
+import { ThreatIntelFeedAggregatorPrimaryRecord } from "../entities/threat_intel_feed_aggregator_primary.entity"
+import { CreateThreatIntelFeedAggregatorTaskRequest } from "../models/threat_intel_feed_aggregator_request.dto"
+
+interface ThreatIntelFeedAggregatorDomainContract {
+    fn executeTask(req: CreateThreatIntelFeedAggregatorTaskRequest) -> Result<ThreatIntelFeedAggregatorPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

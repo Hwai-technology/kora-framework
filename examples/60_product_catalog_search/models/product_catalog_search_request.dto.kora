@@ -1,0 +1,15 @@
+// Example 60: Faceted Product Catalog Search & Inverted Index
+// Transport Model: Command Request
+
+model CreateProductCatalogSearchTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryProductCatalogSearchFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

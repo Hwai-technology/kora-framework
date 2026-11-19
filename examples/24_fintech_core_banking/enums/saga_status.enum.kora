@@ -1,0 +1,13 @@
+// ============================================================================
+// Example 24: Fintech Core Banking — Enum: SagaStepStatus
+// Segregated Saga Lifecycle State Machine
+// ============================================================================
+
+enum SagaStepStatus {
+    Initiated
+    SourceReserved
+    DestinationCredited
+    FullyCommitted
+    CompensatedRollback
+    FailedTerminal
+}

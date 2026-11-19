@@ -1,0 +1,12 @@
+// Example 68: Cold Chain Vaccine Temperature Monitoring
+// Persistent Database Entity: Audit Log
+
+@table("cold_chain_environmental_guard_audit_logs")
+model ColdChainEnvironmentalGuardAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

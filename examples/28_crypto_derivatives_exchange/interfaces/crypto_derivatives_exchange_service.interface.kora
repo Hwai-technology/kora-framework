@@ -1,0 +1,10 @@
+// Example 28: Crypto Derivatives & Margin Engine
+// Domain Service Interface
+
+import { CryptoDerivativesExchangeRecord } from "../entities/crypto_derivatives_exchange_primary.entity"
+import { CreateCryptoDerivativesExchangeRequest } from "../models/crypto_derivatives_exchange_request.dto"
+
+interface CryptoDerivativesExchangeServiceInterface {
+    fn processRequest(req: CreateCryptoDerivativesExchangeRequest) -> Result<CryptoDerivativesExchangeRecord, String>
+    fn validateState(id: Int) -> Bool
+}

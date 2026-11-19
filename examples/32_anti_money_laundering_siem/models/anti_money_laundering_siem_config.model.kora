@@ -1,0 +1,10 @@
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// Configuration Model
+
+model AntiMoneyLaunderingSiemConfig {
+    environment: String
+    maxBatchSize: Int
+    retryAttempts: Int
+    timeoutSeconds: Int
+    enabled: Bool
+}

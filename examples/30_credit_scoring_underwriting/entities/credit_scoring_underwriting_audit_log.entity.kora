@@ -1,0 +1,12 @@
+// Example 30: Credit Underwriting & Risk Assessment
+// Audit Trail Entity
+
+@table("credit_scoring_underwriting_audit_logs")
+model CreditScoringUnderwritingAuditLog {
+    @id
+    id: Int
+    recordId: Int
+    action: String
+    performedBy: String
+    timestamp: Int
+}

@@ -1,0 +1,11 @@
+// ============================================================================
+// Example 24: Fintech Core Banking — Enum: ComplianceRiskLevel
+// Regulatory Compliance and AML Risk Classification
+// ============================================================================
+
+enum ComplianceRiskLevel {
+    LowRisk
+    MediumRisk
+    HighRisk
+    SanctionRestricted
+}

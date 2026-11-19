@@ -1,0 +1,9 @@
+// Example 31: reconciliation_settlement — Enum: DisputeStage
+// Dedicated Domain Enum Specification
+
+enum DisputeStage {
+    DisputeLogged
+    EvidenceSubmitted
+    ArbitrationPending
+    SettledResolved
+}

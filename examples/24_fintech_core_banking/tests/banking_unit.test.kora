@@ -1,0 +1,227 @@
+// ============================================================================
+// Unit Test Suite: 24_fintech_core_banking
+// Rigorous Financial Invariant, Saga, Idempotency & Optimistic Locking Tests
+// ============================================================================
+
+import { Account } from "../entities/account.entity"
+import { LedgerJournalEvent } from "../entities/ledger_entry.entity"
+import { BankingRepository } from "../interfaces/banking.repository.interface"
+import { BankingService } from "../services/banking.service"
+import { TransferSagaCommand, SagaExecutionResult } from "../models/banking.dto"
+
+class RigorousBankingRepo implements BankingRepository {
+    acc1_balance: Int
+    acc1_reserved: Int
+    acc1_version: Int
+
+    acc2_balance: Int
+    acc2_reserved: Int
+    acc2_version: Int
+
+    acc3_balance: Int
+    acc3_reserved: Int
+    acc3_version: Int
+
+    idempotencyStore: String
+
+    init() {
+        this.acc1_balance = 100000
+        this.acc1_reserved = 0
+        this.acc1_version = 1
+
+        this.acc2_balance = 50000
+        this.acc2_reserved = 0
+        this.acc2_version = 1
+
+        this.acc3_balance = 25000
+        this.acc3_reserved = 0
+        this.acc3_version = 1
+
+        this.idempotencyStore = ""
+    }
+
+    fn findAccountById(id: Int) -> Option<Account> {
+        if id == 1 {
+            return Some(Account {
+                id: 1,
+                accountNumber: "ACC-01",
+                balance: this.acc1_balance,
+                reservedBalance: this.acc1_reserved,
+                version: this.acc1_version,
+                status: "ACTIVE",
+            })
+        }
+        if id == 2 {
+            return Some(Account {
+                id: 2,
+                accountNumber: "ACC-02",
+                balance: this.acc2_balance,
+                reservedBalance: this.acc2_reserved,
+                version: this.acc2_version,
+                status: "ACTIVE",
+            })
+        }
+        if id == 3 {
+            return Some(Account {
+                id: 3,
+                accountNumber: "ACC-03-FROZEN",
+                balance: this.acc3_balance,
+                reservedBalance: this.acc3_reserved,
+                version: this.acc3_version,
+                status: "FROZEN",
+            })
+        }
+        return None
+    }
+
+    fn saveAccountOptimistic(account: Account, expectedVersion: Int) -> Result<Account, String> {
+        if account.id == 1 {
+            if this.acc1_version != expectedVersion {
+                return Err("Optimistic lock conflict")
+            }
+            this.acc1_balance = account.balance
+            this.acc1_reserved = account.reservedBalance
+            this.acc1_version = account.version
+            return Ok(account)
+        }
+        if account.id == 2 {
+            if this.acc2_version != expectedVersion {
+                return Err("Optimistic lock conflict")
+            }
+            this.acc2_balance = account.balance
+            this.acc2_reserved = account.reservedBalance
+            this.acc2_version = account.version
+            return Ok(account)
+        }
+        if account.id == 3 {
+            if this.acc3_version != expectedVersion {
+                return Err("Optimistic lock conflict")
+            }
+            this.acc3_balance = account.balance
+            this.acc3_reserved = account.reservedBalance
+            this.acc3_version = account.version
+            return Ok(account)
+        }
+        return Err("Account not found")
+    }
+
+    fn appendJournalEvent(event: LedgerJournalEvent) -> Result<LedgerJournalEvent, String> {
+        return Ok(event)
+    }
+
+    fn checkIdempotency(key: String) -> Option<String> {
+        if this.idempotencyStore == key {
+            return Some("PROCESSED")
+        }
+        return None
+    }
+
+    fn recordIdempotency(key: String, payload: String) -> Bool {
+        this.idempotencyStore = key
+        return true
+    }
+
+    fn getTotalSystemAssets() -> Int {
+        return this.acc1_balance + this.acc1_reserved + this.acc2_balance + this.acc2_reserved + this.acc3_balance + this.acc3_reserved
+    }
+}
+
+class CoreBankingUnitTestSuite {
+    repo: RigorousBankingRepo
+    service: BankingService
+
+    init(repo: RigorousBankingRepo, service: BankingService) {
+        this.repo = repo
+        this.service = service
+    }
+
+    fn test_successful_saga_transfer() -> Bool {
+        let cmd = TransferSagaCommand {
+            sagaId: "SAGA-001",
+            idempotencyKey: "IDEMP-KEY-001",
+            sourceAccountId: 1,
+            destinationAccountId: 2,
+            amount: 15000,
+            expectedSourceVersion: 1,
+        }
+        let res = this.service.executeTransferSaga(cmd)
+        let ok = res.status == "SAGA_COMMITTED_SUCCESSFULLY"
+        let balanceMatch = res.finalSourceBalance == 85000 && res.finalDestBalance == 65000
+        return ok && balanceMatch
+    }
+
+    fn test_optimistic_locking_conflict() -> Bool {
+        // Attempt transfer with stale expectedVersion (1, but current is 3)
+        let staleCmd = TransferSagaCommand {
+            sagaId: "SAGA-002-STALE",
+            idempotencyKey: "IDEMP-KEY-002",
+            sourceAccountId: 1,
+            destinationAccountId: 2,
+            amount: 5000,
+            expectedSourceVersion: 1, // Stale!
+        }
+        let res = this.service.executeTransferSaga(staleCmd)
+        return res.status == "FAILED_OPTIMISTIC_LOCK_CONFLICT"
+    }
+
+    fn test_saga_compensation_on_frozen_account() -> Bool {
+        let acc1 = match this.repo.findAccountById(1) {
+            Some(a) => a,
+            None => Account { id: 0, accountNumber: "", balance: 0, reservedBalance: 0, version: 0, status: "" },
+        }
+        let preBalance = acc1.balance
+
+        let cmd = TransferSagaCommand {
+            sagaId: "SAGA-003-FROZEN",
+            idempotencyKey: "IDEMP-KEY-003",
+            sourceAccountId: 1,
+            destinationAccountId: 3, // Account 3 is FROZEN!
+            amount: 10000,
+            expectedSourceVersion: acc1.version,
+        }
+        let res = this.service.executeTransferSaga(cmd)
+
+        let compensated = res.status == "SAGA_COMPENSATED_AND_ROLLED_BACK" && res.compensated
+        let postBalance = res.finalSourceBalance == preBalance
+        return compensated && postBalance
+    }
+
+    fn test_idempotency_deduplication() -> Bool {
+        // Re-execute with previously used idempotency key
+        let dupCmd = TransferSagaCommand {
+            sagaId: "SAGA-001-REPLAY",
+            idempotencyKey: "IDEMP-KEY-001", // Already processed in test 1
+            sourceAccountId: 1,
+            destinationAccountId: 2,
+            amount: 15000,
+            expectedSourceVersion: 99,
+        }
+        let res = this.service.executeTransferSaga(dupCmd)
+        return res.status == "IDEMPOTENT_DUPLICATE_IGNORED"
+    }
+
+    fn test_financial_conservation_invariant() -> Bool {
+        // Baseline initial assets: 100000 + 50000 + 25000 = 175000
+        let total = this.repo.getTotalSystemAssets()
+        return total == 175000
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_successful_saga_transfer()
+        let t2 = this.test_optimistic_locking_conflict()
+        let t3 = this.test_saga_compensation_on_frozen_account()
+        let t4 = this.test_idempotency_deduplication()
+        let t5 = this.test_financial_conservation_invariant()
+
+        if t1 && t2 && t3 && t4 && t5 {
+            print("  ✓ Core Banking Rigorous Unit Tests: 5/5 passed (Saga, Concurrency & Invariants Verified)")
+        } else {
+            print("  ✗ Core Banking Rigorous Unit Tests: failed")
+        }
+    }
+}
+
+let repo = RigorousBankingRepo()
+let service = BankingService(repo)
+let suite = CoreBankingUnitTestSuite(repo, service)
+suite.run()

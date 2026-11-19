@@ -1,0 +1,7 @@
+// examples/08_openapi_swagger — Event: ContractViolationEvent
+
+model ContractViolationEvent {
+    route: String
+    offendingField: String
+    errorType: String
+}

@@ -1,0 +1,10 @@
+// Example 87: FIDO2 / WebAuthn Passkey Registration & Attestation
+// Repository Interface
+
+import { HardwareSecurityTokenFido2PrimaryRecord } from "../entities/hardware_security_token_fido2_primary.entity"
+
+interface HardwareSecurityTokenFido2Repository {
+    fn findById(id: Int) -> Option<HardwareSecurityTokenFido2PrimaryRecord>
+    fn save(record: HardwareSecurityTokenFido2PrimaryRecord) -> Result<HardwareSecurityTokenFido2PrimaryRecord, String>
+    fn countActive() -> Int
+}

@@ -1,0 +1,26 @@
+// Example 31: Inter-Bank Reconciliation & Settlement
+// Router & Endpoint Dispatcher
+
+import { CreateReconciliationSettlementRequest } from "../models/reconciliation_settlement_request.dto"
+import { ReconciliationSettlementResponse } from "../models/reconciliation_settlement_response.dto"
+import { ReconciliationSettlementRecord } from "../entities/reconciliation_settlement_primary.entity"
+import { ReconciliationSettlementCommandController } from "../controllers/reconciliation_settlement_command.controller"
+import { ReconciliationSettlementQueryController } from "../controllers/reconciliation_settlement_query.controller"
+
+class ReconciliationSettlementRouter {
+    commandController: ReconciliationSettlementCommandController
+    queryController: ReconciliationSettlementQueryController
+
+    init(commandController: ReconciliationSettlementCommandController, queryController: ReconciliationSettlementQueryController) {
+        this.commandController = commandController
+        this.queryController = queryController
+    }
+
+    fn postRecord(req: CreateReconciliationSettlementRequest) -> ReconciliationSettlementResponse {
+        return this.commandController.handleCreate(req)
+    }
+
+    fn fetchRecord(id: Int) -> Option<ReconciliationSettlementRecord> {
+        return this.queryController.getById(id)
+    }
+}

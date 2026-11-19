@@ -1,0 +1,9 @@
+// examples/03_crud_products_api — Enum: ProductCategory
+
+enum ProductCategory {
+    Electronics
+    Apparel
+    Books
+    HomeGoods
+    DigitalSoftware
+}

@@ -1,0 +1,15 @@
+// Example 74: Retrieval-Augmented Generation (RAG) Document Chunker
+// Transport Model: Command Request
+
+model CreateRagKnowledgePipelineTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryRagKnowledgePipelineFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

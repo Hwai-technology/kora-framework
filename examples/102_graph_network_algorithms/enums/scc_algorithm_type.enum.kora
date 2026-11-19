@@ -1,0 +1,6 @@
+// Example 102: Graph Algorithms & Tarjan SCC / PageRank — Enum: SccAlgorithmType
+
+enum SccAlgorithmType {
+    TarjanLowLinkAlgorithm
+    KosarajuTwoPassAlgorithm
+}

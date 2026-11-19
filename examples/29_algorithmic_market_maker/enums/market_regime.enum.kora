@@ -1,0 +1,9 @@
+// Example 29: algorithmic_market_maker — Enum: MarketRegime
+// Dedicated Domain Enum Specification
+
+enum MarketRegime {
+    CalmBalanced
+    TrendingUpward
+    TrendingDownward
+    HighVolatilityShock
+}

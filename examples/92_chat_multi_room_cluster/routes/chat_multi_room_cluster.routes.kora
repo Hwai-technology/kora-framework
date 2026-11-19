@@ -1,0 +1,22 @@
+// Example 92: Multi-Room WebSocket Chat & Presence Cluster
+// Router & Endpoint Dispatcher
+
+import { CreateChatMultiRoomClusterTaskRequest } from "../models/chat_multi_room_cluster_request.dto"
+import { ChatMultiRoomClusterResponseDto } from "../models/chat_multi_room_cluster_response.dto"
+import { ChatMultiRoomClusterController } from "../controllers/chat_multi_room_cluster.controller"
+
+class ChatMultiRoomClusterRouter {
+    controller: ChatMultiRoomClusterController
+
+    init(controller: ChatMultiRoomClusterController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateChatMultiRoomClusterTaskRequest) -> ChatMultiRoomClusterResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

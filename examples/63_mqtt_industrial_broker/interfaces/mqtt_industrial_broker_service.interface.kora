@@ -1,0 +1,10 @@
+// Example 63: MQTT Industrial Telemetry Broker & Topic Tree
+// Domain Service Contract
+
+import { MqttIndustrialBrokerPrimaryRecord } from "../entities/mqtt_industrial_broker_primary.entity"
+import { CreateMqttIndustrialBrokerTaskRequest } from "../models/mqtt_industrial_broker_request.dto"
+
+interface MqttIndustrialBrokerDomainContract {
+    fn executeTask(req: CreateMqttIndustrialBrokerTaskRequest) -> Result<MqttIndustrialBrokerPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

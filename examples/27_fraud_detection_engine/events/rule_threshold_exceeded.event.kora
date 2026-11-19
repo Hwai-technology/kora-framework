@@ -1,0 +1,9 @@
+// Example 27: fraud_detection_engine — Domain Event: RuleThresholdExceededEvent
+// Dedicated Domain Event Specification
+
+model RuleThresholdExceededEvent {
+    ruleId: String
+    thresholdVal: Int
+    actualVal: Int
+    timestamp: Int
+}

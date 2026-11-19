@@ -1,0 +1,9 @@
+// Example 49: API Gateway & Web Application Firewall
+// Configuration Model
+
+model ApiGatewayWafClusterConfig {
+    heartbeatIntervalMs: Int
+    electionTimeoutMs: Int
+    quorumMajoritySize: Int
+    clusterName: String
+}

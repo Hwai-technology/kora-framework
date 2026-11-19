@@ -1,0 +1,7 @@
+// Example 96: Video on Demand (VOD) HLS/DASH Transmuxer — Domain Event: DrmLicenseAcquiredEvent
+
+model DrmLicenseAcquiredEvent {
+    assetId: String
+    drmSystem: String
+    tokenExpiry: Int
+}

@@ -1,25 +1,124 @@
 // ============================================================================
-// Realtime Chat — Repository Data Access Layer
+// Realtime WebSocket Session & Federation Repository Layer
 // ============================================================================
 
-import { ChatMessage, RoomPresence } from "../models/chat.models"
+import { WsSession, RoomPresence, BroadcastEnvelope } from "../models/chat.models"
 
 class ChatRepository {
-    database: Database
+    sessions: Vector<WsSession>
+    broadcastHistory: Vector<BroadcastEnvelope>
 
-    init(database: Database) {
-        this.database = database
+    init() {
+        this.sessions = Vector<WsSession>()
+        this.broadcastHistory = Vector<BroadcastEnvelope>()
     }
 
-    fn create(message: ChatMessage) -> ChatMessage {
-        let res = this.database.chatMessages.create(message)
-        return res
+    fn storeSession(session: WsSession) -> Unit {
+        this.sessions.push(session)
     }
 
-    fn getPresence(room: String) -> RoomPresence {
+    fn findSession(sessionId: String) -> Option<WsSession> {
+        var i = 0
+        while i < this.sessions.length() {
+            let s = this.sessions[i]
+            if s.sessionId == sessionId && s.active {
+                return Some(s)
+            }
+            i = i + 1
+        }
+        return None
+    }
+
+    fn updateHeartbeat(sessionId: String, timestamp: Int) -> Bool {
+        var found = false
+        var i = 0
+        while i < this.sessions.length() {
+            let s = this.sessions[i]
+            if s.sessionId == sessionId && s.active {
+                s.lastHeartbeatTs = timestamp
+                s.messagesReceived = s.messagesReceived + 1
+                found = true
+            }
+            i = i + 1
+        }
+        return found
+    }
+
+    fn recordMessageSent(sessionId: String) -> Unit {
+        var i = 0
+        while i < this.sessions.length() {
+            let s = this.sessions[i]
+            if s.sessionId == sessionId && s.active {
+                s.messagesSent = s.messagesSent + 1
+            }
+            i = i + 1
+        }
+    }
+
+    fn getActiveSessionsByChannel(channel: String) -> Vector<WsSession> {
+        let result = Vector<WsSession>()
+        var i = 0
+        while i < this.sessions.length() {
+            let s = this.sessions[i]
+            if s.active && s.channel == channel {
+                result.push(s)
+            }
+            i = i + 1
+        }
+        return result
+    }
+
+    fn recordBroadcast(envelope: BroadcastEnvelope) -> Unit {
+        this.broadcastHistory.push(envelope)
+    }
+
+    fn evictTimedOutSessions(cutoffTimestamp: Int) -> Int {
+        var evictedCount = 0
+        var i = 0
+        while i < this.sessions.length() {
+            let s = this.sessions[i]
+            if s.active && s.lastHeartbeatTs < cutoffTimestamp {
+                s.active = false
+                evictedCount = evictedCount + 1
+            }
+            i = i + 1
+        }
+        return evictedCount
+    }
+
+    fn terminateSession(sessionId: String) -> Bool {
+        var terminated = false
+        var i = 0
+        while i < this.sessions.length() {
+            let s = this.sessions[i]
+            if s.sessionId == sessionId && s.active {
+                s.active = false
+                terminated = true
+            }
+            i = i + 1
+        }
+        return terminated
+    }
+
+    fn getPresence(channel: String) -> RoomPresence {
+        var count = 0
+        var latestTs = 0
+        var i = 0
+        while i < this.sessions.length() {
+            let s = this.sessions[i]
+            if s.active && s.channel == channel {
+                count = count + 1
+                if s.lastHeartbeatTs > latestTs {
+                    latestTs = s.lastHeartbeatTs
+                }
+            }
+            i = i + 1
+        }
         return RoomPresence {
-            room: room,
-            activeMembers: 42,
+            room: channel,
+            activeMembers: count,
+            topic: "Federated Realtime Channel: " + channel,
+            lastActivityTs: latestTs,
         }
     }
 }

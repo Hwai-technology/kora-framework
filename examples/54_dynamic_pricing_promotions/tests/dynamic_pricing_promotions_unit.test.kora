@@ -1,0 +1,75 @@
+// ============================================================================
+// Unit Test Suite: Dynamic Pricing Engine & Flash Sale Rate-Limiter
+// Verifies Domain Invariants, Boundary Calculations & Liveness
+// ============================================================================
+
+import { CreateDynamicPricingPromotionsTaskRequest } from "../models/dynamic_pricing_promotions_request.dto"
+import { DynamicPricingPromotionsInMemoryRepository } from "../repositories/dynamic_pricing_promotions_inmemory.repository"
+import { DynamicPricingPromotionsCoreService } from "../services/dynamic_pricing_promotions_core.service"
+import { DynamicPricingPromotionsTelemetryService } from "../services/dynamic_pricing_promotions_telemetry.service"
+
+class DynamicPricingPromotionsUnitTestSuite {
+    service: DynamicPricingPromotionsCoreService
+    telemetry: DynamicPricingPromotionsTelemetryService
+
+    init(service: DynamicPricingPromotionsCoreService, telemetry: DynamicPricingPromotionsTelemetryService) {
+        this.service = service
+        this.telemetry = telemetry
+    }
+
+    fn test_valid_task_execution() -> Bool {
+        let req = CreateDynamicPricingPromotionsTaskRequest {
+            taskKey: "UNIT-TASK-101",
+            targetEntityId: 10,
+            workloadCapacity: 95,
+            domainContext: "E-Commerce",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(rec) => rec.id == 10 && rec.capacityScore == 95,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_negative_target_rejected() -> Bool {
+        let req = CreateDynamicPricingPromotionsTaskRequest {
+            taskKey: "INVALID-TASK",
+            targetEntityId: -1,
+            workloadCapacity: 50,
+            domainContext: "E-Commerce",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Target entity ID must be strictly positive",
+        }
+    }
+
+    fn test_health_evaluation() -> Bool {
+        let health = this.service.evaluateHealth(10)
+        return health == "OPTIMUM_PERFORMANCE" || health == "MODERATE_NORMAL"
+    }
+
+    fn test_telemetry_ping() -> Bool {
+        return this.telemetry.ping()
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_task_execution()
+        let t2 = this.test_invalid_negative_target_rejected()
+        let t3 = this.test_health_evaluation()
+        let t4 = this.test_telemetry_ping()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ Dynamic Pricing Engine & Flash Sale Rate-Limiter Unit Tests: 4/4 passed (Domain Invariants Verified)")
+        } else {
+            print("  ✗ Dynamic Pricing Engine & Flash Sale Rate-Limiter Unit Tests: failed")
+        }
+    }
+}
+
+let repo = DynamicPricingPromotionsInMemoryRepository()
+let service = DynamicPricingPromotionsCoreService(repo)
+let telemetry = DynamicPricingPromotionsTelemetryService()
+let suite = DynamicPricingPromotionsUnitTestSuite(service, telemetry)
+suite.run()

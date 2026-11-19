@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 80: AI Workflow Directed Acyclic Graph (DAG) Engine
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { AiWorkflowDagEngineInMemoryRepository } from "./repositories/ai_workflow_dag_engine_inmemory.repository"
+import { AiWorkflowDagEngineCoreService } from "./services/ai_workflow_dag_engine_core.service"
+import { AiWorkflowDagEngineController } from "./controllers/ai_workflow_dag_engine.controller"
+import { AiWorkflowDagEngineRouter } from "./routes/ai_workflow_dag_engine.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = AiWorkflowDagEngineInMemoryRepository()
+        let service = AiWorkflowDagEngineCoreService(repo)
+        let controller = AiWorkflowDagEngineController(service)
+        let router = AiWorkflowDagEngineRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

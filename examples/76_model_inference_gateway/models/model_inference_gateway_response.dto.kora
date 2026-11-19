@@ -1,0 +1,16 @@
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher
+// Transport Model: Standard Response
+
+model ModelInferenceGatewayResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model ModelInferenceGatewaySummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

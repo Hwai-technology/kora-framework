@@ -1,0 +1,8 @@
+// Example 28: crypto_derivatives_exchange — Enum: MarginMode
+// Dedicated Domain Enum Specification
+
+enum MarginMode {
+    IsolatedCross
+    CrossPortfolio
+    MultiAssetCollateral
+}

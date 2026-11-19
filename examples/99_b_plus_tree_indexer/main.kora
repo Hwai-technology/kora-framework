@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 99: B+ Tree Disk Pager & Index Node Balancer
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { BPlusTreeIndexerInMemoryRepository } from "./repositories/b_plus_tree_indexer_inmemory.repository"
+import { BPlusTreeIndexerCoreService } from "./services/b_plus_tree_indexer_core.service"
+import { BPlusTreeIndexerController } from "./controllers/b_plus_tree_indexer.controller"
+import { BPlusTreeIndexerRouter } from "./routes/b_plus_tree_indexer.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = BPlusTreeIndexerInMemoryRepository()
+        let service = BPlusTreeIndexerCoreService(repo)
+        let controller = BPlusTreeIndexerController(service)
+        let router = BPlusTreeIndexerRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

@@ -1,0 +1,9 @@
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions
+// Configuration Model
+
+model TelemedicineConsultationServiceConfig {
+    hipaaAuditEnabled: Bool
+    encryptionKeyVersion: Int
+    maxBatchFetchSize: Int
+    environment: String
+}

@@ -1,0 +1,7 @@
+// Example 86: SIEM High-Throughput Log Ingestion & CEF Normalizer — Domain Event: SiemLogNormalizedEvent
+
+model SiemLogNormalizedEvent {
+    sourceHost: String
+    cefEventClassId: String
+    severity: Int
+}

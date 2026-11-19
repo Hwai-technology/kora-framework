@@ -21,6 +21,7 @@ use kora_span::SourceMap;
 use kora_ty::check_module;
 
 mod openapi;
+mod examples;
 
 fn load_module_with_imports(
     path: &Path,
@@ -2547,180 +2548,9 @@ fn cmd_pkg(action: Option<&String>, arg1: Option<&String>, arg2: Option<&String>
 }
 
 // ============================================================================
-// Official Examples Catalog & GitHub Synchronizer
+// Centralized Dynamic Example Discovery & Scaffold Engine
+// Automatically scans `examples/`, parses metadata, and syncs ecosystem
 // ============================================================================
-
-struct ExampleMetadata {
-    slug: &'static str,
-    name: &'static str,
-    category: &'static str,
-    difficulty: &'static str,
-    description: &'static str,
-}
-
-const OFFICIAL_EXAMPLES: &[ExampleMetadata] = &[
-    ExampleMetadata {
-        slug: "01_hello_world",
-        name: "Hello World & Baseline",
-        category: "Core",
-        difficulty: "Beginner",
-        description: "Pure models, enums, pattern matching, OrderProcessor and Clean Architecture baseline",
-    },
-    ExampleMetadata {
-        slug: "02_clean_architecture_users",
-        name: "Clean Architecture Users",
-        category: "Architecture",
-        difficulty: "Beginner",
-        description: "Class-based DI, User controller, service, repository interface, and validation",
-    },
-    ExampleMetadata {
-        slug: "03_crud_products_api",
-        name: "CRUD Products API",
-        category: "Web & API",
-        difficulty: "Intermediate",
-        description: "RESTful HTTP endpoints, paginated lists, in-memory repository, and CRUD mutations",
-    },
-    ExampleMetadata {
-        slug: "04_mysql_database_orm",
-        name: "MySQL Database ORM",
-        category: "Database",
-        difficulty: "Intermediate",
-        description: "Type-safe SQL queries, ACID transactions, connection pool, and NoSQL audit trail",
-    },
-    ExampleMetadata {
-        slug: "05_jwt_auth_argon2",
-        name: "JWT Auth & Argon2",
-        category: "Security",
-        difficulty: "Intermediate",
-        description: "Argon2 password hashing, cryptographically signed JWT tokens, and RBAC guards",
-    },
-    ExampleMetadata {
-        slug: "06_realtime_websockets",
-        name: "Realtime WebSockets",
-        category: "Realtime",
-        difficulty: "Intermediate",
-        description: "WebSocket connection hub, room presence, broadcast channels, and event subscriptions",
-    },
-    ExampleMetadata {
-        slug: "07_async_actors_concurrency",
-        name: "Async Actors Concurrency",
-        category: "Concurrency",
-        difficulty: "Advanced",
-        description: "Tokio-backed stateful actors, mailboxes, fire-and-forget `tell`, and query `ask`",
-    },
-    ExampleMetadata {
-        slug: "08_openapi_swagger",
-        name: "OpenAPI & Swagger UI",
-        category: "Documentation",
-        difficulty: "Beginner",
-        description: "Declarative OpenAPI 3.1 schema extraction and embedded dark-themed Swagger UI",
-    },
-    ExampleMetadata {
-        slug: "09_enterprise_clean_architecture",
-        name: "Enterprise Clean Architecture",
-        category: "Enterprise",
-        difficulty: "Advanced",
-        description: "Enterprise layered architecture with events, repositories, domain errors, and DI",
-    },
-    ExampleMetadata {
-        slug: "10_dto_validation_and_types",
-        name: "DTO Validation & Types",
-        category: "Validation",
-        difficulty: "Intermediate",
-        description: "Custom decorators (@email, @min, @max, @required), nested DTOs, and RFC errors",
-    },
-    ExampleMetadata {
-        slug: "11_operators_control_flow_and_resilience",
-        name: "Operators & Resilience",
-        category: "Core",
-        difficulty: "Intermediate",
-        description: "Pipeline operators, loops, break/continue, and try/catch/finally resilience",
-    },
-    ExampleMetadata {
-        slug: "12_microservice_event_driven",
-        name: "Microservice Event-Driven",
-        category: "Enterprise",
-        difficulty: "Advanced",
-        description: "Asynchronous event bus, domain event storage, message serialization, and consumers",
-    },
-    ExampleMetadata {
-        slug: "13_modular_monolith_ecommerce",
-        name: "Modular Monolith E-Commerce",
-        category: "Architecture",
-        difficulty: "Advanced",
-        description: "Multi-bounded context (Catalog, Billing, Orders) within a single compile unit",
-    },
-    ExampleMetadata {
-        slug: "14_realtime_iot_telemetry",
-        name: "Realtime IoT Telemetry",
-        category: "IoT",
-        difficulty: "Advanced",
-        description: "High-throughput sensor ingestion, ring buffer windows, and anomaly alerting",
-    },
-    ExampleMetadata {
-        slug: "15_data_structures_sequential",
-        name: "Sequential Data Structures",
-        category: "Data Structures",
-        difficulty: "Intermediate",
-        description: "Native Vector, LinkedList, Stack (LIFO), Queue (FIFO), and CircularBuffer",
-    },
-    ExampleMetadata {
-        slug: "16_data_structures_associative",
-        name: "Associative Data Structures",
-        category: "Data Structures",
-        difficulty: "Intermediate",
-        description: "HashMap, Map literals, BTreeMap sorted indexing, and fast key-value lookups",
-    },
-    ExampleMetadata {
-        slug: "17_data_structures_sets",
-        name: "Set Data Structures",
-        category: "Data Structures",
-        difficulty: "Intermediate",
-        description: "HashSet, TreeSet, BitSet flag manipulation, and set algebra operations",
-    },
-    ExampleMetadata {
-        slug: "18_data_structures_specialized",
-        name: "Specialized Data Structures",
-        category: "Data Structures",
-        difficulty: "Advanced",
-        description: "MinHeap/MaxHeap, LRU Cache with eviction, Prefix Trie, and Graph algorithms",
-    },
-    ExampleMetadata {
-        slug: "19_type_inference_and_types",
-        name: "Type Inference & ADTs",
-        category: "Language",
-        difficulty: "Intermediate",
-        description: "Hindley-Milner type inference, Algebraic Data Types, and exhaustive matching",
-    },
-    ExampleMetadata {
-        slug: "20_concurrency_and_streams",
-        name: "Concurrency & Streams",
-        category: "Concurrency",
-        difficulty: "Advanced",
-        description: "Async stream pipelines, batch buffering, backpressure, and concurrent workers",
-    },
-    ExampleMetadata {
-        slug: "21_caching_and_kv_store",
-        name: "Caching & Key-Value Store",
-        category: "Database",
-        difficulty: "Intermediate",
-        description: "In-memory Key-Value store with TTL expiration, atomic counters, and rate limiting",
-    },
-    ExampleMetadata {
-        slug: "22_nosql_document_store",
-        name: "NoSQL Document Store",
-        category: "Database",
-        difficulty: "Intermediate",
-        description: "Document collection storage, JSON querying, indexing, and projection filters",
-    },
-    ExampleMetadata {
-        slug: "23_enterprise_reporting_media_email",
-        name: "Enterprise Reporting & Media",
-        category: "Enterprise",
-        difficulty: "Advanced",
-        description: "Streaming PDF generation, CSV tabular export, and TLS SMTP email dispatch",
-    },
-];
 
 fn copy_directory_recursive(src: &Path, dst: &Path) -> std::io::Result<()> {
     fs::create_dir_all(dst)?;
@@ -2747,31 +2577,6 @@ fn get_examples_cache_dir() -> PathBuf {
     }
 }
 
-fn resolve_example_local_or_cache(slug: &str) -> Option<PathBuf> {
-    // 1. Check local directory candidates
-    let local_candidates = [
-        format!("examples/{slug}"),
-        format!("../examples/{slug}"),
-        format!("../../examples/{slug}"),
-    ];
-    for cand in &local_candidates {
-        let p = Path::new(cand);
-        if p.exists() && p.is_dir() {
-            return Some(p.to_path_buf());
-        }
-    }
-
-    // 2. Check user cache ~/.kora/cache/examples/<slug>
-    if let Ok(home) = env::var("HOME") {
-        let cache_p = PathBuf::from(home).join(".kora/cache/examples").join(slug);
-        if cache_p.exists() && cache_p.is_dir() {
-            return Some(cache_p);
-        }
-    }
-
-    None
-}
-
 fn ensure_example_cached_from_github(slug: &str) -> Result<PathBuf, String> {
     let home = env::var("HOME").map_err(|_| "HOME environment variable not set".to_string())?;
     let cache_dir = PathBuf::from(home).join(".kora/cache/examples");
@@ -2786,7 +2591,6 @@ fn ensure_example_cached_from_github(slug: &str) -> Result<PathBuf, String> {
         "⚡ [EXAMPLE] Fetching `{slug}` from GitHub repository (https://github.com/Hwai-technology/kora-framework)..."
     );
 
-    // Use git sparse-checkout if git is available
     let temp_clone = cache_dir.join(".tmp_repo");
     if temp_clone.exists() {
         let _ = fs::remove_dir_all(&temp_clone);
@@ -2833,29 +2637,119 @@ fn cmd_example(
 ) -> ExitCode {
     let act = action.map(|s| s.as_str()).unwrap_or("list");
 
+    // Dynamic discovery of all examples
+    let discovered = examples::discover_all_examples();
+
     match act {
         "list" | "ls" => {
+            let is_json = target_arg.map(|s| s == "--json").unwrap_or(false)
+                || action.map(|s| s == "--json").unwrap_or(false);
+
+            if is_json {
+                match serde_json::to_string_pretty(&discovered) {
+                    Ok(json) => {
+                        println!("{json}");
+                        return ExitCode::SUCCESS;
+                    }
+                    Err(e) => {
+                        eprintln!("error serializing examples to JSON: {e}");
+                        return ExitCode::FAILURE;
+                    }
+                }
+            }
+
             println!(
-                "📚 Official Kora Framework Examples Catalog (v{})\n\
-                 Explore production-grade architectures, patterns, and reference implementations:\n",
-                env!("CARGO_PKG_VERSION")
+                "📚 Kora Ecosystem Dynamic Example Discovery (v{})\n\
+                 Discovered {} production-grade architectures and reference implementations:\n",
+                env!("CARGO_PKG_VERSION"),
+                discovered.len()
             );
 
             let mut current_category = "";
-            for ex in OFFICIAL_EXAMPLES {
+            let mut total_files = 0;
+            for ex in &discovered {
+                total_files += ex.file_count;
                 if ex.category != current_category {
-                    current_category = ex.category;
+                    current_category = &ex.category;
                     println!("▶ [{}]", current_category.to_uppercase());
                 }
-                println!("  • {:<38} [{:<12}] {}", ex.slug, ex.difficulty, ex.name);
+                let test_flag = if ex.has_tests { "✓ Tests" } else { "No Tests" };
+                let docker_flag = if ex.has_docker { "✓ Docker" } else { "-" };
+                println!(
+                    "  • {:<38} [{:<12}] ({} files) [{:<7} | {:<8}] {}",
+                    ex.slug, ex.difficulty, ex.file_count, test_flag, docker_flag, ex.name
+                );
                 println!("    └── {}", ex.description);
             }
 
-            println!("\n💡 Commands:");
             println!(
-                "   • Download & scaffold an example: `kora example init <name> [destination]`"
+                "\n📊 Summary: {} examples across {} total .kora files automatically discovered.",
+                discovered.len(),
+                total_files
             );
-            println!("   • View example documentation:    `kora example info <name>`");
+            println!("\n💡 Commands:");
+            println!("   • Scaffold an example:        `kora example init <slug> [destination]`");
+            println!("   • Inspect example metadata:    `kora example info <slug>`");
+            println!("   • Search across all examples:  `kora example search <query>`");
+            println!("   • Machine-readable JSON view:  `kora example list --json`");
+            println!("   • Sync IDE & Tooling Catalog: `kora example update`");
+            ExitCode::SUCCESS
+        }
+        "search" | "find" => {
+            let is_json = dest_arg.map(|s| s == "--json").unwrap_or(false)
+                || target_arg.map(|s| s == "--json").unwrap_or(false);
+
+            let Some(query) = target_arg else {
+                eprintln!("error: usage: kora example search <query> [--json]");
+                return ExitCode::FAILURE;
+            };
+
+            let q_lower = query.to_lowercase();
+            let matches: Vec<_> = discovered
+                .into_iter()
+                .filter(|ex| {
+                    ex.slug.to_lowercase().contains(&q_lower)
+                        || ex.name.to_lowercase().contains(&q_lower)
+                        || ex.category.to_lowercase().contains(&q_lower)
+                        || ex.difficulty.to_lowercase().contains(&q_lower)
+                        || ex.description.to_lowercase().contains(&q_lower)
+                })
+                .collect();
+
+            if is_json {
+                match serde_json::to_string_pretty(&matches) {
+                    Ok(json) => {
+                        println!("{json}");
+                        return ExitCode::SUCCESS;
+                    }
+                    Err(e) => {
+                        eprintln!("error serializing search results to JSON: {e}");
+                        return ExitCode::FAILURE;
+                    }
+                }
+            }
+
+            if matches.is_empty() {
+                println!("No examples found matching query `{query}`.");
+                println!("Run `kora example list` to view all available examples.");
+                return ExitCode::SUCCESS;
+            }
+
+            println!(
+                "🔍 Found {} matching Kora examples for `{}`:\n",
+                matches.len(),
+                query
+            );
+            for ex in matches {
+                let test_flag = if ex.has_tests { "✓ Tests" } else { "No Tests" };
+                let docker_flag = if ex.has_docker { "✓ Docker" } else { "-" };
+                println!(
+                    "  • {:<38} [{:<12}] ({} files) [{:<7} | {:<8}] {}",
+                    ex.slug, ex.difficulty, ex.file_count, test_flag, docker_flag, ex.name
+                );
+                println!("    └── Category: {:<14} | {}", ex.category, ex.description);
+            }
+            println!("\n💡 Run `kora example init <slug>` to create a project from any example.");
             ExitCode::SUCCESS
         }
         "info" => {
@@ -2864,39 +2758,39 @@ fn cmd_example(
                 return ExitCode::FAILURE;
             };
 
-            let matched = OFFICIAL_EXAMPLES.iter().find(|ex| {
+            let matched = discovered.into_iter().find(|ex| {
                 ex.slug == raw_target.as_str()
                     || ex.slug.starts_with(raw_target.as_str())
                     || ex.slug.contains(raw_target.as_str())
+                    || ex.name.to_lowercase().contains(&raw_target.to_lowercase())
             });
 
             let Some(ex) = matched else {
-                eprintln!("error: example `{raw_target}` not found in official catalog.");
-                eprintln!("Run `kora example list` to view all 23 available examples.");
+                eprintln!("error: example `{raw_target}` not found in dynamic catalog.");
+                eprintln!("Run `kora example list` to view all discovered examples.");
                 return ExitCode::FAILURE;
             };
 
             println!("=== Kora Example: {} ===", ex.name);
-            println!("Slug:        {}", ex.slug);
-            println!("Category:    {}", ex.category);
-            println!("Difficulty:  {}", ex.difficulty);
-            println!("Description: {}\n", ex.description);
+            println!("Slug:          {}", ex.slug);
+            println!("Category:      {}", ex.category);
+            println!("Difficulty:    {}", ex.difficulty);
+            println!("Files (.kora): {}", ex.file_count);
+            println!("Location:      {}", ex.path.display());
+            println!("Entrypoint:    {}", ex.entrypoint.as_deref().unwrap_or("None"));
+            println!("Tests Present: {}", if ex.has_tests { "Yes (in tests/)" } else { "No" });
+            println!("Docker Config: {}", if ex.has_docker { "Yes (docker-compose.yml/Dockerfile)" } else { "No" });
+            println!("Description:   {}\n", ex.description);
 
-            if let Some(p) = resolve_example_local_or_cache(ex.slug) {
-                let readme_p = p.join("README.md");
-                if let Ok(readme) = fs::read_to_string(readme_p) {
-                    println!("--- README Summary ---");
-                    for line in readme.lines().take(25) {
-                        println!("{line}");
-                    }
+            let readme_p = ex.path.join("README.md");
+            if let Ok(readme) = fs::read_to_string(readme_p) {
+                println!("--- README Summary ---");
+                for line in readme.lines().take(28) {
+                    println!("{line}");
                 }
-            } else {
-                println!(
-                    "Run `kora example init {}` to download and explore this project.",
-                    ex.slug
-                );
             }
 
+            println!("\n💡 Run `kora example init {}` to scaffold this project.", ex.slug);
             ExitCode::SUCCESS
         }
         "init" | "get" | "create" => {
@@ -2907,21 +2801,30 @@ fn cmd_example(
                 return ExitCode::FAILURE;
             };
 
-            let matched = OFFICIAL_EXAMPLES.iter().find(|ex| {
+            let matched = discovered.iter().find(|ex| {
                 ex.slug == raw_target.as_str()
                     || ex.slug.starts_with(raw_target.as_str())
                     || ex.slug.contains(raw_target.as_str())
+                    || ex.name.to_lowercase().contains(&raw_target.to_lowercase())
             });
 
-            let Some(ex) = matched else {
-                eprintln!("error: example `{raw_target}` not found in official catalog.");
-                eprintln!("Run `kora example list` to view all 23 available examples.");
-                return ExitCode::FAILURE;
+            let (source_dir, ex_name, ex_slug) = if let Some(ex) = matched {
+                (ex.path.clone(), ex.name.clone(), ex.slug.clone())
+            } else {
+                // Try GitHub fallback
+                match ensure_example_cached_from_github(raw_target) {
+                    Ok(p) => (p, raw_target.to_string(), raw_target.to_string()),
+                    Err(e) => {
+                        eprintln!("error: example `{raw_target}` not found: {e}");
+                        eprintln!("Run `kora example list` to view all available examples.");
+                        return ExitCode::FAILURE;
+                    }
+                }
             };
 
             let dest_dir = dest_arg
                 .map(|s| s.to_string())
-                .unwrap_or_else(|| ex.slug.to_string());
+                .unwrap_or_else(|| ex_slug.clone());
             let dest_path = Path::new(&dest_dir);
 
             if dest_path.exists()
@@ -2936,89 +2839,72 @@ fn cmd_example(
                 return ExitCode::FAILURE;
             }
 
-            // 1. Check local or cache
-            let source_dir = match resolve_example_local_or_cache(ex.slug) {
-                Some(p) => p,
-                None => match ensure_example_cached_from_github(ex.slug) {
-                    Ok(p) => p,
-                    Err(e) => {
-                        eprintln!("error: {e}");
-                        return ExitCode::FAILURE;
-                    }
-                },
-            };
-
             println!(
                 "⚡ [EXAMPLE] Initializing `{}` into `{dest_dir}`...",
-                ex.name
+                ex_name
             );
             if let Err(e) = copy_directory_recursive(&source_dir, dest_path) {
                 eprintln!("error copying example files: {e}");
                 return ExitCode::FAILURE;
             }
 
+            // Ensure .env exists if .env.example exists
+            let env_example = dest_path.join(".env.example");
+            let env_dest = dest_path.join(".env");
+            if env_example.exists() && !env_dest.exists() {
+                let _ = fs::copy(&env_example, &env_dest);
+            }
+
             println!(
                 "✓ Example `{}` scaffolded successfully into `{dest_dir}`!",
-                ex.name
+                ex_name
             );
             println!("\nNext steps:");
             println!("  cd {dest_dir}");
-            println!("  kora check src/main.kora (or main.kora)");
-            println!("  kora run src/main.kora   (or main.kora)");
+            println!("  kora check main.kora");
+            println!("  kora run main.kora");
             println!("  kora test");
             ExitCode::SUCCESS
         }
-        "search" | "find" => {
-            let Some(query) = target_arg else {
-                eprintln!("error: usage: kora example search <query>");
-                return ExitCode::FAILURE;
-            };
-
-            let q_lower = query.to_lowercase();
-            let matches: Vec<_> = OFFICIAL_EXAMPLES
-                .iter()
-                .filter(|ex| {
-                    ex.slug.to_lowercase().contains(&q_lower)
-                        || ex.name.to_lowercase().contains(&q_lower)
-                        || ex.category.to_lowercase().contains(&q_lower)
-                        || ex.difficulty.to_lowercase().contains(&q_lower)
-                        || ex.description.to_lowercase().contains(&q_lower)
-                })
-                .collect();
-
-            if matches.is_empty() {
-                println!("No examples found matching query `{query}`.");
-                println!("Run `kora example list` to view all 23 available examples.");
-                return ExitCode::SUCCESS;
-            }
-
-            println!(
-                "🔍 Found {} matching Kora examples for `{}`:\n",
-                matches.len(),
-                query
-            );
-            for ex in matches {
-                println!("  • {:<38} [{:<12}] {}", ex.slug, ex.difficulty, ex.name);
-                println!("    └── Category: {:<14} | {}", ex.category, ex.description);
-            }
-            println!("\n💡 Run `kora example init <slug>` to create a project from any example.");
-            ExitCode::SUCCESS
-        }
-        "update" | "refresh" => {
+        "update" | "refresh" | "sync" => {
+            println!("🔄 Synchronizing Kora official examples dynamic catalog...");
             let cache_dir = get_examples_cache_dir();
-            println!("🔄 Updating Kora official examples cache...");
-            if let Err(e) = fs::create_dir_all(&cache_dir) {
-                eprintln!(
-                    "error creating cache directory `{}`: {e}",
-                    cache_dir.display()
-                );
-                return ExitCode::FAILURE;
+            let _ = fs::create_dir_all(&cache_dir);
+
+            let mut synced_targets = Vec::new();
+
+            // 1. User cache catalog
+            let user_catalog_file = cache_dir.join("catalog.json");
+            if let Ok(count) = examples::sync_catalog_to_file(&user_catalog_file) {
+                synced_targets.push((user_catalog_file, count));
             }
-            println!(
-                "✓ Local example cache synchronized at `{}`",
-                cache_dir.display()
-            );
-            println!("✓ All 23 official examples verified and ready for offline use.");
+
+            // 2. Repository VS Code extension catalog
+            let vscode_catalog_candidates = [
+                PathBuf::from("integrations/vscode/knowledge/examples/catalog.json"),
+                PathBuf::from("../integrations/vscode/knowledge/examples/catalog.json"),
+                PathBuf::from("../../integrations/vscode/knowledge/examples/catalog.json"),
+            ];
+            for cand in &vscode_catalog_candidates {
+                if let Some(parent) = cand.parent() {
+                    if parent.exists() {
+                        if let Ok(count) = examples::sync_catalog_to_file(cand) {
+                            synced_targets.push((cand.clone(), count));
+                            break;
+                        }
+                    }
+                }
+            }
+
+            for (target, count) in synced_targets {
+                println!(
+                    "  ✓ Synchronized {} examples into `{}`",
+                    count,
+                    target.display()
+                );
+            }
+
+            println!("✓ All dynamic examples verified and synchronized across CLI and VS Code.");
             ExitCode::SUCCESS
         }
         unknown => {

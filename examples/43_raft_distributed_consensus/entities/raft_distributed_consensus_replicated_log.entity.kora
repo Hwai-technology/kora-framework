@@ -1,0 +1,13 @@
+// Example 43: Raft Distributed Consensus Engine
+// Persistent Database Entity: Replicated Log
+
+@table("raft_distributed_consensus_replicated_logs")
+model RaftDistributedConsensusReplicatedLogEntry {
+    @id
+    id: Int
+    logIndex: Int
+    termNumber: Int
+    commandPayload: String
+    committedQuorum: Bool
+    timestamp: Int
+}

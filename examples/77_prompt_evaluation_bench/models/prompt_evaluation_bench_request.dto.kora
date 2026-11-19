@@ -1,0 +1,15 @@
+// Example 77: Prompt Engineering Evaluation & Hallucination Scorer
+// Transport Model: Command Request
+
+model CreatePromptEvaluationBenchTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryPromptEvaluationBenchFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

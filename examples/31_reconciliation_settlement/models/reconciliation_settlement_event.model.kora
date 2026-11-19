@@ -1,0 +1,10 @@
+// Example 31: Inter-Bank Reconciliation & Settlement
+// Domain Event Model
+
+model ReconciliationSettlementEvent {
+    eventId: String
+    eventType: String
+    entityId: Int
+    occurredAt: Int
+    payloadHash: String
+}

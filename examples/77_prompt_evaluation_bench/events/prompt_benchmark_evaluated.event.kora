@@ -1,0 +1,7 @@
+// Example 77: Prompt Engineering Evaluation & Hallucination Scorer — Domain Event: PromptBenchmarkEvaluatedEvent
+
+model PromptBenchmarkEvaluatedEvent {
+    promptVersion: String
+    datasetCaseCount: Int
+    compositeScorePercent: Int
+}

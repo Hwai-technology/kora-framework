@@ -1,0 +1,10 @@
+// Example 24: Core Banking Ledger & Accounts
+// Domain Service Interface
+
+import { FintechCoreBankingRecord } from "../entities/fintech_core_banking_primary.entity"
+import { CreateFintechCoreBankingRequest } from "../models/fintech_core_banking_request.dto"
+
+interface FintechCoreBankingServiceInterface {
+    fn processRequest(req: CreateFintechCoreBankingRequest) -> Result<FintechCoreBankingRecord, String>
+    fn validateState(id: Int) -> Bool
+}

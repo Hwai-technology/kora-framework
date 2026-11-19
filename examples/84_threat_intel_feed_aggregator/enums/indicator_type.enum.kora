@@ -1,0 +1,8 @@
+// Example 84: Threat Intelligence STIX/TAXII Indicator Parser — Enum: IndicatorType
+
+enum IndicatorType {
+    MaliciousIpAddress
+    PhishingDomainUrl
+    MalwareSha256Hash
+    AttackPatternMitreAttck
+}

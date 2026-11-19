@@ -1,0 +1,13 @@
+// Example 48: Distributed Cache Cluster & Write-Behind
+// Persistent Database Entity: Replicated Log
+
+@table("distributed_cache_cluster_replicated_logs")
+model DistributedCacheClusterReplicatedLogEntry {
+    @id
+    id: Int
+    logIndex: Int
+    termNumber: Int
+    commandPayload: String
+    committedQuorum: Bool
+    timestamp: Int
+}

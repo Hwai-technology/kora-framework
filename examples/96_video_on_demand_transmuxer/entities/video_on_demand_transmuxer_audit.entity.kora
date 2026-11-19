@@ -1,0 +1,12 @@
+// Example 96: Video on Demand (VOD) HLS/DASH Transmuxer
+// Persistent Database Entity: Audit Log
+
+@table("video_on_demand_transmuxer_audit_logs")
+model VideoOnDemandTransmuxerAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

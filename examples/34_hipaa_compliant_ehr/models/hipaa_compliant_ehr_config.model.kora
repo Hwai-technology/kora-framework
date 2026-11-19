@@ -1,0 +1,9 @@
+// Example 34: HIPAA Compliant Electronic Health Records
+// Configuration Model
+
+model HipaaCompliantEhrServiceConfig {
+    hipaaAuditEnabled: Bool
+    encryptionKeyVersion: Int
+    maxBatchFetchSize: Int
+    environment: String
+}

@@ -1,0 +1,26 @@
+// Example 24: Core Banking Ledger & Accounts
+// Router & Endpoint Dispatcher
+
+import { CreateFintechCoreBankingRequest } from "../models/fintech_core_banking_request.dto"
+import { FintechCoreBankingResponse } from "../models/fintech_core_banking_response.dto"
+import { FintechCoreBankingRecord } from "../entities/fintech_core_banking_primary.entity"
+import { FintechCoreBankingCommandController } from "../controllers/fintech_core_banking_command.controller"
+import { FintechCoreBankingQueryController } from "../controllers/fintech_core_banking_query.controller"
+
+class FintechCoreBankingRouter {
+    commandController: FintechCoreBankingCommandController
+    queryController: FintechCoreBankingQueryController
+
+    init(commandController: FintechCoreBankingCommandController, queryController: FintechCoreBankingQueryController) {
+        this.commandController = commandController
+        this.queryController = queryController
+    }
+
+    fn postRecord(req: CreateFintechCoreBankingRequest) -> FintechCoreBankingResponse {
+        return this.commandController.handleCreate(req)
+    }
+
+    fn fetchRecord(id: Int) -> Option<FintechCoreBankingRecord> {
+        return this.queryController.getById(id)
+    }
+}

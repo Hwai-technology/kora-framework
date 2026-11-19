@@ -1,0 +1,10 @@
+// ============================================================================
+// Example 01: Core Language Foundations — Model: DiscountPolicy
+// ============================================================================
+
+model DiscountPolicy {
+    promoCode: String
+    discountBasisPoints: Int
+    minimumOrderCents: Int
+    active: Bool
+}

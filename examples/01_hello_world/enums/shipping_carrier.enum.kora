@@ -1,0 +1,10 @@
+// ============================================================================
+// Example 01: Core Language Foundations — Enum: ShippingCarrier
+// ============================================================================
+
+enum ShippingCarrier {
+    DHL
+    FedEx
+    UPS
+    LocalCourier
+}

@@ -1,0 +1,16 @@
+// Example 27: Real-time Fraud & Anomaly Evaluator
+// Notification Service Implementation
+
+import { FraudDetectionEngineNotifier } from "../interfaces/fraud_detection_engine_notifier.interface"
+
+class FraudDetectionEngineNotificationService implements FraudDetectionEngineNotifier {
+    init() {}
+
+    fn sendAlert(subject: String, level: String) -> Bool {
+        return level != "CRITICAL" || subject != ""
+    }
+
+    fn ping() -> Bool {
+        return true
+    }
+}

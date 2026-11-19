@@ -1,0 +1,38 @@
+// Example 91: CRDT Collaborative Real-Time Document Editor
+// Presentation Controller
+
+import { CreateCollaborativeCrdtDocTaskRequest } from "../models/collaborative_crdt_doc_request.dto"
+import { CollaborativeCrdtDocResponseDto } from "../models/collaborative_crdt_doc_response.dto"
+import { CollaborativeCrdtDocCoreService } from "../services/collaborative_crdt_doc_core.service"
+
+class CollaborativeCrdtDocController {
+    service: CollaborativeCrdtDocCoreService
+
+    init(service: CollaborativeCrdtDocCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateCollaborativeCrdtDocTaskRequest) -> CollaborativeCrdtDocResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => CollaborativeCrdtDocResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => CollaborativeCrdtDocResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

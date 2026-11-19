@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 58: Distributed Shopping Cart Session Actor
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { ShoppingCartSessionActorInMemoryRepository } from "./repositories/shopping_cart_session_actor_inmemory.repository"
+import { ShoppingCartSessionActorCoreService } from "./services/shopping_cart_session_actor_core.service"
+import { ShoppingCartSessionActorController } from "./controllers/shopping_cart_session_actor.controller"
+import { ShoppingCartSessionActorRouter } from "./routes/shopping_cart_session_actor.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = ShoppingCartSessionActorInMemoryRepository()
+        let service = ShoppingCartSessionActorCoreService(repo)
+        let controller = ShoppingCartSessionActorController(service)
+        let router = ShoppingCartSessionActorRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

@@ -1,0 +1,6 @@
+// Example 99: B+ Tree Disk Pager & Index Node Balancer — Enum: BtreeNodeType
+
+enum BtreeNodeType {
+    InternalRoutingNode
+    LeafKeyDataNode
+}

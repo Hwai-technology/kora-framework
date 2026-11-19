@@ -1,0 +1,34 @@
+// Example 47: Cloud Event Bus & Partitioned Streaming
+// Cluster Repository Implementation
+
+import { CloudEventBusNodeState } from "../entities/cloud_event_bus_primary.entity"
+import { CloudEventBusRepository } from "../interfaces/cloud_event_bus_repository.interface"
+
+class CloudEventBusClusterRepository implements CloudEventBusRepository {
+    init() {}
+
+    fn findNodeById(nodeId: Int) -> Option<CloudEventBusNodeState> {
+        if nodeId > 0 {
+            return Some(CloudEventBusNodeState {
+                id: nodeId,
+                nodeIdentifier: "CLUSTER-NODE-" + nodeId.toString(),
+                currentEpochTerm: 4,
+                votedForCandidate: 1,
+                isLeader: nodeId == 1,
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn saveNodeState(state: CloudEventBusNodeState) -> Result<CloudEventBusNodeState, String> {
+        if state.id <= 0 {
+            return Err("Invalid cluster node identifier")
+        }
+        return Ok(state)
+    }
+
+    fn getActiveQuorumCount() -> Int {
+        return 3
+    }
+}

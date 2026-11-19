@@ -1,0 +1,7 @@
+// examples/05_jwt_auth_argon2 — Enum: TokenType
+
+enum TokenType {
+    BearerAccessToken
+    RefreshTokenOpaque
+    SingleUsePasswordReset
+}

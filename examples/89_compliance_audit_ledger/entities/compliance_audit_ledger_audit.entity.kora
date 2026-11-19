@@ -1,0 +1,12 @@
+// Example 89: Immutable Cryptographic Audit Trail (SOC 2 / ISO 27001)
+// Persistent Database Entity: Audit Log
+
+@table("compliance_audit_ledger_audit_logs")
+model ComplianceAuditLedgerAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

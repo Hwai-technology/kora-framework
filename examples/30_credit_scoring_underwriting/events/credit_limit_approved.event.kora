@@ -1,0 +1,9 @@
+// Example 30: credit_scoring_underwriting — Domain Event: CreditLimitApprovedEvent
+// Dedicated Domain Event Specification
+
+model CreditLimitApprovedEvent {
+    applicationId: String
+    assignedCreditLimit: Int
+    aprBasisPoints: Int
+    timestamp: Int
+}

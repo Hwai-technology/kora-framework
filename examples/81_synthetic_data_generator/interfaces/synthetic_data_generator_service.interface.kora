@@ -1,0 +1,10 @@
+// Example 81: Synthetic Tabular Data & Differential Privacy Generator
+// Domain Service Contract
+
+import { SyntheticDataGeneratorPrimaryRecord } from "../entities/synthetic_data_generator_primary.entity"
+import { CreateSyntheticDataGeneratorTaskRequest } from "../models/synthetic_data_generator_request.dto"
+
+interface SyntheticDataGeneratorDomainContract {
+    fn executeTask(req: CreateSyntheticDataGeneratorTaskRequest) -> Result<SyntheticDataGeneratorPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

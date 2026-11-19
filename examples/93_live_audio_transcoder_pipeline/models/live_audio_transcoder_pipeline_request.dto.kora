@@ -1,0 +1,15 @@
+// Example 93: Live Audio Transcoding & Packet Chunking Pipeline
+// Transport Model: Command Request
+
+model CreateLiveAudioTranscoderPipelineTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryLiveAudioTranscoderPipelineFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

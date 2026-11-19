@@ -1,0 +1,10 @@
+// Example 87: FIDO2 / WebAuthn Passkey Registration & Attestation
+// Domain Service Contract
+
+import { HardwareSecurityTokenFido2PrimaryRecord } from "../entities/hardware_security_token_fido2_primary.entity"
+import { CreateHardwareSecurityTokenFido2TaskRequest } from "../models/hardware_security_token_fido2_request.dto"
+
+interface HardwareSecurityTokenFido2DomainContract {
+    fn executeTask(req: CreateHardwareSecurityTokenFido2TaskRequest) -> Result<HardwareSecurityTokenFido2PrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

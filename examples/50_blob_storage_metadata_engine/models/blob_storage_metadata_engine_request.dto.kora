@@ -1,0 +1,14 @@
+// Example 50: Distributed Blob Storage Metadata Engine
+// Transport Model: Command Request
+
+model CreateBlobStorageMetadataEngineTaskRequest {
+    taskKey: String
+    originatingNodeId: Int
+    payloadVolume: Int
+    targetCluster: String
+}
+
+model QueryBlobStorageMetadataEngineStatusRequest {
+    resourceKey: String
+    quorumRequired: Int
+}

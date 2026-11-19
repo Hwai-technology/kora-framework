@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 53: Inventory Allocation Matrix & Multi-Warehouse Stock
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { InventoryAllocationMatrixInMemoryRepository } from "./repositories/inventory_allocation_matrix_inmemory.repository"
+import { InventoryAllocationMatrixCoreService } from "./services/inventory_allocation_matrix_core.service"
+import { InventoryAllocationMatrixController } from "./controllers/inventory_allocation_matrix.controller"
+import { InventoryAllocationMatrixRouter } from "./routes/inventory_allocation_matrix.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = InventoryAllocationMatrixInMemoryRepository()
+        let service = InventoryAllocationMatrixCoreService(repo)
+        let controller = InventoryAllocationMatrixController(service)
+        let router = InventoryAllocationMatrixRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

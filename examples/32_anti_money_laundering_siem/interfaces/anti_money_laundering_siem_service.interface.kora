@@ -1,0 +1,10 @@
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// Domain Service Interface
+
+import { AntiMoneyLaunderingSiemRecord } from "../entities/anti_money_laundering_siem_primary.entity"
+import { CreateAntiMoneyLaunderingSiemRequest } from "../models/anti_money_laundering_siem_request.dto"
+
+interface AntiMoneyLaunderingSiemServiceInterface {
+    fn processRequest(req: CreateAntiMoneyLaunderingSiemRequest) -> Result<AntiMoneyLaunderingSiemRecord, String>
+    fn validateState(id: Int) -> Bool
+}

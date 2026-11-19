@@ -1,0 +1,37 @@
+// ============================================================================
+// Example 24: Fintech Core Banking — Controller: BankingController
+// Dispatches Saga transfers and performs aggregate invariant audits
+// ============================================================================
+
+import { Account } from "../entities/account.entity"
+import { BankingService } from "../services/banking.service"
+import { TransferSagaCommand, SagaExecutionResult, AuditVerificationSummary } from "../models/banking.dto"
+
+class BankingController {
+    service: BankingService
+
+    init(service: BankingService) {
+        this.service = service
+    }
+
+    fn getAccountDetails(accountId: Int) -> Option<Account> {
+        return this.service.findAccountById(accountId)
+    }
+
+    fn executeSagaTransfer(cmd: TransferSagaCommand) -> SagaExecutionResult {
+        return this.service.executeTransferSaga(cmd)
+    }
+
+    fn auditSystemConservation(baselineTotal: Int) -> AuditVerificationSummary {
+        let currentTotal = this.service.getTotalSystemAssets()
+        let invariantHolds = currentTotal == baselineTotal
+        let discrepancy = currentTotal - baselineTotal
+
+        return AuditVerificationSummary {
+            totalAccountsAudited: 2,
+            totalSystemMoney: currentTotal,
+            conservationInvariantHolds: invariantHolds,
+            discrepancyAmount: discrepancy,
+        }
+    }
+}

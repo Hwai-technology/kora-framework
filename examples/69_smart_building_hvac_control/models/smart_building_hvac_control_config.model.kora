@@ -1,0 +1,9 @@
+// Example 69: Smart Building HVAC & Air Quality Coordinator
+// Configuration Model
+
+model SmartBuildingHvacControlConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

@@ -1,0 +1,10 @@
+// Example 24: Core Banking Ledger & Accounts
+// Configuration Model
+
+model FintechCoreBankingConfig {
+    environment: String
+    maxBatchSize: Int
+    retryAttempts: Int
+    timeoutSeconds: Int
+    enabled: Bool
+}

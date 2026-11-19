@@ -1,0 +1,37 @@
+// Example 28: Crypto Derivatives & Margin Engine
+// Core Domain Service Implementation
+
+import { CryptoDerivativesExchangeRecord } from "../entities/crypto_derivatives_exchange_primary.entity"
+import { CreateCryptoDerivativesExchangeRequest } from "../models/crypto_derivatives_exchange_request.dto"
+import { CryptoDerivativesExchangeRepository } from "../interfaces/crypto_derivatives_exchange_repository.interface"
+import { CryptoDerivativesExchangeServiceInterface } from "../interfaces/crypto_derivatives_exchange_service.interface"
+
+class CryptoDerivativesExchangeCoreService implements CryptoDerivativesExchangeServiceInterface {
+    repo: CryptoDerivativesExchangeRepository
+
+    init(repo: CryptoDerivativesExchangeRepository) {
+        this.repo = repo
+    }
+
+    fn processRequest(req: CreateCryptoDerivativesExchangeRequest) -> Result<CryptoDerivativesExchangeRecord, String> {
+        if req.volume <= 0 {
+            return Err("Volume must be positive")
+        }
+        let record = CryptoDerivativesExchangeRecord {
+            id: req.targetId,
+            reference: req.reference,
+            status: "COMMITTED",
+            balance: req.volume,
+            active: true,
+        }
+        return this.repo.save(record)
+    }
+
+    fn validateState(id: Int) -> Bool {
+        let opt = this.repo.findById(id)
+        return match opt {
+            Some(rec) => rec.active,
+            None => false,
+        }
+    }
+}

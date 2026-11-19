@@ -1,0 +1,13 @@
+// Example 30: Credit Underwriting & Risk Assessment
+// Primary Persistent Database Entity
+
+@table("credit_scoring_underwriting_records")
+model CreditScoringUnderwritingRecord {
+    @id
+    id: Int
+    @unique
+    reference: String
+    status: String
+    balance: Int
+    active: Bool
+}

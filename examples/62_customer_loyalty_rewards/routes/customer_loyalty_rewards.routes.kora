@@ -1,0 +1,22 @@
+// Example 62: Customer Loyalty Rewards Ledger & Tier Upgrades
+// Router & Endpoint Dispatcher
+
+import { CreateCustomerLoyaltyRewardsTaskRequest } from "../models/customer_loyalty_rewards_request.dto"
+import { CustomerLoyaltyRewardsResponseDto } from "../models/customer_loyalty_rewards_response.dto"
+import { CustomerLoyaltyRewardsController } from "../controllers/customer_loyalty_rewards.controller"
+
+class CustomerLoyaltyRewardsRouter {
+    controller: CustomerLoyaltyRewardsController
+
+    init(controller: CustomerLoyaltyRewardsController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateCustomerLoyaltyRewardsTaskRequest) -> CustomerLoyaltyRewardsResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

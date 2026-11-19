@@ -1,0 +1,7 @@
+// Example 77: Prompt Engineering Evaluation & Hallucination Scorer — Domain Event: HallucinationDetectedEvent
+
+model HallucinationDetectedEvent {
+    caseId: String
+    unsupportedClaimHash: String
+    confidenceBps: Int
+}

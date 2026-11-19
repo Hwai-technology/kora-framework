@@ -1,0 +1,38 @@
+// Example 68: Cold Chain Vaccine Temperature Monitoring
+// Presentation Controller
+
+import { CreateColdChainEnvironmentalGuardTaskRequest } from "../models/cold_chain_environmental_guard_request.dto"
+import { ColdChainEnvironmentalGuardResponseDto } from "../models/cold_chain_environmental_guard_response.dto"
+import { ColdChainEnvironmentalGuardCoreService } from "../services/cold_chain_environmental_guard_core.service"
+
+class ColdChainEnvironmentalGuardController {
+    service: ColdChainEnvironmentalGuardCoreService
+
+    init(service: ColdChainEnvironmentalGuardCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateColdChainEnvironmentalGuardTaskRequest) -> ColdChainEnvironmentalGuardResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => ColdChainEnvironmentalGuardResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => ColdChainEnvironmentalGuardResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

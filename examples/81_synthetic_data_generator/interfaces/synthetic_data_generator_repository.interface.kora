@@ -1,0 +1,10 @@
+// Example 81: Synthetic Tabular Data & Differential Privacy Generator
+// Repository Interface
+
+import { SyntheticDataGeneratorPrimaryRecord } from "../entities/synthetic_data_generator_primary.entity"
+
+interface SyntheticDataGeneratorRepository {
+    fn findById(id: Int) -> Option<SyntheticDataGeneratorPrimaryRecord>
+    fn save(record: SyntheticDataGeneratorPrimaryRecord) -> Result<SyntheticDataGeneratorPrimaryRecord, String>
+    fn countActive() -> Int
+}

@@ -1,0 +1,38 @@
+// Example 73: Autonomous LLM Agent Orchestrator & Tool Calling
+// Presentation Controller
+
+import { CreateLlmAgentOrchestratorTaskRequest } from "../models/llm_agent_orchestrator_request.dto"
+import { LlmAgentOrchestratorResponseDto } from "../models/llm_agent_orchestrator_response.dto"
+import { LlmAgentOrchestratorCoreService } from "../services/llm_agent_orchestrator_core.service"
+
+class LlmAgentOrchestratorController {
+    service: LlmAgentOrchestratorCoreService
+
+    init(service: LlmAgentOrchestratorCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateLlmAgentOrchestratorTaskRequest) -> LlmAgentOrchestratorResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => LlmAgentOrchestratorResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => LlmAgentOrchestratorResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

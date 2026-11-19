@@ -1,0 +1,10 @@
+// Example 57: Marketplace Vendor Settlement & Escrow Payouts
+// Domain Service Contract
+
+import { MarketplaceVendorSettlementPrimaryRecord } from "../entities/marketplace_vendor_settlement_primary.entity"
+import { CreateMarketplaceVendorSettlementTaskRequest } from "../models/marketplace_vendor_settlement_request.dto"
+
+interface MarketplaceVendorSettlementDomainContract {
+    fn executeTask(req: CreateMarketplaceVendorSettlementTaskRequest) -> Result<MarketplaceVendorSettlementPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

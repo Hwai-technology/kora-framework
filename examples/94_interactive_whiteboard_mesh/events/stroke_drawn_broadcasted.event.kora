@@ -1,0 +1,7 @@
+// Example 94: Interactive Vector Whiteboard & Delta Sync — Domain Event: StrokeDrawnBroadcastedEvent
+
+model StrokeDrawnBroadcastedEvent {
+    boardId: String
+    strokeId: String
+    pointCount: Int
+}

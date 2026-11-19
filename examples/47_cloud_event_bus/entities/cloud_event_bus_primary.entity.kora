@@ -1,0 +1,14 @@
+// Example 47: Cloud Event Bus & Partitioned Streaming
+// Persistent Database Entity: Cluster Node State
+
+@table("cloud_event_bus_node_state")
+model CloudEventBusNodeState {
+    @id
+    id: Int
+    @unique
+    nodeIdentifier: String
+    currentEpochTerm: Int
+    votedForCandidate: Int
+    isLeader: Bool
+    active: Bool
+}

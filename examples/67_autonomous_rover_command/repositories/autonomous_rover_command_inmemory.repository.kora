@@ -1,0 +1,33 @@
+// Example 67: Autonomous Rover Navigation & Obstacle Avoidance
+// Repository Implementation
+
+import { AutonomousRoverCommandPrimaryRecord } from "../entities/autonomous_rover_command_primary.entity"
+import { AutonomousRoverCommandRepository } from "../interfaces/autonomous_rover_command_repository.interface"
+
+class AutonomousRoverCommandInMemoryRepository implements AutonomousRoverCommandRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<AutonomousRoverCommandPrimaryRecord> {
+        if id > 0 {
+            return Some(AutonomousRoverCommandPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: AutonomousRoverCommandPrimaryRecord) -> Result<AutonomousRoverCommandPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

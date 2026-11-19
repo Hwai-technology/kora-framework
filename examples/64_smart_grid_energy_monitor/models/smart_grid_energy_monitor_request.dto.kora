@@ -1,0 +1,15 @@
+// Example 64: Smart Electrical Grid Substation Telemetry
+// Transport Model: Command Request
+
+model CreateSmartGridEnergyMonitorTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QuerySmartGridEnergyMonitorFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

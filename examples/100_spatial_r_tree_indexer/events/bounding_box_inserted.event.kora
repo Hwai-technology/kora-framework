@@ -1,0 +1,9 @@
+// Example 100: Spatial 2D R-Tree & k-Nearest Neighbors (k-NN) — Domain Event: BoundingBoxInsertedEvent
+
+model BoundingBoxInsertedEvent {
+    spatialItemId: Int
+    minX: Int
+    maxX: Int
+    minY: Int
+    maxY: Int
+}

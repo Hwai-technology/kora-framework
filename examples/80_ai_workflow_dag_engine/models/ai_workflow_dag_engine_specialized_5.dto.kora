@@ -1,0 +1,9 @@
+// Example 80: AI Workflow Directed Acyclic Graph (DAG) Engine
+// Specialized Model 5
+
+model AiWorkflowDagEngineSpecializedProfile5 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

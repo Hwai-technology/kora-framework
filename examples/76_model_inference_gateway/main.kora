@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { ModelInferenceGatewayInMemoryRepository } from "./repositories/model_inference_gateway_inmemory.repository"
+import { ModelInferenceGatewayCoreService } from "./services/model_inference_gateway_core.service"
+import { ModelInferenceGatewayController } from "./controllers/model_inference_gateway.controller"
+import { ModelInferenceGatewayRouter } from "./routes/model_inference_gateway.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = ModelInferenceGatewayInMemoryRepository()
+        let service = ModelInferenceGatewayCoreService(repo)
+        let controller = ModelInferenceGatewayController(service)
+        let router = ModelInferenceGatewayRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

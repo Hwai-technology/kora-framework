@@ -1,0 +1,8 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director — Domain Event: RateLimitThrottleEnforcedEvent
+// Dedicated Domain Event Specification
+
+model RateLimitThrottleEnforcedEvent {
+    clientId: String
+    tokenBucketEmpty: Bool
+    retryAfterSeconds: Int
+}

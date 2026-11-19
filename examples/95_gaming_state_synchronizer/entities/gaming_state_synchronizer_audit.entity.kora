@@ -1,0 +1,12 @@
+// Example 95: Multiplayer Game 60Hz Tick State Synchronizer
+// Persistent Database Entity: Audit Log
+
+@table("gaming_state_synchronizer_audit_logs")
+model GamingStateSynchronizerAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

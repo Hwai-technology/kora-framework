@@ -1,0 +1,14 @@
+// Example 39: Pharmacy Dispensing & Drug Interaction Checker
+// Persistent Database Entity: Primary Record
+
+@table("pharmacy_inventory_interaction_clinical_records")
+model PharmacyInventoryInteractionClinicalEntity {
+    @id
+    id: Int
+    @unique
+    patientId: Int
+    clinicianId: Int
+    clinicalMetricScore: Int
+    complianceState: String
+    active: Bool
+}

@@ -1,0 +1,10 @@
+// Example 41: Genomic Variant Annotation & Pathogenicity — Domain Event: VariantIdentifiedEvent
+// Dedicated Domain Event Specification
+
+model VariantIdentifiedEvent {
+    sampleId: String
+    chromosome: String
+    genomicPosition: Int
+    refAllele: String
+    altAllele: String
+}

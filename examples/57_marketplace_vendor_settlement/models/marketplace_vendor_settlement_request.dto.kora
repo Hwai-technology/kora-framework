@@ -1,0 +1,15 @@
+// Example 57: Marketplace Vendor Settlement & Escrow Payouts
+// Transport Model: Command Request
+
+model CreateMarketplaceVendorSettlementTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryMarketplaceVendorSettlementFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

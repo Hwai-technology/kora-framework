@@ -1,0 +1,7 @@
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher — Domain Event: InferenceBatchDispatchedEvent
+
+model InferenceBatchDispatchedEvent {
+    batchSize: Int
+    gpuWorkerId: Int
+    promptTokenCount: Int
+}

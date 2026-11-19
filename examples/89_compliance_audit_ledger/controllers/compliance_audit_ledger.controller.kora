@@ -1,0 +1,38 @@
+// Example 89: Immutable Cryptographic Audit Trail (SOC 2 / ISO 27001)
+// Presentation Controller
+
+import { CreateComplianceAuditLedgerTaskRequest } from "../models/compliance_audit_ledger_request.dto"
+import { ComplianceAuditLedgerResponseDto } from "../models/compliance_audit_ledger_response.dto"
+import { ComplianceAuditLedgerCoreService } from "../services/compliance_audit_ledger_core.service"
+
+class ComplianceAuditLedgerController {
+    service: ComplianceAuditLedgerCoreService
+
+    init(service: ComplianceAuditLedgerCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateComplianceAuditLedgerTaskRequest) -> ComplianceAuditLedgerResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => ComplianceAuditLedgerResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => ComplianceAuditLedgerResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

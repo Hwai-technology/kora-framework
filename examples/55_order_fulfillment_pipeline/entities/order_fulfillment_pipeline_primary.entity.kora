@@ -1,0 +1,13 @@
+// Example 55: Order Fulfillment & Pick-Pack-Ship Workflow
+// Persistent Database Entity: Primary Record
+
+@table("order_fulfillment_pipeline_records")
+model OrderFulfillmentPipelinePrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

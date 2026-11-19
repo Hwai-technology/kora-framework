@@ -1,0 +1,12 @@
+// Example 94: Interactive Vector Whiteboard & Delta Sync
+// Persistent Database Entity: Audit Log
+
+@table("interactive_whiteboard_mesh_audit_logs")
+model InteractiveWhiteboardMeshAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

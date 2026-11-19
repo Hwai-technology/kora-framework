@@ -1,0 +1,7 @@
+// Example 74: Retrieval-Augmented Generation (RAG) Document Chunker — Domain Event: RetrievalRankingCompletedEvent
+
+model RetrievalRankingCompletedEvent {
+    queryHash: String
+    retrievedContextTokens: Int
+    reciprocalRankScore: Int
+}

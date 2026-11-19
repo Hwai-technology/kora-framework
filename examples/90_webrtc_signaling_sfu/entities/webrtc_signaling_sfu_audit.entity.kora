@@ -1,0 +1,12 @@
+// Example 90: WebRTC SFU Media Router & SDP Signaling
+// Persistent Database Entity: Audit Log
+
+@table("webrtc_signaling_sfu_audit_logs")
+model WebrtcSignalingSfuAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

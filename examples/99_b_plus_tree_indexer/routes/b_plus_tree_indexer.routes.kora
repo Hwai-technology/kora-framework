@@ -1,0 +1,22 @@
+// Example 99: B+ Tree Disk Pager & Index Node Balancer
+// Router & Endpoint Dispatcher
+
+import { CreateBPlusTreeIndexerTaskRequest } from "../models/b_plus_tree_indexer_request.dto"
+import { BPlusTreeIndexerResponseDto } from "../models/b_plus_tree_indexer_response.dto"
+import { BPlusTreeIndexerController } from "../controllers/b_plus_tree_indexer.controller"
+
+class BPlusTreeIndexerRouter {
+    controller: BPlusTreeIndexerController
+
+    init(controller: BPlusTreeIndexerController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateBPlusTreeIndexerTaskRequest) -> BPlusTreeIndexerResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

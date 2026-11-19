@@ -1,0 +1,16 @@
+// Example 83: Zero-Trust Context-Aware Policy Decision Point (PDP)
+// Transport Model: Standard Response
+
+model ZeroTrustPolicyEnforcerResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model ZeroTrustPolicyEnforcerSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

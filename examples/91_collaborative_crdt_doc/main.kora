@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 91: CRDT Collaborative Real-Time Document Editor
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { CollaborativeCrdtDocInMemoryRepository } from "./repositories/collaborative_crdt_doc_inmemory.repository"
+import { CollaborativeCrdtDocCoreService } from "./services/collaborative_crdt_doc_core.service"
+import { CollaborativeCrdtDocController } from "./controllers/collaborative_crdt_doc.controller"
+import { CollaborativeCrdtDocRouter } from "./routes/collaborative_crdt_doc.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = CollaborativeCrdtDocInMemoryRepository()
+        let service = CollaborativeCrdtDocCoreService(repo)
+        let controller = CollaborativeCrdtDocController(service)
+        let router = CollaborativeCrdtDocRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

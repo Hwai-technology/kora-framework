@@ -1,0 +1,7 @@
+// Example 82: OAuth 2.1 & OpenID Connect Authorization Server — Enum: JwtSignatureAlgorithm
+
+enum JwtSignatureAlgorithm {
+    RsaSha256_RS256
+    EcdsaP256_ES256
+    Ed25519_EdDSA
+}

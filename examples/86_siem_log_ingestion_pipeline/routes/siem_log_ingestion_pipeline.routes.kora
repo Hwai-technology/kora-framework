@@ -1,0 +1,22 @@
+// Example 86: SIEM High-Throughput Log Ingestion & CEF Normalizer
+// Router & Endpoint Dispatcher
+
+import { CreateSiemLogIngestionPipelineTaskRequest } from "../models/siem_log_ingestion_pipeline_request.dto"
+import { SiemLogIngestionPipelineResponseDto } from "../models/siem_log_ingestion_pipeline_response.dto"
+import { SiemLogIngestionPipelineController } from "../controllers/siem_log_ingestion_pipeline.controller"
+
+class SiemLogIngestionPipelineRouter {
+    controller: SiemLogIngestionPipelineController
+
+    init(controller: SiemLogIngestionPipelineController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateSiemLogIngestionPipelineTaskRequest) -> SiemLogIngestionPipelineResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

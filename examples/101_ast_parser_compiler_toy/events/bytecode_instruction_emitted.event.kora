@@ -1,0 +1,7 @@
+// Example 101: Pratt Parsing & Bytecode Virtual Machine — Domain Event: BytecodeInstructionEmittedEvent
+
+model BytecodeInstructionEmittedEvent {
+    opcode: String
+    operandReg: Int
+    byteOffset: Int
+}

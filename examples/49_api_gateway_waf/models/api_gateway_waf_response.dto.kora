@@ -1,0 +1,17 @@
+// Example 49: API Gateway & Web Application Firewall
+// Transport Model: Standard Response
+
+model ApiGatewayWafResponseDto {
+    operationId: String
+    nodeId: Int
+    status: String
+    isQuorumSatisfied: Bool
+    message: String
+}
+
+model ApiGatewayWafTopologySummaryDto {
+    activeClusterNodes: Int
+    leaderTerm: Int
+    healthyReplicasCount: Int
+    clusterState: String
+}

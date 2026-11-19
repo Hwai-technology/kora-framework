@@ -1,42 +1,145 @@
 // ============================================================================
 // Unit Test Suite: 06_realtime_websockets
-// Tests WebSocket message routing, room presence, and payload integrity
+// Verifies RFC 6455 Framing, Token Upgrade, Ping/Pong Heartbeats, and Isolation
 // ============================================================================
 
-import { ChatMessage, RoomPresence } from "../models/chat.models"
+import { WsFrame } from "../models/chat.models"
 import { ChatRepository } from "../repositories/chat.repository"
 import { ChatService } from "../services/chat_hub.service"
 
 class WebSocketsUnitTestSuite {
+    repo: ChatRepository
     service: ChatService
 
-    init(service: ChatService) {
-        this.service = service
+    init() {
+        this.repo = ChatRepository()
+        this.service = ChatService(this.repo)
     }
 
-    fn test_send_message() -> Bool {
-        let msg = this.service.sendMessage("Unit test message")
-        return msg.content == "Unit test message" && msg.sender == "system"
+    // 1. Upgrade Authentication: Invalid token rejected
+    fn test_unauthorized_upgrade_rejected() -> Bool {
+        let opt = this.service.authenticateUpgrade("bad_token_123", "192.168.1.10", "trading")
+        let isPresent = match opt {
+            Some(s) => true,
+            None => false,
+        }
+        return !isPresent
     }
 
-    fn test_room_presence() -> Bool {
-        let presence = this.service.getPresence("general")
-        return presence.room == "general" && presence.activeMembers == 5
+    // 2. Upgrade Authentication: Valid bearer token creates active session
+    fn test_valid_upgrade_session() -> Bool {
+        let opt = this.service.authenticateUpgrade("kora_ws_token_trader_99", "192.168.1.10", "trading")
+        let isPresent = match opt {
+            Some(s) => true,
+            None => false,
+        }
+        if !isPresent {
+            return false
+        }
+        let session = match opt {
+            Some(s) => s.active && s.channel == "trading",
+            None => false,
+        }
+        return session
     }
 
-    fn run() -> Unit {
-        let p1 = this.test_send_message()
-        let p2 = this.test_room_presence()
-        if p1 && p2 {
-            print("  ✓ WebSockets Unit Tests: 2/2 passed")
+    // 3. RFC 6455 Section 5.1: Client frame without mask must trigger protocol error
+    fn test_unmasked_frame_rejected() -> Bool {
+        let opt = this.service.authenticateUpgrade("kora_ws_token_alice", "10.0.0.1", "general")
+        let sid = match opt {
+            Some(s) => s.sessionId,
+            None => "INVALID",
+        }
+        if sid == "INVALID" {
+            return false
+        }
+
+        let unmaskedFrame = WsFrame {
+            fin: true,
+            opcode: 1,
+            masked: false,
+            maskKey: 0,
+            payloadLength: 5,
+            payload: "Hello",
+        }
+
+        let reply = this.service.handleFrame(sid, unmaskedFrame)
+        let isReplyOk = match reply {
+            Some(f) => f.opcode == 8 && f.payload == "1002_PROTOCOL_ERROR_UNMASKED",
+            None => false,
+        }
+        return isReplyOk
+    }
+
+    // 4. RFC 6455 Section 5.5.2: Ping (opcode 9) triggers immediate Pong (opcode 10)
+    fn test_ping_pong_turnaround() -> Bool {
+        let opt = this.service.authenticateUpgrade("kora_ws_token_bob", "10.0.0.2", "crypto")
+        let sid = match opt {
+            Some(s) => s.sessionId,
+            None => "INVALID",
+        }
+        if sid == "INVALID" {
+            return false
+        }
+
+        let pingFrame = WsFrame {
+            fin: true,
+            opcode: 9,
+            masked: true,
+            maskKey: 123456,
+            payloadLength: 4,
+            payload: "PING",
+        }
+
+        let reply = this.service.handleFrame(sid, pingFrame)
+        let isPongOk = match reply {
+            Some(f) => f.opcode == 10 && f.payload == "PING",
+            None => false,
+        }
+        return isPongOk
+    }
+
+    // 5. Room Isolation & Broadcast Fanout
+    fn test_room_broadcast_fanout() -> Bool {
+        this.service.authenticateUpgrade("kora_ws_token_u1", "10.0.0.3", "room_a")
+        this.service.authenticateUpgrade("kora_ws_token_u2", "10.0.0.4", "room_a")
+        this.service.authenticateUpgrade("kora_ws_token_u3", "10.0.0.5", "room_b")
+
+        let deliveredA = this.service.broadcast("room_a", "system", "Notice to A")
+        let deliveredB = this.service.broadcast("room_b", "system", "Notice to B")
+
+        let presenceA = this.service.getPresence("room_a")
+        let presenceB = this.service.getPresence("room_b")
+
+        return deliveredA == 2 && deliveredB == 1 && presenceA.activeMembers == 2 && presenceB.activeMembers == 1
+    }
+
+    // 6. Heartbeat Watchdog Eviction of Dead Sessions
+    fn test_watchdog_evicts_dead_session() -> Bool {
+        this.service.authenticateUpgrade("kora_ws_token_dead", "10.0.0.6", "room_c")
+
+        // Current time: 1710000000 + 120s (> 60s timeout)
+        let evicted = this.service.processHeartbeatWatchdog(1710000120, 60)
+        let presence = this.service.getPresence("room_c")
+
+        return evicted >= 1 && presence.activeMembers == 0
+    }
+
+    fn runAll() -> Unit {
+        let t1 = this.test_unauthorized_upgrade_rejected()
+        let t2 = this.test_valid_upgrade_session()
+        let t3 = this.test_unmasked_frame_rejected()
+        let t4 = this.test_ping_pong_turnaround()
+        let t5 = this.test_room_broadcast_fanout()
+        let t6 = this.test_watchdog_evicts_dead_session()
+
+        if t1 && t2 && t3 && t4 && t5 && t6 {
+            print("  ✓ Realtime WebSockets RFC 6455 Unit Tests: 6/6 passed")
         } else {
-            print("  ✗ WebSockets Unit Tests: failed")
+            print("  ✗ Realtime WebSockets RFC 6455 Unit Tests: FAILED")
         }
     }
 }
 
-let db = Database()
-let repo = ChatRepository(db)
-let service = ChatService(repo)
-let suite = WebSocketsUnitTestSuite(service)
-suite.run()
+let suite = WebSocketsUnitTestSuite()
+suite.runAll()

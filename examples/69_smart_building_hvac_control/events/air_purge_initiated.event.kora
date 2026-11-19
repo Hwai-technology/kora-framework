@@ -1,0 +1,7 @@
+// Example 69: Smart Building HVAC & Air Quality Coordinator — Domain Event: AirPurgeInitiatedEvent
+
+model AirPurgeInitiatedEvent {
+    zoneId: String
+    co2Ppm: Int
+    fanSpeedRpm: Int
+}

@@ -1,0 +1,9 @@
+// Example 26: payment_gateway_orchestrator — Domain Event: RefundProcessedEvent
+// Dedicated Domain Event Specification
+
+model RefundProcessedEvent {
+    refundId: String
+    originalTxId: String
+    refundAmount: Int
+    timestamp: Int
+}

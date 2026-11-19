@@ -1,0 +1,12 @@
+// ============================================================================
+// Example 25: HFT Order Book — Event: TradeExecutedEvent
+// ============================================================================
+
+model TradeExecutedEvent {
+    tradeId: Int
+    buyOrderId: Int
+    sellOrderId: Int
+    executionPrice: Int
+    matchedQuantity: Int
+    timestamp: Int
+}

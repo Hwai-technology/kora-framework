@@ -1,0 +1,7 @@
+// Example 82: OAuth 2.1 & OpenID Connect Authorization Server — Enum: OauthGrantType
+
+enum OauthGrantType {
+    AuthorizationCodePkce
+    ClientCredentialsMachine
+    RefreshTokenRotation
+}

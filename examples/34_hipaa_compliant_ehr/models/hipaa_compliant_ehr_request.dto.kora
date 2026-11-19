@@ -1,0 +1,16 @@
+// Example 34: HIPAA Compliant Electronic Health Records
+// Transport Model: Command Requests
+
+model CreateHipaaCompliantEhrRecordRequest {
+    patientId: Int
+    clinicianId: Int
+    domainContext: String
+    clinicalMetricScore: Int
+    confidentialNotes: String
+}
+
+model QueryHipaaCompliantEhrFilterRequest {
+    patientId: Int
+    limit: Int
+    includeHistorical: Bool
+}

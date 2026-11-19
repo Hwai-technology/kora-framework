@@ -1,0 +1,16 @@
+// Example 66: Predictive Industrial Equipment Maintenance
+// Transport Model: Standard Response
+
+model PredictiveMaintenanceSensorResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model PredictiveMaintenanceSensorSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

@@ -1,0 +1,7 @@
+// examples/10_dto_validation_and_types — Event: DtoValidationPassedEvent
+
+model DtoValidationPassedEvent {
+    dtoType: String
+    fieldCount: Int
+    timestamp: Int
+}

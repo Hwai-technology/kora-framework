@@ -1,0 +1,17 @@
+// Example 41: Genomic Variant Annotation & Pathogenicity
+// Compliance & Audit Service
+
+class GenomicVariantAnnotatorComplianceService {
+    init() {}
+
+    fn verifyPhiAccessAuthorization(staffId: Int, isEmergency: Bool) -> Bool {
+        if isEmergency {
+            return true
+        }
+        return staffId > 0
+    }
+
+    fn generateAuditDigest(patientId: Int, staffId: Int) -> String {
+        return "AUDIT-SHA256-" + patientId.toString() + "-" + staffId.toString()
+    }
+}

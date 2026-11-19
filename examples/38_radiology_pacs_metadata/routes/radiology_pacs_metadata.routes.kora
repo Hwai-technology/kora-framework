@@ -1,0 +1,22 @@
+// Example 38: Radiology PACS DICOM Metadata Indexer
+// Router & Endpoint Dispatcher
+
+import { CreateRadiologyPacsMetadataRecordRequest } from "../models/radiology_pacs_metadata_request.dto"
+import { RadiologyPacsMetadataResponseDto } from "../models/radiology_pacs_metadata_response.dto"
+import { RadiologyPacsMetadataController } from "../controllers/radiology_pacs_metadata.controller"
+
+class RadiologyPacsMetadataRouter {
+    controller: RadiologyPacsMetadataController
+
+    init(controller: RadiologyPacsMetadataController) {
+        this.controller = controller
+    }
+
+    fn postRecord(req: CreateRadiologyPacsMetadataRecordRequest) -> RadiologyPacsMetadataResponseDto {
+        return this.controller.handleRecordSubmission(req)
+    }
+
+    fn getRiskScore(patientId: Int) -> String {
+        return this.controller.checkPatientRisk(patientId)
+    }
+}

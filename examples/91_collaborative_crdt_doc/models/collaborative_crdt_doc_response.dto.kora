@@ -1,0 +1,16 @@
+// Example 91: CRDT Collaborative Real-Time Document Editor
+// Transport Model: Standard Response
+
+model CollaborativeCrdtDocResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model CollaborativeCrdtDocSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

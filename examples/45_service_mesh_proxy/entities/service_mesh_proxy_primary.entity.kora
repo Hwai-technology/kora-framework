@@ -1,0 +1,14 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director
+// Persistent Database Entity: Cluster Node State
+
+@table("service_mesh_proxy_node_state")
+model ServiceMeshProxyNodeState {
+    @id
+    id: Int
+    @unique
+    nodeIdentifier: String
+    currentEpochTerm: Int
+    votedForCandidate: Int
+    isLeader: Bool
+    active: Bool
+}

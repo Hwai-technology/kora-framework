@@ -1,0 +1,13 @@
+// Example 72: HNSW Vector Index & Approximate Nearest Neighbor
+// Persistent Database Entity: Primary Record
+
+@table("vector_index_hnsw_records")
+model VectorIndexHnswPrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

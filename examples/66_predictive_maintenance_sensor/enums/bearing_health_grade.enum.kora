@@ -1,0 +1,8 @@
+// Example 66: Predictive Industrial Equipment Maintenance — Enum: BearingHealthGrade
+
+enum BearingHealthGrade {
+    GradeAPristine
+    GradeBMinorWear
+    GradeCAcceleratedFriction
+    GradeDImminentFailure
+}

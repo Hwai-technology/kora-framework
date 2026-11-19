@@ -18,6 +18,7 @@ pub struct DefId(pub u32);
 pub enum SymbolKind {
     BuiltinType,
     BuiltinValue,
+    BuiltinTypeAndValue,
     Struct,
     Model,
     Interface,
@@ -227,6 +228,12 @@ impl<'a> Resolver<'a> {
             );
         }
         for &v in PRELUDE_VALUES {
+            if let Some(existing) = self.symbols.get_mut(v) {
+                if existing.kind == SymbolKind::BuiltinType {
+                    existing.kind = SymbolKind::BuiltinTypeAndValue;
+                    continue;
+                }
+            }
             let id = self.alloc_def();
             self.symbols.insert(
                 v.to_string(),
@@ -477,12 +484,13 @@ impl<'a> Resolver<'a> {
                         if matches!(
                             sym.kind,
                             SymbolKind::BuiltinType
+                                | SymbolKind::BuiltinTypeAndValue
                                 | SymbolKind::Struct
                                 | SymbolKind::Model
                                 | SymbolKind::Interface
                                 | SymbolKind::Class
                                 | SymbolKind::Enum
-                        ) => {}
+                        ) || PRELUDE_TYPES.contains(&name.name.as_str()) => {}
                     _ => {
                         // Allow single-letter or generic parameter tokens (e.g. T, U, V)
                         if !name
@@ -1251,5 +1259,14 @@ counter = counter + 1
         let ast5 = parse_module(FileId(0), src_model_stmt, &mut bag5);
         verify_architectural_purity("models/user.model.kora", &ast5, &mut bag5);
         assert!(bag5.items().iter().any(|d| d.code == "E5002"));
+    }
+
+    #[test]
+    fn test_vector_in_prelude() {
+        let mut bag = DiagnosticBag::new();
+        let src = "class Foo { init() {} fn test(v: Vector<Int>) -> Int { return 1 } }\n";
+        let ast = parse_module(FileId(0), src, &mut bag);
+        let _ = lower_and_resolve(ast, &mut bag);
+        assert!(!bag.has_errors(), "diagnostics: {:?}", bag.items());
     }
 }

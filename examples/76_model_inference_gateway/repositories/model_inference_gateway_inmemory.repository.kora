@@ -1,0 +1,33 @@
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher
+// Repository Implementation
+
+import { ModelInferenceGatewayPrimaryRecord } from "../entities/model_inference_gateway_primary.entity"
+import { ModelInferenceGatewayRepository } from "../interfaces/model_inference_gateway_repository.interface"
+
+class ModelInferenceGatewayInMemoryRepository implements ModelInferenceGatewayRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<ModelInferenceGatewayPrimaryRecord> {
+        if id > 0 {
+            return Some(ModelInferenceGatewayPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: ModelInferenceGatewayPrimaryRecord) -> Result<ModelInferenceGatewayPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

@@ -1,10 +1,18 @@
+// ============================================================================
+// Example 01: Core Language Foundations — Service: OrderProcessor
+// ============================================================================
+
 import { OrderStatus } from "../enums/order_status.enum"
+import { CustomerTier } from "../enums/customer_tier.enum"
 
 class OrderProcessor {
+    init() {}
+
     fn describeOrder(status: OrderStatus) -> String {
         return match status {
             OrderStatus.Pending => "Order is awaiting payment",
-            OrderStatus.Paid(cents) => "Order payment confirmed",
+            OrderStatus.Paid(cents) => "Order #" + cents.toString() + " is confirmed and paid.",
+            OrderStatus.Shipped(tracking) => "Order is in transit: " + tracking,
             OrderStatus.Cancelled(reason) => reason,
         }
     }
@@ -12,5 +20,22 @@ class OrderProcessor {
     fn calculateTotal(subtotal: Int, taxRatePercent: Int) -> Int {
         let tax = (subtotal * taxRatePercent) / 100
         return subtotal + tax
+    }
+
+    fn calculateDiscountedSubtotal(subtotal: Int, tierDiscountPercent: Int) -> Int {
+        if tierDiscountPercent <= 0 {
+            return subtotal
+        }
+        let discount = (subtotal * tierDiscountPercent) / 100
+        return subtotal - discount
+    }
+
+    fn resolveTierDiscount(tier: CustomerTier) -> Int {
+        return match tier {
+            CustomerTier.Standard => 0,
+            CustomerTier.Premium => 10,
+            CustomerTier.VIP => 20,
+            CustomerTier.Enterprise => 30,
+        }
     }
 }

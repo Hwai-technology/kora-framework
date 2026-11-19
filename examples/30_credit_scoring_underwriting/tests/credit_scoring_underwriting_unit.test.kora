@@ -1,0 +1,78 @@
+// ============================================================================
+// Unit Test Suite: credit_scoring_underwriting
+// ============================================================================
+
+import { CreateCreditScoringUnderwritingRequest } from "../models/credit_scoring_underwriting_request.dto"
+import { CreditScoringUnderwritingPrimaryRepository } from "../repositories/credit_scoring_underwriting_primary.repository"
+import { CreditScoringUnderwritingCoreService } from "../services/credit_scoring_underwriting_core.service"
+import { CreditScoringUnderwritingValidationService } from "../services/credit_scoring_underwriting_validation.service"
+
+class CreditScoringUnderwritingUnitTestSuite {
+    service: CreditScoringUnderwritingCoreService
+    validator: CreditScoringUnderwritingValidationService
+
+    init(service: CreditScoringUnderwritingCoreService, validator: CreditScoringUnderwritingValidationService) {
+        this.service = service
+        this.validator = validator
+    }
+
+    fn test_valid_processing() -> Bool {
+        let req = CreateCreditScoringUnderwritingRequest {
+            reference: "TEST-REF-100",
+            targetId: 10,
+            volume: 500,
+            currency: "USD",
+        }
+        let res = this.service.processRequest(req)
+        return match res {
+            Ok(rec) => rec.status == "COMMITTED" && rec.balance == 500,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_volume() -> Bool {
+        let req = CreateCreditScoringUnderwritingRequest {
+            reference: "TEST-REF-FAIL",
+            targetId: 11,
+            volume: -10,
+            currency: "USD",
+        }
+        let res = this.service.processRequest(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Volume must be positive",
+        }
+    }
+
+    fn test_validator() -> Bool {
+        let req = CreateCreditScoringUnderwritingRequest {
+            reference: "VALID-REF",
+            targetId: 12,
+            volume: 100,
+            currency: "USD",
+        }
+        let res = this.validator.validateInput(req)
+        return match res {
+            Ok(v) => v,
+            Err(e) => false,
+        }
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_processing()
+        let t2 = this.test_invalid_volume()
+        let t3 = this.test_validator()
+
+        if t1 && t2 && t3 {
+            print("  ✓ Credit Underwriting & Risk Assessment Unit Tests: 3/3 passed")
+        } else {
+            print("  ✗ Credit Underwriting & Risk Assessment Unit Tests: failed")
+        }
+    }
+}
+
+let repo = CreditScoringUnderwritingPrimaryRepository()
+let service = CreditScoringUnderwritingCoreService(repo)
+let validator = CreditScoringUnderwritingValidationService()
+let suite = CreditScoringUnderwritingUnitTestSuite(service, validator)
+suite.run()

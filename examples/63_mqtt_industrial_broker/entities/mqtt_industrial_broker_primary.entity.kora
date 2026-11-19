@@ -1,0 +1,13 @@
+// Example 63: MQTT Industrial Telemetry Broker & Topic Tree
+// Persistent Database Entity: Primary Record
+
+@table("mqtt_industrial_broker_records")
+model MqttIndustrialBrokerPrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

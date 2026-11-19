@@ -1,0 +1,7 @@
+// Example 65: Fleet Telematics & Polygonal Geofence Monitor — Domain Event: HarshAccelerationDetectedEvent
+
+model HarshAccelerationDetectedEvent {
+    vehicleVin: String
+    gForceBps: Int
+    speedKmh: Int
+}

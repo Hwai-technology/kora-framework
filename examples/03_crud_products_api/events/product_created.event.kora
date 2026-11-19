@@ -1,0 +1,8 @@
+// examples/03_crud_products_api — Event: ProductCreatedEvent
+
+model ProductCreatedEvent {
+    productId: Int
+    sku: String
+    priceCents: Int
+    timestamp: Int
+}

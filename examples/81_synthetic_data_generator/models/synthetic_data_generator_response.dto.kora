@@ -1,0 +1,16 @@
+// Example 81: Synthetic Tabular Data & Differential Privacy Generator
+// Transport Model: Standard Response
+
+model SyntheticDataGeneratorResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model SyntheticDataGeneratorSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

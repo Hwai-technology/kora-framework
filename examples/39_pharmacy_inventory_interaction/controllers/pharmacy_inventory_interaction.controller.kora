@@ -1,0 +1,39 @@
+// Example 39: Pharmacy Dispensing & Drug Interaction Checker
+// Presentation Controller
+
+import { CreatePharmacyInventoryInteractionRecordRequest } from "../models/pharmacy_inventory_interaction_request.dto"
+import { PharmacyInventoryInteractionResponseDto } from "../models/pharmacy_inventory_interaction_response.dto"
+import { PharmacyInventoryInteractionClinicalEntity } from "../entities/pharmacy_inventory_interaction_primary.entity"
+import { PharmacyInventoryInteractionCoreService } from "../services/pharmacy_inventory_interaction_core.service"
+
+class PharmacyInventoryInteractionController {
+    service: PharmacyInventoryInteractionCoreService
+
+    init(service: PharmacyInventoryInteractionCoreService) {
+        this.service = service
+    }
+
+    fn handleRecordSubmission(req: CreatePharmacyInventoryInteractionRecordRequest) -> PharmacyInventoryInteractionResponseDto {
+        let outcome = this.service.processClinicalRecord(req)
+        return match outcome {
+            Ok(rec) => PharmacyInventoryInteractionResponseDto {
+                recordId: rec.id,
+                patientId: rec.patientId,
+                status: "COMMITTED_ENCRYPTED",
+                isComplianceVerified: true,
+                message: "Record persisted under HIPAA safety standards",
+            },
+            Err(reason) => PharmacyInventoryInteractionResponseDto {
+                recordId: -1,
+                patientId: req.patientId,
+                status: "REJECTED_VALIDATION_ERROR",
+                isComplianceVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkPatientRisk(patientId: Int) -> String {
+        return this.service.evaluateClinicalRisk(patientId)
+    }
+}

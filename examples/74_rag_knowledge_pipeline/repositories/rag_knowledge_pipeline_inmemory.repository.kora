@@ -1,0 +1,33 @@
+// Example 74: Retrieval-Augmented Generation (RAG) Document Chunker
+// Repository Implementation
+
+import { RagKnowledgePipelinePrimaryRecord } from "../entities/rag_knowledge_pipeline_primary.entity"
+import { RagKnowledgePipelineRepository } from "../interfaces/rag_knowledge_pipeline_repository.interface"
+
+class RagKnowledgePipelineInMemoryRepository implements RagKnowledgePipelineRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<RagKnowledgePipelinePrimaryRecord> {
+        if id > 0 {
+            return Some(RagKnowledgePipelinePrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: RagKnowledgePipelinePrimaryRecord) -> Result<RagKnowledgePipelinePrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

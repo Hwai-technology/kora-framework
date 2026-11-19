@@ -1,0 +1,29 @@
+// ============================================================================
+// Example 28: Crypto Derivatives & Margin Engine
+// Application Container & Dependency Container Bootstrap
+// ============================================================================
+
+import { CryptoDerivativesExchangePrimaryRepository } from "./repositories/crypto_derivatives_exchange_primary.repository"
+import { CryptoDerivativesExchangeCoreService } from "./services/crypto_derivatives_exchange_core.service"
+import { CryptoDerivativesExchangeCommandController } from "./controllers/crypto_derivatives_exchange_command.controller"
+import { CryptoDerivativesExchangeQueryController } from "./controllers/crypto_derivatives_exchange_query.controller"
+import { CryptoDerivativesExchangeRouter } from "./routes/crypto_derivatives_exchange.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = CryptoDerivativesExchangePrimaryRepository()
+        let service = CryptoDerivativesExchangeCoreService(repo)
+        let commandCtrl = CryptoDerivativesExchangeCommandController(service)
+        let queryCtrl = CryptoDerivativesExchangeQueryController(repo)
+        let router = CryptoDerivativesExchangeRouter(commandCtrl, queryCtrl)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

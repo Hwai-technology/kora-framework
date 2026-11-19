@@ -1,0 +1,74 @@
+// ============================================================================
+// Unit Test Suite: Distributed Cache Cluster & Write-Behind
+// Verifies Consensus Invariants, Quorum Validation, and Heartbeats
+// ============================================================================
+
+import { CreateDistributedCacheClusterTaskRequest } from "../models/distributed_cache_cluster_request.dto"
+import { DistributedCacheClusterClusterRepository } from "../repositories/distributed_cache_cluster_cluster.repository"
+import { DistributedCacheClusterCoreService } from "../services/distributed_cache_cluster_core.service"
+import { DistributedCacheClusterHeartbeatService } from "../services/distributed_cache_cluster_heartbeat.service"
+
+class DistributedCacheClusterUnitTestSuite {
+    service: DistributedCacheClusterCoreService
+    heartbeat: DistributedCacheClusterHeartbeatService
+
+    init(service: DistributedCacheClusterCoreService, heartbeat: DistributedCacheClusterHeartbeatService) {
+        this.service = service
+        this.heartbeat = heartbeat
+    }
+
+    fn test_consensus_command_processing() -> Bool {
+        let req = CreateDistributedCacheClusterTaskRequest {
+            taskKey: "TASK-REPLICATE-101",
+            originatingNodeId: 1,
+            payloadVolume: 500,
+            targetCluster: "ProductionClusterEast",
+        }
+        let res = this.service.processConsensusCommand(req)
+        return match res {
+            Ok(state) => state.id == 1 && state.isLeader,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_originating_node_rejected() -> Bool {
+        let req = CreateDistributedCacheClusterTaskRequest {
+            taskKey: "TASK-INVALID",
+            originatingNodeId: -1,
+            payloadVolume: 100,
+            targetCluster: "ProductionClusterEast",
+        }
+        let res = this.service.processConsensusCommand(req)
+        return match res {
+            Ok(s) => false,
+            Err(e) => e == "Originating node ID must be strictly positive",
+        }
+    }
+
+    fn test_quorum_evaluation() -> Bool {
+        return this.service.evaluateClusterQuorum()
+    }
+
+    fn test_heartbeat_ping() -> Bool {
+        return this.heartbeat.pingPeer(2)
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_consensus_command_processing()
+        let t2 = this.test_invalid_originating_node_rejected()
+        let t3 = this.test_quorum_evaluation()
+        let t4 = this.test_heartbeat_ping()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ Distributed Cache Cluster & Write-Behind Unit Tests: 4/4 passed (Quorum, Invariants & Heartbeats Verified)")
+        } else {
+            print("  ✗ Distributed Cache Cluster & Write-Behind Unit Tests: failed")
+        }
+    }
+}
+
+let repo = DistributedCacheClusterClusterRepository()
+let service = DistributedCacheClusterCoreService(repo)
+let heartbeat = DistributedCacheClusterHeartbeatService()
+let suite = DistributedCacheClusterUnitTestSuite(service, heartbeat)
+suite.run()

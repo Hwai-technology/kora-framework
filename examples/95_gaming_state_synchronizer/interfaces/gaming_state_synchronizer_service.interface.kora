@@ -1,0 +1,10 @@
+// Example 95: Multiplayer Game 60Hz Tick State Synchronizer
+// Domain Service Contract
+
+import { GamingStateSynchronizerPrimaryRecord } from "../entities/gaming_state_synchronizer_primary.entity"
+import { CreateGamingStateSynchronizerTaskRequest } from "../models/gaming_state_synchronizer_request.dto"
+
+interface GamingStateSynchronizerDomainContract {
+    fn executeTask(req: CreateGamingStateSynchronizerTaskRequest) -> Result<GamingStateSynchronizerPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

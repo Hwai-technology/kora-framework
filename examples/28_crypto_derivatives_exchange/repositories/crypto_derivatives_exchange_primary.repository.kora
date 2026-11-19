@@ -1,0 +1,33 @@
+// Example 28: Crypto Derivatives & Margin Engine
+// Primary Repository Implementation
+
+import { CryptoDerivativesExchangeRecord } from "../entities/crypto_derivatives_exchange_primary.entity"
+import { CryptoDerivativesExchangeRepository } from "../interfaces/crypto_derivatives_exchange_repository.interface"
+
+class CryptoDerivativesExchangePrimaryRepository implements CryptoDerivativesExchangeRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<CryptoDerivativesExchangeRecord> {
+        if id > 0 {
+            return Some(CryptoDerivativesExchangeRecord {
+                id: id,
+                reference: "REF-" + id.toString(),
+                status: "ACTIVE",
+                balance: 100000,
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: CryptoDerivativesExchangeRecord) -> Result<CryptoDerivativesExchangeRecord, String> {
+        if record.id < 0 {
+            return Err("Invalid record id")
+        }
+        return Ok(record)
+    }
+
+    fn countAll() -> Int {
+        return 42
+    }
+}

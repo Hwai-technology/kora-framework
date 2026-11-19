@@ -1,0 +1,34 @@
+// Example 24: Core Banking Ledger & Accounts
+// Command Controller (Mutations & Writes)
+
+import { CreateFintechCoreBankingRequest } from "../models/fintech_core_banking_request.dto"
+import { FintechCoreBankingResponse } from "../models/fintech_core_banking_response.dto"
+import { FintechCoreBankingCoreService } from "../services/fintech_core_banking_core.service"
+
+class FintechCoreBankingCommandController {
+    service: FintechCoreBankingCoreService
+
+    init(service: FintechCoreBankingCoreService) {
+        this.service = service
+    }
+
+    fn handleCreate(req: CreateFintechCoreBankingRequest) -> FintechCoreBankingResponse {
+        let outcome = this.service.processRequest(req)
+        return match outcome {
+            Ok(rec) => FintechCoreBankingResponse {
+                id: rec.id,
+                reference: rec.reference,
+                success: true,
+                statusCode: 201,
+                message: "Created successfully",
+            },
+            Err(reason) => FintechCoreBankingResponse {
+                id: -1,
+                reference: req.reference,
+                success: false,
+                statusCode: 400,
+                message: reason,
+            },
+        }
+    }
+}

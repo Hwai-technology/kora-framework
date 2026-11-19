@@ -1,0 +1,81 @@
+// ============================================================================
+// Load & Stress Test Suite: 27_fraud_detection_engine
+// Stresses 500 High-Throughput Real-Time Risk Evaluations with Injected Anomalies
+// ============================================================================
+
+import { CreateFraudDetectionEngineRequest } from "../models/fraud_detection_engine_request.dto"
+import { FraudDetectionEnginePrimaryRepository } from "../repositories/fraud_detection_engine_primary.repository"
+import { FraudDetectionEngineCoreService } from "../services/fraud_detection_engine_core.service"
+
+class FraudDetectionLoadTestSuite {
+    service: FraudDetectionEngineCoreService
+    repo: FraudDetectionEnginePrimaryRepository
+
+    init() {
+        this.repo = FraudDetectionEnginePrimaryRepository()
+        this.service = FraudDetectionEngineCoreService(this.repo)
+    }
+
+    fn runLoadSuite() -> Bool {
+        var total = 500
+        var i = 0
+        var interceptedFraud = 0
+
+        while i < total {
+            var country = "US"
+            var mcc = 5411
+            var distKm = 5
+            var mins = 60
+            let card = "card_token_batch_" + (i % 25).toString()
+
+            // Injected Anomaly every 10th transaction: Impossible Travel (10,000 km in 10 mins)
+            if i % 10 == 0 {
+                distKm = 10000
+                mins = 10
+            }
+
+            // Injected Critical Sanctions every 50th transaction
+            if i % 50 == 0 {
+                country = "KP"
+            }
+
+            let req = CreateFraudDetectionEngineRequest {
+                targetId: 3000 + i,
+                cardToken: card,
+                amountCents: 5000,
+                currency: "USD",
+                mccCode: mcc,
+                countryCode: country,
+                distanceFromLastTxKm: distKm,
+                minutesSinceLastTx: mins,
+                reference: "LOAD-TX-" + i.toString(),
+            }
+
+            let res = this.service.evaluateRisk(req)
+            let isFraud = match res {
+                Ok(r) => r.riskScore >= 50,
+                Err(e) => false,
+            }
+            if isFraud {
+                interceptedFraud = interceptedFraud + 1
+            }
+            i = i + 1
+        }
+
+        let totalStored = this.repo.countAll()
+        // 50 impossible travel anomalies + 10 critical sanctions = at least 50 intercepted
+        return totalStored == total && interceptedFraud >= 50
+    }
+
+    fn run() -> Unit {
+        let pass = this.runLoadSuite()
+        if pass {
+            print("  ✓ Fraud Detection 500-Transaction High-Throughput Load Test: PASSED")
+        } else {
+            print("  ✗ Fraud Detection 500-Transaction High-Throughput Load Test: FAILED")
+        }
+    }
+}
+
+let loadSuite = FraudDetectionLoadTestSuite()
+loadSuite.run()

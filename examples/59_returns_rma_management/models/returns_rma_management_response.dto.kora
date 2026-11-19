@@ -1,0 +1,16 @@
+// Example 59: Reverse Logistics & RMA Inspection Engine
+// Transport Model: Standard Response
+
+model ReturnsRmaManagementResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model ReturnsRmaManagementSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

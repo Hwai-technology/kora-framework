@@ -1,0 +1,75 @@
+// ============================================================================
+// Unit Test Suite: Order Fulfillment & Pick-Pack-Ship Workflow
+// Verifies Domain Invariants, Boundary Calculations & Liveness
+// ============================================================================
+
+import { CreateOrderFulfillmentPipelineTaskRequest } from "../models/order_fulfillment_pipeline_request.dto"
+import { OrderFulfillmentPipelineInMemoryRepository } from "../repositories/order_fulfillment_pipeline_inmemory.repository"
+import { OrderFulfillmentPipelineCoreService } from "../services/order_fulfillment_pipeline_core.service"
+import { OrderFulfillmentPipelineTelemetryService } from "../services/order_fulfillment_pipeline_telemetry.service"
+
+class OrderFulfillmentPipelineUnitTestSuite {
+    service: OrderFulfillmentPipelineCoreService
+    telemetry: OrderFulfillmentPipelineTelemetryService
+
+    init(service: OrderFulfillmentPipelineCoreService, telemetry: OrderFulfillmentPipelineTelemetryService) {
+        this.service = service
+        this.telemetry = telemetry
+    }
+
+    fn test_valid_task_execution() -> Bool {
+        let req = CreateOrderFulfillmentPipelineTaskRequest {
+            taskKey: "UNIT-TASK-101",
+            targetEntityId: 10,
+            workloadCapacity: 95,
+            domainContext: "E-Commerce",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(rec) => rec.id == 10 && rec.capacityScore == 95,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_negative_target_rejected() -> Bool {
+        let req = CreateOrderFulfillmentPipelineTaskRequest {
+            taskKey: "INVALID-TASK",
+            targetEntityId: -1,
+            workloadCapacity: 50,
+            domainContext: "E-Commerce",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Target entity ID must be strictly positive",
+        }
+    }
+
+    fn test_health_evaluation() -> Bool {
+        let health = this.service.evaluateHealth(10)
+        return health == "OPTIMUM_PERFORMANCE" || health == "MODERATE_NORMAL"
+    }
+
+    fn test_telemetry_ping() -> Bool {
+        return this.telemetry.ping()
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_task_execution()
+        let t2 = this.test_invalid_negative_target_rejected()
+        let t3 = this.test_health_evaluation()
+        let t4 = this.test_telemetry_ping()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ Order Fulfillment & Pick-Pack-Ship Workflow Unit Tests: 4/4 passed (Domain Invariants Verified)")
+        } else {
+            print("  ✗ Order Fulfillment & Pick-Pack-Ship Workflow Unit Tests: failed")
+        }
+    }
+}
+
+let repo = OrderFulfillmentPipelineInMemoryRepository()
+let service = OrderFulfillmentPipelineCoreService(repo)
+let telemetry = OrderFulfillmentPipelineTelemetryService()
+let suite = OrderFulfillmentPipelineUnitTestSuite(service, telemetry)
+suite.run()

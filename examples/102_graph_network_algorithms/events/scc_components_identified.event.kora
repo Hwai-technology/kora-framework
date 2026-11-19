@@ -1,0 +1,6 @@
+// Example 102: Graph Algorithms & Tarjan SCC / PageRank — Domain Event: SccComponentsIdentifiedEvent
+
+model SccComponentsIdentifiedEvent {
+    componentCount: Int
+    largestComponentSize: Int
+}

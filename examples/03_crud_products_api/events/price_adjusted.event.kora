@@ -1,0 +1,8 @@
+// examples/03_crud_products_api — Event: PriceAdjustedEvent
+
+model PriceAdjustedEvent {
+    productId: Int
+    oldPrice: Int
+    newPrice: Int
+    reason: String
+}

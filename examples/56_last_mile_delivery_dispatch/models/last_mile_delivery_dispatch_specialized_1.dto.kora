@@ -1,0 +1,9 @@
+// Example 56: Last-Mile Delivery Dispatch & Fleet Geo-Routing
+// Specialized Model 1
+
+model LastMileDeliveryDispatchSpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

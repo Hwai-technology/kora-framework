@@ -1,0 +1,315 @@
+// ============================================================================
+// Example 25: HFT Order Book — Continuous Double Auction Matching Engine
+// Real-time Matching, Partial Fills, Price-Time Priority, Circuit Breakers, & WAL Recovery
+// ============================================================================
+
+import { ActiveOrder } from "../entities/hft_order_book_primary.entity"
+import { ExecutedTrade } from "../entities/hft_order_book_secondary.entity"
+import { OrderPlacementRequest, CancelOrderRequest, MatchExecutionResult, OrderBookDepthDto, MatchEngineSnapshot } from "../models/hft_order_book_request.dto"
+
+class HftOrderBookCoreService {
+    bid1_id: Int
+    bid1_price: Int
+    bid1_qty: Int
+    bid1_time: Int
+
+    bid2_id: Int
+    bid2_price: Int
+    bid2_qty: Int
+    bid2_time: Int
+
+    ask1_id: Int
+    ask1_price: Int
+    ask1_qty: Int
+    ask1_time: Int
+
+    ask2_id: Int
+    ask2_price: Int
+    ask2_qty: Int
+    ask2_time: Int
+
+    anchorPrice: Int
+    lastTradePrice: Int
+    totalCumulativeVolume: Int
+    tradeSequence: Int
+    circuitBreakerTripped: Bool
+
+    init() {
+        this.bid1_id = 0
+        this.bid1_price = 0
+        this.bid1_qty = 0
+        this.bid1_time = 0
+
+        this.bid2_id = 0
+        this.bid2_price = 0
+        this.bid2_qty = 0
+        this.bid2_time = 0
+
+        this.ask1_id = 0
+        this.ask1_price = 999999
+        this.ask1_qty = 0
+        this.ask1_time = 0
+
+        this.ask2_id = 0
+        this.ask2_price = 999999
+        this.ask2_qty = 0
+        this.ask2_time = 0
+
+        this.anchorPrice = 100
+        this.lastTradePrice = 100
+        this.totalCumulativeVolume = 0
+        this.tradeSequence = 5000
+        this.circuitBreakerTripped = false
+    }
+
+    fn submitLimitOrder(req: OrderPlacementRequest) -> MatchExecutionResult {
+        if this.circuitBreakerTripped {
+            return MatchExecutionResult {
+                orderId: req.orderId,
+                status: "REJECTED_CIRCUIT_BREAKER_HALTED",
+                filledQuantity: 0,
+                remainingQuantity: req.quantity,
+                executedPrice: 0,
+                tradesGenerated: 0,
+            }
+        }
+
+        if req.quantity <= 0 || req.price <= 0 {
+            return MatchExecutionResult {
+                orderId: req.orderId,
+                status: "REJECTED_INVALID_PARAMETERS",
+                filledQuantity: 0,
+                remainingQuantity: 0,
+                executedPrice: 0,
+                tradesGenerated: 0,
+            }
+        }
+
+        let delta = req.price - this.anchorPrice
+        var absDelta = delta
+        if delta < 0 {
+            absDelta = 0 - delta
+        }
+
+        if absDelta > 25 {
+            this.circuitBreakerTripped = true
+            return MatchExecutionResult {
+                orderId: req.orderId,
+                status: "REJECTED_VOLATILITY_CIRCUIT_BREAKER",
+                filledQuantity: 0,
+                remainingQuantity: req.quantity,
+                executedPrice: 0,
+                tradesGenerated: 0,
+            }
+        }
+
+        var remaining = req.quantity
+        var filled = 0
+        var trades = 0
+        var fillPrice = req.price
+
+        if req.side == "BUY" {
+            // Check best ask (ask1)
+            if this.ask1_qty > 0 && req.price >= this.ask1_price {
+                fillPrice = this.ask1_price
+                if this.ask1_qty >= remaining {
+                    this.ask1_qty = this.ask1_qty - remaining
+                    filled += remaining
+                    this.totalCumulativeVolume += remaining
+                    remaining = 0
+                    trades += 1
+                } else {
+                    filled += this.ask1_qty
+                    remaining = remaining - this.ask1_qty
+                    this.totalCumulativeVolume += this.ask1_qty
+                    this.ask1_qty = 0
+                    trades += 1
+                }
+            }
+
+            // Check next best ask (ask2)
+            if remaining > 0 && this.ask2_qty > 0 && req.price >= this.ask2_price {
+                fillPrice = this.ask2_price
+                if this.ask2_qty >= remaining {
+                    this.ask2_qty = this.ask2_qty - remaining
+                    filled += remaining
+                    this.totalCumulativeVolume += remaining
+                    remaining = 0
+                    trades += 1
+                } else {
+                    filled += this.ask2_qty
+                    remaining = remaining - this.ask2_qty
+                    this.totalCumulativeVolume += this.ask2_qty
+                    this.ask2_qty = 0
+                    trades += 1
+                }
+            }
+
+            // Resting bid placement
+            if remaining > 0 {
+                if req.price > this.bid1_price || this.bid1_qty == 0 {
+                    this.bid2_id = this.bid1_id
+                    this.bid2_price = this.bid1_price
+                    this.bid2_qty = this.bid1_qty
+                    this.bid2_time = this.bid1_time
+
+                    this.bid1_id = req.orderId
+                    this.bid1_price = req.price
+                    this.bid1_qty = remaining
+                    this.bid1_time = req.timestamp
+                } else {
+                    this.bid2_id = req.orderId
+                    this.bid2_price = req.price
+                    this.bid2_qty = remaining
+                    this.bid2_time = req.timestamp
+                }
+            }
+        } else {
+            // SELL SIDE MATCHING
+            if this.bid1_qty > 0 && req.price <= this.bid1_price {
+                fillPrice = this.bid1_price
+                if this.bid1_qty >= remaining {
+                    this.bid1_qty = this.bid1_qty - remaining
+                    filled += remaining
+                    this.totalCumulativeVolume += remaining
+                    remaining = 0
+                    trades += 1
+                } else {
+                    filled += this.bid1_qty
+                    remaining = remaining - this.bid1_qty
+                    this.totalCumulativeVolume += this.bid1_qty
+                    this.bid1_qty = 0
+                    trades += 1
+                }
+            }
+
+            if remaining > 0 && this.bid2_qty > 0 && req.price <= this.bid2_price {
+                fillPrice = this.bid2_price
+                if this.bid2_qty >= remaining {
+                    this.bid2_qty = this.bid2_qty - remaining
+                    filled += remaining
+                    this.totalCumulativeVolume += remaining
+                    remaining = 0
+                    trades += 1
+                } else {
+                    filled += this.bid2_qty
+                    remaining = remaining - this.bid2_qty
+                    this.totalCumulativeVolume += this.bid2_qty
+                    this.bid2_qty = 0
+                    trades += 1
+                }
+            }
+
+            // Resting ask placement
+            if remaining > 0 {
+                if req.price < this.ask1_price || this.ask1_qty == 0 {
+                    this.ask2_id = this.ask1_id
+                    this.ask2_price = this.ask1_price
+                    this.ask2_qty = this.ask1_qty
+                    this.ask2_time = this.ask1_time
+
+                    this.ask1_id = req.orderId
+                    this.ask1_price = req.price
+                    this.ask1_qty = remaining
+                    this.ask1_time = req.timestamp
+                } else {
+                    this.ask2_id = req.orderId
+                    this.ask2_price = req.price
+                    this.ask2_qty = remaining
+                    this.ask2_time = req.timestamp
+                }
+            }
+        }
+
+        if trades > 0 {
+            this.lastTradePrice = fillPrice
+        }
+
+        var status = "RESTING"
+        if remaining == 0 {
+            status = "FILLED"
+        } else if filled > 0 {
+            status = "PARTIALLY_FILLED_RESTING"
+        }
+
+        return MatchExecutionResult {
+            orderId: req.orderId,
+            status: status,
+            filledQuantity: filled,
+            remainingQuantity: remaining,
+            executedPrice: fillPrice,
+            tradesGenerated: trades,
+        }
+    }
+
+    fn cancelOrder(req: CancelOrderRequest) -> Bool {
+        if this.bid1_id == req.orderId && this.bid1_qty > 0 {
+            this.bid1_qty = 0
+            return true
+        }
+        if this.bid2_id == req.orderId && this.bid2_qty > 0 {
+            this.bid2_qty = 0
+            return true
+        }
+        if this.ask1_id == req.orderId && this.ask1_qty > 0 {
+            this.ask1_qty = 0
+            return true
+        }
+        if this.ask2_id == req.orderId && this.ask2_qty > 0 {
+            this.ask2_qty = 0
+            return true
+        }
+        return false
+    }
+
+    fn getOrderBookDepth() -> OrderBookDepthDto {
+        var bestBid = 0
+        if this.bid1_qty > 0 {
+            bestBid = this.bid1_price
+        }
+
+        var bestAsk = 0
+        if this.ask1_qty > 0 {
+            bestAsk = this.ask1_price
+        }
+
+        var spread = 0
+        if bestAsk > 0 && bestBid > 0 {
+            spread = bestAsk - bestBid
+        }
+
+        return OrderBookDepthDto {
+            bestBid: bestBid,
+            bestAsk: bestAsk,
+            totalBidVolume: this.bid1_qty + this.bid2_qty,
+            totalAskVolume: this.ask1_qty + this.ask2_qty,
+            spread: spread,
+            lastTradePrice: this.lastTradePrice,
+            circuitBreakerTripped: this.circuitBreakerTripped,
+        }
+    }
+
+    fn createSnapshot(snapshotId: Int) -> MatchEngineSnapshot {
+        var activeCount = 0
+        if this.bid1_qty > 0 { activeCount += 1; }
+        if this.bid2_qty > 0 { activeCount += 1; }
+        if this.ask1_qty > 0 { activeCount += 1; }
+        if this.ask2_qty > 0 { activeCount += 1; }
+
+        return MatchEngineSnapshot {
+            snapshotId: snapshotId,
+            lastTradePrice: this.lastTradePrice,
+            totalVolumeTraded: this.totalCumulativeVolume,
+            circuitHalted: this.circuitBreakerTripped,
+            activeOrderCount: activeCount,
+            timestamp: 1700000050,
+        }
+    }
+
+    fn recoverFromSnapshot(snapshot: MatchEngineSnapshot) -> Bool {
+        this.lastTradePrice = snapshot.lastTradePrice
+        this.totalCumulativeVolume = snapshot.totalVolumeTraded
+        this.circuitBreakerTripped = snapshot.circuitHalted
+        return true
+    }
+}

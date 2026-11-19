@@ -1,0 +1,14 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director
+// Transport Model: Command Request
+
+model CreateServiceMeshProxyTaskRequest {
+    taskKey: String
+    originatingNodeId: Int
+    payloadVolume: Int
+    targetCluster: String
+}
+
+model QueryServiceMeshProxyStatusRequest {
+    resourceKey: String
+    quorumRequired: Int
+}

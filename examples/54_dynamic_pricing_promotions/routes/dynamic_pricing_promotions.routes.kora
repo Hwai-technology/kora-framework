@@ -1,0 +1,22 @@
+// Example 54: Dynamic Pricing Engine & Flash Sale Rate-Limiter
+// Router & Endpoint Dispatcher
+
+import { CreateDynamicPricingPromotionsTaskRequest } from "../models/dynamic_pricing_promotions_request.dto"
+import { DynamicPricingPromotionsResponseDto } from "../models/dynamic_pricing_promotions_response.dto"
+import { DynamicPricingPromotionsController } from "../controllers/dynamic_pricing_promotions.controller"
+
+class DynamicPricingPromotionsRouter {
+    controller: DynamicPricingPromotionsController
+
+    init(controller: DynamicPricingPromotionsController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateDynamicPricingPromotionsTaskRequest) -> DynamicPricingPromotionsResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

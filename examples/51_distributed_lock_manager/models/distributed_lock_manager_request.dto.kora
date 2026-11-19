@@ -1,0 +1,14 @@
+// Example 51: Distributed Lock Manager & Fencing Tokens
+// Transport Model: Command Request
+
+model CreateDistributedLockManagerTaskRequest {
+    taskKey: String
+    originatingNodeId: Int
+    payloadVolume: Int
+    targetCluster: String
+}
+
+model QueryDistributedLockManagerStatusRequest {
+    resourceKey: String
+    quorumRequired: Int
+}

@@ -1,0 +1,12 @@
+// Example 31: Inter-Bank Reconciliation & Settlement
+// Audit Trail Entity
+
+@table("reconciliation_settlement_audit_logs")
+model ReconciliationSettlementAuditLog {
+    @id
+    id: Int
+    recordId: Int
+    action: String
+    performedBy: String
+    timestamp: Int
+}

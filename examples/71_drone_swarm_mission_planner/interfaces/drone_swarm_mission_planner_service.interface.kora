@@ -1,0 +1,10 @@
+// Example 71: Autonomous Drone Swarm Formation Coordinator
+// Domain Service Contract
+
+import { DroneSwarmMissionPlannerPrimaryRecord } from "../entities/drone_swarm_mission_planner_primary.entity"
+import { CreateDroneSwarmMissionPlannerTaskRequest } from "../models/drone_swarm_mission_planner_request.dto"
+
+interface DroneSwarmMissionPlannerDomainContract {
+    fn executeTask(req: CreateDroneSwarmMissionPlannerTaskRequest) -> Result<DroneSwarmMissionPlannerPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

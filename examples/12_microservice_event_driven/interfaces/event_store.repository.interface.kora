@@ -1,6 +1,15 @@
-import { DomainEventEntity } from "../entities/domain_event.entity"
+// ============================================================================
+// Event Store & Transactional Outbox Repository Interface
+// ============================================================================
 
-interface EventStoreRepositoryInterface {
-    fn saveEvent(eventType: String, payload: String) -> Result<DomainEventEntity, String>
-    fn getLatestEvents(limit: Int) -> Result<Int, String>
+import { EventEnvelope, OutboxTelemetry } from "../models/event_envelope.model"
+
+interface IEventStoreRepository {
+    fn saveToOutbox(envelope: EventEnvelope) -> Result<EventEnvelope, String>
+    fn findById(eventId: String) -> Option<EventEnvelope>
+    fn isIdempotencyKeySeen(key: String) -> Bool
+    fn markDelivered(eventId: String) -> Bool
+    fn recordRetryAttempt(eventId: String) -> Int
+    fn moveToDeadLetterQueue(eventId: String, reason: String) -> Bool
+    fn getTelemetry() -> OutboxTelemetry
 }

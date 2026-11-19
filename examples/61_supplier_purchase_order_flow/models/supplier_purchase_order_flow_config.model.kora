@@ -1,0 +1,9 @@
+// Example 61: Supplier Purchase Order & 3-Way Invoice Matcher
+// Configuration Model
+
+model SupplierPurchaseOrderFlowConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

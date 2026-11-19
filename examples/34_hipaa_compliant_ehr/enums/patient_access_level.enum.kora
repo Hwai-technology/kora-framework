@@ -1,0 +1,10 @@
+// Example 34: HIPAA Compliant Electronic Health Records — Enum: PatientAccessLevel
+// Dedicated Domain Enum Specification
+
+enum PatientAccessLevel {
+    EmergencyBreakGlass
+    AttendingPhysician
+    ConsultingSpecialist
+    RegisteredNurse
+    AuditorReadOnly
+}

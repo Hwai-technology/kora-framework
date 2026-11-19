@@ -1,0 +1,15 @@
+// Example 78: High-Throughput Vector Embedding Ingestion Pipeline
+// Transport Model: Command Request
+
+model CreateEmbeddingIngestionWorkerTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryEmbeddingIngestionWorkerFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

@@ -1,0 +1,12 @@
+// Example 62: Customer Loyalty Rewards Ledger & Tier Upgrades
+// Persistent Database Entity: Audit Log
+
+@table("customer_loyalty_rewards_audit_logs")
+model CustomerLoyaltyRewardsAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

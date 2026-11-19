@@ -1,0 +1,56 @@
+// Example 38: Radiology PACS DICOM Metadata Indexer
+// Core Domain Service Implementation
+
+import { RadiologyPacsMetadataClinicalEntity } from "../entities/radiology_pacs_metadata_primary.entity"
+import { CreateRadiologyPacsMetadataRecordRequest } from "../models/radiology_pacs_metadata_request.dto"
+import { RadiologyPacsMetadataRepository } from "../interfaces/radiology_pacs_metadata_repository.interface"
+import { RadiologyPacsMetadataDomainContract } from "../interfaces/radiology_pacs_metadata_service.interface"
+
+class RadiologyPacsMetadataCoreService implements RadiologyPacsMetadataDomainContract {
+    repo: RadiologyPacsMetadataRepository
+
+    init(repo: RadiologyPacsMetadataRepository) {
+        this.repo = repo
+    }
+
+    fn processClinicalRecord(req: CreateRadiologyPacsMetadataRecordRequest) -> Result<RadiologyPacsMetadataClinicalEntity, String> {
+        if req.patientId <= 0 {
+            return Err("Patient ID must be strictly positive")
+        }
+        if req.clinicalMetricScore < 0 {
+            return Err("Clinical metric score cannot be negative")
+        }
+
+        let entity = RadiologyPacsMetadataClinicalEntity {
+            id: req.patientId + 5000,
+            patientId: req.patientId,
+            clinicianId: req.clinicianId,
+            clinicalMetricScore: req.clinicalMetricScore,
+            complianceState: "AUDITED_SECURE",
+            active: true,
+        }
+        return this.repo.save(entity)
+    }
+
+    fn evaluateClinicalRisk(patientId: Int) -> String {
+        let opt = this.repo.findByPatientId(patientId)
+        let isPresent = match opt {
+            Some(r) => true,
+            None => false,
+        }
+        if !isPresent {
+            return "RECORD_NOT_FOUND"
+        }
+        let record = match opt {
+            Some(r) => r,
+            None => RadiologyPacsMetadataClinicalEntity { id: 0, patientId: 0, clinicianId: 0, clinicalMetricScore: 0, complianceState: "", active: false },
+        }
+        if record.clinicalMetricScore > 80 {
+            return "CRITICAL_OBSERVATION"
+        }
+        if record.clinicalMetricScore > 40 {
+            return "MODERATE_ATTENTION"
+        }
+        return "NOMINAL_STABLE"
+    }
+}

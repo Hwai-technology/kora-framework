@@ -1,0 +1,33 @@
+// Example 62: Customer Loyalty Rewards Ledger & Tier Upgrades
+// Repository Implementation
+
+import { CustomerLoyaltyRewardsPrimaryRecord } from "../entities/customer_loyalty_rewards_primary.entity"
+import { CustomerLoyaltyRewardsRepository } from "../interfaces/customer_loyalty_rewards_repository.interface"
+
+class CustomerLoyaltyRewardsInMemoryRepository implements CustomerLoyaltyRewardsRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<CustomerLoyaltyRewardsPrimaryRecord> {
+        if id > 0 {
+            return Some(CustomerLoyaltyRewardsPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: CustomerLoyaltyRewardsPrimaryRecord) -> Result<CustomerLoyaltyRewardsPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

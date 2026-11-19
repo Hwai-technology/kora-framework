@@ -1,0 +1,8 @@
+// Example 60: Faceted Product Catalog Search & Inverted Index — Enum: CatalogVisibility
+
+enum CatalogVisibility {
+    PublicSearchable
+    UnlistedDirectLinkOnly
+    B2BWholesaleRestricted
+    ArchivedDraft
+}

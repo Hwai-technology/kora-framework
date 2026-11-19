@@ -1,0 +1,7 @@
+// Example 92: Multi-Room WebSocket Chat & Presence Cluster — Enum: MessageDeliveryReceipt
+
+enum MessageDeliveryReceipt {
+    SentToServer
+    DeliveredToPeerDevice
+    ReadByRecipientUser
+}

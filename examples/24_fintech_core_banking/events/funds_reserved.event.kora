@@ -1,0 +1,13 @@
+// ============================================================================
+// Example 24: Fintech Core Banking — Event: FundsReservedEvent
+// Segregated Domain Event for OCC Fund Reservation
+// ============================================================================
+
+model FundsReservedEvent {
+    eventId: String
+    sagaId: String
+    accountId: Int
+    amount: Int
+    version: Int
+    timestamp: Int
+}

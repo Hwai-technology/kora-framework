@@ -1,0 +1,6 @@
+// Example 60: Faceted Product Catalog Search & Inverted Index — Domain Event: CatalogIndexRebuiltEvent
+
+model CatalogIndexRebuiltEvent {
+    indexedProductCount: Int
+    durationMs: Int
+}

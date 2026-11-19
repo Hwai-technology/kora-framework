@@ -1,0 +1,10 @@
+// Example 55: Order Fulfillment & Pick-Pack-Ship Workflow
+// Repository Interface
+
+import { OrderFulfillmentPipelinePrimaryRecord } from "../entities/order_fulfillment_pipeline_primary.entity"
+
+interface OrderFulfillmentPipelineRepository {
+    fn findById(id: Int) -> Option<OrderFulfillmentPipelinePrimaryRecord>
+    fn save(record: OrderFulfillmentPipelinePrimaryRecord) -> Result<OrderFulfillmentPipelinePrimaryRecord, String>
+    fn countActive() -> Int
+}

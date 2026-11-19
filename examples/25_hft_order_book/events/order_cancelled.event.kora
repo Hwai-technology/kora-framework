@@ -1,0 +1,10 @@
+// ============================================================================
+// Example 25: HFT Order Book — Event: OrderCancelledEvent
+// ============================================================================
+
+model OrderCancelledEvent {
+    orderId: Int
+    traderId: Int
+    unfilledQuantity: Int
+    timestamp: Int
+}

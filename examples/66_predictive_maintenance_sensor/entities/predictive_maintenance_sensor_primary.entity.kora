@@ -1,0 +1,13 @@
+// Example 66: Predictive Industrial Equipment Maintenance
+// Persistent Database Entity: Primary Record
+
+@table("predictive_maintenance_sensor_records")
+model PredictiveMaintenanceSensorPrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

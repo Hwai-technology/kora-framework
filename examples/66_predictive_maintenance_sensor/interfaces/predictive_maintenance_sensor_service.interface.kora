@@ -1,0 +1,10 @@
+// Example 66: Predictive Industrial Equipment Maintenance
+// Domain Service Contract
+
+import { PredictiveMaintenanceSensorPrimaryRecord } from "../entities/predictive_maintenance_sensor_primary.entity"
+import { CreatePredictiveMaintenanceSensorTaskRequest } from "../models/predictive_maintenance_sensor_request.dto"
+
+interface PredictiveMaintenanceSensorDomainContract {
+    fn executeTask(req: CreatePredictiveMaintenanceSensorTaskRequest) -> Result<PredictiveMaintenanceSensorPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

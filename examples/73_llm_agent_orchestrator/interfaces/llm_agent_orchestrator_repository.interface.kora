@@ -1,0 +1,10 @@
+// Example 73: Autonomous LLM Agent Orchestrator & Tool Calling
+// Repository Interface
+
+import { LlmAgentOrchestratorPrimaryRecord } from "../entities/llm_agent_orchestrator_primary.entity"
+
+interface LlmAgentOrchestratorRepository {
+    fn findById(id: Int) -> Option<LlmAgentOrchestratorPrimaryRecord>
+    fn save(record: LlmAgentOrchestratorPrimaryRecord) -> Result<LlmAgentOrchestratorPrimaryRecord, String>
+    fn countActive() -> Int
+}

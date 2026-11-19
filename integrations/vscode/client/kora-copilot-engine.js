@@ -96,7 +96,7 @@ All Kora projects and generated features must provide automated test coverage:
 - \`kora run <file.kora>\`: Compiles and executes native release binary.
 - \`kora test [dir]\`: Runs the automated test runner across all unit, load, and lifecycle test suites.
 - \`kora g feature <name>\`: Generates a complete Clean Architecture slice (routes, controller, service, repo, validator, entity, dto, errors, events, unit test, load test).
-- \`kora example list\`: Displays the catalog of 23 official production examples.
+- \`kora example list\`: Displays the dynamic catalog of official production examples.
 - \`kora example init <slug> [dir]\`: Clones/scaffolds an official GitHub example with offline caching.
 - \`kora example search <query>\`: Searches official examples catalog.
 - \`kora doctor\`: Verifies compiler, runtime, environment, and extension health.
@@ -121,7 +121,7 @@ The official Kora VS Code Extension (\`integrations/vscode/\`) provides:
   - **Architecture Explorer**: Live layer counters (Controllers, Services, Repositories, Entities, Models, Tests) & Clean Architecture data flow.
   - **Learning Center**: 4 hands-on lessons with runnable code and 1-click editor insertion.
   - **Copilot Chat**: Context-aware AI assistant querying \`.agent/rules/\`, \`docs/\`, and \`knowledge/\`.
-  - **Examples Browser**: 23 official production examples with 1-click scaffolding via \`kora example init\`.`
+  - **Examples Browser**: Dynamic ecosystem of 100+ official production examples with 1-click scaffolding via \`kora example init\`.`
     }
 ];
 

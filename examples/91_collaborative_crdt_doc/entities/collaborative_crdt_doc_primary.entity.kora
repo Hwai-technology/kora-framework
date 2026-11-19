@@ -1,0 +1,13 @@
+// Example 91: CRDT Collaborative Real-Time Document Editor
+// Persistent Database Entity: Primary Record
+
+@table("collaborative_crdt_doc_records")
+model CollaborativeCrdtDocPrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

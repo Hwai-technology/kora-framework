@@ -1,0 +1,33 @@
+// Example 91: CRDT Collaborative Real-Time Document Editor
+// Repository Implementation
+
+import { CollaborativeCrdtDocPrimaryRecord } from "../entities/collaborative_crdt_doc_primary.entity"
+import { CollaborativeCrdtDocRepository } from "../interfaces/collaborative_crdt_doc_repository.interface"
+
+class CollaborativeCrdtDocInMemoryRepository implements CollaborativeCrdtDocRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<CollaborativeCrdtDocPrimaryRecord> {
+        if id > 0 {
+            return Some(CollaborativeCrdtDocPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: CollaborativeCrdtDocPrimaryRecord) -> Result<CollaborativeCrdtDocPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

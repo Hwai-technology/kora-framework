@@ -1,0 +1,9 @@
+// Example 44: Distributed Dynamo-Style Key-Value Store
+// Specialized Model 3
+
+model DistributedKvStoreSpecializedProfile3 {
+    profileId: String
+    classificationCode: String
+    quorumWeight: Int
+    isActive: Bool
+}

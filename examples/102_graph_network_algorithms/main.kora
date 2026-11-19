@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 102: Graph Algorithms & Tarjan SCC / PageRank
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { GraphNetworkAlgorithmsInMemoryRepository } from "./repositories/graph_network_algorithms_inmemory.repository"
+import { GraphNetworkAlgorithmsCoreService } from "./services/graph_network_algorithms_core.service"
+import { GraphNetworkAlgorithmsController } from "./controllers/graph_network_algorithms.controller"
+import { GraphNetworkAlgorithmsRouter } from "./routes/graph_network_algorithms.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = GraphNetworkAlgorithmsInMemoryRepository()
+        let service = GraphNetworkAlgorithmsCoreService(repo)
+        let controller = GraphNetworkAlgorithmsController(service)
+        let router = GraphNetworkAlgorithmsRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

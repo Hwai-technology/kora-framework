@@ -1,0 +1,9 @@
+// Example 50: Distributed Blob Storage Metadata Engine — Enum: StorageTier
+// Dedicated Domain Enum Specification
+
+enum StorageTier {
+    HotStandardAvailability
+    CoolInfrequentAccess
+    ColdGlacierArchive
+    DeepArchiveImmutable
+}

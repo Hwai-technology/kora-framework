@@ -1,0 +1,7 @@
+// Example 79: Multimodal CLIP Cross-Search Engine — Domain Event: MultimodalQueryMatchedEvent
+
+model MultimodalQueryMatchedEvent {
+    queryModality: String
+    topResultImageId: String
+    cosineScorePercent: Int
+}

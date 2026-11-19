@@ -1,0 +1,9 @@
+// Example 31: reconciliation_settlement — Enum: ReconciliationStatus
+// Dedicated Domain Enum Specification
+
+enum ReconciliationStatus {
+    PerfectMatch
+    TimingDifferencePending
+    AmountDiscrepancy
+    UnmatchedOrphan
+}

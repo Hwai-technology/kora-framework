@@ -1,0 +1,7 @@
+// Example 64: Smart Electrical Grid Substation Telemetry — Enum: TransformerHealth
+
+enum TransformerHealth {
+    OptimumCool
+    ElevatedThermalWarning
+    CriticalOverloadTrip
+}

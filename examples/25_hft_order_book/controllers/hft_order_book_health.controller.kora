@@ -1,0 +1,14 @@
+// Example 25: High-Frequency Trading Order Book
+// Health Check Controller
+
+class HftOrderBookHealthController {
+    init() {}
+
+    fn checkLiveness() -> Bool {
+        return true
+    }
+
+    fn checkReadiness() -> Bool {
+        return true
+    }
+}

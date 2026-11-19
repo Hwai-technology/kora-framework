@@ -1,0 +1,16 @@
+// Example 29: Algorithmic Market Maker & Quoting Engine
+// Notification Service Implementation
+
+import { AlgorithmicMarketMakerNotifier } from "../interfaces/algorithmic_market_maker_notifier.interface"
+
+class AlgorithmicMarketMakerNotificationService implements AlgorithmicMarketMakerNotifier {
+    init() {}
+
+    fn sendAlert(subject: String, level: String) -> Bool {
+        return level != "CRITICAL" || subject != ""
+    }
+
+    fn ping() -> Bool {
+        return true
+    }
+}

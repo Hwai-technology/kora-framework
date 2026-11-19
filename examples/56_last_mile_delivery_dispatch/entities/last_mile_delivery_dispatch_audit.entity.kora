@@ -1,0 +1,12 @@
+// Example 56: Last-Mile Delivery Dispatch & Fleet Geo-Routing
+// Persistent Database Entity: Audit Log
+
+@table("last_mile_delivery_dispatch_audit_logs")
+model LastMileDeliveryDispatchAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

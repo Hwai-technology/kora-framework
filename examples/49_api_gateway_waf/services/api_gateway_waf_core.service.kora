@@ -1,0 +1,39 @@
+// Example 49: API Gateway & Web Application Firewall
+// Core Domain Service Implementation
+
+import { ApiGatewayWafNodeState } from "../entities/api_gateway_waf_primary.entity"
+import { CreateApiGatewayWafTaskRequest } from "../models/api_gateway_waf_request.dto"
+import { ApiGatewayWafRepository } from "../interfaces/api_gateway_waf_repository.interface"
+import { ApiGatewayWafConsensusContract } from "../interfaces/api_gateway_waf_service.interface"
+
+class ApiGatewayWafCoreService implements ApiGatewayWafConsensusContract {
+    repo: ApiGatewayWafRepository
+
+    init(repo: ApiGatewayWafRepository) {
+        this.repo = repo
+    }
+
+    fn processConsensusCommand(req: CreateApiGatewayWafTaskRequest) -> Result<ApiGatewayWafNodeState, String> {
+        if req.originatingNodeId <= 0 {
+            return Err("Originating node ID must be strictly positive")
+        }
+        if req.payloadVolume <= 0 {
+            return Err("Payload volume must be positive")
+        }
+
+        let state = ApiGatewayWafNodeState {
+            id: req.originatingNodeId,
+            nodeIdentifier: "CLUSTER-NODE-" + req.originatingNodeId.toString(),
+            currentEpochTerm: 5,
+            votedForCandidate: req.originatingNodeId,
+            isLeader: true,
+            active: true,
+        }
+        return this.repo.saveNodeState(state)
+    }
+
+    fn evaluateClusterQuorum() -> Bool {
+        let quorum = this.repo.getActiveQuorumCount()
+        return quorum >= 3
+    }
+}

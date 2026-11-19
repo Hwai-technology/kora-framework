@@ -1,0 +1,12 @@
+// Example 103: Probabilistic Bloom & Cuckoo Filter Suite
+// Persistent Database Entity: Audit Log
+
+@table("bloom_cuckoo_filter_suite_audit_logs")
+model BloomCuckooFilterSuiteAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

@@ -1,0 +1,8 @@
+// Example 72: HNSW Vector Index & Approximate Nearest Neighbor — Enum: DistanceMetric
+
+enum DistanceMetric {
+    CosineSimilarity
+    EuclideanL2Distance
+    DotProductInnerProduct
+    ManhattanL1Distance
+}

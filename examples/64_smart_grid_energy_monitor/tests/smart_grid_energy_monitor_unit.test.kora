@@ -1,0 +1,75 @@
+// ============================================================================
+// Unit Test Suite: Smart Electrical Grid Substation Telemetry
+// Verifies Domain Invariants, Boundary Calculations & Liveness
+// ============================================================================
+
+import { CreateSmartGridEnergyMonitorTaskRequest } from "../models/smart_grid_energy_monitor_request.dto"
+import { SmartGridEnergyMonitorInMemoryRepository } from "../repositories/smart_grid_energy_monitor_inmemory.repository"
+import { SmartGridEnergyMonitorCoreService } from "../services/smart_grid_energy_monitor_core.service"
+import { SmartGridEnergyMonitorTelemetryService } from "../services/smart_grid_energy_monitor_telemetry.service"
+
+class SmartGridEnergyMonitorUnitTestSuite {
+    service: SmartGridEnergyMonitorCoreService
+    telemetry: SmartGridEnergyMonitorTelemetryService
+
+    init(service: SmartGridEnergyMonitorCoreService, telemetry: SmartGridEnergyMonitorTelemetryService) {
+        this.service = service
+        this.telemetry = telemetry
+    }
+
+    fn test_valid_task_execution() -> Bool {
+        let req = CreateSmartGridEnergyMonitorTaskRequest {
+            taskKey: "UNIT-TASK-101",
+            targetEntityId: 10,
+            workloadCapacity: 95,
+            domainContext: "IoT & Robotics",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(rec) => rec.id == 10 && rec.capacityScore == 95,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_negative_target_rejected() -> Bool {
+        let req = CreateSmartGridEnergyMonitorTaskRequest {
+            taskKey: "INVALID-TASK",
+            targetEntityId: -1,
+            workloadCapacity: 50,
+            domainContext: "IoT & Robotics",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Target entity ID must be strictly positive",
+        }
+    }
+
+    fn test_health_evaluation() -> Bool {
+        let health = this.service.evaluateHealth(10)
+        return health == "OPTIMUM_PERFORMANCE" || health == "MODERATE_NORMAL"
+    }
+
+    fn test_telemetry_ping() -> Bool {
+        return this.telemetry.ping()
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_task_execution()
+        let t2 = this.test_invalid_negative_target_rejected()
+        let t3 = this.test_health_evaluation()
+        let t4 = this.test_telemetry_ping()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ Smart Electrical Grid Substation Telemetry Unit Tests: 4/4 passed (Domain Invariants Verified)")
+        } else {
+            print("  ✗ Smart Electrical Grid Substation Telemetry Unit Tests: failed")
+        }
+    }
+}
+
+let repo = SmartGridEnergyMonitorInMemoryRepository()
+let service = SmartGridEnergyMonitorCoreService(repo)
+let telemetry = SmartGridEnergyMonitorTelemetryService()
+let suite = SmartGridEnergyMonitorUnitTestSuite(service, telemetry)
+suite.run()

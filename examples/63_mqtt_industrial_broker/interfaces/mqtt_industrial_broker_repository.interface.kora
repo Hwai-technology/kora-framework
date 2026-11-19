@@ -1,0 +1,10 @@
+// Example 63: MQTT Industrial Telemetry Broker & Topic Tree
+// Repository Interface
+
+import { MqttIndustrialBrokerPrimaryRecord } from "../entities/mqtt_industrial_broker_primary.entity"
+
+interface MqttIndustrialBrokerRepository {
+    fn findById(id: Int) -> Option<MqttIndustrialBrokerPrimaryRecord>
+    fn save(record: MqttIndustrialBrokerPrimaryRecord) -> Result<MqttIndustrialBrokerPrimaryRecord, String>
+    fn countActive() -> Int
+}

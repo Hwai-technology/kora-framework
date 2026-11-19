@@ -1,0 +1,7 @@
+// Example 61: Supplier Purchase Order & 3-Way Invoice Matcher — Domain Event: PurchaseOrderIssuedEvent
+
+model PurchaseOrderIssuedEvent {
+    poNumber: String
+    supplierId: Int
+    totalCommittedCents: Int
+}

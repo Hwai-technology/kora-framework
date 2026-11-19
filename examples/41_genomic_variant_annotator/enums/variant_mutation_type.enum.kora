@@ -1,0 +1,9 @@
+// Example 41: Genomic Variant Annotation & Pathogenicity — Enum: VariantMutationType
+// Dedicated Domain Enum Specification
+
+enum VariantMutationType {
+    SingleNucleotideVariantSNV
+    InsertionDeletionInDel
+    CopyNumberVariantCNV
+    ChromosomalTranslocation
+}

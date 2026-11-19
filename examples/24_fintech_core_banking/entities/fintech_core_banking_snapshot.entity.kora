@@ -1,0 +1,11 @@
+// Example 24: Core Banking Ledger & Accounts
+// State Snapshot Entity
+
+@table("fintech_core_banking_snapshots")
+model FintechCoreBankingSnapshot {
+    @id
+    id: Int
+    aggregateId: Int
+    version: Int
+    stateHash: String
+}

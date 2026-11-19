@@ -1,0 +1,10 @@
+// Example 64: Smart Electrical Grid Substation Telemetry
+// Domain Service Contract
+
+import { SmartGridEnergyMonitorPrimaryRecord } from "../entities/smart_grid_energy_monitor_primary.entity"
+import { CreateSmartGridEnergyMonitorTaskRequest } from "../models/smart_grid_energy_monitor_request.dto"
+
+interface SmartGridEnergyMonitorDomainContract {
+    fn executeTask(req: CreateSmartGridEnergyMonitorTaskRequest) -> Result<SmartGridEnergyMonitorPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

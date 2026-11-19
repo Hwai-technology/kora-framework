@@ -1,0 +1,10 @@
+// Example 29: algorithmic_market_maker — Domain Event: QuoteSpreadUpdatedEvent
+// Dedicated Domain Event Specification
+
+model QuoteSpreadUpdatedEvent {
+    symbol: String
+    bidPrice: Int
+    askPrice: Int
+    spreadBps: Int
+    timestamp: Int
+}

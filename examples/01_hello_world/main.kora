@@ -3,7 +3,9 @@
 // ============================================================================
 
 import { Coordinates } from "./models/coordinates.model"
+import { CustomerProfile } from "./models/customer_profile.model"
 import { OrderStatus } from "./enums/order_status.enum"
+import { CustomerTier } from "./enums/customer_tier.enum"
 import { OrderProcessor } from "./services/order_processor.service"
 
 class Application {
@@ -16,7 +18,19 @@ class Application {
     fn bootstrap() -> Unit {
         let developer = "Ahmet"
         let location = Coordinates { lat: 41.0082, lng: 28.9784 }
-        let finalAmount = this.processor.calculateTotal(1200, 18)
+        let customer = CustomerProfile {
+            id: 101,
+            fullName: "Enterprise Client",
+            email: "client@kora.dev",
+            tier: "Enterprise",
+            loyaltyPoints: 500,
+        }
+
+        let baseAmount = 1200
+        let discountPercent = this.processor.resolveTierDiscount(CustomerTier.Enterprise)
+        let discountedSubtotal = this.processor.calculateDiscountedSubtotal(baseAmount, discountPercent)
+        let finalAmount = this.processor.calculateTotal(discountedSubtotal, 18)
+
         let currentStatus = OrderStatus.Paid(finalAmount)
         let message = this.processor.describeOrder(currentStatus)
 
@@ -25,5 +39,6 @@ class Application {
     }
 }
 
-let app = Application(OrderProcessor())
+let processor = OrderProcessor()
+let app = Application(processor)
 app.bootstrap()

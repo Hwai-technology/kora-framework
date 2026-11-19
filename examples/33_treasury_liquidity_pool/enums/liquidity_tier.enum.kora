@@ -1,0 +1,9 @@
+// Example 33: treasury_liquidity_pool — Enum: LiquidityTier
+// Dedicated Domain Enum Specification
+
+enum LiquidityTier {
+    PrimaryCashBuffer
+    SecondaryShortTermYield
+    TertiaryCapitalPreservation
+    RegulatoryEmergencyReserve
+}

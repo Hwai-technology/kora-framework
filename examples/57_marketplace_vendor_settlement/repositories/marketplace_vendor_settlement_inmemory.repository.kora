@@ -1,0 +1,33 @@
+// Example 57: Marketplace Vendor Settlement & Escrow Payouts
+// Repository Implementation
+
+import { MarketplaceVendorSettlementPrimaryRecord } from "../entities/marketplace_vendor_settlement_primary.entity"
+import { MarketplaceVendorSettlementRepository } from "../interfaces/marketplace_vendor_settlement_repository.interface"
+
+class MarketplaceVendorSettlementInMemoryRepository implements MarketplaceVendorSettlementRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<MarketplaceVendorSettlementPrimaryRecord> {
+        if id > 0 {
+            return Some(MarketplaceVendorSettlementPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: MarketplaceVendorSettlementPrimaryRecord) -> Result<MarketplaceVendorSettlementPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

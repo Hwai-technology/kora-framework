@@ -1,0 +1,31 @@
+// ============================================================================
+// Realtime WebSocket Domain Events
+// ============================================================================
+
+model ClientConnectedEvent {
+    sessionId: String
+    userId: String
+    clientIp: String
+    timestamp: Int
+}
+
+model MessageBroadcastEvent {
+    channel: String
+    senderId: String
+    messageId: String
+    payload: String
+    recipientsCount: Int
+    timestamp: Int
+}
+
+model HeartbeatTimeoutEvent {
+    sessionId: String
+    elapsedSeconds: Int
+    timestamp: Int
+}
+
+model ClientDisconnectedEvent {
+    sessionId: String
+    reasonCode: Int
+    timestamp: Int
+}

@@ -1,0 +1,10 @@
+// Example 89: Immutable Cryptographic Audit Trail (SOC 2 / ISO 27001)
+// Domain Service Contract
+
+import { ComplianceAuditLedgerPrimaryRecord } from "../entities/compliance_audit_ledger_primary.entity"
+import { CreateComplianceAuditLedgerTaskRequest } from "../models/compliance_audit_ledger_request.dto"
+
+interface ComplianceAuditLedgerDomainContract {
+    fn executeTask(req: CreateComplianceAuditLedgerTaskRequest) -> Result<ComplianceAuditLedgerPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

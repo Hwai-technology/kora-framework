@@ -1,0 +1,7 @@
+// Example 53: Inventory Allocation Matrix & Multi-Warehouse Stock — Domain Event: ReplenishmentOrderedEvent
+
+model ReplenishmentOrderedEvent {
+    sku: String
+    orderQuantity: Int
+    supplierId: Int
+}

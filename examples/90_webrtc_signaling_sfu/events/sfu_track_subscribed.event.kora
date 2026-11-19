@@ -1,0 +1,7 @@
+// Example 90: WebRTC SFU Media Router & SDP Signaling — Domain Event: SfuTrackSubscribedEvent
+
+model SfuTrackSubscribedEvent {
+    subscriberPeerId: String
+    publisherPeerId: String
+    mediaKind: String
+}

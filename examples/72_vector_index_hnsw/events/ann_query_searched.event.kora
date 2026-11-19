@@ -1,0 +1,7 @@
+// Example 72: HNSW Vector Index & Approximate Nearest Neighbor — Domain Event: AnnQuerySearchedEvent
+
+model AnnQuerySearchedEvent {
+    topK: Int
+    searchDepthEf: Int
+    latencyMicros: Int
+}

@@ -1,0 +1,10 @@
+// Example 50: Distributed Blob Storage Metadata Engine
+// Repository Interface
+
+import { BlobStorageMetadataEngineNodeState } from "../entities/blob_storage_metadata_engine_primary.entity"
+
+interface BlobStorageMetadataEngineRepository {
+    fn findNodeById(nodeId: Int) -> Option<BlobStorageMetadataEngineNodeState>
+    fn saveNodeState(state: BlobStorageMetadataEngineNodeState) -> Result<BlobStorageMetadataEngineNodeState, String>
+    fn getActiveQuorumCount() -> Int
+}

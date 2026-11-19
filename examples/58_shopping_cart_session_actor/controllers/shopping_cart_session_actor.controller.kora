@@ -1,0 +1,38 @@
+// Example 58: Distributed Shopping Cart Session Actor
+// Presentation Controller
+
+import { CreateShoppingCartSessionActorTaskRequest } from "../models/shopping_cart_session_actor_request.dto"
+import { ShoppingCartSessionActorResponseDto } from "../models/shopping_cart_session_actor_response.dto"
+import { ShoppingCartSessionActorCoreService } from "../services/shopping_cart_session_actor_core.service"
+
+class ShoppingCartSessionActorController {
+    service: ShoppingCartSessionActorCoreService
+
+    init(service: ShoppingCartSessionActorCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateShoppingCartSessionActorTaskRequest) -> ShoppingCartSessionActorResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => ShoppingCartSessionActorResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => ShoppingCartSessionActorResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

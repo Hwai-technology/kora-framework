@@ -1,0 +1,10 @@
+// Example 39: Pharmacy Dispensing & Drug Interaction Checker — Enum: DispenseStatus
+// Dedicated Domain Enum Specification
+
+enum DispenseStatus {
+    OrderReceived
+    PharmacistReviewed
+    ReadyForDispense
+    DispensedToPatient
+    RejectedContraindicated
+}

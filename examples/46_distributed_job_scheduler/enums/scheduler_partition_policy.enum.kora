@@ -1,0 +1,8 @@
+// Example 46: Distributed Task Scheduler & Leader Lease — Enum: SchedulerPartitionPolicy
+// Dedicated Domain Enum Specification
+
+enum SchedulerPartitionPolicy {
+    HashAffinityPartition
+    WorkStealingBalanced
+    FailoverSurrogate
+}

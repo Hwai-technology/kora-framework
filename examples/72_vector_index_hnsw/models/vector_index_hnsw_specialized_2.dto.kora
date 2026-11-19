@@ -1,0 +1,9 @@
+// Example 72: HNSW Vector Index & Approximate Nearest Neighbor
+// Specialized Model 2
+
+model VectorIndexHnswSpecializedProfile2 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

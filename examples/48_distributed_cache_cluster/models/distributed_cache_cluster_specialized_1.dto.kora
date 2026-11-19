@@ -1,0 +1,9 @@
+// Example 48: Distributed Cache Cluster & Write-Behind
+// Specialized Model 1
+
+model DistributedCacheClusterSpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    quorumWeight: Int
+    isActive: Bool
+}

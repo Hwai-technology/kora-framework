@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 100: Spatial 2D R-Tree & k-Nearest Neighbors (k-NN)
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { SpatialRTreeIndexerInMemoryRepository } from "./repositories/spatial_r_tree_indexer_inmemory.repository"
+import { SpatialRTreeIndexerCoreService } from "./services/spatial_r_tree_indexer_core.service"
+import { SpatialRTreeIndexerController } from "./controllers/spatial_r_tree_indexer.controller"
+import { SpatialRTreeIndexerRouter } from "./routes/spatial_r_tree_indexer.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = SpatialRTreeIndexerInMemoryRepository()
+        let service = SpatialRTreeIndexerCoreService(repo)
+        let controller = SpatialRTreeIndexerController(service)
+        let router = SpatialRTreeIndexerRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

@@ -1,0 +1,12 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// Audit Trail Entity
+
+@table("treasury_liquidity_pool_audit_logs")
+model TreasuryLiquidityPoolAuditLog {
+    @id
+    id: Int
+    recordId: Int
+    action: String
+    performedBy: String
+    timestamp: Int
+}

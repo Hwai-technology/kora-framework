@@ -1,0 +1,17 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector
+// Transport Model: Standard Response
+
+model DistributedTracingCollectorResponseDto {
+    operationId: String
+    nodeId: Int
+    status: String
+    isQuorumSatisfied: Bool
+    message: String
+}
+
+model DistributedTracingCollectorTopologySummaryDto {
+    activeClusterNodes: Int
+    leaderTerm: Int
+    healthyReplicasCount: Int
+    clusterState: String
+}

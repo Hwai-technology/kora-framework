@@ -1,0 +1,9 @@
+// Example 35: FHIR R4 & HL7 Interoperability Hub — Domain Event: Hl7SegmentParsedEvent
+// Dedicated Domain Event Specification
+
+model Hl7SegmentParsedEvent {
+    messageControlId: String
+    mshSendingApp: String
+    segmentType: String
+    timestamp: Int
+}

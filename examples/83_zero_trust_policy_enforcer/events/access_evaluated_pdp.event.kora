@@ -1,0 +1,7 @@
+// Example 83: Zero-Trust Context-Aware Policy Decision Point (PDP) — Domain Event: AccessEvaluatedPdpEvent
+
+model AccessEvaluatedPdpEvent {
+    subjectId: String
+    resourceId: String
+    decision: String
+}

@@ -1,0 +1,8 @@
+// examples/03_crud_products_api — Enum: InventoryStatus
+
+enum InventoryStatus {
+    InStock
+    LowStockThreshold
+    BackorderOnly
+    Discontinued
+}

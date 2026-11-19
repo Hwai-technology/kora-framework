@@ -1,0 +1,10 @@
+// Example 29: Algorithmic Market Maker & Quoting Engine
+// Primary Repository Interface
+
+import { AlgorithmicMarketMakerRecord } from "../entities/algorithmic_market_maker_primary.entity"
+
+interface AlgorithmicMarketMakerRepository {
+    fn findById(id: Int) -> Option<AlgorithmicMarketMakerRecord>
+    fn save(record: AlgorithmicMarketMakerRecord) -> Result<AlgorithmicMarketMakerRecord, String>
+    fn countAll() -> Int
+}

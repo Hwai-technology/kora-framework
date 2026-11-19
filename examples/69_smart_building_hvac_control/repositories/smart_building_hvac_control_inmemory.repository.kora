@@ -1,0 +1,33 @@
+// Example 69: Smart Building HVAC & Air Quality Coordinator
+// Repository Implementation
+
+import { SmartBuildingHvacControlPrimaryRecord } from "../entities/smart_building_hvac_control_primary.entity"
+import { SmartBuildingHvacControlRepository } from "../interfaces/smart_building_hvac_control_repository.interface"
+
+class SmartBuildingHvacControlInMemoryRepository implements SmartBuildingHvacControlRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<SmartBuildingHvacControlPrimaryRecord> {
+        if id > 0 {
+            return Some(SmartBuildingHvacControlPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: SmartBuildingHvacControlPrimaryRecord) -> Result<SmartBuildingHvacControlPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

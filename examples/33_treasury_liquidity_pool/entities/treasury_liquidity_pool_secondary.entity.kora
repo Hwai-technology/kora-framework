@@ -1,0 +1,11 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// Secondary Audit Log Entity
+
+@table("treasury_liquidity_pool_items")
+model TreasuryLiquidityPoolItem {
+    @id
+    id: Int
+    parentId: Int
+    itemCode: String
+    amount: Int
+}

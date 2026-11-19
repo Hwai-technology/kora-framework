@@ -1,0 +1,9 @@
+// Example 78: High-Throughput Vector Embedding Ingestion Pipeline
+// Specialized Model 6
+
+model EmbeddingIngestionWorkerSpecializedProfile6 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

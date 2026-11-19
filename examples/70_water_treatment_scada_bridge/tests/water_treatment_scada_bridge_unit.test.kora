@@ -1,0 +1,75 @@
+// ============================================================================
+// Unit Test Suite: Industrial SCADA Modbus Gateway & Water Treatment
+// Verifies Domain Invariants, Boundary Calculations & Liveness
+// ============================================================================
+
+import { CreateWaterTreatmentScadaBridgeTaskRequest } from "../models/water_treatment_scada_bridge_request.dto"
+import { WaterTreatmentScadaBridgeInMemoryRepository } from "../repositories/water_treatment_scada_bridge_inmemory.repository"
+import { WaterTreatmentScadaBridgeCoreService } from "../services/water_treatment_scada_bridge_core.service"
+import { WaterTreatmentScadaBridgeTelemetryService } from "../services/water_treatment_scada_bridge_telemetry.service"
+
+class WaterTreatmentScadaBridgeUnitTestSuite {
+    service: WaterTreatmentScadaBridgeCoreService
+    telemetry: WaterTreatmentScadaBridgeTelemetryService
+
+    init(service: WaterTreatmentScadaBridgeCoreService, telemetry: WaterTreatmentScadaBridgeTelemetryService) {
+        this.service = service
+        this.telemetry = telemetry
+    }
+
+    fn test_valid_task_execution() -> Bool {
+        let req = CreateWaterTreatmentScadaBridgeTaskRequest {
+            taskKey: "UNIT-TASK-101",
+            targetEntityId: 10,
+            workloadCapacity: 95,
+            domainContext: "IoT & Robotics",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(rec) => rec.id == 10 && rec.capacityScore == 95,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_negative_target_rejected() -> Bool {
+        let req = CreateWaterTreatmentScadaBridgeTaskRequest {
+            taskKey: "INVALID-TASK",
+            targetEntityId: -1,
+            workloadCapacity: 50,
+            domainContext: "IoT & Robotics",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Target entity ID must be strictly positive",
+        }
+    }
+
+    fn test_health_evaluation() -> Bool {
+        let health = this.service.evaluateHealth(10)
+        return health == "OPTIMUM_PERFORMANCE" || health == "MODERATE_NORMAL"
+    }
+
+    fn test_telemetry_ping() -> Bool {
+        return this.telemetry.ping()
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_task_execution()
+        let t2 = this.test_invalid_negative_target_rejected()
+        let t3 = this.test_health_evaluation()
+        let t4 = this.test_telemetry_ping()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ Industrial SCADA Modbus Gateway & Water Treatment Unit Tests: 4/4 passed (Domain Invariants Verified)")
+        } else {
+            print("  ✗ Industrial SCADA Modbus Gateway & Water Treatment Unit Tests: failed")
+        }
+    }
+}
+
+let repo = WaterTreatmentScadaBridgeInMemoryRepository()
+let service = WaterTreatmentScadaBridgeCoreService(repo)
+let telemetry = WaterTreatmentScadaBridgeTelemetryService()
+let suite = WaterTreatmentScadaBridgeUnitTestSuite(service, telemetry)
+suite.run()

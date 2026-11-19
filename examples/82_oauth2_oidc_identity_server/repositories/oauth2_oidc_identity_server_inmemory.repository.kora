@@ -1,0 +1,33 @@
+// Example 82: OAuth 2.1 & OpenID Connect Authorization Server
+// Repository Implementation
+
+import { Oauth2OidcIdentityServerPrimaryRecord } from "../entities/oauth2_oidc_identity_server_primary.entity"
+import { Oauth2OidcIdentityServerRepository } from "../interfaces/oauth2_oidc_identity_server_repository.interface"
+
+class Oauth2OidcIdentityServerInMemoryRepository implements Oauth2OidcIdentityServerRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<Oauth2OidcIdentityServerPrimaryRecord> {
+        if id > 0 {
+            return Some(Oauth2OidcIdentityServerPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: Oauth2OidcIdentityServerPrimaryRecord) -> Result<Oauth2OidcIdentityServerPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

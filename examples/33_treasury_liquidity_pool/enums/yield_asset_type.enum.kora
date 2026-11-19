@@ -1,0 +1,9 @@
+// Example 33: treasury_liquidity_pool — Enum: YieldAssetType
+// Dedicated Domain Enum Specification
+
+enum YieldAssetType {
+    OvernightReverseRepo
+    TreasuryBills30Day
+    HighGradeCommercialPaper
+    CentralBankDeposit
+}

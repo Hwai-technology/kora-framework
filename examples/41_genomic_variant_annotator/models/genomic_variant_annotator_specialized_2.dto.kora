@@ -1,0 +1,9 @@
+// Example 41: Genomic Variant Annotation & Pathogenicity
+// Specialized Model 2
+
+model GenomicVariantAnnotatorSpecializedProfile2 {
+    profileId: String
+    classificationCode: String
+    riskWeight: Int
+    isActive: Bool
+}

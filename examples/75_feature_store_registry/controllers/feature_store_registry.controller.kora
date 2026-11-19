@@ -1,0 +1,38 @@
+// Example 75: Real-Time Machine Learning Feature Store
+// Presentation Controller
+
+import { CreateFeatureStoreRegistryTaskRequest } from "../models/feature_store_registry_request.dto"
+import { FeatureStoreRegistryResponseDto } from "../models/feature_store_registry_response.dto"
+import { FeatureStoreRegistryCoreService } from "../services/feature_store_registry_core.service"
+
+class FeatureStoreRegistryController {
+    service: FeatureStoreRegistryCoreService
+
+    init(service: FeatureStoreRegistryCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateFeatureStoreRegistryTaskRequest) -> FeatureStoreRegistryResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => FeatureStoreRegistryResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => FeatureStoreRegistryResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

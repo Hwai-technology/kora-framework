@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 54: Dynamic Pricing Engine & Flash Sale Rate-Limiter
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { DynamicPricingPromotionsInMemoryRepository } from "./repositories/dynamic_pricing_promotions_inmemory.repository"
+import { DynamicPricingPromotionsCoreService } from "./services/dynamic_pricing_promotions_core.service"
+import { DynamicPricingPromotionsController } from "./controllers/dynamic_pricing_promotions.controller"
+import { DynamicPricingPromotionsRouter } from "./routes/dynamic_pricing_promotions.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = DynamicPricingPromotionsInMemoryRepository()
+        let service = DynamicPricingPromotionsCoreService(repo)
+        let controller = DynamicPricingPromotionsController(service)
+        let router = DynamicPricingPromotionsRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

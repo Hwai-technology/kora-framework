@@ -1,0 +1,7 @@
+// examples/08_openapi_swagger — Enum: ValidationMode
+
+enum ValidationMode {
+    StrictRejectUnknown
+    LenientCoerce
+    AuditWarningOnly
+}

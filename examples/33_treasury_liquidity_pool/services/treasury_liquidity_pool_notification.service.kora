@@ -1,0 +1,16 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// Notification Service Implementation
+
+import { TreasuryLiquidityPoolNotifier } from "../interfaces/treasury_liquidity_pool_notifier.interface"
+
+class TreasuryLiquidityPoolNotificationService implements TreasuryLiquidityPoolNotifier {
+    init() {}
+
+    fn sendAlert(subject: String, level: String) -> Bool {
+        return level != "CRITICAL" || subject != ""
+    }
+
+    fn ping() -> Bool {
+        return true
+    }
+}

@@ -1,0 +1,7 @@
+// Example 55: Order Fulfillment & Pick-Pack-Ship Workflow — Domain Event: ShippingLabelGeneratedEvent
+
+model ShippingLabelGeneratedEvent {
+    orderId: Int
+    trackingNumber: String
+    carrierRateCents: Int
+}

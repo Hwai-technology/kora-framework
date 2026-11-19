@@ -1,0 +1,8 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector — Domain Event: AdaptiveSamplingAdjustedEvent
+// Dedicated Domain Event Specification
+
+model AdaptiveSamplingAdjustedEvent {
+    serviceName: String
+    currentSamplingRatePercent: Int
+    targetThroughputPerSec: Int
+}

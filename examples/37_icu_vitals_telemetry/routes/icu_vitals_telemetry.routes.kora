@@ -1,0 +1,22 @@
+// Example 37: ICU Real-Time High-Frequency Vitals Monitor
+// Router & Endpoint Dispatcher
+
+import { CreateIcuVitalsTelemetryRecordRequest } from "../models/icu_vitals_telemetry_request.dto"
+import { IcuVitalsTelemetryResponseDto } from "../models/icu_vitals_telemetry_response.dto"
+import { IcuVitalsTelemetryController } from "../controllers/icu_vitals_telemetry.controller"
+
+class IcuVitalsTelemetryRouter {
+    controller: IcuVitalsTelemetryController
+
+    init(controller: IcuVitalsTelemetryController) {
+        this.controller = controller
+    }
+
+    fn postRecord(req: CreateIcuVitalsTelemetryRecordRequest) -> IcuVitalsTelemetryResponseDto {
+        return this.controller.handleRecordSubmission(req)
+    }
+
+    fn getRiskScore(patientId: Int) -> String {
+        return this.controller.checkPatientRisk(patientId)
+    }
+}

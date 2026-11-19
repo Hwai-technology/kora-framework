@@ -1,0 +1,10 @@
+// Example 99: B+ Tree Disk Pager & Index Node Balancer
+// Repository Interface
+
+import { BPlusTreeIndexerPrimaryRecord } from "../entities/b_plus_tree_indexer_primary.entity"
+
+interface BPlusTreeIndexerRepository {
+    fn findById(id: Int) -> Option<BPlusTreeIndexerPrimaryRecord>
+    fn save(record: BPlusTreeIndexerPrimaryRecord) -> Result<BPlusTreeIndexerPrimaryRecord, String>
+    fn countActive() -> Int
+}

@@ -1,0 +1,13 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director
+// Persistent Database Entity: Replicated Log
+
+@table("service_mesh_proxy_replicated_logs")
+model ServiceMeshProxyReplicatedLogEntry {
+    @id
+    id: Int
+    logIndex: Int
+    termNumber: Int
+    commandPayload: String
+    committedQuorum: Bool
+    timestamp: Int
+}

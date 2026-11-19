@@ -1,0 +1,6 @@
+// Example 78: High-Throughput Vector Embedding Ingestion Pipeline — Domain Event: ApiQuotaWarningEvent
+
+model ApiQuotaWarningEvent {
+    provider: String
+    remainingRequestsInWindow: Int
+}

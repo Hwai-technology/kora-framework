@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 46: Distributed Task Scheduler & Leader Lease
+// Application Container & Cluster Bootstrap
+// ============================================================================
+
+import { DistributedJobSchedulerClusterRepository } from "./repositories/distributed_job_scheduler_cluster.repository"
+import { DistributedJobSchedulerCoreService } from "./services/distributed_job_scheduler_core.service"
+import { DistributedJobSchedulerController } from "./controllers/distributed_job_scheduler.controller"
+import { DistributedJobSchedulerRouter } from "./routes/distributed_job_scheduler.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = DistributedJobSchedulerClusterRepository()
+        let service = DistributedJobSchedulerCoreService(repo)
+        let controller = DistributedJobSchedulerController(service)
+        let router = DistributedJobSchedulerRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

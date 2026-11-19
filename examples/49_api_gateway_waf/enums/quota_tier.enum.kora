@@ -1,0 +1,8 @@
+// Example 49: API Gateway & Web Application Firewall — Enum: QuotaTier
+// Dedicated Domain Enum Specification
+
+enum QuotaTier {
+    AnonymousFreeTier
+    DeveloperStandard
+    EnterpriseUnlimited
+}

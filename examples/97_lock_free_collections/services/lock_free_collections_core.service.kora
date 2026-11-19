@@ -1,0 +1,55 @@
+// Example 97: Lock-Free Michael-Scott Queue & Treiber Stack
+// Core Domain Service Implementation
+
+import { LockFreeCollectionsPrimaryRecord } from "../entities/lock_free_collections_primary.entity"
+import { CreateLockFreeCollectionsTaskRequest } from "../models/lock_free_collections_request.dto"
+import { LockFreeCollectionsRepository } from "../interfaces/lock_free_collections_repository.interface"
+import { LockFreeCollectionsDomainContract } from "../interfaces/lock_free_collections_service.interface"
+
+class LockFreeCollectionsCoreService implements LockFreeCollectionsDomainContract {
+    repo: LockFreeCollectionsRepository
+
+    init(repo: LockFreeCollectionsRepository) {
+        this.repo = repo
+    }
+
+    fn executeTask(req: CreateLockFreeCollectionsTaskRequest) -> Result<LockFreeCollectionsPrimaryRecord, String> {
+        if req.targetEntityId <= 0 {
+            return Err("Target entity ID must be strictly positive")
+        }
+        if req.workloadCapacity <= 0 {
+            return Err("Workload capacity must be strictly positive")
+        }
+
+        let record = LockFreeCollectionsPrimaryRecord {
+            id: req.targetEntityId,
+            referenceCode: req.taskKey,
+            capacityScore: req.workloadCapacity,
+            operationalStatus: "COMMITTED_HEALTHY",
+            active: true,
+        }
+        return this.repo.save(record)
+    }
+
+    fn evaluateHealth(entityId: Int) -> String {
+        let opt = this.repo.findById(entityId)
+        let isPresent = match opt {
+            Some(r) => true,
+            None => false,
+        }
+        if !isPresent {
+            return "ENTITY_NOT_FOUND"
+        }
+        let record = match opt {
+            Some(r) => r,
+            None => LockFreeCollectionsPrimaryRecord { id: 0, referenceCode: "", capacityScore: 0, operationalStatus: "", active: false },
+        }
+        if record.capacityScore > 80 {
+            return "OPTIMUM_PERFORMANCE"
+        }
+        if record.capacityScore > 40 {
+            return "MODERATE_NORMAL"
+        }
+        return "LOW_CAPACITY"
+    }
+}

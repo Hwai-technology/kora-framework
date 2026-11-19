@@ -1,0 +1,21 @@
+// Example 30: Credit Underwriting & Risk Assessment
+// Query Controller (Reads & Lookups)
+
+import { CreditScoringUnderwritingRecord } from "../entities/credit_scoring_underwriting_primary.entity"
+import { CreditScoringUnderwritingRepository } from "../interfaces/credit_scoring_underwriting_repository.interface"
+
+class CreditScoringUnderwritingQueryController {
+    repo: CreditScoringUnderwritingRepository
+
+    init(repo: CreditScoringUnderwritingRepository) {
+        this.repo = repo
+    }
+
+    fn getById(id: Int) -> Option<CreditScoringUnderwritingRecord> {
+        return this.repo.findById(id)
+    }
+
+    fn getTotalVolume() -> Int {
+        return this.repo.countAll()
+    }
+}

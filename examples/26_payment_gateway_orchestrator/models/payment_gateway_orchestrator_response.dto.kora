@@ -1,0 +1,16 @@
+// Example 26: Payment Gateway & Webhook Orchestrator
+// Transport Model: Standard Responses
+
+model PaymentGatewayOrchestratorResponse {
+    id: Int
+    reference: String
+    success: Bool
+    statusCode: Int
+    message: String
+}
+
+model PaymentGatewayOrchestratorSummaryDto {
+    totalCount: Int
+    activeVolume: Int
+    healthStatus: String
+}

@@ -1,0 +1,10 @@
+// Example 70: Industrial SCADA Modbus Gateway & Water Treatment
+// Repository Interface
+
+import { WaterTreatmentScadaBridgePrimaryRecord } from "../entities/water_treatment_scada_bridge_primary.entity"
+
+interface WaterTreatmentScadaBridgeRepository {
+    fn findById(id: Int) -> Option<WaterTreatmentScadaBridgePrimaryRecord>
+    fn save(record: WaterTreatmentScadaBridgePrimaryRecord) -> Result<WaterTreatmentScadaBridgePrimaryRecord, String>
+    fn countActive() -> Int
+}

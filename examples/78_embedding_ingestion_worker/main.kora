@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 78: High-Throughput Vector Embedding Ingestion Pipeline
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { EmbeddingIngestionWorkerInMemoryRepository } from "./repositories/embedding_ingestion_worker_inmemory.repository"
+import { EmbeddingIngestionWorkerCoreService } from "./services/embedding_ingestion_worker_core.service"
+import { EmbeddingIngestionWorkerController } from "./controllers/embedding_ingestion_worker.controller"
+import { EmbeddingIngestionWorkerRouter } from "./routes/embedding_ingestion_worker.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = EmbeddingIngestionWorkerInMemoryRepository()
+        let service = EmbeddingIngestionWorkerCoreService(repo)
+        let controller = EmbeddingIngestionWorkerController(service)
+        let router = EmbeddingIngestionWorkerRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

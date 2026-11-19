@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 49: API Gateway & Web Application Firewall
+// Application Container & Cluster Bootstrap
+// ============================================================================
+
+import { ApiGatewayWafClusterRepository } from "./repositories/api_gateway_waf_cluster.repository"
+import { ApiGatewayWafCoreService } from "./services/api_gateway_waf_core.service"
+import { ApiGatewayWafController } from "./controllers/api_gateway_waf.controller"
+import { ApiGatewayWafRouter } from "./routes/api_gateway_waf.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = ApiGatewayWafClusterRepository()
+        let service = ApiGatewayWafCoreService(repo)
+        let controller = ApiGatewayWafController(service)
+        let router = ApiGatewayWafRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

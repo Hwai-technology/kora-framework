@@ -1,0 +1,16 @@
+// Example 26: Payment Gateway & Webhook Orchestrator
+// Notification Service Implementation
+
+import { PaymentGatewayOrchestratorNotifier } from "../interfaces/payment_gateway_orchestrator_notifier.interface"
+
+class PaymentGatewayOrchestratorNotificationService implements PaymentGatewayOrchestratorNotifier {
+    init() {}
+
+    fn sendAlert(subject: String, level: String) -> Bool {
+        return level != "CRITICAL" || subject != ""
+    }
+
+    fn ping() -> Bool {
+        return true
+    }
+}

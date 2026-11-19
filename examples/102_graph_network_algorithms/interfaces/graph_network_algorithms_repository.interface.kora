@@ -1,0 +1,10 @@
+// Example 102: Graph Algorithms & Tarjan SCC / PageRank
+// Repository Interface
+
+import { GraphNetworkAlgorithmsPrimaryRecord } from "../entities/graph_network_algorithms_primary.entity"
+
+interface GraphNetworkAlgorithmsRepository {
+    fn findById(id: Int) -> Option<GraphNetworkAlgorithmsPrimaryRecord>
+    fn save(record: GraphNetworkAlgorithmsPrimaryRecord) -> Result<GraphNetworkAlgorithmsPrimaryRecord, String>
+    fn countActive() -> Int
+}

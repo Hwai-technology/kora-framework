@@ -1,0 +1,10 @@
+// Example 37: ICU Real-Time High-Frequency Vitals Monitor
+// Domain Service Contract
+
+import { IcuVitalsTelemetryClinicalEntity } from "../entities/icu_vitals_telemetry_primary.entity"
+import { CreateIcuVitalsTelemetryRecordRequest } from "../models/icu_vitals_telemetry_request.dto"
+
+interface IcuVitalsTelemetryDomainContract {
+    fn processClinicalRecord(req: CreateIcuVitalsTelemetryRecordRequest) -> Result<IcuVitalsTelemetryClinicalEntity, String>
+    fn evaluateClinicalRisk(patientId: Int) -> String
+}

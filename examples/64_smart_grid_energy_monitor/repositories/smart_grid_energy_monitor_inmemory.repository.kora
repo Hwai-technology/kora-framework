@@ -1,0 +1,33 @@
+// Example 64: Smart Electrical Grid Substation Telemetry
+// Repository Implementation
+
+import { SmartGridEnergyMonitorPrimaryRecord } from "../entities/smart_grid_energy_monitor_primary.entity"
+import { SmartGridEnergyMonitorRepository } from "../interfaces/smart_grid_energy_monitor_repository.interface"
+
+class SmartGridEnergyMonitorInMemoryRepository implements SmartGridEnergyMonitorRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<SmartGridEnergyMonitorPrimaryRecord> {
+        if id > 0 {
+            return Some(SmartGridEnergyMonitorPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: SmartGridEnergyMonitorPrimaryRecord) -> Result<SmartGridEnergyMonitorPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

@@ -1,0 +1,38 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director
+// Presentation Controller
+
+import { CreateServiceMeshProxyTaskRequest } from "../models/service_mesh_proxy_request.dto"
+import { ServiceMeshProxyResponseDto } from "../models/service_mesh_proxy_response.dto"
+import { ServiceMeshProxyCoreService } from "../services/service_mesh_proxy_core.service"
+
+class ServiceMeshProxyController {
+    service: ServiceMeshProxyCoreService
+
+    init(service: ServiceMeshProxyCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskProposal(req: CreateServiceMeshProxyTaskRequest) -> ServiceMeshProxyResponseDto {
+        let outcome = this.service.processConsensusCommand(req)
+        return match outcome {
+            Ok(state) => ServiceMeshProxyResponseDto {
+                operationId: "CONSENSUS-TX-" + req.taskKey,
+                nodeId: state.id,
+                status: "QUORUM_COMMITTED",
+                isQuorumSatisfied: true,
+                message: "Log entry replicated and committed across cluster quorum",
+            },
+            Err(reason) => ServiceMeshProxyResponseDto {
+                operationId: "CONSENSUS-FAILED",
+                nodeId: req.originatingNodeId,
+                status: "QUORUM_REJECTED",
+                isQuorumSatisfied: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkQuorumStatus() -> Bool {
+        return this.service.evaluateClusterQuorum()
+    }
+}

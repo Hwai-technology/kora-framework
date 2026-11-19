@@ -1,0 +1,22 @@
+// Example 96: Video on Demand (VOD) HLS/DASH Transmuxer
+// Router & Endpoint Dispatcher
+
+import { CreateVideoOnDemandTransmuxerTaskRequest } from "../models/video_on_demand_transmuxer_request.dto"
+import { VideoOnDemandTransmuxerResponseDto } from "../models/video_on_demand_transmuxer_response.dto"
+import { VideoOnDemandTransmuxerController } from "../controllers/video_on_demand_transmuxer.controller"
+
+class VideoOnDemandTransmuxerRouter {
+    controller: VideoOnDemandTransmuxerController
+
+    init(controller: VideoOnDemandTransmuxerController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateVideoOnDemandTransmuxerTaskRequest) -> VideoOnDemandTransmuxerResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

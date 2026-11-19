@@ -1,0 +1,22 @@
+// Example 91: CRDT Collaborative Real-Time Document Editor
+// Router & Endpoint Dispatcher
+
+import { CreateCollaborativeCrdtDocTaskRequest } from "../models/collaborative_crdt_doc_request.dto"
+import { CollaborativeCrdtDocResponseDto } from "../models/collaborative_crdt_doc_response.dto"
+import { CollaborativeCrdtDocController } from "../controllers/collaborative_crdt_doc.controller"
+
+class CollaborativeCrdtDocRouter {
+    controller: CollaborativeCrdtDocController
+
+    init(controller: CollaborativeCrdtDocController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateCollaborativeCrdtDocTaskRequest) -> CollaborativeCrdtDocResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

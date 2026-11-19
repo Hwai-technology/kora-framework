@@ -1,0 +1,15 @@
+// Example 73: Autonomous LLM Agent Orchestrator & Tool Calling
+// Transport Model: Command Request
+
+model CreateLlmAgentOrchestratorTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryLlmAgentOrchestratorFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

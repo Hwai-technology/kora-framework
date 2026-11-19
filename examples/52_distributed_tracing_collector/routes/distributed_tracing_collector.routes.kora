@@ -1,0 +1,22 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector
+// Router & Endpoint Dispatcher
+
+import { CreateDistributedTracingCollectorTaskRequest } from "../models/distributed_tracing_collector_request.dto"
+import { DistributedTracingCollectorResponseDto } from "../models/distributed_tracing_collector_response.dto"
+import { DistributedTracingCollectorController } from "../controllers/distributed_tracing_collector.controller"
+
+class DistributedTracingCollectorRouter {
+    controller: DistributedTracingCollectorController
+
+    init(controller: DistributedTracingCollectorController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateDistributedTracingCollectorTaskRequest) -> DistributedTracingCollectorResponseDto {
+        return this.controller.handleTaskProposal(req)
+    }
+
+    fn getQuorum() -> Bool {
+        return this.controller.checkQuorumStatus()
+    }
+}

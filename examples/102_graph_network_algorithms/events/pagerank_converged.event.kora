@@ -1,0 +1,6 @@
+// Example 102: Graph Algorithms & Tarjan SCC / PageRank — Domain Event: PagerankConvergedEvent
+
+model PagerankConvergedEvent {
+    iterationRounds: Int
+    eigenvalueDeltaBps: Int
+}

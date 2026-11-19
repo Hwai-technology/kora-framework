@@ -1,0 +1,15 @@
+// Example 67: Autonomous Rover Navigation & Obstacle Avoidance
+// Transport Model: Command Request
+
+model CreateAutonomousRoverCommandTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryAutonomousRoverCommandFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

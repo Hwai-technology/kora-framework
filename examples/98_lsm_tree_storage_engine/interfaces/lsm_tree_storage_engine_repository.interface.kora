@@ -1,0 +1,10 @@
+// Example 98: Log-Structured Merge-Tree (LSM-Tree) Engine
+// Repository Interface
+
+import { LsmTreeStorageEnginePrimaryRecord } from "../entities/lsm_tree_storage_engine_primary.entity"
+
+interface LsmTreeStorageEngineRepository {
+    fn findById(id: Int) -> Option<LsmTreeStorageEnginePrimaryRecord>
+    fn save(record: LsmTreeStorageEnginePrimaryRecord) -> Result<LsmTreeStorageEnginePrimaryRecord, String>
+    fn countActive() -> Int
+}

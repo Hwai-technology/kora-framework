@@ -1,0 +1,7 @@
+// examples/07_async_actors_concurrency — Event: ActorSpawnedEvent
+
+model ActorSpawnedEvent {
+    actorId: String
+    supervisorId: String
+    timestamp: Int
+}

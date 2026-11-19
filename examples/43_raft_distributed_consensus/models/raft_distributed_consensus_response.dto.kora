@@ -1,0 +1,17 @@
+// Example 43: Raft Distributed Consensus Engine
+// Transport Model: Standard Response
+
+model RaftDistributedConsensusResponseDto {
+    operationId: String
+    nodeId: Int
+    status: String
+    isQuorumSatisfied: Bool
+    message: String
+}
+
+model RaftDistributedConsensusTopologySummaryDto {
+    activeClusterNodes: Int
+    leaderTerm: Int
+    healthyReplicasCount: Int
+    clusterState: String
+}

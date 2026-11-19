@@ -1,0 +1,38 @@
+// Example 101: Pratt Parsing & Bytecode Virtual Machine
+// Presentation Controller
+
+import { CreateAstParserCompilerToyTaskRequest } from "../models/ast_parser_compiler_toy_request.dto"
+import { AstParserCompilerToyResponseDto } from "../models/ast_parser_compiler_toy_response.dto"
+import { AstParserCompilerToyCoreService } from "../services/ast_parser_compiler_toy_core.service"
+
+class AstParserCompilerToyController {
+    service: AstParserCompilerToyCoreService
+
+    init(service: AstParserCompilerToyCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateAstParserCompilerToyTaskRequest) -> AstParserCompilerToyResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => AstParserCompilerToyResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => AstParserCompilerToyResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

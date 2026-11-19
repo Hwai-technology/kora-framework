@@ -1,0 +1,50 @@
+// ============================================================================
+// Fraud Evaluation Repository Layer
+// ============================================================================
+
+import { FraudDetectionEngineRecord } from "../entities/fraud_detection_engine_primary.entity"
+import { FraudDetectionEngineRepository } from "../interfaces/fraud_detection_engine_repository.interface"
+
+class FraudDetectionEnginePrimaryRepository implements FraudDetectionEngineRepository {
+    records: Vector<FraudDetectionEngineRecord>
+    cardVelocity: Vector<String>
+
+    init() {
+        this.records = Vector<FraudDetectionEngineRecord>()
+        this.cardVelocity = Vector<String>()
+    }
+
+    fn findById(id: Int) -> Option<FraudDetectionEngineRecord> {
+        var i = 0
+        while i < this.records.length() {
+            let r = this.records[i]
+            if r.id == id && r.active {
+                return Some(r)
+            }
+            i = i + 1
+        }
+        return None
+    }
+
+    fn recordVelocity(cardToken: String) -> Int {
+        this.cardVelocity.push(cardToken)
+        var count = 0
+        var i = 0
+        while i < this.cardVelocity.length() {
+            if this.cardVelocity[i] == cardToken {
+                count = count + 1
+            }
+            i = i + 1
+        }
+        return count
+    }
+
+    fn save(record: FraudDetectionEngineRecord) -> Result<FraudDetectionEngineRecord, String> {
+        this.records.push(record)
+        return Ok(record)
+    }
+
+    fn countAll() -> Int {
+        return this.records.length()
+    }
+}

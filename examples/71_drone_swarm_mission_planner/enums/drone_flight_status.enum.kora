@@ -1,0 +1,7 @@
+// Example 71: Autonomous Drone Swarm Formation Coordinator — Enum: DroneFlightStatus
+
+enum DroneFlightStatus {
+    AirborneActiveFormation
+    BatteryRelayReturning
+    GroundedStandbyDeck
+}

@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 57: Marketplace Vendor Settlement & Escrow Payouts
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { MarketplaceVendorSettlementInMemoryRepository } from "./repositories/marketplace_vendor_settlement_inmemory.repository"
+import { MarketplaceVendorSettlementCoreService } from "./services/marketplace_vendor_settlement_core.service"
+import { MarketplaceVendorSettlementController } from "./controllers/marketplace_vendor_settlement.controller"
+import { MarketplaceVendorSettlementRouter } from "./routes/marketplace_vendor_settlement.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = MarketplaceVendorSettlementInMemoryRepository()
+        let service = MarketplaceVendorSettlementCoreService(repo)
+        let controller = MarketplaceVendorSettlementController(service)
+        let router = MarketplaceVendorSettlementRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

@@ -1,0 +1,10 @@
+// Example 99: B+ Tree Disk Pager & Index Node Balancer
+// Domain Service Contract
+
+import { BPlusTreeIndexerPrimaryRecord } from "../entities/b_plus_tree_indexer_primary.entity"
+import { CreateBPlusTreeIndexerTaskRequest } from "../models/b_plus_tree_indexer_request.dto"
+
+interface BPlusTreeIndexerDomainContract {
+    fn executeTask(req: CreateBPlusTreeIndexerTaskRequest) -> Result<BPlusTreeIndexerPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

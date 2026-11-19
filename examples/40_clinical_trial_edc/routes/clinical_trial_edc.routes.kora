@@ -1,0 +1,22 @@
+// Example 40: Clinical Trial Electronic Data Capture (EDC)
+// Router & Endpoint Dispatcher
+
+import { CreateClinicalTrialEdcRecordRequest } from "../models/clinical_trial_edc_request.dto"
+import { ClinicalTrialEdcResponseDto } from "../models/clinical_trial_edc_response.dto"
+import { ClinicalTrialEdcController } from "../controllers/clinical_trial_edc.controller"
+
+class ClinicalTrialEdcRouter {
+    controller: ClinicalTrialEdcController
+
+    init(controller: ClinicalTrialEdcController) {
+        this.controller = controller
+    }
+
+    fn postRecord(req: CreateClinicalTrialEdcRecordRequest) -> ClinicalTrialEdcResponseDto {
+        return this.controller.handleRecordSubmission(req)
+    }
+
+    fn getRiskScore(patientId: Int) -> String {
+        return this.controller.checkPatientRisk(patientId)
+    }
+}

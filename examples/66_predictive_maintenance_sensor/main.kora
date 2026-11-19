@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 66: Predictive Industrial Equipment Maintenance
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { PredictiveMaintenanceSensorInMemoryRepository } from "./repositories/predictive_maintenance_sensor_inmemory.repository"
+import { PredictiveMaintenanceSensorCoreService } from "./services/predictive_maintenance_sensor_core.service"
+import { PredictiveMaintenanceSensorController } from "./controllers/predictive_maintenance_sensor.controller"
+import { PredictiveMaintenanceSensorRouter } from "./routes/predictive_maintenance_sensor.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = PredictiveMaintenanceSensorInMemoryRepository()
+        let service = PredictiveMaintenanceSensorCoreService(repo)
+        let controller = PredictiveMaintenanceSensorController(service)
+        let router = PredictiveMaintenanceSensorRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

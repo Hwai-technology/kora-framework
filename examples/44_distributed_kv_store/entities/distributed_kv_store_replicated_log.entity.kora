@@ -1,0 +1,13 @@
+// Example 44: Distributed Dynamo-Style Key-Value Store
+// Persistent Database Entity: Replicated Log
+
+@table("distributed_kv_store_replicated_logs")
+model DistributedKvStoreReplicatedLogEntry {
+    @id
+    id: Int
+    logIndex: Int
+    termNumber: Int
+    commandPayload: String
+    committedQuorum: Bool
+    timestamp: Int
+}

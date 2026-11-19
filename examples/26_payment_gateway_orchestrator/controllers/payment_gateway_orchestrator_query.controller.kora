@@ -1,0 +1,21 @@
+// Example 26: Payment Gateway & Webhook Orchestrator
+// Query Controller (Reads & Lookups)
+
+import { PaymentGatewayOrchestratorRecord } from "../entities/payment_gateway_orchestrator_primary.entity"
+import { PaymentGatewayOrchestratorRepository } from "../interfaces/payment_gateway_orchestrator_repository.interface"
+
+class PaymentGatewayOrchestratorQueryController {
+    repo: PaymentGatewayOrchestratorRepository
+
+    init(repo: PaymentGatewayOrchestratorRepository) {
+        this.repo = repo
+    }
+
+    fn getById(id: Int) -> Option<PaymentGatewayOrchestratorRecord> {
+        return this.repo.findById(id)
+    }
+
+    fn getTotalVolume() -> Int {
+        return this.repo.countAll()
+    }
+}

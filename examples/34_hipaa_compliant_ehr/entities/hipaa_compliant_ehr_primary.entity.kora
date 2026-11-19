@@ -1,0 +1,14 @@
+// Example 34: HIPAA Compliant Electronic Health Records
+// Persistent Database Entity: Primary Record
+
+@table("hipaa_compliant_ehr_clinical_records")
+model HipaaCompliantEhrClinicalEntity {
+    @id
+    id: Int
+    @unique
+    patientId: Int
+    clinicianId: Int
+    clinicalMetricScore: Int
+    complianceState: String
+    active: Bool
+}

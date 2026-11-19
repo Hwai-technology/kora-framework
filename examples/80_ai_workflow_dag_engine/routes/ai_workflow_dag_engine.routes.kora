@@ -1,0 +1,22 @@
+// Example 80: AI Workflow Directed Acyclic Graph (DAG) Engine
+// Router & Endpoint Dispatcher
+
+import { CreateAiWorkflowDagEngineTaskRequest } from "../models/ai_workflow_dag_engine_request.dto"
+import { AiWorkflowDagEngineResponseDto } from "../models/ai_workflow_dag_engine_response.dto"
+import { AiWorkflowDagEngineController } from "../controllers/ai_workflow_dag_engine.controller"
+
+class AiWorkflowDagEngineRouter {
+    controller: AiWorkflowDagEngineController
+
+    init(controller: AiWorkflowDagEngineController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateAiWorkflowDagEngineTaskRequest) -> AiWorkflowDagEngineResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

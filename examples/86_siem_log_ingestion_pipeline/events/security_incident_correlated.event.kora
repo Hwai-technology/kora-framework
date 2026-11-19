@@ -1,0 +1,7 @@
+// Example 86: SIEM High-Throughput Log Ingestion & CEF Normalizer — Domain Event: SecurityIncidentCorrelatedEvent
+
+model SecurityIncidentCorrelatedEvent {
+    correlationRuleName: String
+    aggregateEventCount: Int
+    priorityLevel: String
+}

@@ -1,0 +1,10 @@
+// Example 26: payment_gateway_orchestrator — Domain Event: PaymentAuthorizedEvent
+// Dedicated Domain Event Specification
+
+model PaymentAuthorizedEvent {
+    transactionId: String
+    amount: Int
+    currency: String
+    authCode: String
+    timestamp: Int
+}

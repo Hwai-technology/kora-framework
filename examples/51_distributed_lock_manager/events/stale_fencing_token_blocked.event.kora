@@ -1,0 +1,8 @@
+// Example 51: Distributed Lock Manager & Fencing Tokens — Domain Event: StaleFencingTokenBlockedEvent
+// Dedicated Domain Event Specification
+
+model StaleFencingTokenBlockedEvent {
+    resourceKey: String
+    staleToken: Int
+    highestSeenToken: Int
+}

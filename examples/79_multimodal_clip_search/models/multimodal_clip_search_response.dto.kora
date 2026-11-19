@@ -1,0 +1,16 @@
+// Example 79: Multimodal CLIP Cross-Search Engine
+// Transport Model: Standard Response
+
+model MultimodalClipSearchResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model MultimodalClipSearchSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

@@ -1,0 +1,38 @@
+// Example 84: Threat Intelligence STIX/TAXII Indicator Parser
+// Presentation Controller
+
+import { CreateThreatIntelFeedAggregatorTaskRequest } from "../models/threat_intel_feed_aggregator_request.dto"
+import { ThreatIntelFeedAggregatorResponseDto } from "../models/threat_intel_feed_aggregator_response.dto"
+import { ThreatIntelFeedAggregatorCoreService } from "../services/threat_intel_feed_aggregator_core.service"
+
+class ThreatIntelFeedAggregatorController {
+    service: ThreatIntelFeedAggregatorCoreService
+
+    init(service: ThreatIntelFeedAggregatorCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateThreatIntelFeedAggregatorTaskRequest) -> ThreatIntelFeedAggregatorResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => ThreatIntelFeedAggregatorResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => ThreatIntelFeedAggregatorResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

@@ -1,0 +1,7 @@
+// Example 95: Multiplayer Game 60Hz Tick State Synchronizer — Domain Event: GameTickCompletedEvent
+
+model GameTickCompletedEvent {
+    tickSequenceNumber: Int
+    activeEntitiesCount: Int
+    tickDurationMicros: Int
+}

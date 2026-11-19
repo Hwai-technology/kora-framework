@@ -1,0 +1,10 @@
+// Example 68: Cold Chain Vaccine Temperature Monitoring
+// Repository Interface
+
+import { ColdChainEnvironmentalGuardPrimaryRecord } from "../entities/cold_chain_environmental_guard_primary.entity"
+
+interface ColdChainEnvironmentalGuardRepository {
+    fn findById(id: Int) -> Option<ColdChainEnvironmentalGuardPrimaryRecord>
+    fn save(record: ColdChainEnvironmentalGuardPrimaryRecord) -> Result<ColdChainEnvironmentalGuardPrimaryRecord, String>
+    fn countActive() -> Int
+}

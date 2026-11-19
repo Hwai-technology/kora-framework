@@ -1,0 +1,16 @@
+// Example 101: Pratt Parsing & Bytecode Virtual Machine
+// Transport Model: Standard Response
+
+model AstParserCompilerToyResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model AstParserCompilerToySummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

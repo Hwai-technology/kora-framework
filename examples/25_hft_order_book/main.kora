@@ -1,0 +1,23 @@
+// ============================================================================
+// Example 25: HFT Order Book — Main Entrypoint
+// Production Bootstrap with High-Frequency Continuous Matching Engine
+// ============================================================================
+
+import { HftOrderBookCoreService } from "./services/hft_order_book_core.service"
+import { HftOrderBookCommandController } from "./controllers/hft_order_book_command.controller"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let matchingEngine = HftOrderBookCoreService()
+        let commandCtrl = HftOrderBookCommandController(matchingEngine)
+
+        let app = run()
+        app.use(commandCtrl)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

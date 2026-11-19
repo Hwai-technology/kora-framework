@@ -1,0 +1,8 @@
+// Example 38: Radiology PACS DICOM Metadata Indexer — Enum: StudyPriority
+// Dedicated Domain Enum Specification
+
+enum StudyPriority {
+    RoutineElective
+    UrgentInpatient
+    StatTraumaCritical
+}

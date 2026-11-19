@@ -1,0 +1,10 @@
+// Example 54: Dynamic Pricing Engine & Flash Sale Rate-Limiter
+// Repository Interface
+
+import { DynamicPricingPromotionsPrimaryRecord } from "../entities/dynamic_pricing_promotions_primary.entity"
+
+interface DynamicPricingPromotionsRepository {
+    fn findById(id: Int) -> Option<DynamicPricingPromotionsPrimaryRecord>
+    fn save(record: DynamicPricingPromotionsPrimaryRecord) -> Result<DynamicPricingPromotionsPrimaryRecord, String>
+    fn countActive() -> Int
+}

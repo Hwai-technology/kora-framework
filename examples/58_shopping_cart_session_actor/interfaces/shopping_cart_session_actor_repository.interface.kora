@@ -1,0 +1,10 @@
+// Example 58: Distributed Shopping Cart Session Actor
+// Repository Interface
+
+import { ShoppingCartSessionActorPrimaryRecord } from "../entities/shopping_cart_session_actor_primary.entity"
+
+interface ShoppingCartSessionActorRepository {
+    fn findById(id: Int) -> Option<ShoppingCartSessionActorPrimaryRecord>
+    fn save(record: ShoppingCartSessionActorPrimaryRecord) -> Result<ShoppingCartSessionActorPrimaryRecord, String>
+    fn countActive() -> Int
+}

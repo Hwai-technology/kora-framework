@@ -1,0 +1,22 @@
+// Example 68: Cold Chain Vaccine Temperature Monitoring
+// Router & Endpoint Dispatcher
+
+import { CreateColdChainEnvironmentalGuardTaskRequest } from "../models/cold_chain_environmental_guard_request.dto"
+import { ColdChainEnvironmentalGuardResponseDto } from "../models/cold_chain_environmental_guard_response.dto"
+import { ColdChainEnvironmentalGuardController } from "../controllers/cold_chain_environmental_guard.controller"
+
+class ColdChainEnvironmentalGuardRouter {
+    controller: ColdChainEnvironmentalGuardController
+
+    init(controller: ColdChainEnvironmentalGuardController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateColdChainEnvironmentalGuardTaskRequest) -> ColdChainEnvironmentalGuardResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

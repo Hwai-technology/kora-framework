@@ -1,0 +1,7 @@
+// Example 28: Crypto Derivatives & Margin Engine
+// Notifier Interface
+
+interface CryptoDerivativesExchangeNotifier {
+    fn sendAlert(subject: String, level: String) -> Bool
+    fn ping() -> Bool
+}

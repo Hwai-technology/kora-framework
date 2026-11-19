@@ -1,0 +1,10 @@
+// Example 95: Multiplayer Game 60Hz Tick State Synchronizer
+// Repository Interface
+
+import { GamingStateSynchronizerPrimaryRecord } from "../entities/gaming_state_synchronizer_primary.entity"
+
+interface GamingStateSynchronizerRepository {
+    fn findById(id: Int) -> Option<GamingStateSynchronizerPrimaryRecord>
+    fn save(record: GamingStateSynchronizerPrimaryRecord) -> Result<GamingStateSynchronizerPrimaryRecord, String>
+    fn countActive() -> Int
+}

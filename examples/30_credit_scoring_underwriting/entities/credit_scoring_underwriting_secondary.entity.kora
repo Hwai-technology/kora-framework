@@ -1,0 +1,11 @@
+// Example 30: Credit Underwriting & Risk Assessment
+// Secondary Audit Log Entity
+
+@table("credit_scoring_underwriting_items")
+model CreditScoringUnderwritingItem {
+    @id
+    id: Int
+    parentId: Int
+    itemCode: String
+    amount: Int
+}

@@ -1,0 +1,9 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director
+// Specialized Model 4
+
+model ServiceMeshProxySpecializedProfile4 {
+    profileId: String
+    classificationCode: String
+    quorumWeight: Int
+    isActive: Bool
+}

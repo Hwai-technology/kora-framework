@@ -1,0 +1,78 @@
+// ============================================================================
+// Unit Test Suite: reconciliation_settlement
+// ============================================================================
+
+import { CreateReconciliationSettlementRequest } from "../models/reconciliation_settlement_request.dto"
+import { ReconciliationSettlementPrimaryRepository } from "../repositories/reconciliation_settlement_primary.repository"
+import { ReconciliationSettlementCoreService } from "../services/reconciliation_settlement_core.service"
+import { ReconciliationSettlementValidationService } from "../services/reconciliation_settlement_validation.service"
+
+class ReconciliationSettlementUnitTestSuite {
+    service: ReconciliationSettlementCoreService
+    validator: ReconciliationSettlementValidationService
+
+    init(service: ReconciliationSettlementCoreService, validator: ReconciliationSettlementValidationService) {
+        this.service = service
+        this.validator = validator
+    }
+
+    fn test_valid_processing() -> Bool {
+        let req = CreateReconciliationSettlementRequest {
+            reference: "TEST-REF-100",
+            targetId: 10,
+            volume: 500,
+            currency: "USD",
+        }
+        let res = this.service.processRequest(req)
+        return match res {
+            Ok(rec) => rec.status == "COMMITTED" && rec.balance == 500,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_volume() -> Bool {
+        let req = CreateReconciliationSettlementRequest {
+            reference: "TEST-REF-FAIL",
+            targetId: 11,
+            volume: -10,
+            currency: "USD",
+        }
+        let res = this.service.processRequest(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Volume must be positive",
+        }
+    }
+
+    fn test_validator() -> Bool {
+        let req = CreateReconciliationSettlementRequest {
+            reference: "VALID-REF",
+            targetId: 12,
+            volume: 100,
+            currency: "USD",
+        }
+        let res = this.validator.validateInput(req)
+        return match res {
+            Ok(v) => v,
+            Err(e) => false,
+        }
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_processing()
+        let t2 = this.test_invalid_volume()
+        let t3 = this.test_validator()
+
+        if t1 && t2 && t3 {
+            print("  ✓ Inter-Bank Reconciliation & Settlement Unit Tests: 3/3 passed")
+        } else {
+            print("  ✗ Inter-Bank Reconciliation & Settlement Unit Tests: failed")
+        }
+    }
+}
+
+let repo = ReconciliationSettlementPrimaryRepository()
+let service = ReconciliationSettlementCoreService(repo)
+let validator = ReconciliationSettlementValidationService()
+let suite = ReconciliationSettlementUnitTestSuite(service, validator)
+suite.run()

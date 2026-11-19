@@ -1,0 +1,16 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// Transport Model: Standard Responses
+
+model TreasuryLiquidityPoolResponse {
+    id: Int
+    reference: String
+    success: Bool
+    statusCode: Int
+    message: String
+}
+
+model TreasuryLiquidityPoolSummaryDto {
+    totalCount: Int
+    activeVolume: Int
+    healthStatus: String
+}

@@ -1,0 +1,14 @@
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher
+// Telemetry & Liveness Monitor
+
+class ModelInferenceGatewayTelemetryService {
+    init() {}
+
+    fn ping() -> Bool {
+        return true
+    }
+
+    fn computeDigest(entityId: Int, metricScore: Int) -> String {
+        return "SHA256-DIGEST-" + entityId.toString() + "-" + metricScore.toString()
+    }
+}

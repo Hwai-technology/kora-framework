@@ -1,0 +1,6 @@
+// Example 63: MQTT Industrial Telemetry Broker & Topic Tree — Domain Event: ClientKeepaliveTimeoutEvent
+
+model ClientKeepaliveTimeoutEvent {
+    clientId: String
+    configuredTimeoutSeconds: Int
+}

@@ -1,0 +1,7 @@
+// Example 77: Prompt Engineering Evaluation & Hallucination Scorer — Enum: EvalVerdict
+
+enum EvalVerdict {
+    PassQualityBar
+    MarginalWarningReview
+    FailRegressionDetected
+}

@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 67: Autonomous Rover Navigation & Obstacle Avoidance
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { AutonomousRoverCommandInMemoryRepository } from "./repositories/autonomous_rover_command_inmemory.repository"
+import { AutonomousRoverCommandCoreService } from "./services/autonomous_rover_command_core.service"
+import { AutonomousRoverCommandController } from "./controllers/autonomous_rover_command.controller"
+import { AutonomousRoverCommandRouter } from "./routes/autonomous_rover_command.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = AutonomousRoverCommandInMemoryRepository()
+        let service = AutonomousRoverCommandCoreService(repo)
+        let controller = AutonomousRoverCommandController(service)
+        let router = AutonomousRoverCommandRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

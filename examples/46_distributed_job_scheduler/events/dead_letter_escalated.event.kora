@@ -1,0 +1,8 @@
+// Example 46: Distributed Task Scheduler & Leader Lease — Domain Event: DeadLetterEscalatedEvent
+// Dedicated Domain Event Specification
+
+model DeadLetterEscalatedEvent {
+    jobId: String
+    maxAttemptsExhausted: Int
+    rootCause: String
+}

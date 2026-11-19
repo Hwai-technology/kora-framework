@@ -1,0 +1,10 @@
+// Example 58: Distributed Shopping Cart Session Actor
+// Domain Service Contract
+
+import { ShoppingCartSessionActorPrimaryRecord } from "../entities/shopping_cart_session_actor_primary.entity"
+import { CreateShoppingCartSessionActorTaskRequest } from "../models/shopping_cart_session_actor_request.dto"
+
+interface ShoppingCartSessionActorDomainContract {
+    fn executeTask(req: CreateShoppingCartSessionActorTaskRequest) -> Result<ShoppingCartSessionActorPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

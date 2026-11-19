@@ -1,0 +1,38 @@
+// Example 87: FIDO2 / WebAuthn Passkey Registration & Attestation
+// Presentation Controller
+
+import { CreateHardwareSecurityTokenFido2TaskRequest } from "../models/hardware_security_token_fido2_request.dto"
+import { HardwareSecurityTokenFido2ResponseDto } from "../models/hardware_security_token_fido2_response.dto"
+import { HardwareSecurityTokenFido2CoreService } from "../services/hardware_security_token_fido2_core.service"
+
+class HardwareSecurityTokenFido2Controller {
+    service: HardwareSecurityTokenFido2CoreService
+
+    init(service: HardwareSecurityTokenFido2CoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateHardwareSecurityTokenFido2TaskRequest) -> HardwareSecurityTokenFido2ResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => HardwareSecurityTokenFido2ResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => HardwareSecurityTokenFido2ResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

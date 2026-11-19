@@ -1,0 +1,22 @@
+// Example 79: Multimodal CLIP Cross-Search Engine
+// Router & Endpoint Dispatcher
+
+import { CreateMultimodalClipSearchTaskRequest } from "../models/multimodal_clip_search_request.dto"
+import { MultimodalClipSearchResponseDto } from "../models/multimodal_clip_search_response.dto"
+import { MultimodalClipSearchController } from "../controllers/multimodal_clip_search.controller"
+
+class MultimodalClipSearchRouter {
+    controller: MultimodalClipSearchController
+
+    init(controller: MultimodalClipSearchController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateMultimodalClipSearchTaskRequest) -> MultimodalClipSearchResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

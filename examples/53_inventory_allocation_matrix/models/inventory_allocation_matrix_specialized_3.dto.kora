@@ -1,0 +1,9 @@
+// Example 53: Inventory Allocation Matrix & Multi-Warehouse Stock
+// Specialized Model 3
+
+model InventoryAllocationMatrixSpecializedProfile3 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

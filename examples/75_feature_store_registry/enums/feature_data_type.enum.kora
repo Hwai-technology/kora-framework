@@ -1,0 +1,8 @@
+// Example 75: Real-Time Machine Learning Feature Store — Enum: FeatureDataType
+
+enum FeatureDataType {
+    FloatScalarVector
+    CategoricalStringIndex
+    SparseEmbeddingBucket
+    TimestampInt64
+}

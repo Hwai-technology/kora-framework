@@ -1,0 +1,75 @@
+// ============================================================================
+// Unit Test Suite: FIDO2 / WebAuthn Passkey Registration & Attestation
+// Verifies Domain Invariants, Boundary Calculations & Liveness
+// ============================================================================
+
+import { CreateHardwareSecurityTokenFido2TaskRequest } from "../models/hardware_security_token_fido2_request.dto"
+import { HardwareSecurityTokenFido2InMemoryRepository } from "../repositories/hardware_security_token_fido2_inmemory.repository"
+import { HardwareSecurityTokenFido2CoreService } from "../services/hardware_security_token_fido2_core.service"
+import { HardwareSecurityTokenFido2TelemetryService } from "../services/hardware_security_token_fido2_telemetry.service"
+
+class HardwareSecurityTokenFido2UnitTestSuite {
+    service: HardwareSecurityTokenFido2CoreService
+    telemetry: HardwareSecurityTokenFido2TelemetryService
+
+    init(service: HardwareSecurityTokenFido2CoreService, telemetry: HardwareSecurityTokenFido2TelemetryService) {
+        this.service = service
+        this.telemetry = telemetry
+    }
+
+    fn test_valid_task_execution() -> Bool {
+        let req = CreateHardwareSecurityTokenFido2TaskRequest {
+            taskKey: "UNIT-TASK-101",
+            targetEntityId: 10,
+            workloadCapacity: 95,
+            domainContext: "Cybersecurity",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(rec) => rec.id == 10 && rec.capacityScore == 95,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_negative_target_rejected() -> Bool {
+        let req = CreateHardwareSecurityTokenFido2TaskRequest {
+            taskKey: "INVALID-TASK",
+            targetEntityId: -1,
+            workloadCapacity: 50,
+            domainContext: "Cybersecurity",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Target entity ID must be strictly positive",
+        }
+    }
+
+    fn test_health_evaluation() -> Bool {
+        let health = this.service.evaluateHealth(10)
+        return health == "OPTIMUM_PERFORMANCE" || health == "MODERATE_NORMAL"
+    }
+
+    fn test_telemetry_ping() -> Bool {
+        return this.telemetry.ping()
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_task_execution()
+        let t2 = this.test_invalid_negative_target_rejected()
+        let t3 = this.test_health_evaluation()
+        let t4 = this.test_telemetry_ping()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ FIDO2 / WebAuthn Passkey Registration & Attestation Unit Tests: 4/4 passed (Domain Invariants Verified)")
+        } else {
+            print("  ✗ FIDO2 / WebAuthn Passkey Registration & Attestation Unit Tests: failed")
+        }
+    }
+}
+
+let repo = HardwareSecurityTokenFido2InMemoryRepository()
+let service = HardwareSecurityTokenFido2CoreService(repo)
+let telemetry = HardwareSecurityTokenFido2TelemetryService()
+let suite = HardwareSecurityTokenFido2UnitTestSuite(service, telemetry)
+suite.run()

@@ -1,0 +1,12 @@
+// Example 65: Fleet Telematics & Polygonal Geofence Monitor
+// Persistent Database Entity: Audit Log
+
+@table("fleet_telematics_geofencing_audit_logs")
+model FleetTelematicsGeofencingAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

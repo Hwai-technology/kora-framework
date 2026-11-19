@@ -1,0 +1,34 @@
+// Example 49: API Gateway & Web Application Firewall
+// Cluster Repository Implementation
+
+import { ApiGatewayWafNodeState } from "../entities/api_gateway_waf_primary.entity"
+import { ApiGatewayWafRepository } from "../interfaces/api_gateway_waf_repository.interface"
+
+class ApiGatewayWafClusterRepository implements ApiGatewayWafRepository {
+    init() {}
+
+    fn findNodeById(nodeId: Int) -> Option<ApiGatewayWafNodeState> {
+        if nodeId > 0 {
+            return Some(ApiGatewayWafNodeState {
+                id: nodeId,
+                nodeIdentifier: "CLUSTER-NODE-" + nodeId.toString(),
+                currentEpochTerm: 4,
+                votedForCandidate: 1,
+                isLeader: nodeId == 1,
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn saveNodeState(state: ApiGatewayWafNodeState) -> Result<ApiGatewayWafNodeState, String> {
+        if state.id <= 0 {
+            return Err("Invalid cluster node identifier")
+        }
+        return Ok(state)
+    }
+
+    fn getActiveQuorumCount() -> Int {
+        return 3
+    }
+}

@@ -1,0 +1,15 @@
+// Example 103: Probabilistic Bloom & Cuckoo Filter Suite
+// Transport Model: Command Request
+
+model CreateBloomCuckooFilterSuiteTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryBloomCuckooFilterSuiteFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

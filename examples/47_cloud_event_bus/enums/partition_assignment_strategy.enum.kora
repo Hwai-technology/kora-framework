@@ -1,0 +1,8 @@
+// Example 47: Cloud Event Bus & Partitioned Streaming — Enum: PartitionAssignmentStrategy
+// Dedicated Domain Enum Specification
+
+enum PartitionAssignmentStrategy {
+    RangeAssignor
+    RoundRobinSticky
+    CooperativeStickyRebalance
+}

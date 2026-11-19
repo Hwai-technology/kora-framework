@@ -1,0 +1,14 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director
+// Cluster Heartbeat & Liveness Service
+
+class ServiceMeshProxyHeartbeatService {
+    init() {}
+
+    fn pingPeer(peerId: Int) -> Bool {
+        return peerId > 0
+    }
+
+    fn calculateElectionTimeout(baseMs: Int, jitterMs: Int) -> Int {
+        return baseMs + jitterMs
+    }
+}

@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 69: Smart Building HVAC & Air Quality Coordinator
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { SmartBuildingHvacControlInMemoryRepository } from "./repositories/smart_building_hvac_control_inmemory.repository"
+import { SmartBuildingHvacControlCoreService } from "./services/smart_building_hvac_control_core.service"
+import { SmartBuildingHvacControlController } from "./controllers/smart_building_hvac_control.controller"
+import { SmartBuildingHvacControlRouter } from "./routes/smart_building_hvac_control.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = SmartBuildingHvacControlInMemoryRepository()
+        let service = SmartBuildingHvacControlCoreService(repo)
+        let controller = SmartBuildingHvacControlController(service)
+        let router = SmartBuildingHvacControlRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

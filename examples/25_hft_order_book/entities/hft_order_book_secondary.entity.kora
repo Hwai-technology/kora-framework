@@ -1,0 +1,15 @@
+// ============================================================================
+// Example 25: HFT Order Book — Entity: ExecutedTrade
+// Immutable Trade Tape
+// ============================================================================
+
+@table("executed_trades")
+model ExecutedTrade {
+    @id
+    tradeId: Int
+    buyOrderId: Int
+    sellOrderId: Int
+    price: Int
+    quantity: Int
+    timestamp: Int
+}

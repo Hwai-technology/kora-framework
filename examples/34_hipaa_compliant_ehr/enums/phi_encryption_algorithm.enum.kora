@@ -1,0 +1,8 @@
+// Example 34: HIPAA Compliant Electronic Health Records — Enum: PhiEncryptionAlgorithm
+// Dedicated Domain Enum Specification
+
+enum PhiEncryptionAlgorithm {
+    Aes256GcmEnvelope
+    ChaCha20Poly1305
+    Rsa4096OaepKeyWrap
+}

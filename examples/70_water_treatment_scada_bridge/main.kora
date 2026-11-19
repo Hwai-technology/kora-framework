@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 70: Industrial SCADA Modbus Gateway & Water Treatment
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { WaterTreatmentScadaBridgeInMemoryRepository } from "./repositories/water_treatment_scada_bridge_inmemory.repository"
+import { WaterTreatmentScadaBridgeCoreService } from "./services/water_treatment_scada_bridge_core.service"
+import { WaterTreatmentScadaBridgeController } from "./controllers/water_treatment_scada_bridge.controller"
+import { WaterTreatmentScadaBridgeRouter } from "./routes/water_treatment_scada_bridge.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = WaterTreatmentScadaBridgeInMemoryRepository()
+        let service = WaterTreatmentScadaBridgeCoreService(repo)
+        let controller = WaterTreatmentScadaBridgeController(service)
+        let router = WaterTreatmentScadaBridgeRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

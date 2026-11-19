@@ -1,0 +1,7 @@
+// Example 69: Smart Building HVAC & Air Quality Coordinator — Domain Event: ZoneTemperatureAdjustedEvent
+
+model ZoneTemperatureAdjustedEvent {
+    zoneId: String
+    targetTempMilliC: Int
+    actuatorDutyPercent: Int
+}

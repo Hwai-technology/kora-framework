@@ -1,0 +1,38 @@
+// Example 50: Distributed Blob Storage Metadata Engine
+// Presentation Controller
+
+import { CreateBlobStorageMetadataEngineTaskRequest } from "../models/blob_storage_metadata_engine_request.dto"
+import { BlobStorageMetadataEngineResponseDto } from "../models/blob_storage_metadata_engine_response.dto"
+import { BlobStorageMetadataEngineCoreService } from "../services/blob_storage_metadata_engine_core.service"
+
+class BlobStorageMetadataEngineController {
+    service: BlobStorageMetadataEngineCoreService
+
+    init(service: BlobStorageMetadataEngineCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskProposal(req: CreateBlobStorageMetadataEngineTaskRequest) -> BlobStorageMetadataEngineResponseDto {
+        let outcome = this.service.processConsensusCommand(req)
+        return match outcome {
+            Ok(state) => BlobStorageMetadataEngineResponseDto {
+                operationId: "CONSENSUS-TX-" + req.taskKey,
+                nodeId: state.id,
+                status: "QUORUM_COMMITTED",
+                isQuorumSatisfied: true,
+                message: "Log entry replicated and committed across cluster quorum",
+            },
+            Err(reason) => BlobStorageMetadataEngineResponseDto {
+                operationId: "CONSENSUS-FAILED",
+                nodeId: req.originatingNodeId,
+                status: "QUORUM_REJECTED",
+                isQuorumSatisfied: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkQuorumStatus() -> Bool {
+        return this.service.evaluateClusterQuorum()
+    }
+}

@@ -1,0 +1,9 @@
+// Example 34: HIPAA Compliant Electronic Health Records — Enum: ConsentStatus
+// Dedicated Domain Enum Specification
+
+enum ConsentStatus {
+    ExplicitConsentGranted
+    ProxyConsentLegalGuardian
+    ConsentRevoked
+    EmergencyImpliedConsent
+}

@@ -1,0 +1,22 @@
+// Example 61: Supplier Purchase Order & 3-Way Invoice Matcher
+// Router & Endpoint Dispatcher
+
+import { CreateSupplierPurchaseOrderFlowTaskRequest } from "../models/supplier_purchase_order_flow_request.dto"
+import { SupplierPurchaseOrderFlowResponseDto } from "../models/supplier_purchase_order_flow_response.dto"
+import { SupplierPurchaseOrderFlowController } from "../controllers/supplier_purchase_order_flow.controller"
+
+class SupplierPurchaseOrderFlowRouter {
+    controller: SupplierPurchaseOrderFlowController
+
+    init(controller: SupplierPurchaseOrderFlowController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateSupplierPurchaseOrderFlowTaskRequest) -> SupplierPurchaseOrderFlowResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

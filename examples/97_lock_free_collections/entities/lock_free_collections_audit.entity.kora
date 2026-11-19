@@ -1,0 +1,12 @@
+// Example 97: Lock-Free Michael-Scott Queue & Treiber Stack
+// Persistent Database Entity: Audit Log
+
+@table("lock_free_collections_audit_logs")
+model LockFreeCollectionsAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

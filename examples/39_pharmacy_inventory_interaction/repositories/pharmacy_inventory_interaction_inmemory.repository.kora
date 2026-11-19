@@ -1,0 +1,34 @@
+// Example 39: Pharmacy Dispensing & Drug Interaction Checker
+// Repository Implementation
+
+import { PharmacyInventoryInteractionClinicalEntity } from "../entities/pharmacy_inventory_interaction_primary.entity"
+import { PharmacyInventoryInteractionRepository } from "../interfaces/pharmacy_inventory_interaction_repository.interface"
+
+class PharmacyInventoryInteractionInMemoryRepository implements PharmacyInventoryInteractionRepository {
+    init() {}
+
+    fn findByPatientId(patientId: Int) -> Option<PharmacyInventoryInteractionClinicalEntity> {
+        if patientId > 0 {
+            return Some(PharmacyInventoryInteractionClinicalEntity {
+                id: patientId + 1000,
+                patientId: patientId,
+                clinicianId: 42,
+                clinicalMetricScore: 85,
+                complianceState: "HIPAA_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(entity: PharmacyInventoryInteractionClinicalEntity) -> Result<PharmacyInventoryInteractionClinicalEntity, String> {
+        if entity.patientId <= 0 {
+            return Err("Invalid patient identifier")
+        }
+        return Ok(entity)
+    }
+
+    fn verifyIntegrity(recordId: Int) -> Bool {
+        return recordId > 0
+    }
+}

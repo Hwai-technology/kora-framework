@@ -1,0 +1,16 @@
+// Example 73: Autonomous LLM Agent Orchestrator & Tool Calling
+// Transport Model: Standard Response
+
+model LlmAgentOrchestratorResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model LlmAgentOrchestratorSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

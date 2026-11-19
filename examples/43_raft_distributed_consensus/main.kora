@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 43: Raft Distributed Consensus Engine
+// Application Container & Cluster Bootstrap
+// ============================================================================
+
+import { RaftDistributedConsensusClusterRepository } from "./repositories/raft_distributed_consensus_cluster.repository"
+import { RaftDistributedConsensusCoreService } from "./services/raft_distributed_consensus_core.service"
+import { RaftDistributedConsensusController } from "./controllers/raft_distributed_consensus.controller"
+import { RaftDistributedConsensusRouter } from "./routes/raft_distributed_consensus.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = RaftDistributedConsensusClusterRepository()
+        let service = RaftDistributedConsensusCoreService(repo)
+        let controller = RaftDistributedConsensusController(service)
+        let router = RaftDistributedConsensusRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

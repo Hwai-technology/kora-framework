@@ -1,0 +1,10 @@
+// Example 48: Distributed Cache Cluster & Write-Behind
+// Repository Interface
+
+import { DistributedCacheClusterNodeState } from "../entities/distributed_cache_cluster_primary.entity"
+
+interface DistributedCacheClusterRepository {
+    fn findNodeById(nodeId: Int) -> Option<DistributedCacheClusterNodeState>
+    fn saveNodeState(state: DistributedCacheClusterNodeState) -> Result<DistributedCacheClusterNodeState, String>
+    fn getActiveQuorumCount() -> Int
+}

@@ -1,0 +1,16 @@
+// Example 67: Autonomous Rover Navigation & Obstacle Avoidance
+// Transport Model: Standard Response
+
+model AutonomousRoverCommandResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model AutonomousRoverCommandSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

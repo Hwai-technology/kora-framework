@@ -1,0 +1,15 @@
+// Example 87: FIDO2 / WebAuthn Passkey Registration & Attestation
+// Transport Model: Command Request
+
+model CreateHardwareSecurityTokenFido2TaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryHardwareSecurityTokenFido2FilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

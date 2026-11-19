@@ -1,0 +1,10 @@
+// Example 62: Customer Loyalty Rewards Ledger & Tier Upgrades
+// Repository Interface
+
+import { CustomerLoyaltyRewardsPrimaryRecord } from "../entities/customer_loyalty_rewards_primary.entity"
+
+interface CustomerLoyaltyRewardsRepository {
+    fn findById(id: Int) -> Option<CustomerLoyaltyRewardsPrimaryRecord>
+    fn save(record: CustomerLoyaltyRewardsPrimaryRecord) -> Result<CustomerLoyaltyRewardsPrimaryRecord, String>
+    fn countActive() -> Int
+}

@@ -1,0 +1,10 @@
+// Example 43: Raft Distributed Consensus Engine
+// Repository Interface
+
+import { RaftDistributedConsensusNodeState } from "../entities/raft_distributed_consensus_primary.entity"
+
+interface RaftDistributedConsensusRepository {
+    fn findNodeById(nodeId: Int) -> Option<RaftDistributedConsensusNodeState>
+    fn saveNodeState(state: RaftDistributedConsensusNodeState) -> Result<RaftDistributedConsensusNodeState, String>
+    fn getActiveQuorumCount() -> Int
+}

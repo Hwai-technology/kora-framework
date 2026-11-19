@@ -1,0 +1,29 @@
+// ============================================================================
+// Example 31: Inter-Bank Reconciliation & Settlement
+// Application Container & Dependency Container Bootstrap
+// ============================================================================
+
+import { ReconciliationSettlementPrimaryRepository } from "./repositories/reconciliation_settlement_primary.repository"
+import { ReconciliationSettlementCoreService } from "./services/reconciliation_settlement_core.service"
+import { ReconciliationSettlementCommandController } from "./controllers/reconciliation_settlement_command.controller"
+import { ReconciliationSettlementQueryController } from "./controllers/reconciliation_settlement_query.controller"
+import { ReconciliationSettlementRouter } from "./routes/reconciliation_settlement.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = ReconciliationSettlementPrimaryRepository()
+        let service = ReconciliationSettlementCoreService(repo)
+        let commandCtrl = ReconciliationSettlementCommandController(service)
+        let queryCtrl = ReconciliationSettlementQueryController(repo)
+        let router = ReconciliationSettlementRouter(commandCtrl, queryCtrl)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

@@ -1,0 +1,9 @@
+// Example 30: credit_scoring_underwriting — Domain Event: CreditApplicationScoredEvent
+// Dedicated Domain Event Specification
+
+model CreditApplicationScoredEvent {
+    applicationId: String
+    ficoEquivalentScore: Int
+    dtiRatioBasisPoints: Int
+    timestamp: Int
+}

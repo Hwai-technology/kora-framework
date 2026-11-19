@@ -1,0 +1,12 @@
+// Example 92: Multi-Room WebSocket Chat & Presence Cluster
+// Persistent Database Entity: Audit Log
+
+@table("chat_multi_room_cluster_audit_logs")
+model ChatMultiRoomClusterAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

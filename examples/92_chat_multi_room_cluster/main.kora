@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 92: Multi-Room WebSocket Chat & Presence Cluster
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { ChatMultiRoomClusterInMemoryRepository } from "./repositories/chat_multi_room_cluster_inmemory.repository"
+import { ChatMultiRoomClusterCoreService } from "./services/chat_multi_room_cluster_core.service"
+import { ChatMultiRoomClusterController } from "./controllers/chat_multi_room_cluster.controller"
+import { ChatMultiRoomClusterRouter } from "./routes/chat_multi_room_cluster.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = ChatMultiRoomClusterInMemoryRepository()
+        let service = ChatMultiRoomClusterCoreService(repo)
+        let controller = ChatMultiRoomClusterController(service)
+        let router = ChatMultiRoomClusterRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

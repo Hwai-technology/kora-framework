@@ -1,0 +1,14 @@
+// Example 50: Distributed Blob Storage Metadata Engine
+// Persistent Database Entity: Cluster Node State
+
+@table("blob_storage_metadata_engine_node_state")
+model BlobStorageMetadataEngineNodeState {
+    @id
+    id: Int
+    @unique
+    nodeIdentifier: String
+    currentEpochTerm: Int
+    votedForCandidate: Int
+    isLeader: Bool
+    active: Bool
+}

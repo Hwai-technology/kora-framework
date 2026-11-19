@@ -1,0 +1,12 @@
+// Example 61: Supplier Purchase Order & 3-Way Invoice Matcher
+// Persistent Database Entity: Audit Log
+
+@table("supplier_purchase_order_flow_audit_logs")
+model SupplierPurchaseOrderFlowAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

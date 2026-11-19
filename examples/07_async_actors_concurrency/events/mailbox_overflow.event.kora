@@ -1,0 +1,7 @@
+// examples/07_async_actors_concurrency — Event: MailboxOverflowEvent
+
+model MailboxOverflowEvent {
+    actorId: String
+    droppedCount: Int
+    currentDepth: Int
+}

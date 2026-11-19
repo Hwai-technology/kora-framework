@@ -1,0 +1,7 @@
+// Example 58: Distributed Shopping Cart Session Actor — Enum: DevicePlatform
+
+enum DevicePlatform {
+    MobileIosApp
+    MobileAndroidApp
+    DesktopWebBrowser
+}

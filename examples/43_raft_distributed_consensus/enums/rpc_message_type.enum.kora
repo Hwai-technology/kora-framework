@@ -1,0 +1,10 @@
+// Example 43: Raft Distributed Consensus Engine — Enum: RpcMessageType
+// Dedicated Domain Enum Specification
+
+enum RpcMessageType {
+    RequestVoteArgs
+    RequestVoteReply
+    AppendEntriesArgs
+    AppendEntriesReply
+    InstallSnapshotArgs
+}

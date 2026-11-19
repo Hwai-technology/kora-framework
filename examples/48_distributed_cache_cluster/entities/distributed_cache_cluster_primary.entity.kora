@@ -1,0 +1,14 @@
+// Example 48: Distributed Cache Cluster & Write-Behind
+// Persistent Database Entity: Cluster Node State
+
+@table("distributed_cache_cluster_node_state")
+model DistributedCacheClusterNodeState {
+    @id
+    id: Int
+    @unique
+    nodeIdentifier: String
+    currentEpochTerm: Int
+    votedForCandidate: Int
+    isLeader: Bool
+    active: Bool
+}

@@ -1,0 +1,10 @@
+// Example 91: CRDT Collaborative Real-Time Document Editor
+// Domain Service Contract
+
+import { CollaborativeCrdtDocPrimaryRecord } from "../entities/collaborative_crdt_doc_primary.entity"
+import { CreateCollaborativeCrdtDocTaskRequest } from "../models/collaborative_crdt_doc_request.dto"
+
+interface CollaborativeCrdtDocDomainContract {
+    fn executeTask(req: CreateCollaborativeCrdtDocTaskRequest) -> Result<CollaborativeCrdtDocPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

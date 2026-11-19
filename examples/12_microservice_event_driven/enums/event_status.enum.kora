@@ -1,5 +1,11 @@
+// ============================================================================
+// Event Delivery & Outbox Lifecycle States
+// ============================================================================
+
 enum EventStatus {
-    PENDING,
-    PROCESSED,
-    FAILED,
+    PendingOutbox,
+    Published,
+    Delivered,
+    Retrying,
+    DeadLettered,
 }

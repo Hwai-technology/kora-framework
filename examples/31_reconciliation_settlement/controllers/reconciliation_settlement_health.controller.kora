@@ -1,0 +1,14 @@
+// Example 31: Inter-Bank Reconciliation & Settlement
+// Health Check Controller
+
+class ReconciliationSettlementHealthController {
+    init() {}
+
+    fn checkLiveness() -> Bool {
+        return true
+    }
+
+    fn checkReadiness() -> Bool {
+        return true
+    }
+}

@@ -1,0 +1,22 @@
+// Example 94: Interactive Vector Whiteboard & Delta Sync
+// Router & Endpoint Dispatcher
+
+import { CreateInteractiveWhiteboardMeshTaskRequest } from "../models/interactive_whiteboard_mesh_request.dto"
+import { InteractiveWhiteboardMeshResponseDto } from "../models/interactive_whiteboard_mesh_response.dto"
+import { InteractiveWhiteboardMeshController } from "../controllers/interactive_whiteboard_mesh.controller"
+
+class InteractiveWhiteboardMeshRouter {
+    controller: InteractiveWhiteboardMeshController
+
+    init(controller: InteractiveWhiteboardMeshController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateInteractiveWhiteboardMeshTaskRequest) -> InteractiveWhiteboardMeshResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

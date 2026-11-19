@@ -1,0 +1,9 @@
+// Example 34: HIPAA Compliant Electronic Health Records
+// Specialized Model 3
+
+model HipaaCompliantEhrSpecializedProfile3 {
+    profileId: String
+    classificationCode: String
+    riskWeight: Int
+    isActive: Bool
+}

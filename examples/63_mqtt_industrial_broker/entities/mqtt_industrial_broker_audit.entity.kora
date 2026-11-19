@@ -1,0 +1,12 @@
+// Example 63: MQTT Industrial Telemetry Broker & Topic Tree
+// Persistent Database Entity: Audit Log
+
+@table("mqtt_industrial_broker_audit_logs")
+model MqttIndustrialBrokerAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

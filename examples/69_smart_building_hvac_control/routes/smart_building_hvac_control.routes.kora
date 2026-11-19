@@ -1,0 +1,22 @@
+// Example 69: Smart Building HVAC & Air Quality Coordinator
+// Router & Endpoint Dispatcher
+
+import { CreateSmartBuildingHvacControlTaskRequest } from "../models/smart_building_hvac_control_request.dto"
+import { SmartBuildingHvacControlResponseDto } from "../models/smart_building_hvac_control_response.dto"
+import { SmartBuildingHvacControlController } from "../controllers/smart_building_hvac_control.controller"
+
+class SmartBuildingHvacControlRouter {
+    controller: SmartBuildingHvacControlController
+
+    init(controller: SmartBuildingHvacControlController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateSmartBuildingHvacControlTaskRequest) -> SmartBuildingHvacControlResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

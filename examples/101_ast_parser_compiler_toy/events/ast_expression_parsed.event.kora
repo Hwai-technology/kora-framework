@@ -1,0 +1,6 @@
+// Example 101: Pratt Parsing & Bytecode Virtual Machine — Domain Event: AstExpressionParsedEvent
+
+model AstExpressionParsedEvent {
+    expressionDepth: Int
+    nodeCount: Int
+}

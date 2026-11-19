@@ -1,0 +1,38 @@
+// Example 92: Multi-Room WebSocket Chat & Presence Cluster
+// Presentation Controller
+
+import { CreateChatMultiRoomClusterTaskRequest } from "../models/chat_multi_room_cluster_request.dto"
+import { ChatMultiRoomClusterResponseDto } from "../models/chat_multi_room_cluster_response.dto"
+import { ChatMultiRoomClusterCoreService } from "../services/chat_multi_room_cluster_core.service"
+
+class ChatMultiRoomClusterController {
+    service: ChatMultiRoomClusterCoreService
+
+    init(service: ChatMultiRoomClusterCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateChatMultiRoomClusterTaskRequest) -> ChatMultiRoomClusterResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => ChatMultiRoomClusterResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => ChatMultiRoomClusterResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

@@ -1,0 +1,10 @@
+// Example 66: Predictive Industrial Equipment Maintenance
+// Repository Interface
+
+import { PredictiveMaintenanceSensorPrimaryRecord } from "../entities/predictive_maintenance_sensor_primary.entity"
+
+interface PredictiveMaintenanceSensorRepository {
+    fn findById(id: Int) -> Option<PredictiveMaintenanceSensorPrimaryRecord>
+    fn save(record: PredictiveMaintenanceSensorPrimaryRecord) -> Result<PredictiveMaintenanceSensorPrimaryRecord, String>
+    fn countActive() -> Int
+}

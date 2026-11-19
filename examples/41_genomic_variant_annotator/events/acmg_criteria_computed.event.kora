@@ -1,0 +1,8 @@
+// Example 41: Genomic Variant Annotation & Pathogenicity — Domain Event: AcmgCriteriaComputedEvent
+// Dedicated Domain Event Specification
+
+model AcmgCriteriaComputedEvent {
+    variantId: String
+    strongEvidenceScore: Int
+    classificationResult: String
+}

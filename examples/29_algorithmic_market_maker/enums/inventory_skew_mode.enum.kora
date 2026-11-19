@@ -1,0 +1,9 @@
+// Example 29: algorithmic_market_maker — Enum: InventorySkewMode
+// Dedicated Domain Enum Specification
+
+enum InventorySkewMode {
+    NeutralMidpoint
+    SkewBidHeavy
+    SkewAskHeavy
+    EmergencyFlatten
+}

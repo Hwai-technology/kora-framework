@@ -1,0 +1,9 @@
+// ============================================================================
+// Example 25: HFT Order Book — Enum: CircuitHaltReason
+// ============================================================================
+
+enum CircuitHaltReason {
+    VolatilityThresholdExceeded
+    MarketDislocation
+    AdministrativeKillSwitch
+}

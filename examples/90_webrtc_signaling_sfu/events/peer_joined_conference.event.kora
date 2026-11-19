@@ -1,0 +1,7 @@
+// Example 90: WebRTC SFU Media Router & SDP Signaling — Domain Event: PeerJoinedConferenceEvent
+
+model PeerJoinedConferenceEvent {
+    roomId: String
+    peerId: String
+    mediaTracksCount: Int
+}

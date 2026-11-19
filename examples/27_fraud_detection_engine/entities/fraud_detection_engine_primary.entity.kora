@@ -1,0 +1,16 @@
+// ============================================================================
+// Fraud Evaluation Record Entity
+// ============================================================================
+
+model FraudDetectionEngineRecord {
+    id: Int
+    assessmentId: String
+    cardToken: String
+    riskScore: Int
+    outcome: String
+    velocityCount: Int
+    distanceKm: Int
+    reason: String
+    reference: String
+    active: Bool
+}

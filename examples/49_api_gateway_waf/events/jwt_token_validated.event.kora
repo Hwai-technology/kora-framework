@@ -1,0 +1,9 @@
+// Example 49: API Gateway & Web Application Firewall — Domain Event: JwtTokenValidatedEvent
+// Dedicated Domain Event Specification
+
+model JwtTokenValidatedEvent {
+    jti: String
+    subject: String
+    scope: String
+    isValid: Bool
+}

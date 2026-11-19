@@ -1,0 +1,9 @@
+// Example 81: Synthetic Tabular Data & Differential Privacy Generator
+// Configuration Model
+
+model SyntheticDataGeneratorConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

@@ -1,0 +1,16 @@
+// Example 87: FIDO2 / WebAuthn Passkey Registration & Attestation
+// Transport Model: Standard Response
+
+model HardwareSecurityTokenFido2ResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model HardwareSecurityTokenFido2SummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

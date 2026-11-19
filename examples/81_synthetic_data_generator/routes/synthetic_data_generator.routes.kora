@@ -1,0 +1,22 @@
+// Example 81: Synthetic Tabular Data & Differential Privacy Generator
+// Router & Endpoint Dispatcher
+
+import { CreateSyntheticDataGeneratorTaskRequest } from "../models/synthetic_data_generator_request.dto"
+import { SyntheticDataGeneratorResponseDto } from "../models/synthetic_data_generator_response.dto"
+import { SyntheticDataGeneratorController } from "../controllers/synthetic_data_generator.controller"
+
+class SyntheticDataGeneratorRouter {
+    controller: SyntheticDataGeneratorController
+
+    init(controller: SyntheticDataGeneratorController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateSyntheticDataGeneratorTaskRequest) -> SyntheticDataGeneratorResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

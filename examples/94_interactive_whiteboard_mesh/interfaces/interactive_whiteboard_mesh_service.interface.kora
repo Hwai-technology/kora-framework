@@ -1,0 +1,10 @@
+// Example 94: Interactive Vector Whiteboard & Delta Sync
+// Domain Service Contract
+
+import { InteractiveWhiteboardMeshPrimaryRecord } from "../entities/interactive_whiteboard_mesh_primary.entity"
+import { CreateInteractiveWhiteboardMeshTaskRequest } from "../models/interactive_whiteboard_mesh_request.dto"
+
+interface InteractiveWhiteboardMeshDomainContract {
+    fn executeTask(req: CreateInteractiveWhiteboardMeshTaskRequest) -> Result<InteractiveWhiteboardMeshPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

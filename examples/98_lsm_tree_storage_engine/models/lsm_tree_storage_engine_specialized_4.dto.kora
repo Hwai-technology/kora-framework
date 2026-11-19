@@ -1,0 +1,9 @@
+// Example 98: Log-Structured Merge-Tree (LSM-Tree) Engine
+// Specialized Model 4
+
+model LsmTreeStorageEngineSpecializedProfile4 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

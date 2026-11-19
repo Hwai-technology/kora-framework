@@ -1,0 +1,9 @@
+// Example 50: Distributed Blob Storage Metadata Engine — Enum: MultipartUploadStatus
+// Dedicated Domain Enum Specification
+
+enum MultipartUploadStatus {
+    UploadInitiated
+    ChunksUploading
+    CompletedAssembled
+    AbortedCleaned
+}

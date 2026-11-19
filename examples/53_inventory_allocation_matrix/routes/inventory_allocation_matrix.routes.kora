@@ -1,0 +1,22 @@
+// Example 53: Inventory Allocation Matrix & Multi-Warehouse Stock
+// Router & Endpoint Dispatcher
+
+import { CreateInventoryAllocationMatrixTaskRequest } from "../models/inventory_allocation_matrix_request.dto"
+import { InventoryAllocationMatrixResponseDto } from "../models/inventory_allocation_matrix_response.dto"
+import { InventoryAllocationMatrixController } from "../controllers/inventory_allocation_matrix.controller"
+
+class InventoryAllocationMatrixRouter {
+    controller: InventoryAllocationMatrixController
+
+    init(controller: InventoryAllocationMatrixController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateInventoryAllocationMatrixTaskRequest) -> InventoryAllocationMatrixResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

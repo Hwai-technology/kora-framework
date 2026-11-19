@@ -1,0 +1,38 @@
+// Example 94: Interactive Vector Whiteboard & Delta Sync
+// Presentation Controller
+
+import { CreateInteractiveWhiteboardMeshTaskRequest } from "../models/interactive_whiteboard_mesh_request.dto"
+import { InteractiveWhiteboardMeshResponseDto } from "../models/interactive_whiteboard_mesh_response.dto"
+import { InteractiveWhiteboardMeshCoreService } from "../services/interactive_whiteboard_mesh_core.service"
+
+class InteractiveWhiteboardMeshController {
+    service: InteractiveWhiteboardMeshCoreService
+
+    init(service: InteractiveWhiteboardMeshCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateInteractiveWhiteboardMeshTaskRequest) -> InteractiveWhiteboardMeshResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => InteractiveWhiteboardMeshResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => InteractiveWhiteboardMeshResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

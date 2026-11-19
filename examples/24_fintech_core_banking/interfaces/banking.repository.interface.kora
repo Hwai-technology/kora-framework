@@ -1,0 +1,16 @@
+// ============================================================================
+// Example 24: Fintech Core Banking — Repository Interface
+// Domain contract supporting Optimistic Locking, Event Sourcing & Idempotency
+// ============================================================================
+
+import { Account } from "../entities/account.entity"
+import { LedgerJournalEvent } from "../entities/ledger_entry.entity"
+
+interface BankingRepository {
+    fn findAccountById(id: Int) -> Option<Account>
+    fn saveAccountOptimistic(account: Account, expectedVersion: Int) -> Result<Account, String>
+    fn appendJournalEvent(event: LedgerJournalEvent) -> Result<LedgerJournalEvent, String>
+    fn checkIdempotency(key: String) -> Option<String>
+    fn recordIdempotency(key: String, payload: String) -> Bool
+    fn getTotalSystemAssets() -> Int
+}

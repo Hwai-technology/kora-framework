@@ -1,0 +1,7 @@
+// Example 84: Threat Intelligence STIX/TAXII Indicator Parser — Enum: ThreatConfidenceLevel
+
+enum ThreatConfidenceLevel {
+    LowSpeculative
+    MediumCorroborated
+    HighConfirmedHoneyPot
+}

@@ -1,0 +1,16 @@
+// Example 61: Supplier Purchase Order & 3-Way Invoice Matcher
+// Transport Model: Standard Response
+
+model SupplierPurchaseOrderFlowResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model SupplierPurchaseOrderFlowSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

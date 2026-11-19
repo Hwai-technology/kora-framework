@@ -1,0 +1,9 @@
+// Example 92: Multi-Room WebSocket Chat & Presence Cluster
+// Specialized Model 1
+
+model ChatMultiRoomClusterSpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

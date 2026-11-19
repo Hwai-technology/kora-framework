@@ -1,0 +1,8 @@
+// Example 67: Autonomous Rover Navigation & Obstacle Avoidance — Enum: RoverNavigationMode
+
+enum RoverNavigationMode {
+    AutonomousWaypointTracking
+    TeleoperatedManualOverride
+    FailsafeReturnToHome
+    EmergencyObstacleEStop
+}

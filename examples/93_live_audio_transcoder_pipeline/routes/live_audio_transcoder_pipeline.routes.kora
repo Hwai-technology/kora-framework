@@ -1,0 +1,22 @@
+// Example 93: Live Audio Transcoding & Packet Chunking Pipeline
+// Router & Endpoint Dispatcher
+
+import { CreateLiveAudioTranscoderPipelineTaskRequest } from "../models/live_audio_transcoder_pipeline_request.dto"
+import { LiveAudioTranscoderPipelineResponseDto } from "../models/live_audio_transcoder_pipeline_response.dto"
+import { LiveAudioTranscoderPipelineController } from "../controllers/live_audio_transcoder_pipeline.controller"
+
+class LiveAudioTranscoderPipelineRouter {
+    controller: LiveAudioTranscoderPipelineController
+
+    init(controller: LiveAudioTranscoderPipelineController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateLiveAudioTranscoderPipelineTaskRequest) -> LiveAudioTranscoderPipelineResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

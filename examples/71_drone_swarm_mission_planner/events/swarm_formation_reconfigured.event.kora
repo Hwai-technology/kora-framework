@@ -1,0 +1,7 @@
+// Example 71: Autonomous Drone Swarm Formation Coordinator — Domain Event: SwarmFormationReconfiguredEvent
+
+model SwarmFormationReconfiguredEvent {
+    swarmId: String
+    activeUavCount: Int
+    newFormationPattern: String
+}

@@ -1,0 +1,15 @@
+// Example 68: Cold Chain Vaccine Temperature Monitoring
+// Transport Model: Command Request
+
+model CreateColdChainEnvironmentalGuardTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryColdChainEnvironmentalGuardFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

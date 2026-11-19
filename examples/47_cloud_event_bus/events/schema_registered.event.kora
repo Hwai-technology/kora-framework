@@ -1,0 +1,8 @@
+// Example 47: Cloud Event Bus & Partitioned Streaming — Domain Event: SchemaRegisteredEvent
+// Dedicated Domain Event Specification
+
+model SchemaRegisteredEvent {
+    subject: String
+    schemaVersion: Int
+    fingerprintHash: String
+}

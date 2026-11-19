@@ -1,0 +1,9 @@
+// Example 84: Threat Intelligence STIX/TAXII Indicator Parser
+// Configuration Model
+
+model ThreatIntelFeedAggregatorConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

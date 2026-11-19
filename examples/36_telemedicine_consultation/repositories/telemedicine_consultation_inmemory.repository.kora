@@ -1,0 +1,34 @@
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions
+// Repository Implementation
+
+import { TelemedicineConsultationClinicalEntity } from "../entities/telemedicine_consultation_primary.entity"
+import { TelemedicineConsultationRepository } from "../interfaces/telemedicine_consultation_repository.interface"
+
+class TelemedicineConsultationInMemoryRepository implements TelemedicineConsultationRepository {
+    init() {}
+
+    fn findByPatientId(patientId: Int) -> Option<TelemedicineConsultationClinicalEntity> {
+        if patientId > 0 {
+            return Some(TelemedicineConsultationClinicalEntity {
+                id: patientId + 1000,
+                patientId: patientId,
+                clinicianId: 42,
+                clinicalMetricScore: 85,
+                complianceState: "HIPAA_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(entity: TelemedicineConsultationClinicalEntity) -> Result<TelemedicineConsultationClinicalEntity, String> {
+        if entity.patientId <= 0 {
+            return Err("Invalid patient identifier")
+        }
+        return Ok(entity)
+    }
+
+    fn verifyIntegrity(recordId: Int) -> Bool {
+        return recordId > 0
+    }
+}

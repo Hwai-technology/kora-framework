@@ -1,0 +1,38 @@
+// Example 69: Smart Building HVAC & Air Quality Coordinator
+// Presentation Controller
+
+import { CreateSmartBuildingHvacControlTaskRequest } from "../models/smart_building_hvac_control_request.dto"
+import { SmartBuildingHvacControlResponseDto } from "../models/smart_building_hvac_control_response.dto"
+import { SmartBuildingHvacControlCoreService } from "../services/smart_building_hvac_control_core.service"
+
+class SmartBuildingHvacControlController {
+    service: SmartBuildingHvacControlCoreService
+
+    init(service: SmartBuildingHvacControlCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateSmartBuildingHvacControlTaskRequest) -> SmartBuildingHvacControlResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => SmartBuildingHvacControlResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => SmartBuildingHvacControlResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

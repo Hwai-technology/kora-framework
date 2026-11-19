@@ -1,0 +1,16 @@
+// Example 78: High-Throughput Vector Embedding Ingestion Pipeline
+// Transport Model: Standard Response
+
+model EmbeddingIngestionWorkerResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model EmbeddingIngestionWorkerSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

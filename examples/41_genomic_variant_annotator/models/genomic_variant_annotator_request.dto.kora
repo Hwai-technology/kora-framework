@@ -1,0 +1,16 @@
+// Example 41: Genomic Variant Annotation & Pathogenicity
+// Transport Model: Command Requests
+
+model CreateGenomicVariantAnnotatorRecordRequest {
+    patientId: Int
+    clinicianId: Int
+    domainContext: String
+    clinicalMetricScore: Int
+    confidentialNotes: String
+}
+
+model QueryGenomicVariantAnnotatorFilterRequest {
+    patientId: Int
+    limit: Int
+    includeHistorical: Bool
+}

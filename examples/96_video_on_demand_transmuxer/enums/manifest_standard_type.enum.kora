@@ -1,0 +1,6 @@
+// Example 96: Video on Demand (VOD) HLS/DASH Transmuxer — Enum: ManifestStandardType
+
+enum ManifestStandardType {
+    HttpLiveStreamingHLS
+    DynamicAdaptiveStreamingDASH
+}

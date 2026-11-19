@@ -1,0 +1,9 @@
+// Example 78: High-Throughput Vector Embedding Ingestion Pipeline
+// Configuration Model
+
+model EmbeddingIngestionWorkerConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

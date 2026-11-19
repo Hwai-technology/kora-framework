@@ -1,0 +1,13 @@
+// Example 97: Lock-Free Michael-Scott Queue & Treiber Stack
+// Persistent Database Entity: Primary Record
+
+@table("lock_free_collections_records")
+model LockFreeCollectionsPrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

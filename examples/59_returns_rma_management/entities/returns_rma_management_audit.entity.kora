@@ -1,0 +1,12 @@
+// Example 59: Reverse Logistics & RMA Inspection Engine
+// Persistent Database Entity: Audit Log
+
+@table("returns_rma_management_audit_logs")
+model ReturnsRmaManagementAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

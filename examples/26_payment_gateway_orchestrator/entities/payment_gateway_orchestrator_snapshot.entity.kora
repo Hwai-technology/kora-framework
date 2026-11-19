@@ -1,0 +1,11 @@
+// Example 26: Payment Gateway & Webhook Orchestrator
+// State Snapshot Entity
+
+@table("payment_gateway_orchestrator_snapshots")
+model PaymentGatewayOrchestratorSnapshot {
+    @id
+    id: Int
+    aggregateId: Int
+    version: Int
+    stateHash: String
+}

@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 103: Probabilistic Bloom & Cuckoo Filter Suite
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { BloomCuckooFilterSuiteInMemoryRepository } from "./repositories/bloom_cuckoo_filter_suite_inmemory.repository"
+import { BloomCuckooFilterSuiteCoreService } from "./services/bloom_cuckoo_filter_suite_core.service"
+import { BloomCuckooFilterSuiteController } from "./controllers/bloom_cuckoo_filter_suite.controller"
+import { BloomCuckooFilterSuiteRouter } from "./routes/bloom_cuckoo_filter_suite.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = BloomCuckooFilterSuiteInMemoryRepository()
+        let service = BloomCuckooFilterSuiteCoreService(repo)
+        let controller = BloomCuckooFilterSuiteController(service)
+        let router = BloomCuckooFilterSuiteRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

@@ -1,0 +1,15 @@
+// Example 98: Log-Structured Merge-Tree (LSM-Tree) Engine
+// Transport Model: Command Request
+
+model CreateLsmTreeStorageEngineTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryLsmTreeStorageEngineFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

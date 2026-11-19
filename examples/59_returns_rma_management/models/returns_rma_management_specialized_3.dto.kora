@@ -1,0 +1,9 @@
+// Example 59: Reverse Logistics & RMA Inspection Engine
+// Specialized Model 3
+
+model ReturnsRmaManagementSpecializedProfile3 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

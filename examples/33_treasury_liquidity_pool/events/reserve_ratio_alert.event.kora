@@ -1,0 +1,8 @@
+// Example 33: treasury_liquidity_pool — Domain Event: ReserveRatioAlertEvent
+// Dedicated Domain Event Specification
+
+model ReserveRatioAlertEvent {
+    currentReserveRatioBps: Int
+    minimumRequiredBps: Int
+    breachSeverity: String
+}

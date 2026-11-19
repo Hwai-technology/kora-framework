@@ -1,0 +1,10 @@
+// Example 79: Multimodal CLIP Cross-Search Engine
+// Repository Interface
+
+import { MultimodalClipSearchPrimaryRecord } from "../entities/multimodal_clip_search_primary.entity"
+
+interface MultimodalClipSearchRepository {
+    fn findById(id: Int) -> Option<MultimodalClipSearchPrimaryRecord>
+    fn save(record: MultimodalClipSearchPrimaryRecord) -> Result<MultimodalClipSearchPrimaryRecord, String>
+    fn countActive() -> Int
+}

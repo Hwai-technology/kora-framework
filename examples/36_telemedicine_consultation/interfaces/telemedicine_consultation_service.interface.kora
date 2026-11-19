@@ -1,0 +1,10 @@
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions
+// Domain Service Contract
+
+import { TelemedicineConsultationClinicalEntity } from "../entities/telemedicine_consultation_primary.entity"
+import { CreateTelemedicineConsultationRecordRequest } from "../models/telemedicine_consultation_request.dto"
+
+interface TelemedicineConsultationDomainContract {
+    fn processClinicalRecord(req: CreateTelemedicineConsultationRecordRequest) -> Result<TelemedicineConsultationClinicalEntity, String>
+    fn evaluateClinicalRisk(patientId: Int) -> String
+}

@@ -1,0 +1,10 @@
+// Example 33: treasury_liquidity_pool — Domain Event: LiquiditySweepExecutedEvent
+// Dedicated Domain Event Specification
+
+model LiquiditySweepExecutedEvent {
+    sweepId: String
+    fromPool: String
+    toPool: String
+    amountSwept: Int
+    timestamp: Int
+}

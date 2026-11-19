@@ -1,0 +1,10 @@
+// Example 28: Crypto Derivatives & Margin Engine
+// Primary Repository Interface
+
+import { CryptoDerivativesExchangeRecord } from "../entities/crypto_derivatives_exchange_primary.entity"
+
+interface CryptoDerivativesExchangeRepository {
+    fn findById(id: Int) -> Option<CryptoDerivativesExchangeRecord>
+    fn save(record: CryptoDerivativesExchangeRecord) -> Result<CryptoDerivativesExchangeRecord, String>
+    fn countAll() -> Int
+}

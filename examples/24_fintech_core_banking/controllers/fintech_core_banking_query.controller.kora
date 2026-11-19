@@ -1,0 +1,21 @@
+// Example 24: Core Banking Ledger & Accounts
+// Query Controller (Reads & Lookups)
+
+import { FintechCoreBankingRecord } from "../entities/fintech_core_banking_primary.entity"
+import { FintechCoreBankingRepository } from "../interfaces/fintech_core_banking_repository.interface"
+
+class FintechCoreBankingQueryController {
+    repo: FintechCoreBankingRepository
+
+    init(repo: FintechCoreBankingRepository) {
+        this.repo = repo
+    }
+
+    fn getById(id: Int) -> Option<FintechCoreBankingRecord> {
+        return this.repo.findById(id)
+    }
+
+    fn getTotalVolume() -> Int {
+        return this.repo.countAll()
+    }
+}

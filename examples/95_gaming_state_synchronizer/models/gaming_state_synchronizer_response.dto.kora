@@ -1,0 +1,16 @@
+// Example 95: Multiplayer Game 60Hz Tick State Synchronizer
+// Transport Model: Standard Response
+
+model GamingStateSynchronizerResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model GamingStateSynchronizerSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

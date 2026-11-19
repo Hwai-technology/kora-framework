@@ -1,0 +1,9 @@
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions — Domain Event: ConsultationRoomCreatedEvent
+// Dedicated Domain Event Specification
+
+model ConsultationRoomCreatedEvent {
+    sessionId: String
+    patientId: Int
+    physicianId: Int
+    scheduledStart: Int
+}

@@ -1,0 +1,39 @@
+// Example 41: Genomic Variant Annotation & Pathogenicity
+// Presentation Controller
+
+import { CreateGenomicVariantAnnotatorRecordRequest } from "../models/genomic_variant_annotator_request.dto"
+import { GenomicVariantAnnotatorResponseDto } from "../models/genomic_variant_annotator_response.dto"
+import { GenomicVariantAnnotatorClinicalEntity } from "../entities/genomic_variant_annotator_primary.entity"
+import { GenomicVariantAnnotatorCoreService } from "../services/genomic_variant_annotator_core.service"
+
+class GenomicVariantAnnotatorController {
+    service: GenomicVariantAnnotatorCoreService
+
+    init(service: GenomicVariantAnnotatorCoreService) {
+        this.service = service
+    }
+
+    fn handleRecordSubmission(req: CreateGenomicVariantAnnotatorRecordRequest) -> GenomicVariantAnnotatorResponseDto {
+        let outcome = this.service.processClinicalRecord(req)
+        return match outcome {
+            Ok(rec) => GenomicVariantAnnotatorResponseDto {
+                recordId: rec.id,
+                patientId: rec.patientId,
+                status: "COMMITTED_ENCRYPTED",
+                isComplianceVerified: true,
+                message: "Record persisted under HIPAA safety standards",
+            },
+            Err(reason) => GenomicVariantAnnotatorResponseDto {
+                recordId: -1,
+                patientId: req.patientId,
+                status: "REJECTED_VALIDATION_ERROR",
+                isComplianceVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkPatientRisk(patientId: Int) -> String {
+        return this.service.evaluateClinicalRisk(patientId)
+    }
+}

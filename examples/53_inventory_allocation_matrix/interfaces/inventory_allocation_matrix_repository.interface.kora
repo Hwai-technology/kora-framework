@@ -1,0 +1,10 @@
+// Example 53: Inventory Allocation Matrix & Multi-Warehouse Stock
+// Repository Interface
+
+import { InventoryAllocationMatrixPrimaryRecord } from "../entities/inventory_allocation_matrix_primary.entity"
+
+interface InventoryAllocationMatrixRepository {
+    fn findById(id: Int) -> Option<InventoryAllocationMatrixPrimaryRecord>
+    fn save(record: InventoryAllocationMatrixPrimaryRecord) -> Result<InventoryAllocationMatrixPrimaryRecord, String>
+    fn countActive() -> Int
+}

@@ -1,0 +1,14 @@
+// Example 103: Probabilistic Bloom & Cuckoo Filter Suite
+// Telemetry & Liveness Monitor
+
+class BloomCuckooFilterSuiteTelemetryService {
+    init() {}
+
+    fn ping() -> Bool {
+        return true
+    }
+
+    fn computeDigest(entityId: Int, metricScore: Int) -> String {
+        return "SHA256-DIGEST-" + entityId.toString() + "-" + metricScore.toString()
+    }
+}

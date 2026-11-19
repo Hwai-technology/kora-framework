@@ -1,0 +1,26 @@
+// Example 28: Crypto Derivatives & Margin Engine
+// Router & Endpoint Dispatcher
+
+import { CreateCryptoDerivativesExchangeRequest } from "../models/crypto_derivatives_exchange_request.dto"
+import { CryptoDerivativesExchangeResponse } from "../models/crypto_derivatives_exchange_response.dto"
+import { CryptoDerivativesExchangeRecord } from "../entities/crypto_derivatives_exchange_primary.entity"
+import { CryptoDerivativesExchangeCommandController } from "../controllers/crypto_derivatives_exchange_command.controller"
+import { CryptoDerivativesExchangeQueryController } from "../controllers/crypto_derivatives_exchange_query.controller"
+
+class CryptoDerivativesExchangeRouter {
+    commandController: CryptoDerivativesExchangeCommandController
+    queryController: CryptoDerivativesExchangeQueryController
+
+    init(commandController: CryptoDerivativesExchangeCommandController, queryController: CryptoDerivativesExchangeQueryController) {
+        this.commandController = commandController
+        this.queryController = queryController
+    }
+
+    fn postRecord(req: CreateCryptoDerivativesExchangeRequest) -> CryptoDerivativesExchangeResponse {
+        return this.commandController.handleCreate(req)
+    }
+
+    fn fetchRecord(id: Int) -> Option<CryptoDerivativesExchangeRecord> {
+        return this.queryController.getById(id)
+    }
+}

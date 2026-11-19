@@ -1,0 +1,22 @@
+// Example 66: Predictive Industrial Equipment Maintenance
+// Router & Endpoint Dispatcher
+
+import { CreatePredictiveMaintenanceSensorTaskRequest } from "../models/predictive_maintenance_sensor_request.dto"
+import { PredictiveMaintenanceSensorResponseDto } from "../models/predictive_maintenance_sensor_response.dto"
+import { PredictiveMaintenanceSensorController } from "../controllers/predictive_maintenance_sensor.controller"
+
+class PredictiveMaintenanceSensorRouter {
+    controller: PredictiveMaintenanceSensorController
+
+    init(controller: PredictiveMaintenanceSensorController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreatePredictiveMaintenanceSensorTaskRequest) -> PredictiveMaintenanceSensorResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

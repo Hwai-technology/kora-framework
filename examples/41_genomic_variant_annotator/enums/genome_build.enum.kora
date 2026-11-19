@@ -1,0 +1,8 @@
+// Example 41: Genomic Variant Annotation & Pathogenicity — Enum: GenomeBuild
+// Dedicated Domain Enum Specification
+
+enum GenomeBuild {
+    GRCh37_hg19
+    GRCh38_hg38
+    T2T_CHM13
+}

@@ -1,0 +1,9 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector
+// Specialized Model 1
+
+model DistributedTracingCollectorSpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    quorumWeight: Int
+    isActive: Bool
+}

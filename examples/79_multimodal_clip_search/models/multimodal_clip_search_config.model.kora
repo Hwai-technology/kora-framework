@@ -1,0 +1,9 @@
+// Example 79: Multimodal CLIP Cross-Search Engine
+// Configuration Model
+
+model MultimodalClipSearchConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

@@ -1,0 +1,13 @@
+// Example 24: Core Banking Ledger & Accounts
+// Primary Persistent Database Entity
+
+@table("fintech_core_banking_records")
+model FintechCoreBankingRecord {
+    @id
+    id: Int
+    @unique
+    reference: String
+    status: String
+    balance: Int
+    active: Bool
+}

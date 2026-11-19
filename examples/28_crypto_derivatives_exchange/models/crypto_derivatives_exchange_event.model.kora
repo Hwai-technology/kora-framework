@@ -1,0 +1,10 @@
+// Example 28: Crypto Derivatives & Margin Engine
+// Domain Event Model
+
+model CryptoDerivativesExchangeEvent {
+    eventId: String
+    eventType: String
+    entityId: Int
+    occurredAt: Int
+    payloadHash: String
+}

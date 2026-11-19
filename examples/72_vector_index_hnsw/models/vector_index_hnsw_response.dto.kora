@@ -1,0 +1,16 @@
+// Example 72: HNSW Vector Index & Approximate Nearest Neighbor
+// Transport Model: Standard Response
+
+model VectorIndexHnswResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model VectorIndexHnswSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

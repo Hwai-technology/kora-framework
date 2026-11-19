@@ -1,0 +1,10 @@
+// Example 53: Inventory Allocation Matrix & Multi-Warehouse Stock
+// Domain Service Contract
+
+import { InventoryAllocationMatrixPrimaryRecord } from "../entities/inventory_allocation_matrix_primary.entity"
+import { CreateInventoryAllocationMatrixTaskRequest } from "../models/inventory_allocation_matrix_request.dto"
+
+interface InventoryAllocationMatrixDomainContract {
+    fn executeTask(req: CreateInventoryAllocationMatrixTaskRequest) -> Result<InventoryAllocationMatrixPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

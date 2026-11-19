@@ -1,0 +1,8 @@
+// Example 96: Video on Demand (VOD) HLS/DASH Transmuxer — Enum: VideoResolutionTier
+
+enum VideoResolutionTier {
+    FullHd1080p
+    HighDef720p
+    StandardDef480p
+    MobileLowBandwidth360p
+}

@@ -1,0 +1,9 @@
+// Example 40: Clinical Trial Electronic Data Capture (EDC) — Domain Event: AdverseEventReportedEvent
+// Dedicated Domain Event Specification
+
+model AdverseEventReportedEvent {
+    aeId: String
+    subjectId: String
+    gradeLevel: String
+    saeReportedToFda: Bool
+}

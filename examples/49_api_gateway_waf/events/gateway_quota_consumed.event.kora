@@ -1,0 +1,8 @@
+// Example 49: API Gateway & Web Application Firewall — Domain Event: GatewayQuotaConsumedEvent
+// Dedicated Domain Event Specification
+
+model GatewayQuotaConsumedEvent {
+    apiKeyHash: String
+    consumedTokens: Int
+    remainingTokens: Int
+}

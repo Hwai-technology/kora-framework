@@ -1,0 +1,8 @@
+// Example 59: Reverse Logistics & RMA Inspection Engine — Enum: RmaDisposition
+
+enum RmaDisposition {
+    RestockLikeNew
+    RefurbishOpenBox
+    LiquidateSalvage
+    RecycleDestroyScrap
+}

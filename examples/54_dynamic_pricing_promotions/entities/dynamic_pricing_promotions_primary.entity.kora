@@ -1,0 +1,13 @@
+// Example 54: Dynamic Pricing Engine & Flash Sale Rate-Limiter
+// Persistent Database Entity: Primary Record
+
+@table("dynamic_pricing_promotions_records")
+model DynamicPricingPromotionsPrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

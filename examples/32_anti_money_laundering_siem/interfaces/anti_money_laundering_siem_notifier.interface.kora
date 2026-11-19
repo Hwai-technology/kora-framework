@@ -1,0 +1,7 @@
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// Notifier Interface
+
+interface AntiMoneyLaunderingSiemNotifier {
+    fn sendAlert(subject: String, level: String) -> Bool
+    fn ping() -> Bool
+}

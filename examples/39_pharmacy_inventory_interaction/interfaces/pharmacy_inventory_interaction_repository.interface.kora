@@ -1,0 +1,10 @@
+// Example 39: Pharmacy Dispensing & Drug Interaction Checker
+// Repository Interface
+
+import { PharmacyInventoryInteractionClinicalEntity } from "../entities/pharmacy_inventory_interaction_primary.entity"
+
+interface PharmacyInventoryInteractionRepository {
+    fn findByPatientId(patientId: Int) -> Option<PharmacyInventoryInteractionClinicalEntity>
+    fn save(entity: PharmacyInventoryInteractionClinicalEntity) -> Result<PharmacyInventoryInteractionClinicalEntity, String>
+    fn verifyIntegrity(recordId: Int) -> Bool
+}

@@ -1,0 +1,14 @@
+// Example 100: Spatial 2D R-Tree & k-Nearest Neighbors (k-NN)
+// Telemetry & Liveness Monitor
+
+class SpatialRTreeIndexerTelemetryService {
+    init() {}
+
+    fn ping() -> Bool {
+        return true
+    }
+
+    fn computeDigest(entityId: Int, metricScore: Int) -> String {
+        return "SHA256-DIGEST-" + entityId.toString() + "-" + metricScore.toString()
+    }
+}

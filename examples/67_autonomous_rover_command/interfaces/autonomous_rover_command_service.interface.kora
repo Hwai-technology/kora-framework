@@ -1,0 +1,10 @@
+// Example 67: Autonomous Rover Navigation & Obstacle Avoidance
+// Domain Service Contract
+
+import { AutonomousRoverCommandPrimaryRecord } from "../entities/autonomous_rover_command_primary.entity"
+import { CreateAutonomousRoverCommandTaskRequest } from "../models/autonomous_rover_command_request.dto"
+
+interface AutonomousRoverCommandDomainContract {
+    fn executeTask(req: CreateAutonomousRoverCommandTaskRequest) -> Result<AutonomousRoverCommandPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

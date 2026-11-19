@@ -1,0 +1,10 @@
+// Example 27: Real-time Fraud & Anomaly Evaluator
+// Configuration Model
+
+model FraudDetectionEngineConfig {
+    environment: String
+    maxBatchSize: Int
+    retryAttempts: Int
+    timeoutSeconds: Int
+    enabled: Bool
+}

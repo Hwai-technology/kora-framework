@@ -1,0 +1,6 @@
+// Example 75: Real-Time Machine Learning Feature Store — Enum: StoreStorageEngine
+
+enum StoreStorageEngine {
+    RedisOnlineMemoryLowLatency
+    ParquetOfflineS3ColdData
+}

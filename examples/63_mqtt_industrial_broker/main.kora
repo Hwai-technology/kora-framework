@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 63: MQTT Industrial Telemetry Broker & Topic Tree
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { MqttIndustrialBrokerInMemoryRepository } from "./repositories/mqtt_industrial_broker_inmemory.repository"
+import { MqttIndustrialBrokerCoreService } from "./services/mqtt_industrial_broker_core.service"
+import { MqttIndustrialBrokerController } from "./controllers/mqtt_industrial_broker.controller"
+import { MqttIndustrialBrokerRouter } from "./routes/mqtt_industrial_broker.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = MqttIndustrialBrokerInMemoryRepository()
+        let service = MqttIndustrialBrokerCoreService(repo)
+        let controller = MqttIndustrialBrokerController(service)
+        let router = MqttIndustrialBrokerRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

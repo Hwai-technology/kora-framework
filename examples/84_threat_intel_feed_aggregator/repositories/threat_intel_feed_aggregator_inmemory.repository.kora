@@ -1,0 +1,33 @@
+// Example 84: Threat Intelligence STIX/TAXII Indicator Parser
+// Repository Implementation
+
+import { ThreatIntelFeedAggregatorPrimaryRecord } from "../entities/threat_intel_feed_aggregator_primary.entity"
+import { ThreatIntelFeedAggregatorRepository } from "../interfaces/threat_intel_feed_aggregator_repository.interface"
+
+class ThreatIntelFeedAggregatorInMemoryRepository implements ThreatIntelFeedAggregatorRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<ThreatIntelFeedAggregatorPrimaryRecord> {
+        if id > 0 {
+            return Some(ThreatIntelFeedAggregatorPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: ThreatIntelFeedAggregatorPrimaryRecord) -> Result<ThreatIntelFeedAggregatorPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

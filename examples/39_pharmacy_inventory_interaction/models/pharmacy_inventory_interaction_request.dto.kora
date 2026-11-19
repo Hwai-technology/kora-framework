@@ -1,0 +1,16 @@
+// Example 39: Pharmacy Dispensing & Drug Interaction Checker
+// Transport Model: Command Requests
+
+model CreatePharmacyInventoryInteractionRecordRequest {
+    patientId: Int
+    clinicianId: Int
+    domainContext: String
+    clinicalMetricScore: Int
+    confidentialNotes: String
+}
+
+model QueryPharmacyInventoryInteractionFilterRequest {
+    patientId: Int
+    limit: Int
+    includeHistorical: Bool
+}

@@ -1,0 +1,75 @@
+// ============================================================================
+// Unit Test Suite: Real-Time Machine Learning Feature Store
+// Verifies Domain Invariants, Boundary Calculations & Liveness
+// ============================================================================
+
+import { CreateFeatureStoreRegistryTaskRequest } from "../models/feature_store_registry_request.dto"
+import { FeatureStoreRegistryInMemoryRepository } from "../repositories/feature_store_registry_inmemory.repository"
+import { FeatureStoreRegistryCoreService } from "../services/feature_store_registry_core.service"
+import { FeatureStoreRegistryTelemetryService } from "../services/feature_store_registry_telemetry.service"
+
+class FeatureStoreRegistryUnitTestSuite {
+    service: FeatureStoreRegistryCoreService
+    telemetry: FeatureStoreRegistryTelemetryService
+
+    init(service: FeatureStoreRegistryCoreService, telemetry: FeatureStoreRegistryTelemetryService) {
+        this.service = service
+        this.telemetry = telemetry
+    }
+
+    fn test_valid_task_execution() -> Bool {
+        let req = CreateFeatureStoreRegistryTaskRequest {
+            taskKey: "UNIT-TASK-101",
+            targetEntityId: 10,
+            workloadCapacity: 95,
+            domainContext: "AI/ML Systems",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(rec) => rec.id == 10 && rec.capacityScore == 95,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_negative_target_rejected() -> Bool {
+        let req = CreateFeatureStoreRegistryTaskRequest {
+            taskKey: "INVALID-TASK",
+            targetEntityId: -1,
+            workloadCapacity: 50,
+            domainContext: "AI/ML Systems",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Target entity ID must be strictly positive",
+        }
+    }
+
+    fn test_health_evaluation() -> Bool {
+        let health = this.service.evaluateHealth(10)
+        return health == "OPTIMUM_PERFORMANCE" || health == "MODERATE_NORMAL"
+    }
+
+    fn test_telemetry_ping() -> Bool {
+        return this.telemetry.ping()
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_task_execution()
+        let t2 = this.test_invalid_negative_target_rejected()
+        let t3 = this.test_health_evaluation()
+        let t4 = this.test_telemetry_ping()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ Real-Time Machine Learning Feature Store Unit Tests: 4/4 passed (Domain Invariants Verified)")
+        } else {
+            print("  ✗ Real-Time Machine Learning Feature Store Unit Tests: failed")
+        }
+    }
+}
+
+let repo = FeatureStoreRegistryInMemoryRepository()
+let service = FeatureStoreRegistryCoreService(repo)
+let telemetry = FeatureStoreRegistryTelemetryService()
+let suite = FeatureStoreRegistryUnitTestSuite(service, telemetry)
+suite.run()

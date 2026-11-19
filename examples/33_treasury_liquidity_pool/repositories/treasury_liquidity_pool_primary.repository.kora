@@ -1,0 +1,33 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// Primary Repository Implementation
+
+import { TreasuryLiquidityPoolRecord } from "../entities/treasury_liquidity_pool_primary.entity"
+import { TreasuryLiquidityPoolRepository } from "../interfaces/treasury_liquidity_pool_repository.interface"
+
+class TreasuryLiquidityPoolPrimaryRepository implements TreasuryLiquidityPoolRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<TreasuryLiquidityPoolRecord> {
+        if id > 0 {
+            return Some(TreasuryLiquidityPoolRecord {
+                id: id,
+                reference: "REF-" + id.toString(),
+                status: "ACTIVE",
+                balance: 100000,
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: TreasuryLiquidityPoolRecord) -> Result<TreasuryLiquidityPoolRecord, String> {
+        if record.id < 0 {
+            return Err("Invalid record id")
+        }
+        return Ok(record)
+    }
+
+    fn countAll() -> Int {
+        return 42
+    }
+}

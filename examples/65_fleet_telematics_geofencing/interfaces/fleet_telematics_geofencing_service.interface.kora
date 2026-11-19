@@ -1,0 +1,10 @@
+// Example 65: Fleet Telematics & Polygonal Geofence Monitor
+// Domain Service Contract
+
+import { FleetTelematicsGeofencingPrimaryRecord } from "../entities/fleet_telematics_geofencing_primary.entity"
+import { CreateFleetTelematicsGeofencingTaskRequest } from "../models/fleet_telematics_geofencing_request.dto"
+
+interface FleetTelematicsGeofencingDomainContract {
+    fn executeTask(req: CreateFleetTelematicsGeofencingTaskRequest) -> Result<FleetTelematicsGeofencingPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

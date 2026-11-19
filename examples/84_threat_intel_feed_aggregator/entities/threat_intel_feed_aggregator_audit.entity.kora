@@ -1,0 +1,12 @@
+// Example 84: Threat Intelligence STIX/TAXII Indicator Parser
+// Persistent Database Entity: Audit Log
+
+@table("threat_intel_feed_aggregator_audit_logs")
+model ThreatIntelFeedAggregatorAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

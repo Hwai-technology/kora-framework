@@ -1,0 +1,7 @@
+// Example 60: Faceted Product Catalog Search & Inverted Index — Domain Event: SearchQueryExecutedEvent
+
+model SearchQueryExecutedEvent {
+    queryTokenHash: String
+    resultsCount: Int
+    latencyMicros: Int
+}

@@ -1,0 +1,9 @@
+// Example 39: Pharmacy Dispensing & Drug Interaction Checker — Domain Event: MedicationDispensedEvent
+// Dedicated Domain Event Specification
+
+model MedicationDispensedEvent {
+    dispenseId: String
+    ndcCode: String
+    quantityUnits: Int
+    timestamp: Int
+}

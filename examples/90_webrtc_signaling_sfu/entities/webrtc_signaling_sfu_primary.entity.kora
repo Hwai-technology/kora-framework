@@ -1,0 +1,13 @@
+// Example 90: WebRTC SFU Media Router & SDP Signaling
+// Persistent Database Entity: Primary Record
+
+@table("webrtc_signaling_sfu_records")
+model WebrtcSignalingSfuPrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

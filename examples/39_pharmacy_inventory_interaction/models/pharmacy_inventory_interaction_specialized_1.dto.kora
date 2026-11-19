@@ -1,0 +1,9 @@
+// Example 39: Pharmacy Dispensing & Drug Interaction Checker
+// Specialized Model 1
+
+model PharmacyInventoryInteractionSpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    riskWeight: Int
+    isActive: Bool
+}

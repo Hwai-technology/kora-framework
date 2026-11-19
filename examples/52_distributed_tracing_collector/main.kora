@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 52: Distributed Tracing & OpenTelemetry Collector
+// Application Container & Cluster Bootstrap
+// ============================================================================
+
+import { DistributedTracingCollectorClusterRepository } from "./repositories/distributed_tracing_collector_cluster.repository"
+import { DistributedTracingCollectorCoreService } from "./services/distributed_tracing_collector_core.service"
+import { DistributedTracingCollectorController } from "./controllers/distributed_tracing_collector.controller"
+import { DistributedTracingCollectorRouter } from "./routes/distributed_tracing_collector.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = DistributedTracingCollectorClusterRepository()
+        let service = DistributedTracingCollectorCoreService(repo)
+        let controller = DistributedTracingCollectorController(service)
+        let router = DistributedTracingCollectorRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

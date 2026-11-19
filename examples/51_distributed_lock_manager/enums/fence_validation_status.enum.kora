@@ -1,0 +1,8 @@
+// Example 51: Distributed Lock Manager & Fencing Tokens — Enum: FenceValidationStatus
+// Dedicated Domain Enum Specification
+
+enum FenceValidationStatus {
+    ValidOrderMonotonic
+    StaleFenceRejected
+    EpochRolledOver
+}

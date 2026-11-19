@@ -1,0 +1,7 @@
+// Example 27: Real-time Fraud & Anomaly Evaluator
+// Notifier Interface
+
+interface FraudDetectionEngineNotifier {
+    fn sendAlert(subject: String, level: String) -> Bool
+    fn ping() -> Bool
+}

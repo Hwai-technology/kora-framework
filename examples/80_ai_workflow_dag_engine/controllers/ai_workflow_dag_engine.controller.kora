@@ -1,0 +1,38 @@
+// Example 80: AI Workflow Directed Acyclic Graph (DAG) Engine
+// Presentation Controller
+
+import { CreateAiWorkflowDagEngineTaskRequest } from "../models/ai_workflow_dag_engine_request.dto"
+import { AiWorkflowDagEngineResponseDto } from "../models/ai_workflow_dag_engine_response.dto"
+import { AiWorkflowDagEngineCoreService } from "../services/ai_workflow_dag_engine_core.service"
+
+class AiWorkflowDagEngineController {
+    service: AiWorkflowDagEngineCoreService
+
+    init(service: AiWorkflowDagEngineCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateAiWorkflowDagEngineTaskRequest) -> AiWorkflowDagEngineResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => AiWorkflowDagEngineResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => AiWorkflowDagEngineResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

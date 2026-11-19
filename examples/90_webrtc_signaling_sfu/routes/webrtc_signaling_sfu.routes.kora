@@ -1,0 +1,22 @@
+// Example 90: WebRTC SFU Media Router & SDP Signaling
+// Router & Endpoint Dispatcher
+
+import { CreateWebrtcSignalingSfuTaskRequest } from "../models/webrtc_signaling_sfu_request.dto"
+import { WebrtcSignalingSfuResponseDto } from "../models/webrtc_signaling_sfu_response.dto"
+import { WebrtcSignalingSfuController } from "../controllers/webrtc_signaling_sfu.controller"
+
+class WebrtcSignalingSfuRouter {
+    controller: WebrtcSignalingSfuController
+
+    init(controller: WebrtcSignalingSfuController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateWebrtcSignalingSfuTaskRequest) -> WebrtcSignalingSfuResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

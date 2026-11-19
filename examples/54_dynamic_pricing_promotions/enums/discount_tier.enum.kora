@@ -1,0 +1,8 @@
+// Example 54: Dynamic Pricing Engine & Flash Sale Rate-Limiter — Enum: DiscountTier
+
+enum DiscountTier {
+    PercentageOff
+    FixedBundleDeduction
+    BogoBuyOneGetOne
+    TieredVolumeRebate
+}

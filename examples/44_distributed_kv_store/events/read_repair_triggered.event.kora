@@ -1,0 +1,8 @@
+// Example 44: Distributed Dynamo-Style Key-Value Store — Domain Event: ReadRepairTriggeredEvent
+// Dedicated Domain Event Specification
+
+model ReadRepairTriggeredEvent {
+    key: String
+    divergentReplicasCount: Int
+    repairedToVersion: Int
+}

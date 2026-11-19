@@ -1,0 +1,16 @@
+// Example 56: Last-Mile Delivery Dispatch & Fleet Geo-Routing
+// Transport Model: Standard Response
+
+model LastMileDeliveryDispatchResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model LastMileDeliveryDispatchSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

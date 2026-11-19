@@ -1,0 +1,7 @@
+// Example 63: MQTT Industrial Telemetry Broker & Topic Tree — Domain Event: MqttPacketPublishedEvent
+
+model MqttPacketPublishedEvent {
+    topic: String
+    qos: Int
+    payloadBytes: Int
+}

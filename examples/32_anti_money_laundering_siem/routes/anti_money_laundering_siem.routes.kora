@@ -1,0 +1,26 @@
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// Router & Endpoint Dispatcher
+
+import { CreateAntiMoneyLaunderingSiemRequest } from "../models/anti_money_laundering_siem_request.dto"
+import { AntiMoneyLaunderingSiemResponse } from "../models/anti_money_laundering_siem_response.dto"
+import { AntiMoneyLaunderingSiemRecord } from "../entities/anti_money_laundering_siem_primary.entity"
+import { AntiMoneyLaunderingSiemCommandController } from "../controllers/anti_money_laundering_siem_command.controller"
+import { AntiMoneyLaunderingSiemQueryController } from "../controllers/anti_money_laundering_siem_query.controller"
+
+class AntiMoneyLaunderingSiemRouter {
+    commandController: AntiMoneyLaunderingSiemCommandController
+    queryController: AntiMoneyLaunderingSiemQueryController
+
+    init(commandController: AntiMoneyLaunderingSiemCommandController, queryController: AntiMoneyLaunderingSiemQueryController) {
+        this.commandController = commandController
+        this.queryController = queryController
+    }
+
+    fn postRecord(req: CreateAntiMoneyLaunderingSiemRequest) -> AntiMoneyLaunderingSiemResponse {
+        return this.commandController.handleCreate(req)
+    }
+
+    fn fetchRecord(id: Int) -> Option<AntiMoneyLaunderingSiemRecord> {
+        return this.queryController.getById(id)
+    }
+}

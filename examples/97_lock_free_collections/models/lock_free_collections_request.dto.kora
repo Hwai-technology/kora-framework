@@ -1,0 +1,15 @@
+// Example 97: Lock-Free Michael-Scott Queue & Treiber Stack
+// Transport Model: Command Request
+
+model CreateLockFreeCollectionsTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryLockFreeCollectionsFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

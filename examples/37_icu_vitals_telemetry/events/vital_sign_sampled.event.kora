@@ -1,0 +1,10 @@
+// Example 37: ICU Real-Time High-Frequency Vitals Monitor — Domain Event: VitalSignSampledEvent
+// Dedicated Domain Event Specification
+
+model VitalSignSampledEvent {
+    patientId: Int
+    bedNumber: Int
+    heartRateBpm: Int
+    spO2Percent: Int
+    timestamp: Int
+}

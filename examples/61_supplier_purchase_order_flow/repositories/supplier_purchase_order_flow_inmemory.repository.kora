@@ -1,0 +1,33 @@
+// Example 61: Supplier Purchase Order & 3-Way Invoice Matcher
+// Repository Implementation
+
+import { SupplierPurchaseOrderFlowPrimaryRecord } from "../entities/supplier_purchase_order_flow_primary.entity"
+import { SupplierPurchaseOrderFlowRepository } from "../interfaces/supplier_purchase_order_flow_repository.interface"
+
+class SupplierPurchaseOrderFlowInMemoryRepository implements SupplierPurchaseOrderFlowRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<SupplierPurchaseOrderFlowPrimaryRecord> {
+        if id > 0 {
+            return Some(SupplierPurchaseOrderFlowPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: SupplierPurchaseOrderFlowPrimaryRecord) -> Result<SupplierPurchaseOrderFlowPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

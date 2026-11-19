@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { TelemedicineConsultationInMemoryRepository } from "./repositories/telemedicine_consultation_inmemory.repository"
+import { TelemedicineConsultationCoreService } from "./services/telemedicine_consultation_core.service"
+import { TelemedicineConsultationController } from "./controllers/telemedicine_consultation.controller"
+import { TelemedicineConsultationRouter } from "./routes/telemedicine_consultation.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = TelemedicineConsultationInMemoryRepository()
+        let service = TelemedicineConsultationCoreService(repo)
+        let controller = TelemedicineConsultationController(service)
+        let router = TelemedicineConsultationRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

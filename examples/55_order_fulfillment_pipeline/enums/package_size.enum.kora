@@ -1,0 +1,7 @@
+// Example 55: Order Fulfillment & Pick-Pack-Ship Workflow — Enum: PackageSize
+
+enum PackageSize {
+    SmallPaddedEnvelope
+    MediumCardboardBox
+    LargeFreightPallet
+}

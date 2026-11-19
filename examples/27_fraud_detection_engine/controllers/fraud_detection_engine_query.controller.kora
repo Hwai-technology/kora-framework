@@ -1,0 +1,21 @@
+// Example 27: Real-time Fraud & Anomaly Evaluator
+// Query Controller (Reads & Lookups)
+
+import { FraudDetectionEngineRecord } from "../entities/fraud_detection_engine_primary.entity"
+import { FraudDetectionEngineRepository } from "../interfaces/fraud_detection_engine_repository.interface"
+
+class FraudDetectionEngineQueryController {
+    repo: FraudDetectionEngineRepository
+
+    init(repo: FraudDetectionEngineRepository) {
+        this.repo = repo
+    }
+
+    fn getById(id: Int) -> Option<FraudDetectionEngineRecord> {
+        return this.repo.findById(id)
+    }
+
+    fn getTotalVolume() -> Int {
+        return this.repo.countAll()
+    }
+}

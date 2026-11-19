@@ -1,0 +1,9 @@
+// Example 90: WebRTC SFU Media Router & SDP Signaling
+// Specialized Model 5
+
+model WebrtcSignalingSfuSpecializedProfile5 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

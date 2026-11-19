@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 83: Zero-Trust Context-Aware Policy Decision Point (PDP)
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { ZeroTrustPolicyEnforcerInMemoryRepository } from "./repositories/zero_trust_policy_enforcer_inmemory.repository"
+import { ZeroTrustPolicyEnforcerCoreService } from "./services/zero_trust_policy_enforcer_core.service"
+import { ZeroTrustPolicyEnforcerController } from "./controllers/zero_trust_policy_enforcer.controller"
+import { ZeroTrustPolicyEnforcerRouter } from "./routes/zero_trust_policy_enforcer.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = ZeroTrustPolicyEnforcerInMemoryRepository()
+        let service = ZeroTrustPolicyEnforcerCoreService(repo)
+        let controller = ZeroTrustPolicyEnforcerController(service)
+        let router = ZeroTrustPolicyEnforcerRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

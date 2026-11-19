@@ -1,0 +1,10 @@
+// Example 103: Probabilistic Bloom & Cuckoo Filter Suite
+// Repository Interface
+
+import { BloomCuckooFilterSuitePrimaryRecord } from "../entities/bloom_cuckoo_filter_suite_primary.entity"
+
+interface BloomCuckooFilterSuiteRepository {
+    fn findById(id: Int) -> Option<BloomCuckooFilterSuitePrimaryRecord>
+    fn save(record: BloomCuckooFilterSuitePrimaryRecord) -> Result<BloomCuckooFilterSuitePrimaryRecord, String>
+    fn countActive() -> Int
+}

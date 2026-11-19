@@ -1,0 +1,22 @@
+// Example 74: Retrieval-Augmented Generation (RAG) Document Chunker
+// Router & Endpoint Dispatcher
+
+import { CreateRagKnowledgePipelineTaskRequest } from "../models/rag_knowledge_pipeline_request.dto"
+import { RagKnowledgePipelineResponseDto } from "../models/rag_knowledge_pipeline_response.dto"
+import { RagKnowledgePipelineController } from "../controllers/rag_knowledge_pipeline.controller"
+
+class RagKnowledgePipelineRouter {
+    controller: RagKnowledgePipelineController
+
+    init(controller: RagKnowledgePipelineController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateRagKnowledgePipelineTaskRequest) -> RagKnowledgePipelineResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

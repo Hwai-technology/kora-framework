@@ -1,0 +1,9 @@
+// Example 103: Probabilistic Bloom & Cuckoo Filter Suite
+// Configuration Model
+
+model BloomCuckooFilterSuiteConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

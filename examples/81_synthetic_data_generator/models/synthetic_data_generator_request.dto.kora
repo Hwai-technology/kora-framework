@@ -1,0 +1,15 @@
+// Example 81: Synthetic Tabular Data & Differential Privacy Generator
+// Transport Model: Command Request
+
+model CreateSyntheticDataGeneratorTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QuerySyntheticDataGeneratorFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

@@ -1,0 +1,9 @@
+// Example 46: Distributed Task Scheduler & Leader Lease
+// Specialized Model 1
+
+model DistributedJobSchedulerSpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    quorumWeight: Int
+    isActive: Bool
+}

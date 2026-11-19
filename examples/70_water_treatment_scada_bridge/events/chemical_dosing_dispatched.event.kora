@@ -1,0 +1,7 @@
+// Example 70: Industrial SCADA Modbus Gateway & Water Treatment — Domain Event: ChemicalDosingDispatchedEvent
+
+model ChemicalDosingDispatchedEvent {
+    stationId: Int
+    reagentChemical: String
+    dosingRateMillilitersPerHour: Int
+}

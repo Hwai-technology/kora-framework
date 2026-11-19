@@ -1,0 +1,11 @@
+// Example 27: Real-time Fraud & Anomaly Evaluator
+// State Snapshot Entity
+
+@table("fraud_detection_engine_snapshots")
+model FraudDetectionEngineSnapshot {
+    @id
+    id: Int
+    aggregateId: Int
+    version: Int
+    stateHash: String
+}

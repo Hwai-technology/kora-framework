@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 59: Reverse Logistics & RMA Inspection Engine
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { ReturnsRmaManagementInMemoryRepository } from "./repositories/returns_rma_management_inmemory.repository"
+import { ReturnsRmaManagementCoreService } from "./services/returns_rma_management_core.service"
+import { ReturnsRmaManagementController } from "./controllers/returns_rma_management.controller"
+import { ReturnsRmaManagementRouter } from "./routes/returns_rma_management.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = ReturnsRmaManagementInMemoryRepository()
+        let service = ReturnsRmaManagementCoreService(repo)
+        let controller = ReturnsRmaManagementController(service)
+        let router = ReturnsRmaManagementRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

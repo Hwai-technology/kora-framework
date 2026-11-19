@@ -1,0 +1,16 @@
+// Example 62: Customer Loyalty Rewards Ledger & Tier Upgrades
+// Transport Model: Standard Response
+
+model CustomerLoyaltyRewardsResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model CustomerLoyaltyRewardsSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

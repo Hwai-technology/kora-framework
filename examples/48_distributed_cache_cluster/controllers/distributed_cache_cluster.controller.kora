@@ -1,0 +1,38 @@
+// Example 48: Distributed Cache Cluster & Write-Behind
+// Presentation Controller
+
+import { CreateDistributedCacheClusterTaskRequest } from "../models/distributed_cache_cluster_request.dto"
+import { DistributedCacheClusterResponseDto } from "../models/distributed_cache_cluster_response.dto"
+import { DistributedCacheClusterCoreService } from "../services/distributed_cache_cluster_core.service"
+
+class DistributedCacheClusterController {
+    service: DistributedCacheClusterCoreService
+
+    init(service: DistributedCacheClusterCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskProposal(req: CreateDistributedCacheClusterTaskRequest) -> DistributedCacheClusterResponseDto {
+        let outcome = this.service.processConsensusCommand(req)
+        return match outcome {
+            Ok(state) => DistributedCacheClusterResponseDto {
+                operationId: "CONSENSUS-TX-" + req.taskKey,
+                nodeId: state.id,
+                status: "QUORUM_COMMITTED",
+                isQuorumSatisfied: true,
+                message: "Log entry replicated and committed across cluster quorum",
+            },
+            Err(reason) => DistributedCacheClusterResponseDto {
+                operationId: "CONSENSUS-FAILED",
+                nodeId: req.originatingNodeId,
+                status: "QUORUM_REJECTED",
+                isQuorumSatisfied: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkQuorumStatus() -> Bool {
+        return this.service.evaluateClusterQuorum()
+    }
+}

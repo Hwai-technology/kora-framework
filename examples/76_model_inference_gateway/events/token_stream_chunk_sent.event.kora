@@ -1,0 +1,7 @@
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher — Domain Event: TokenStreamChunkSentEvent
+
+model TokenStreamChunkSentEvent {
+    requestId: String
+    tokenSequenceIndex: Int
+    durationFromStartMs: Int
+}

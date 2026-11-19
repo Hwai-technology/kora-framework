@@ -1,48 +1,110 @@
 // ============================================================================
 // Unit Test Suite: 12_microservice_event_driven
-// Tests domain event publication, payload serialization, and event log queries
+// Tests Transactional Outbox, Idempotency Deduplication, Retries, and DLQ
 // ============================================================================
 
-import { DomainEventEntity } from "../entities/domain_event.entity"
 import { EventStoreRepository } from "../repositories/event_store.repository"
 import { EventPublisherService } from "../services/event_publisher.service"
 
 class MicroserviceUnitTestSuite {
+    repo: EventStoreRepository
     service: EventPublisherService
 
-    init(service: EventPublisherService) {
-        this.service = service
+    init() {
+        this.repo = EventStoreRepository()
+        this.service = EventPublisherService(this.repo)
     }
 
-    fn test_publish_event() -> Bool {
-        let res = this.service.publish("USER_REGISTERED", "{\"id\": 10}")
-        return match res {
-            Ok(evt) => evt.eventType == "USER_REGISTERED",
-            Err(e) => false,
+    // 1. Monotonic Outbox Sequence Generation
+    fn test_monotonic_sequence_generation() -> Bool {
+        let res1 = this.service.publishOrderEvent("OrderCreated", "part_1", "idemp_key_001", "{\"total\": 15000}")
+        let res2 = this.service.publishOrderEvent("OrderCreated", "part_1", "idemp_key_002", "{\"total\": 25000}")
+
+        let seq1 = match res1 {
+            Ok(e) => e.sequenceNumber,
+            Err(err) => 0,
         }
-    }
-
-    fn test_list_recent() -> Bool {
-        let res = this.service.listRecent()
-        return match res {
-            Ok(count) => count >= 0,
-            Err(e) => false,
+        let seq2 = match res2 {
+            Ok(e) => e.sequenceNumber,
+            Err(err) => 0,
         }
+
+        return seq1 > 0 && seq2 == seq1 + 1
     }
 
-    fn run() -> Unit {
-        let p1 = this.test_publish_event()
-        let p2 = this.test_list_recent()
-        if p1 && p2 {
-            print("  ✓ Microservice Event-Driven Unit Tests: 2/2 passed")
+    // 2. Idempotency Gate Replay Suppression
+    fn test_idempotency_suppresses_replay() -> Bool {
+        let res1 = this.service.publishOrderEvent("OrderCreated", "part_1", "idemp_key_unique", "{\"total\": 500}")
+        let isFirstOk = match res1 {
+            Ok(e) => true,
+            Err(err) => false,
+        }
+
+        // Duplicate replay with identical key
+        let res2 = this.service.publishOrderEvent("OrderCreated", "part_1", "idemp_key_unique", "{\"total\": 500}")
+        let isDuplicateSuppressed = match res2 {
+            Ok(e) => false,
+            Err(err) => true,
+        }
+
+        return isFirstOk && isDuplicateSuppressed
+    }
+
+    // 3. Successful Consumer Acknowledgement marks Delivered
+    fn test_successful_consumer_ack() -> Bool {
+        let res = this.service.publishOrderEvent("PaymentCaptured", "part_2", "idemp_key_pay_1", "{\"amount\": 9900}")
+        let eid = match res {
+            Ok(e) => e.eventId,
+            Err(err) => "NONE",
+        }
+
+        let ack = this.service.processIncomingDelivery(eid, false)
+        let optSaved = this.repo.findById(eid)
+        let status = match optSaved {
+            Some(e) => e.status,
+            None => "NOT_FOUND",
+        }
+
+        return ack.success && !ack.routedToDlq && status == "Delivered"
+    }
+
+    // 4. Poison Pill Triggers Retries with Exponential Backoff and DLQ routing
+    fn test_retry_and_dead_letter_queue_routing() -> Bool {
+        let res = this.service.publishOrderEvent("OrderFulfillment", "part_3", "idemp_key_poison", "{\"bad\": true}")
+        let eid = match res {
+            Ok(e) => e.eventId,
+            Err(err) => "NONE",
+        }
+
+        // Attempt 1: Transient failure -> retry after 100ms
+        let ack1 = this.service.processIncomingDelivery(eid, true)
+        let pass1 = !ack1.success && ack1.retryAfterMs == 100 && !ack1.routedToDlq
+
+        // Attempt 2: Transient failure -> retry after 200ms
+        let ack2 = this.service.processIncomingDelivery(eid, true)
+        let pass2 = !ack2.success && ack2.retryAfterMs == 200 && !ack2.routedToDlq
+
+        // Attempt 3: Exceeded max retries -> routed to DLQ!
+        let ack3 = this.service.processIncomingDelivery(eid, true)
+        let pass3 = !ack3.success && ack3.routedToDlq
+
+        let dlqCount = this.repo.getDlqCount()
+        return pass1 && pass2 && pass3 && dlqCount == 1
+    }
+
+    fn runAll() -> Unit {
+        let t1 = this.test_monotonic_sequence_generation()
+        let t2 = this.test_idempotency_suppresses_replay()
+        let t3 = this.test_successful_consumer_ack()
+        let t4 = this.test_retry_and_dead_letter_queue_routing()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ Microservice Outbox, Idempotency & DLQ Unit Tests: 4/4 passed")
         } else {
-            print("  ✗ Microservice Event-Driven Unit Tests: failed")
+            print("  ✗ Microservice Outbox, Idempotency & DLQ Unit Tests: FAILED")
         }
     }
 }
 
-let db = Database()
-let repo = EventStoreRepository(db)
-let service = EventPublisherService(repo)
-let suite = MicroserviceUnitTestSuite(service)
-suite.run()
+let suite = MicroserviceUnitTestSuite()
+suite.runAll()

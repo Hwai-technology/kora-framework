@@ -1,0 +1,9 @@
+// Example 60: Faceted Product Catalog Search & Inverted Index
+// Configuration Model
+
+model ProductCatalogSearchConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

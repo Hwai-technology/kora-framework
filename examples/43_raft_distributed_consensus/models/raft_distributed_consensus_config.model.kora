@@ -1,0 +1,9 @@
+// Example 43: Raft Distributed Consensus Engine
+// Configuration Model
+
+model RaftDistributedConsensusClusterConfig {
+    heartbeatIntervalMs: Int
+    electionTimeoutMs: Int
+    quorumMajoritySize: Int
+    clusterName: String
+}

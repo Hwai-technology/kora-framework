@@ -1,0 +1,10 @@
+// ============================================================================
+// Example 01: Core Language Foundations — Enum: PaymentMethod
+// ============================================================================
+
+enum PaymentMethod {
+    CreditCard
+    BankWire
+    CryptoWallet
+    CashOnDelivery
+}

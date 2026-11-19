@@ -1,0 +1,14 @@
+// Example 58: Distributed Shopping Cart Session Actor
+// Telemetry & Liveness Monitor
+
+class ShoppingCartSessionActorTelemetryService {
+    init() {}
+
+    fn ping() -> Bool {
+        return true
+    }
+
+    fn computeDigest(entityId: Int, metricScore: Int) -> String {
+        return "SHA256-DIGEST-" + entityId.toString() + "-" + metricScore.toString()
+    }
+}

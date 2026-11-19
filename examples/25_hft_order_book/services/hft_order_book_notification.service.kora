@@ -1,0 +1,16 @@
+// Example 25: High-Frequency Trading Order Book
+// Notification Service Implementation
+
+import { HftOrderBookNotifier } from "../interfaces/hft_order_book_notifier.interface"
+
+class HftOrderBookNotificationService implements HftOrderBookNotifier {
+    init() {}
+
+    fn sendAlert(subject: String, level: String) -> Bool {
+        return level != "CRITICAL" || subject != ""
+    }
+
+    fn ping() -> Bool {
+        return true
+    }
+}

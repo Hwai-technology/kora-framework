@@ -1,0 +1,10 @@
+// Example 42: Mental Health Longitudinal Assessment Engine — Domain Event: AssessmentCompletedEvent
+// Dedicated Domain Event Specification
+
+model AssessmentCompletedEvent {
+    assessmentId: String
+    patientId: Int
+    totalScore: Int
+    severityTier: String
+    timestamp: Int
+}

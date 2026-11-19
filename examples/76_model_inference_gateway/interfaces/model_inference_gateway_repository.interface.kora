@@ -1,0 +1,10 @@
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher
+// Repository Interface
+
+import { ModelInferenceGatewayPrimaryRecord } from "../entities/model_inference_gateway_primary.entity"
+
+interface ModelInferenceGatewayRepository {
+    fn findById(id: Int) -> Option<ModelInferenceGatewayPrimaryRecord>
+    fn save(record: ModelInferenceGatewayPrimaryRecord) -> Result<ModelInferenceGatewayPrimaryRecord, String>
+    fn countActive() -> Int
+}

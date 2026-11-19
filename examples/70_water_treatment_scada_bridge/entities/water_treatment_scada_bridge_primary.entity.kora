@@ -1,0 +1,13 @@
+// Example 70: Industrial SCADA Modbus Gateway & Water Treatment
+// Persistent Database Entity: Primary Record
+
+@table("water_treatment_scada_bridge_records")
+model WaterTreatmentScadaBridgePrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

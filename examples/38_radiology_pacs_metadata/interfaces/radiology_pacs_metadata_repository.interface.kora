@@ -1,0 +1,10 @@
+// Example 38: Radiology PACS DICOM Metadata Indexer
+// Repository Interface
+
+import { RadiologyPacsMetadataClinicalEntity } from "../entities/radiology_pacs_metadata_primary.entity"
+
+interface RadiologyPacsMetadataRepository {
+    fn findByPatientId(patientId: Int) -> Option<RadiologyPacsMetadataClinicalEntity>
+    fn save(entity: RadiologyPacsMetadataClinicalEntity) -> Result<RadiologyPacsMetadataClinicalEntity, String>
+    fn verifyIntegrity(recordId: Int) -> Bool
+}

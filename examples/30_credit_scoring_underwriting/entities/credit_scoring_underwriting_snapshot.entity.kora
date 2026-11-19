@@ -1,0 +1,11 @@
+// Example 30: Credit Underwriting & Risk Assessment
+// State Snapshot Entity
+
+@table("credit_scoring_underwriting_snapshots")
+model CreditScoringUnderwritingSnapshot {
+    @id
+    id: Int
+    aggregateId: Int
+    version: Int
+    stateHash: String
+}

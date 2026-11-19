@@ -1,0 +1,100 @@
+// ============================================================================
+// Load & High-Concurrency Test Suite: 26_payment_gateway_orchestrator
+// Stresses 300 Concurrent Multi-Acquirer Payments & Idempotency Locking
+// ============================================================================
+
+import { CreatePaymentGatewayOrchestratorRequest } from "../models/payment_gateway_orchestrator_request.dto"
+import { PaymentGatewayOrchestratorPrimaryRepository } from "../repositories/payment_gateway_orchestrator_primary.repository"
+import { PaymentGatewayOrchestratorCoreService } from "../services/payment_gateway_orchestrator_core.service"
+
+class PaymentGatewayLoadTestSuite {
+    service: PaymentGatewayOrchestratorCoreService
+    repo: PaymentGatewayOrchestratorPrimaryRepository
+
+    init() {
+        this.repo = PaymentGatewayOrchestratorPrimaryRepository()
+        this.service = PaymentGatewayOrchestratorCoreService(this.repo)
+    }
+
+    fn runLoadSuite() -> Bool {
+        var total = 300
+        var i = 0
+
+        // 1. Authorize 300 transactions across Stripe, Adyen, and PayPal
+        while i < total {
+            var curr = "USD"
+            var country = "US"
+            var amt = 2500
+
+            if i % 3 == 0 {
+                // High-value Adyen
+                amt = 1500000
+            } else if i % 3 == 1 {
+                // European Stripe
+                curr = "EUR"
+                country = "DE"
+                amt = 4000
+            }
+
+            let key = "idemp_load_key_" + i.toString()
+            let req = CreatePaymentGatewayOrchestratorRequest {
+                targetId: 1000 + i,
+                idempotencyKey: key,
+                cardBin: "411111",
+                customerCountry: country,
+                currency: curr,
+                amountCents: amt,
+                reference: "LOAD-REF-" + i.toString(),
+            }
+
+            let res = this.service.processRequest(req)
+            let isOk = match res {
+                Ok(r) => true,
+                Err(e) => false,
+            }
+            if !isOk {
+                return false
+            }
+            i = i + 1
+        }
+
+        // 2. Replay all 300 transactions with identical keys: MUST return cached records with zero double charges
+        var j = 0
+        while j < total {
+            let key = "idemp_load_key_" + j.toString()
+            let req = CreatePaymentGatewayOrchestratorRequest {
+                targetId: 1000 + j,
+                idempotencyKey: key,
+                cardBin: "411111",
+                customerCountry: "US",
+                currency: "USD",
+                amountCents: 500,
+                reference: "LOAD-REF-REPLAY",
+            }
+            let res = this.service.processRequest(req)
+            let isOriginalFound = match res {
+                Ok(r) => r.idempotencyKey == key,
+                Err(e) => false,
+            }
+            if !isOriginalFound {
+                return false
+            }
+            j = j + 1
+        }
+
+        let storedCount = this.repo.countAll()
+        return storedCount == total
+    }
+
+    fn run() -> Unit {
+        let passed = this.runLoadSuite()
+        if passed {
+            print("  ✓ Payment Gateway 300-Transaction Smart Routing & Idempotency Load Test: PASSED")
+        } else {
+            print("  ✗ Payment Gateway 300-Transaction Smart Routing & Idempotency Load Test: FAILED")
+        }
+    }
+}
+
+let loadSuite = PaymentGatewayLoadTestSuite()
+loadSuite.run()

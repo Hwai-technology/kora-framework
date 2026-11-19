@@ -1,0 +1,10 @@
+// Example 69: Smart Building HVAC & Air Quality Coordinator
+// Repository Interface
+
+import { SmartBuildingHvacControlPrimaryRecord } from "../entities/smart_building_hvac_control_primary.entity"
+
+interface SmartBuildingHvacControlRepository {
+    fn findById(id: Int) -> Option<SmartBuildingHvacControlPrimaryRecord>
+    fn save(record: SmartBuildingHvacControlPrimaryRecord) -> Result<SmartBuildingHvacControlPrimaryRecord, String>
+    fn countActive() -> Int
+}

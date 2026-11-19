@@ -1,0 +1,13 @@
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions
+// Persistent Database Entity: Audit Trail Log
+
+@table("telemedicine_consultation_audit_trail")
+model TelemedicineConsultationAuditTrail {
+    @id
+    id: Int
+    recordId: Int
+    performedByStaffId: Int
+    actionTaken: String
+    tamperProofHash: String
+    timestamp: Int
+}

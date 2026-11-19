@@ -1,0 +1,16 @@
+// Example 97: Lock-Free Michael-Scott Queue & Treiber Stack
+// Transport Model: Standard Response
+
+model LockFreeCollectionsResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model LockFreeCollectionsSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

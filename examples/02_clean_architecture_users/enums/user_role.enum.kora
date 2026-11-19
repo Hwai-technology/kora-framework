@@ -1,0 +1,8 @@
+// examples/02_clean_architecture_users — Enum: UserRole
+
+enum UserRole {
+    Guest
+    Member
+    Moderator
+    Administrator
+}

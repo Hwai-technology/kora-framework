@@ -1,0 +1,33 @@
+// Example 29: Algorithmic Market Maker & Quoting Engine
+// Primary Repository Implementation
+
+import { AlgorithmicMarketMakerRecord } from "../entities/algorithmic_market_maker_primary.entity"
+import { AlgorithmicMarketMakerRepository } from "../interfaces/algorithmic_market_maker_repository.interface"
+
+class AlgorithmicMarketMakerPrimaryRepository implements AlgorithmicMarketMakerRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<AlgorithmicMarketMakerRecord> {
+        if id > 0 {
+            return Some(AlgorithmicMarketMakerRecord {
+                id: id,
+                reference: "REF-" + id.toString(),
+                status: "ACTIVE",
+                balance: 100000,
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: AlgorithmicMarketMakerRecord) -> Result<AlgorithmicMarketMakerRecord, String> {
+        if record.id < 0 {
+            return Err("Invalid record id")
+        }
+        return Ok(record)
+    }
+
+    fn countAll() -> Int {
+        return 42
+    }
+}

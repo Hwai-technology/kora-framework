@@ -1,0 +1,7 @@
+// Example 66: Predictive Industrial Equipment Maintenance — Domain Event: VibrationAnomalyFlaggedEvent
+
+model VibrationAnomalyFlaggedEvent {
+    equipmentId: String
+    dominantHarmonicHz: Int
+    rmsVelocityBps: Int
+}

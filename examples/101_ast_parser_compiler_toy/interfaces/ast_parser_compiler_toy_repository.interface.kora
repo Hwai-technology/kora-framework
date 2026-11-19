@@ -1,0 +1,10 @@
+// Example 101: Pratt Parsing & Bytecode Virtual Machine
+// Repository Interface
+
+import { AstParserCompilerToyPrimaryRecord } from "../entities/ast_parser_compiler_toy_primary.entity"
+
+interface AstParserCompilerToyRepository {
+    fn findById(id: Int) -> Option<AstParserCompilerToyPrimaryRecord>
+    fn save(record: AstParserCompilerToyPrimaryRecord) -> Result<AstParserCompilerToyPrimaryRecord, String>
+    fn countActive() -> Int
+}

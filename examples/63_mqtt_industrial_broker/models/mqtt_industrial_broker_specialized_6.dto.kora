@@ -1,0 +1,9 @@
+// Example 63: MQTT Industrial Telemetry Broker & Topic Tree
+// Specialized Model 6
+
+model MqttIndustrialBrokerSpecializedProfile6 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

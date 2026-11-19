@@ -1,0 +1,10 @@
+// Example 47: Cloud Event Bus & Partitioned Streaming
+// Domain Service Contract
+
+import { CloudEventBusNodeState } from "../entities/cloud_event_bus_primary.entity"
+import { CreateCloudEventBusTaskRequest } from "../models/cloud_event_bus_request.dto"
+
+interface CloudEventBusConsensusContract {
+    fn processConsensusCommand(req: CreateCloudEventBusTaskRequest) -> Result<CloudEventBusNodeState, String>
+    fn evaluateClusterQuorum() -> Bool
+}

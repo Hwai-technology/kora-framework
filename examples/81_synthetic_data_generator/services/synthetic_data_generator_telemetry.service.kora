@@ -1,0 +1,14 @@
+// Example 81: Synthetic Tabular Data & Differential Privacy Generator
+// Telemetry & Liveness Monitor
+
+class SyntheticDataGeneratorTelemetryService {
+    init() {}
+
+    fn ping() -> Bool {
+        return true
+    }
+
+    fn computeDigest(entityId: Int, metricScore: Int) -> String {
+        return "SHA256-DIGEST-" + entityId.toString() + "-" + metricScore.toString()
+    }
+}

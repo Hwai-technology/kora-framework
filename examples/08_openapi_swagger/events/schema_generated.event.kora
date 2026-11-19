@@ -1,0 +1,7 @@
+// examples/08_openapi_swagger — Event: SchemaGeneratedEvent
+
+model SchemaGeneratedEvent {
+    specVersion: String
+    endpointCount: Int
+    timestamp: Int
+}

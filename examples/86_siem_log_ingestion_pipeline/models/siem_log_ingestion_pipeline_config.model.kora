@@ -1,0 +1,9 @@
+// Example 86: SIEM High-Throughput Log Ingestion & CEF Normalizer
+// Configuration Model
+
+model SiemLogIngestionPipelineConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

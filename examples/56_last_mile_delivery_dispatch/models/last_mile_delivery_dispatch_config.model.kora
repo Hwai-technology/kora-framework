@@ -1,0 +1,9 @@
+// Example 56: Last-Mile Delivery Dispatch & Fleet Geo-Routing
+// Configuration Model
+
+model LastMileDeliveryDispatchConfig {
+    maxConcurrency: Int
+    timeoutSeconds: Int
+    enableTelemetryAudit: Bool
+    environment: String
+}

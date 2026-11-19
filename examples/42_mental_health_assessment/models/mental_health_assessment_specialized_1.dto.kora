@@ -1,0 +1,9 @@
+// Example 42: Mental Health Longitudinal Assessment Engine
+// Specialized Model 1
+
+model MentalHealthAssessmentSpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    riskWeight: Int
+    isActive: Bool
+}

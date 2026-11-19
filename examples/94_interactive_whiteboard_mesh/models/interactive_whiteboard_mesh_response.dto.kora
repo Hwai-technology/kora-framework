@@ -1,0 +1,16 @@
+// Example 94: Interactive Vector Whiteboard & Delta Sync
+// Transport Model: Standard Response
+
+model InteractiveWhiteboardMeshResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model InteractiveWhiteboardMeshSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

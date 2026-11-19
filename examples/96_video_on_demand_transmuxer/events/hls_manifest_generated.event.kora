@@ -1,0 +1,7 @@
+// Example 96: Video on Demand (VOD) HLS/DASH Transmuxer — Domain Event: HlsManifestGeneratedEvent
+
+model HlsManifestGeneratedEvent {
+    assetId: String
+    segmentCount: Int
+    bitrateCount: Int
+}

@@ -1,0 +1,7 @@
+// examples/04_mysql_database_orm — Event: MigrationAppliedEvent
+
+model MigrationAppliedEvent {
+    migrationId: String
+    checksum: String
+    executedAt: Int
+}

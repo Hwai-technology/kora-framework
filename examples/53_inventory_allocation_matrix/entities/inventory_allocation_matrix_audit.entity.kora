@@ -1,0 +1,12 @@
+// Example 53: Inventory Allocation Matrix & Multi-Warehouse Stock
+// Persistent Database Entity: Audit Log
+
+@table("inventory_allocation_matrix_audit_logs")
+model InventoryAllocationMatrixAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

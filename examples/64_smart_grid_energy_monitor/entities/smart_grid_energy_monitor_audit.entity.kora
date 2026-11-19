@@ -1,0 +1,12 @@
+// Example 64: Smart Electrical Grid Substation Telemetry
+// Persistent Database Entity: Audit Log
+
+@table("smart_grid_energy_monitor_audit_logs")
+model SmartGridEnergyMonitorAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

@@ -1,0 +1,16 @@
+// Example 75: Real-Time Machine Learning Feature Store
+// Transport Model: Standard Response
+
+model FeatureStoreRegistryResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model FeatureStoreRegistrySummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

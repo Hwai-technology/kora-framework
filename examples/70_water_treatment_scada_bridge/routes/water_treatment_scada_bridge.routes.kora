@@ -1,0 +1,22 @@
+// Example 70: Industrial SCADA Modbus Gateway & Water Treatment
+// Router & Endpoint Dispatcher
+
+import { CreateWaterTreatmentScadaBridgeTaskRequest } from "../models/water_treatment_scada_bridge_request.dto"
+import { WaterTreatmentScadaBridgeResponseDto } from "../models/water_treatment_scada_bridge_response.dto"
+import { WaterTreatmentScadaBridgeController } from "../controllers/water_treatment_scada_bridge.controller"
+
+class WaterTreatmentScadaBridgeRouter {
+    controller: WaterTreatmentScadaBridgeController
+
+    init(controller: WaterTreatmentScadaBridgeController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateWaterTreatmentScadaBridgeTaskRequest) -> WaterTreatmentScadaBridgeResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

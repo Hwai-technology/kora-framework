@@ -1,0 +1,7 @@
+// Example 74: Retrieval-Augmented Generation (RAG) Document Chunker — Enum: ChunkingStrategy
+
+enum ChunkingStrategy {
+    FixedWindowWithOverlap
+    MarkdownHeaderHierarchy
+    SemanticSentenceBoundary
+}

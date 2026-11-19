@@ -1,0 +1,10 @@
+// Example 74: Retrieval-Augmented Generation (RAG) Document Chunker
+// Domain Service Contract
+
+import { RagKnowledgePipelinePrimaryRecord } from "../entities/rag_knowledge_pipeline_primary.entity"
+import { CreateRagKnowledgePipelineTaskRequest } from "../models/rag_knowledge_pipeline_request.dto"
+
+interface RagKnowledgePipelineDomainContract {
+    fn executeTask(req: CreateRagKnowledgePipelineTaskRequest) -> Result<RagKnowledgePipelinePrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

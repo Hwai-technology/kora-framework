@@ -1,0 +1,10 @@
+// Example 44: Distributed Dynamo-Style Key-Value Store
+// Repository Interface
+
+import { DistributedKvStoreNodeState } from "../entities/distributed_kv_store_primary.entity"
+
+interface DistributedKvStoreRepository {
+    fn findNodeById(nodeId: Int) -> Option<DistributedKvStoreNodeState>
+    fn saveNodeState(state: DistributedKvStoreNodeState) -> Result<DistributedKvStoreNodeState, String>
+    fn getActiveQuorumCount() -> Int
+}

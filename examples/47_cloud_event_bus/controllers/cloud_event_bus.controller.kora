@@ -1,0 +1,38 @@
+// Example 47: Cloud Event Bus & Partitioned Streaming
+// Presentation Controller
+
+import { CreateCloudEventBusTaskRequest } from "../models/cloud_event_bus_request.dto"
+import { CloudEventBusResponseDto } from "../models/cloud_event_bus_response.dto"
+import { CloudEventBusCoreService } from "../services/cloud_event_bus_core.service"
+
+class CloudEventBusController {
+    service: CloudEventBusCoreService
+
+    init(service: CloudEventBusCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskProposal(req: CreateCloudEventBusTaskRequest) -> CloudEventBusResponseDto {
+        let outcome = this.service.processConsensusCommand(req)
+        return match outcome {
+            Ok(state) => CloudEventBusResponseDto {
+                operationId: "CONSENSUS-TX-" + req.taskKey,
+                nodeId: state.id,
+                status: "QUORUM_COMMITTED",
+                isQuorumSatisfied: true,
+                message: "Log entry replicated and committed across cluster quorum",
+            },
+            Err(reason) => CloudEventBusResponseDto {
+                operationId: "CONSENSUS-FAILED",
+                nodeId: req.originatingNodeId,
+                status: "QUORUM_REJECTED",
+                isQuorumSatisfied: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkQuorumStatus() -> Bool {
+        return this.service.evaluateClusterQuorum()
+    }
+}

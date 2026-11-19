@@ -1,0 +1,9 @@
+// examples/02_clean_architecture_users — Event: UserRoleChangedEvent
+
+model UserRoleChangedEvent {
+    userId: Int
+    oldRole: String
+    newRole: String
+    changedBy: String
+    timestamp: Int
+}

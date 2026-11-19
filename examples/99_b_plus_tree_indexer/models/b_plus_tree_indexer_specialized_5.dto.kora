@@ -1,0 +1,9 @@
+// Example 99: B+ Tree Disk Pager & Index Node Balancer
+// Specialized Model 5
+
+model BPlusTreeIndexerSpecializedProfile5 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

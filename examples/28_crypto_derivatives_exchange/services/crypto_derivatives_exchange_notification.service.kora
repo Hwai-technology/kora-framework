@@ -1,0 +1,16 @@
+// Example 28: Crypto Derivatives & Margin Engine
+// Notification Service Implementation
+
+import { CryptoDerivativesExchangeNotifier } from "../interfaces/crypto_derivatives_exchange_notifier.interface"
+
+class CryptoDerivativesExchangeNotificationService implements CryptoDerivativesExchangeNotifier {
+    init() {}
+
+    fn sendAlert(subject: String, level: String) -> Bool {
+        return level != "CRITICAL" || subject != ""
+    }
+
+    fn ping() -> Bool {
+        return true
+    }
+}

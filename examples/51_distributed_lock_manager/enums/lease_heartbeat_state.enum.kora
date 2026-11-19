@@ -1,0 +1,8 @@
+// Example 51: Distributed Lock Manager & Fencing Tokens — Enum: LeaseHeartbeatState
+// Dedicated Domain Enum Specification
+
+enum LeaseHeartbeatState {
+    HeartbeatAwaiting
+    ExtendedConfirmed
+    LostNodeIsolated
+}

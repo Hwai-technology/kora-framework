@@ -1,0 +1,9 @@
+// Example 57: Marketplace Vendor Settlement & Escrow Payouts
+// Specialized Model 5
+
+model MarketplaceVendorSettlementSpecializedProfile5 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

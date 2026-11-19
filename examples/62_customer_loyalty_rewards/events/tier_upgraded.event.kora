@@ -1,0 +1,8 @@
+// Example 62: Customer Loyalty Rewards Ledger & Tier Upgrades — Domain Event: TierUpgradedEvent
+
+model TierUpgradedEvent {
+    customerId: Int
+    oldTier: String
+    newTier: String
+    rewardMultiplier: Int
+}

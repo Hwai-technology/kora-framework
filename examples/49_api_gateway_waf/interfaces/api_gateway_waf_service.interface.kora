@@ -1,0 +1,10 @@
+// Example 49: API Gateway & Web Application Firewall
+// Domain Service Contract
+
+import { ApiGatewayWafNodeState } from "../entities/api_gateway_waf_primary.entity"
+import { CreateApiGatewayWafTaskRequest } from "../models/api_gateway_waf_request.dto"
+
+interface ApiGatewayWafConsensusContract {
+    fn processConsensusCommand(req: CreateApiGatewayWafTaskRequest) -> Result<ApiGatewayWafNodeState, String>
+    fn evaluateClusterQuorum() -> Bool
+}

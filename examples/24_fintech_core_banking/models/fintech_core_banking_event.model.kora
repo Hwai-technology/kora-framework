@@ -1,0 +1,10 @@
+// Example 24: Core Banking Ledger & Accounts
+// Domain Event Model
+
+model FintechCoreBankingEvent {
+    eventId: String
+    eventType: String
+    entityId: Int
+    occurredAt: Int
+    payloadHash: String
+}

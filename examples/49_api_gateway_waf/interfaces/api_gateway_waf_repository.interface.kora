@@ -1,0 +1,10 @@
+// Example 49: API Gateway & Web Application Firewall
+// Repository Interface
+
+import { ApiGatewayWafNodeState } from "../entities/api_gateway_waf_primary.entity"
+
+interface ApiGatewayWafRepository {
+    fn findNodeById(nodeId: Int) -> Option<ApiGatewayWafNodeState>
+    fn saveNodeState(state: ApiGatewayWafNodeState) -> Result<ApiGatewayWafNodeState, String>
+    fn getActiveQuorumCount() -> Int
+}

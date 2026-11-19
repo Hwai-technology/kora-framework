@@ -1,0 +1,9 @@
+// Example 91: CRDT Collaborative Real-Time Document Editor
+// Specialized Model 2
+
+model CollaborativeCrdtDocSpecializedProfile2 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

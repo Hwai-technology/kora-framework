@@ -1,0 +1,10 @@
+// Example 46: Distributed Task Scheduler & Leader Lease
+// Domain Service Contract
+
+import { DistributedJobSchedulerNodeState } from "../entities/distributed_job_scheduler_primary.entity"
+import { CreateDistributedJobSchedulerTaskRequest } from "../models/distributed_job_scheduler_request.dto"
+
+interface DistributedJobSchedulerConsensusContract {
+    fn processConsensusCommand(req: CreateDistributedJobSchedulerTaskRequest) -> Result<DistributedJobSchedulerNodeState, String>
+    fn evaluateClusterQuorum() -> Bool
+}

@@ -1,0 +1,9 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector — Domain Event: SpanBatchIngestedEvent
+// Dedicated Domain Event Specification
+
+model SpanBatchIngestedEvent {
+    traceCount: Int
+    spanCount: Int
+    serviceSource: String
+    timestamp: Int
+}

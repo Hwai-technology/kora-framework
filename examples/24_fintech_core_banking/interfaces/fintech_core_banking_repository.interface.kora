@@ -1,0 +1,10 @@
+// Example 24: Core Banking Ledger & Accounts
+// Primary Repository Interface
+
+import { FintechCoreBankingRecord } from "../entities/fintech_core_banking_primary.entity"
+
+interface FintechCoreBankingRepository {
+    fn findById(id: Int) -> Option<FintechCoreBankingRecord>
+    fn save(record: FintechCoreBankingRecord) -> Result<FintechCoreBankingRecord, String>
+    fn countAll() -> Int
+}

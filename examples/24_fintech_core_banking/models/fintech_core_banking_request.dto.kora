@@ -1,0 +1,15 @@
+// Example 24: Core Banking Ledger & Accounts
+// Transport Model: Command & Query Requests
+
+model CreateFintechCoreBankingRequest {
+    reference: String
+    targetId: Int
+    volume: Int
+    currency: String
+}
+
+model FilterFintechCoreBankingRequest {
+    status: String
+    limit: Int
+    offset: Int
+}

@@ -1,0 +1,9 @@
+// Example 36: Telemedicine Virtual Clinic & E-Prescriptions — Domain Event: PrescriptionElectronicallySignedEvent
+// Dedicated Domain Event Specification
+
+model PrescriptionElectronicallySignedEvent {
+    rxId: String
+    drugName: String
+    physicianNpiHash: String
+    timestamp: Int
+}

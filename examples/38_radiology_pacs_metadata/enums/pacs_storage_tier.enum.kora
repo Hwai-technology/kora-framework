@@ -1,0 +1,8 @@
+// Example 38: Radiology PACS DICOM Metadata Indexer — Enum: PacsStorageTier
+// Dedicated Domain Enum Specification
+
+enum PacsStorageTier {
+    OnlineHighPerformanceSSD
+    NearlineObjectArchive
+    DeepColdTapeStorage
+}

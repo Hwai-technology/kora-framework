@@ -1,0 +1,7 @@
+// Example 53: Inventory Allocation Matrix & Multi-Warehouse Stock — Enum: WarehouseZone
+
+enum WarehouseZone {
+    NorthAmericaEast
+    EuropeCentral
+    AsiaPacificHub
+}

@@ -1,0 +1,7 @@
+// examples/02_clean_architecture_users — Event: UserDeactivatedEvent
+
+model UserDeactivatedEvent {
+    userId: Int
+    reason: String
+    timestamp: Int
+}

@@ -1,0 +1,9 @@
+// Example 28: crypto_derivatives_exchange — Domain Event: PositionLiquidatedEvent
+// Dedicated Domain Event Specification
+
+model PositionLiquidatedEvent {
+    positionId: String
+    traderId: Int
+    bankruptcyPrice: Int
+    insuranceContribution: Int
+}

@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 35: FHIR R4 & HL7 Interoperability Hub
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { FhirInteroperabilityHubInMemoryRepository } from "./repositories/fhir_interoperability_hub_inmemory.repository"
+import { FhirInteroperabilityHubCoreService } from "./services/fhir_interoperability_hub_core.service"
+import { FhirInteroperabilityHubController } from "./controllers/fhir_interoperability_hub.controller"
+import { FhirInteroperabilityHubRouter } from "./routes/fhir_interoperability_hub.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = FhirInteroperabilityHubInMemoryRepository()
+        let service = FhirInteroperabilityHubCoreService(repo)
+        let controller = FhirInteroperabilityHubController(service)
+        let router = FhirInteroperabilityHubRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

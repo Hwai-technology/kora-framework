@@ -1,0 +1,9 @@
+// Example 43: Raft Distributed Consensus Engine — Domain Event: LeaderElectedEvent
+// Dedicated Domain Event Specification
+
+model LeaderElectedEvent {
+    term: Int
+    leaderId: Int
+    voterCount: Int
+    timestamp: Int
+}

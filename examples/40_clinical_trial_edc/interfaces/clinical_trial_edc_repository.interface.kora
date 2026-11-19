@@ -1,0 +1,10 @@
+// Example 40: Clinical Trial Electronic Data Capture (EDC)
+// Repository Interface
+
+import { ClinicalTrialEdcClinicalEntity } from "../entities/clinical_trial_edc_primary.entity"
+
+interface ClinicalTrialEdcRepository {
+    fn findByPatientId(patientId: Int) -> Option<ClinicalTrialEdcClinicalEntity>
+    fn save(entity: ClinicalTrialEdcClinicalEntity) -> Result<ClinicalTrialEdcClinicalEntity, String>
+    fn verifyIntegrity(recordId: Int) -> Bool
+}

@@ -1,0 +1,8 @@
+// Example 91: CRDT Collaborative Real-Time Document Editor — Domain Event: CrdtItemInsertedEvent
+
+model CrdtItemInsertedEvent {
+    docId: String
+    peerId: String
+    characterVal: String
+    clockTimestamp: Int
+}

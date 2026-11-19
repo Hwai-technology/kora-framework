@@ -1,0 +1,10 @@
+// Example 28: Crypto Derivatives & Margin Engine
+// Configuration Model
+
+model CryptoDerivativesExchangeConfig {
+    environment: String
+    maxBatchSize: Int
+    retryAttempts: Int
+    timeoutSeconds: Int
+    enabled: Bool
+}

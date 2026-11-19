@@ -1,0 +1,8 @@
+// Example 48: Distributed Cache Cluster & Write-Behind — Domain Event: CacheEvictionPerformedEvent
+// Dedicated Domain Event Specification
+
+model CacheEvictionPerformedEvent {
+    evictedKey: String
+    reason: String
+    memoryFreedBytes: Int
+}

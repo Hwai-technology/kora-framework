@@ -1,0 +1,33 @@
+// Example 68: Cold Chain Vaccine Temperature Monitoring
+// Repository Implementation
+
+import { ColdChainEnvironmentalGuardPrimaryRecord } from "../entities/cold_chain_environmental_guard_primary.entity"
+import { ColdChainEnvironmentalGuardRepository } from "../interfaces/cold_chain_environmental_guard_repository.interface"
+
+class ColdChainEnvironmentalGuardInMemoryRepository implements ColdChainEnvironmentalGuardRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<ColdChainEnvironmentalGuardPrimaryRecord> {
+        if id > 0 {
+            return Some(ColdChainEnvironmentalGuardPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: ColdChainEnvironmentalGuardPrimaryRecord) -> Result<ColdChainEnvironmentalGuardPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

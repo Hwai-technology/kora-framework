@@ -1,0 +1,10 @@
+// Example 101: Pratt Parsing & Bytecode Virtual Machine
+// Domain Service Contract
+
+import { AstParserCompilerToyPrimaryRecord } from "../entities/ast_parser_compiler_toy_primary.entity"
+import { CreateAstParserCompilerToyTaskRequest } from "../models/ast_parser_compiler_toy_request.dto"
+
+interface AstParserCompilerToyDomainContract {
+    fn executeTask(req: CreateAstParserCompilerToyTaskRequest) -> Result<AstParserCompilerToyPrimaryRecord, String>
+    fn evaluateHealth(entityId: Int) -> String
+}

@@ -1,0 +1,7 @@
+// Example 99: B+ Tree Disk Pager & Index Node Balancer — Domain Event: BtreeNodeSplitExecutedEvent
+
+model BtreeNodeSplitExecutedEvent {
+    parentPageId: Int
+    newSiblingPageId: Int
+    splitKey: Int
+}

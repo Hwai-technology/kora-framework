@@ -1,0 +1,12 @@
+// ============================================================================
+// Fraud Detection Engine Repository Interface
+// ============================================================================
+
+import { FraudDetectionEngineRecord } from "../entities/fraud_detection_engine_primary.entity"
+
+interface FraudDetectionEngineRepository {
+    fn findById(id: Int) -> Option<FraudDetectionEngineRecord>
+    fn recordVelocity(cardToken: String) -> Int
+    fn save(record: FraudDetectionEngineRecord) -> Result<FraudDetectionEngineRecord, String>
+    fn countAll() -> Int
+}

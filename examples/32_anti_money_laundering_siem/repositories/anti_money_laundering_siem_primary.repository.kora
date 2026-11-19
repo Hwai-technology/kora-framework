@@ -1,0 +1,33 @@
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// Primary Repository Implementation
+
+import { AntiMoneyLaunderingSiemRecord } from "../entities/anti_money_laundering_siem_primary.entity"
+import { AntiMoneyLaunderingSiemRepository } from "../interfaces/anti_money_laundering_siem_repository.interface"
+
+class AntiMoneyLaunderingSiemPrimaryRepository implements AntiMoneyLaunderingSiemRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<AntiMoneyLaunderingSiemRecord> {
+        if id > 0 {
+            return Some(AntiMoneyLaunderingSiemRecord {
+                id: id,
+                reference: "REF-" + id.toString(),
+                status: "ACTIVE",
+                balance: 100000,
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: AntiMoneyLaunderingSiemRecord) -> Result<AntiMoneyLaunderingSiemRecord, String> {
+        if record.id < 0 {
+            return Err("Invalid record id")
+        }
+        return Ok(record)
+    }
+
+    fn countAll() -> Int {
+        return 42
+    }
+}

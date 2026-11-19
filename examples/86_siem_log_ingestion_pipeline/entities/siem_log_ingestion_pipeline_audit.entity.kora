@@ -1,0 +1,12 @@
+// Example 86: SIEM High-Throughput Log Ingestion & CEF Normalizer
+// Persistent Database Entity: Audit Log
+
+@table("siem_log_ingestion_pipeline_audit_logs")
+model SiemLogIngestionPipelineAuditRecord {
+    @id
+    id: Int
+    entityId: Int
+    actionTaken: String
+    tamperCheckHash: String
+    timestamp: Int
+}

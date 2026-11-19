@@ -1,0 +1,18 @@
+// Example 31: Inter-Bank Reconciliation & Settlement
+// Validation Rules Engine
+
+import { CreateReconciliationSettlementRequest } from "../models/reconciliation_settlement_request.dto"
+
+class ReconciliationSettlementValidationService {
+    init() {}
+
+    fn validateInput(req: CreateReconciliationSettlementRequest) -> Result<Bool, String> {
+        if req.reference == "" {
+            return Err("Reference code is mandatory")
+        }
+        if req.volume < 10 {
+            return Err("Volume below minimum threshold")
+        }
+        return Ok(true)
+    }
+}

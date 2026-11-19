@@ -1,0 +1,9 @@
+// Example 38: Radiology PACS DICOM Metadata Indexer
+// Configuration Model
+
+model RadiologyPacsMetadataServiceConfig {
+    hipaaAuditEnabled: Bool
+    encryptionKeyVersion: Int
+    maxBatchFetchSize: Int
+    environment: String
+}

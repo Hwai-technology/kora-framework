@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 38: Radiology PACS DICOM Metadata Indexer
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { RadiologyPacsMetadataInMemoryRepository } from "./repositories/radiology_pacs_metadata_inmemory.repository"
+import { RadiologyPacsMetadataCoreService } from "./services/radiology_pacs_metadata_core.service"
+import { RadiologyPacsMetadataController } from "./controllers/radiology_pacs_metadata.controller"
+import { RadiologyPacsMetadataRouter } from "./routes/radiology_pacs_metadata.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = RadiologyPacsMetadataInMemoryRepository()
+        let service = RadiologyPacsMetadataCoreService(repo)
+        let controller = RadiologyPacsMetadataController(service)
+        let router = RadiologyPacsMetadataRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

@@ -1,0 +1,22 @@
+// Example 56: Last-Mile Delivery Dispatch & Fleet Geo-Routing
+// Router & Endpoint Dispatcher
+
+import { CreateLastMileDeliveryDispatchTaskRequest } from "../models/last_mile_delivery_dispatch_request.dto"
+import { LastMileDeliveryDispatchResponseDto } from "../models/last_mile_delivery_dispatch_response.dto"
+import { LastMileDeliveryDispatchController } from "../controllers/last_mile_delivery_dispatch.controller"
+
+class LastMileDeliveryDispatchRouter {
+    controller: LastMileDeliveryDispatchController
+
+    init(controller: LastMileDeliveryDispatchController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateLastMileDeliveryDispatchTaskRequest) -> LastMileDeliveryDispatchResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

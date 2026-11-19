@@ -1,0 +1,22 @@
+// Example 95: Multiplayer Game 60Hz Tick State Synchronizer
+// Router & Endpoint Dispatcher
+
+import { CreateGamingStateSynchronizerTaskRequest } from "../models/gaming_state_synchronizer_request.dto"
+import { GamingStateSynchronizerResponseDto } from "../models/gaming_state_synchronizer_response.dto"
+import { GamingStateSynchronizerController } from "../controllers/gaming_state_synchronizer.controller"
+
+class GamingStateSynchronizerRouter {
+    controller: GamingStateSynchronizerController
+
+    init(controller: GamingStateSynchronizerController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateGamingStateSynchronizerTaskRequest) -> GamingStateSynchronizerResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

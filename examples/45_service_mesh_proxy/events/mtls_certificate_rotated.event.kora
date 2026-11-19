@@ -1,0 +1,8 @@
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director — Domain Event: MtlsCertificateRotatedEvent
+// Dedicated Domain Event Specification
+
+model MtlsCertificateRotatedEvent {
+    spiffeId: String
+    certFingerprint: String
+    validUntilTimestamp: Int
+}

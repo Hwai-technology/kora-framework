@@ -1,0 +1,11 @@
+// Example 31: Inter-Bank Reconciliation & Settlement
+// Secondary Audit Log Entity
+
+@table("reconciliation_settlement_items")
+model ReconciliationSettlementItem {
+    @id
+    id: Int
+    parentId: Int
+    itemCode: String
+    amount: Int
+}

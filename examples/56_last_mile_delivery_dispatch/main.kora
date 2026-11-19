@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 56: Last-Mile Delivery Dispatch & Fleet Geo-Routing
+// Application Container & Clean Architecture Bootstrap
+// ============================================================================
+
+import { LastMileDeliveryDispatchInMemoryRepository } from "./repositories/last_mile_delivery_dispatch_inmemory.repository"
+import { LastMileDeliveryDispatchCoreService } from "./services/last_mile_delivery_dispatch_core.service"
+import { LastMileDeliveryDispatchController } from "./controllers/last_mile_delivery_dispatch.controller"
+import { LastMileDeliveryDispatchRouter } from "./routes/last_mile_delivery_dispatch.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = LastMileDeliveryDispatchInMemoryRepository()
+        let service = LastMileDeliveryDispatchCoreService(repo)
+        let controller = LastMileDeliveryDispatchController(service)
+        let router = LastMileDeliveryDispatchRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

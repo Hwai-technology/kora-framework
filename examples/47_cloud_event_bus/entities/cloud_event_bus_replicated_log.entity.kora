@@ -1,0 +1,13 @@
+// Example 47: Cloud Event Bus & Partitioned Streaming
+// Persistent Database Entity: Replicated Log
+
+@table("cloud_event_bus_replicated_logs")
+model CloudEventBusReplicatedLogEntry {
+    @id
+    id: Int
+    logIndex: Int
+    termNumber: Int
+    commandPayload: String
+    committedQuorum: Bool
+    timestamp: Int
+}

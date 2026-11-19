@@ -1,0 +1,38 @@
+// Example 103: Probabilistic Bloom & Cuckoo Filter Suite
+// Presentation Controller
+
+import { CreateBloomCuckooFilterSuiteTaskRequest } from "../models/bloom_cuckoo_filter_suite_request.dto"
+import { BloomCuckooFilterSuiteResponseDto } from "../models/bloom_cuckoo_filter_suite_response.dto"
+import { BloomCuckooFilterSuiteCoreService } from "../services/bloom_cuckoo_filter_suite_core.service"
+
+class BloomCuckooFilterSuiteController {
+    service: BloomCuckooFilterSuiteCoreService
+
+    init(service: BloomCuckooFilterSuiteCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateBloomCuckooFilterSuiteTaskRequest) -> BloomCuckooFilterSuiteResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => BloomCuckooFilterSuiteResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => BloomCuckooFilterSuiteResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

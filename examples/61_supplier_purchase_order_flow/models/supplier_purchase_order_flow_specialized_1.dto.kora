@@ -1,0 +1,9 @@
+// Example 61: Supplier Purchase Order & 3-Way Invoice Matcher
+// Specialized Model 1
+
+model SupplierPurchaseOrderFlowSpecializedProfile1 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

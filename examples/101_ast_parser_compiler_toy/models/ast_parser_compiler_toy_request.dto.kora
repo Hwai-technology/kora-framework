@@ -1,0 +1,15 @@
+// Example 101: Pratt Parsing & Bytecode Virtual Machine
+// Transport Model: Command Request
+
+model CreateAstParserCompilerToyTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryAstParserCompilerToyFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

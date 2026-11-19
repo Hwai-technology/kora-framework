@@ -1,0 +1,16 @@
+// Example 64: Smart Electrical Grid Substation Telemetry
+// Transport Model: Standard Response
+
+model SmartGridEnergyMonitorResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model SmartGridEnergyMonitorSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

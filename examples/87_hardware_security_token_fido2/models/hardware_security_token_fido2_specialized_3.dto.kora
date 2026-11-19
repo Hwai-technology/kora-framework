@@ -1,0 +1,9 @@
+// Example 87: FIDO2 / WebAuthn Passkey Registration & Attestation
+// Specialized Model 3
+
+model HardwareSecurityTokenFido2SpecializedProfile3 {
+    profileId: String
+    classificationCode: String
+    weightScore: Int
+    isActive: Bool
+}

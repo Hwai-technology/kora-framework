@@ -1,0 +1,10 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector
+// Repository Interface
+
+import { DistributedTracingCollectorNodeState } from "../entities/distributed_tracing_collector_primary.entity"
+
+interface DistributedTracingCollectorRepository {
+    fn findNodeById(nodeId: Int) -> Option<DistributedTracingCollectorNodeState>
+    fn saveNodeState(state: DistributedTracingCollectorNodeState) -> Result<DistributedTracingCollectorNodeState, String>
+    fn getActiveQuorumCount() -> Int
+}

@@ -1,0 +1,15 @@
+// Example 75: Real-Time Machine Learning Feature Store
+// Transport Model: Command Request
+
+model CreateFeatureStoreRegistryTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryFeatureStoreRegistryFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

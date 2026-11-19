@@ -1,0 +1,15 @@
+// Example 65: Fleet Telematics & Polygonal Geofence Monitor
+// Transport Model: Command Request
+
+model CreateFleetTelematicsGeofencingTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryFleetTelematicsGeofencingFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

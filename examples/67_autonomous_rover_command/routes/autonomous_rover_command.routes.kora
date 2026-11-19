@@ -1,0 +1,22 @@
+// Example 67: Autonomous Rover Navigation & Obstacle Avoidance
+// Router & Endpoint Dispatcher
+
+import { CreateAutonomousRoverCommandTaskRequest } from "../models/autonomous_rover_command_request.dto"
+import { AutonomousRoverCommandResponseDto } from "../models/autonomous_rover_command_response.dto"
+import { AutonomousRoverCommandController } from "../controllers/autonomous_rover_command.controller"
+
+class AutonomousRoverCommandRouter {
+    controller: AutonomousRoverCommandController
+
+    init(controller: AutonomousRoverCommandController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateAutonomousRoverCommandTaskRequest) -> AutonomousRoverCommandResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

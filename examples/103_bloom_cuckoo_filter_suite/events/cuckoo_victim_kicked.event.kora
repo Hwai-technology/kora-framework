@@ -1,0 +1,7 @@
+// Example 103: Probabilistic Bloom & Cuckoo Filter Suite — Domain Event: CuckooVictimKickedEvent
+
+model CuckooVictimKickedEvent {
+    fingerprint: Int
+    bucketIndex: Int
+    kickoutDepth: Int
+}

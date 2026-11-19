@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 45: Service Mesh Sidecar Proxy & Traffic Director
+// Application Container & Cluster Bootstrap
+// ============================================================================
+
+import { ServiceMeshProxyClusterRepository } from "./repositories/service_mesh_proxy_cluster.repository"
+import { ServiceMeshProxyCoreService } from "./services/service_mesh_proxy_core.service"
+import { ServiceMeshProxyController } from "./controllers/service_mesh_proxy.controller"
+import { ServiceMeshProxyRouter } from "./routes/service_mesh_proxy.routes"
+
+class Application {
+    init() {}
+
+    fn bootstrap() -> Unit {
+        let repo = ServiceMeshProxyClusterRepository()
+        let service = ServiceMeshProxyCoreService(repo)
+        let controller = ServiceMeshProxyController(service)
+        let router = ServiceMeshProxyRouter(controller)
+
+        let app = run()
+        app.use(router)
+        app.listen(8080)
+    }
+}
+
+let app = Application()
+app.bootstrap()

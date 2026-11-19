@@ -1,0 +1,9 @@
+// Example 37: ICU Real-Time High-Frequency Vitals Monitor — Domain Event: ArrhythmiaDetectedEvent
+// Dedicated Domain Event Specification
+
+model ArrhythmiaDetectedEvent {
+    patientId: Int
+    rhythmType: String
+    confidenceScore: Int
+    timestamp: Int
+}

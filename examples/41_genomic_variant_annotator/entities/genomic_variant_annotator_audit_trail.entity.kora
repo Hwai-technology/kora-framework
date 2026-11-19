@@ -1,0 +1,13 @@
+// Example 41: Genomic Variant Annotation & Pathogenicity
+// Persistent Database Entity: Audit Trail Log
+
+@table("genomic_variant_annotator_audit_trail")
+model GenomicVariantAnnotatorAuditTrail {
+    @id
+    id: Int
+    recordId: Int
+    performedByStaffId: Int
+    actionTaken: String
+    tamperProofHash: String
+    timestamp: Int
+}

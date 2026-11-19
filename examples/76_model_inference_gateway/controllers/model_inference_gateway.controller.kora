@@ -1,0 +1,38 @@
+// Example 76: Model Serving Inference Gateway & Dynamic Batcher
+// Presentation Controller
+
+import { CreateModelInferenceGatewayTaskRequest } from "../models/model_inference_gateway_request.dto"
+import { ModelInferenceGatewayResponseDto } from "../models/model_inference_gateway_response.dto"
+import { ModelInferenceGatewayCoreService } from "../services/model_inference_gateway_core.service"
+
+class ModelInferenceGatewayController {
+    service: ModelInferenceGatewayCoreService
+
+    init(service: ModelInferenceGatewayCoreService) {
+        this.service = service
+    }
+
+    fn handleTaskSubmission(req: CreateModelInferenceGatewayTaskRequest) -> ModelInferenceGatewayResponseDto {
+        let outcome = this.service.executeTask(req)
+        return match outcome {
+            Ok(rec) => ModelInferenceGatewayResponseDto {
+                operationId: "TX-" + req.taskKey,
+                entityId: rec.id,
+                status: "EXECUTION_SUCCESSFUL",
+                isVerified: true,
+                message: "Operation completed under Clean Architecture invariants",
+            },
+            Err(reason) => ModelInferenceGatewayResponseDto {
+                operationId: "TX-FAILED",
+                entityId: req.targetEntityId,
+                status: "EXECUTION_REJECTED",
+                isVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn inspectHealth(entityId: Int) -> String {
+        return this.service.evaluateHealth(entityId)
+    }
+}

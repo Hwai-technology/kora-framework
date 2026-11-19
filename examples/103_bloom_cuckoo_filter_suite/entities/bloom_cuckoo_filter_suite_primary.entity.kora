@@ -1,0 +1,13 @@
+// Example 103: Probabilistic Bloom & Cuckoo Filter Suite
+// Persistent Database Entity: Primary Record
+
+@table("bloom_cuckoo_filter_suite_records")
+model BloomCuckooFilterSuitePrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

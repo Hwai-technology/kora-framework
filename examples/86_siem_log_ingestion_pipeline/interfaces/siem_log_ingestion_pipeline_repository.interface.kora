@@ -1,0 +1,10 @@
+// Example 86: SIEM High-Throughput Log Ingestion & CEF Normalizer
+// Repository Interface
+
+import { SiemLogIngestionPipelinePrimaryRecord } from "../entities/siem_log_ingestion_pipeline_primary.entity"
+
+interface SiemLogIngestionPipelineRepository {
+    fn findById(id: Int) -> Option<SiemLogIngestionPipelinePrimaryRecord>
+    fn save(record: SiemLogIngestionPipelinePrimaryRecord) -> Result<SiemLogIngestionPipelinePrimaryRecord, String>
+    fn countActive() -> Int
+}

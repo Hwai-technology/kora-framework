@@ -1,0 +1,12 @@
+// Example 32: Anti-Money Laundering (AML) SIEM Pipeline
+// Audit Trail Entity
+
+@table("anti_money_laundering_siem_audit_logs")
+model AntiMoneyLaunderingSiemAuditLog {
+    @id
+    id: Int
+    recordId: Int
+    action: String
+    performedBy: String
+    timestamp: Int
+}

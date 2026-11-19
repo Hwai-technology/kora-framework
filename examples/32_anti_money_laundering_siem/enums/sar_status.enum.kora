@@ -1,0 +1,9 @@
+// Example 32: anti_money_laundering_siem — Enum: SarStatus
+// Dedicated Domain Enum Specification
+
+enum SarStatus {
+    DraftInvestigating
+    EscalatedMLRO
+    SubmittedToFinCEN
+    ClosedFalsePositive
+}

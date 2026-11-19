@@ -1,0 +1,12 @@
+// ============================================================================
+// Fraud Detection Engine Service Interface Contract
+// ============================================================================
+
+import { FraudDetectionEngineRecord } from "../entities/fraud_detection_engine_primary.entity"
+import { CreateFraudDetectionEngineRequest } from "../models/fraud_detection_engine_request.dto"
+
+interface FraudDetectionEngineServiceInterface {
+    fn processRequest(req: CreateFraudDetectionEngineRequest) -> Result<FraudDetectionEngineRecord, String>
+    fn evaluateRisk(req: CreateFraudDetectionEngineRequest) -> Result<FraudDetectionEngineRecord, String>
+    fn validateState(id: Int) -> Bool
+}

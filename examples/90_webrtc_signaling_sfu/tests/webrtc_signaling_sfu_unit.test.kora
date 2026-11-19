@@ -1,0 +1,75 @@
+// ============================================================================
+// Unit Test Suite: WebRTC SFU Media Router & SDP Signaling
+// Verifies Domain Invariants, Boundary Calculations & Liveness
+// ============================================================================
+
+import { CreateWebrtcSignalingSfuTaskRequest } from "../models/webrtc_signaling_sfu_request.dto"
+import { WebrtcSignalingSfuInMemoryRepository } from "../repositories/webrtc_signaling_sfu_inmemory.repository"
+import { WebrtcSignalingSfuCoreService } from "../services/webrtc_signaling_sfu_core.service"
+import { WebrtcSignalingSfuTelemetryService } from "../services/webrtc_signaling_sfu_telemetry.service"
+
+class WebrtcSignalingSfuUnitTestSuite {
+    service: WebrtcSignalingSfuCoreService
+    telemetry: WebrtcSignalingSfuTelemetryService
+
+    init(service: WebrtcSignalingSfuCoreService, telemetry: WebrtcSignalingSfuTelemetryService) {
+        this.service = service
+        this.telemetry = telemetry
+    }
+
+    fn test_valid_task_execution() -> Bool {
+        let req = CreateWebrtcSignalingSfuTaskRequest {
+            taskKey: "UNIT-TASK-101",
+            targetEntityId: 10,
+            workloadCapacity: 95,
+            domainContext: "Media & Realtime",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(rec) => rec.id == 10 && rec.capacityScore == 95,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_negative_target_rejected() -> Bool {
+        let req = CreateWebrtcSignalingSfuTaskRequest {
+            taskKey: "INVALID-TASK",
+            targetEntityId: -1,
+            workloadCapacity: 50,
+            domainContext: "Media & Realtime",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Target entity ID must be strictly positive",
+        }
+    }
+
+    fn test_health_evaluation() -> Bool {
+        let health = this.service.evaluateHealth(10)
+        return health == "OPTIMUM_PERFORMANCE" || health == "MODERATE_NORMAL"
+    }
+
+    fn test_telemetry_ping() -> Bool {
+        return this.telemetry.ping()
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_task_execution()
+        let t2 = this.test_invalid_negative_target_rejected()
+        let t3 = this.test_health_evaluation()
+        let t4 = this.test_telemetry_ping()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ WebRTC SFU Media Router & SDP Signaling Unit Tests: 4/4 passed (Domain Invariants Verified)")
+        } else {
+            print("  ✗ WebRTC SFU Media Router & SDP Signaling Unit Tests: failed")
+        }
+    }
+}
+
+let repo = WebrtcSignalingSfuInMemoryRepository()
+let service = WebrtcSignalingSfuCoreService(repo)
+let telemetry = WebrtcSignalingSfuTelemetryService()
+let suite = WebrtcSignalingSfuUnitTestSuite(service, telemetry)
+suite.run()

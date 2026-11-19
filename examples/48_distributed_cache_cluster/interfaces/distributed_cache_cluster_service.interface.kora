@@ -1,0 +1,10 @@
+// Example 48: Distributed Cache Cluster & Write-Behind
+// Domain Service Contract
+
+import { DistributedCacheClusterNodeState } from "../entities/distributed_cache_cluster_primary.entity"
+import { CreateDistributedCacheClusterTaskRequest } from "../models/distributed_cache_cluster_request.dto"
+
+interface DistributedCacheClusterConsensusContract {
+    fn processConsensusCommand(req: CreateDistributedCacheClusterTaskRequest) -> Result<DistributedCacheClusterNodeState, String>
+    fn evaluateClusterQuorum() -> Bool
+}

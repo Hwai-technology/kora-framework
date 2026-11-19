@@ -1,0 +1,33 @@
+// Example 31: Inter-Bank Reconciliation & Settlement
+// Primary Repository Implementation
+
+import { ReconciliationSettlementRecord } from "../entities/reconciliation_settlement_primary.entity"
+import { ReconciliationSettlementRepository } from "../interfaces/reconciliation_settlement_repository.interface"
+
+class ReconciliationSettlementPrimaryRepository implements ReconciliationSettlementRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<ReconciliationSettlementRecord> {
+        if id > 0 {
+            return Some(ReconciliationSettlementRecord {
+                id: id,
+                reference: "REF-" + id.toString(),
+                status: "ACTIVE",
+                balance: 100000,
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: ReconciliationSettlementRecord) -> Result<ReconciliationSettlementRecord, String> {
+        if record.id < 0 {
+            return Err("Invalid record id")
+        }
+        return Ok(record)
+    }
+
+    fn countAll() -> Int {
+        return 42
+    }
+}

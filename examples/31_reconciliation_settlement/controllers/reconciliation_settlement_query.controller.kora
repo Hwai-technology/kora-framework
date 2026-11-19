@@ -1,0 +1,21 @@
+// Example 31: Inter-Bank Reconciliation & Settlement
+// Query Controller (Reads & Lookups)
+
+import { ReconciliationSettlementRecord } from "../entities/reconciliation_settlement_primary.entity"
+import { ReconciliationSettlementRepository } from "../interfaces/reconciliation_settlement_repository.interface"
+
+class ReconciliationSettlementQueryController {
+    repo: ReconciliationSettlementRepository
+
+    init(repo: ReconciliationSettlementRepository) {
+        this.repo = repo
+    }
+
+    fn getById(id: Int) -> Option<ReconciliationSettlementRecord> {
+        return this.repo.findById(id)
+    }
+
+    fn getTotalVolume() -> Int {
+        return this.repo.countAll()
+    }
+}

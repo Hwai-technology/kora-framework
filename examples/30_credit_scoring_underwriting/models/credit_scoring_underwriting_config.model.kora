@@ -1,0 +1,10 @@
+// Example 30: Credit Underwriting & Risk Assessment
+// Configuration Model
+
+model CreditScoringUnderwritingConfig {
+    environment: String
+    maxBatchSize: Int
+    retryAttempts: Int
+    timeoutSeconds: Int
+    enabled: Bool
+}

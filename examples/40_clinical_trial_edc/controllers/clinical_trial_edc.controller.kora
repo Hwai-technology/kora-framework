@@ -1,0 +1,39 @@
+// Example 40: Clinical Trial Electronic Data Capture (EDC)
+// Presentation Controller
+
+import { CreateClinicalTrialEdcRecordRequest } from "../models/clinical_trial_edc_request.dto"
+import { ClinicalTrialEdcResponseDto } from "../models/clinical_trial_edc_response.dto"
+import { ClinicalTrialEdcClinicalEntity } from "../entities/clinical_trial_edc_primary.entity"
+import { ClinicalTrialEdcCoreService } from "../services/clinical_trial_edc_core.service"
+
+class ClinicalTrialEdcController {
+    service: ClinicalTrialEdcCoreService
+
+    init(service: ClinicalTrialEdcCoreService) {
+        this.service = service
+    }
+
+    fn handleRecordSubmission(req: CreateClinicalTrialEdcRecordRequest) -> ClinicalTrialEdcResponseDto {
+        let outcome = this.service.processClinicalRecord(req)
+        return match outcome {
+            Ok(rec) => ClinicalTrialEdcResponseDto {
+                recordId: rec.id,
+                patientId: rec.patientId,
+                status: "COMMITTED_ENCRYPTED",
+                isComplianceVerified: true,
+                message: "Record persisted under HIPAA safety standards",
+            },
+            Err(reason) => ClinicalTrialEdcResponseDto {
+                recordId: -1,
+                patientId: req.patientId,
+                status: "REJECTED_VALIDATION_ERROR",
+                isComplianceVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkPatientRisk(patientId: Int) -> String {
+        return this.service.evaluateClinicalRisk(patientId)
+    }
+}

@@ -1,0 +1,15 @@
+// Example 86: SIEM High-Throughput Log Ingestion & CEF Normalizer
+// Transport Model: Command Request
+
+model CreateSiemLogIngestionPipelineTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QuerySiemLogIngestionPipelineFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

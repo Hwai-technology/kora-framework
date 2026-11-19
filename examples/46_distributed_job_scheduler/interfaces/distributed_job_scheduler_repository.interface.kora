@@ -1,0 +1,10 @@
+// Example 46: Distributed Task Scheduler & Leader Lease
+// Repository Interface
+
+import { DistributedJobSchedulerNodeState } from "../entities/distributed_job_scheduler_primary.entity"
+
+interface DistributedJobSchedulerRepository {
+    fn findNodeById(nodeId: Int) -> Option<DistributedJobSchedulerNodeState>
+    fn saveNodeState(state: DistributedJobSchedulerNodeState) -> Result<DistributedJobSchedulerNodeState, String>
+    fn getActiveQuorumCount() -> Int
+}

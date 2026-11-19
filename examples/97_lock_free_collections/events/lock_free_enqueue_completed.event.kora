@@ -1,0 +1,6 @@
+// Example 97: Lock-Free Michael-Scott Queue & Treiber Stack — Domain Event: LockFreeEnqueueCompletedEvent
+
+model LockFreeEnqueueCompletedEvent {
+    itemValue: Int
+    casRetryAttempts: Int
+}

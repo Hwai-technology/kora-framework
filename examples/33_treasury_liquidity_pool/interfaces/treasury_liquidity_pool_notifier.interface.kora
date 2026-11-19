@@ -1,0 +1,7 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// Notifier Interface
+
+interface TreasuryLiquidityPoolNotifier {
+    fn sendAlert(subject: String, level: String) -> Bool
+    fn ping() -> Bool
+}

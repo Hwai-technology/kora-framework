@@ -1,0 +1,22 @@
+// Example 75: Real-Time Machine Learning Feature Store
+// Router & Endpoint Dispatcher
+
+import { CreateFeatureStoreRegistryTaskRequest } from "../models/feature_store_registry_request.dto"
+import { FeatureStoreRegistryResponseDto } from "../models/feature_store_registry_response.dto"
+import { FeatureStoreRegistryController } from "../controllers/feature_store_registry.controller"
+
+class FeatureStoreRegistryRouter {
+    controller: FeatureStoreRegistryController
+
+    init(controller: FeatureStoreRegistryController) {
+        this.controller = controller
+    }
+
+    fn postTask(req: CreateFeatureStoreRegistryTaskRequest) -> FeatureStoreRegistryResponseDto {
+        return this.controller.handleTaskSubmission(req)
+    }
+
+    fn getHealth(entityId: Int) -> String {
+        return this.controller.inspectHealth(entityId)
+    }
+}

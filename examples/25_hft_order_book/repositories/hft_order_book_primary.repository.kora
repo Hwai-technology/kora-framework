@@ -1,0 +1,33 @@
+// Example 25: High-Frequency Trading Order Book
+// Primary Repository Implementation
+
+import { HftOrderBookRecord } from "../entities/hft_order_book_primary.entity"
+import { HftOrderBookRepository } from "../interfaces/hft_order_book_repository.interface"
+
+class HftOrderBookPrimaryRepository implements HftOrderBookRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<HftOrderBookRecord> {
+        if id > 0 {
+            return Some(HftOrderBookRecord {
+                id: id,
+                reference: "REF-" + id.toString(),
+                status: "ACTIVE",
+                balance: 100000,
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: HftOrderBookRecord) -> Result<HftOrderBookRecord, String> {
+        if record.id < 0 {
+            return Err("Invalid record id")
+        }
+        return Ok(record)
+    }
+
+    fn countAll() -> Int {
+        return 42
+    }
+}

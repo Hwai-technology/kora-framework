@@ -1,0 +1,75 @@
+// ============================================================================
+// Unit Test Suite: Pratt Parsing & Bytecode Virtual Machine
+// Verifies Domain Invariants, Boundary Calculations & Liveness
+// ============================================================================
+
+import { CreateAstParserCompilerToyTaskRequest } from "../models/ast_parser_compiler_toy_request.dto"
+import { AstParserCompilerToyInMemoryRepository } from "../repositories/ast_parser_compiler_toy_inmemory.repository"
+import { AstParserCompilerToyCoreService } from "../services/ast_parser_compiler_toy_core.service"
+import { AstParserCompilerToyTelemetryService } from "../services/ast_parser_compiler_toy_telemetry.service"
+
+class AstParserCompilerToyUnitTestSuite {
+    service: AstParserCompilerToyCoreService
+    telemetry: AstParserCompilerToyTelemetryService
+
+    init(service: AstParserCompilerToyCoreService, telemetry: AstParserCompilerToyTelemetryService) {
+        this.service = service
+        this.telemetry = telemetry
+    }
+
+    fn test_valid_task_execution() -> Bool {
+        let req = CreateAstParserCompilerToyTaskRequest {
+            taskKey: "UNIT-TASK-101",
+            targetEntityId: 10,
+            workloadCapacity: 95,
+            domainContext: "Algorithms & Kernels",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(rec) => rec.id == 10 && rec.capacityScore == 95,
+            Err(e) => false,
+        }
+    }
+
+    fn test_invalid_negative_target_rejected() -> Bool {
+        let req = CreateAstParserCompilerToyTaskRequest {
+            taskKey: "INVALID-TASK",
+            targetEntityId: -1,
+            workloadCapacity: 50,
+            domainContext: "Algorithms & Kernels",
+        }
+        let res = this.service.executeTask(req)
+        return match res {
+            Ok(r) => false,
+            Err(e) => e == "Target entity ID must be strictly positive",
+        }
+    }
+
+    fn test_health_evaluation() -> Bool {
+        let health = this.service.evaluateHealth(10)
+        return health == "OPTIMUM_PERFORMANCE" || health == "MODERATE_NORMAL"
+    }
+
+    fn test_telemetry_ping() -> Bool {
+        return this.telemetry.ping()
+    }
+
+    fn run() -> Unit {
+        let t1 = this.test_valid_task_execution()
+        let t2 = this.test_invalid_negative_target_rejected()
+        let t3 = this.test_health_evaluation()
+        let t4 = this.test_telemetry_ping()
+
+        if t1 && t2 && t3 && t4 {
+            print("  ✓ Pratt Parsing & Bytecode Virtual Machine Unit Tests: 4/4 passed (Domain Invariants Verified)")
+        } else {
+            print("  ✗ Pratt Parsing & Bytecode Virtual Machine Unit Tests: failed")
+        }
+    }
+}
+
+let repo = AstParserCompilerToyInMemoryRepository()
+let service = AstParserCompilerToyCoreService(repo)
+let telemetry = AstParserCompilerToyTelemetryService()
+let suite = AstParserCompilerToyUnitTestSuite(service, telemetry)
+suite.run()

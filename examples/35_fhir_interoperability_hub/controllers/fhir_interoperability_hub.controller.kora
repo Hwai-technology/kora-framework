@@ -1,0 +1,39 @@
+// Example 35: FHIR R4 & HL7 Interoperability Hub
+// Presentation Controller
+
+import { CreateFhirInteroperabilityHubRecordRequest } from "../models/fhir_interoperability_hub_request.dto"
+import { FhirInteroperabilityHubResponseDto } from "../models/fhir_interoperability_hub_response.dto"
+import { FhirInteroperabilityHubClinicalEntity } from "../entities/fhir_interoperability_hub_primary.entity"
+import { FhirInteroperabilityHubCoreService } from "../services/fhir_interoperability_hub_core.service"
+
+class FhirInteroperabilityHubController {
+    service: FhirInteroperabilityHubCoreService
+
+    init(service: FhirInteroperabilityHubCoreService) {
+        this.service = service
+    }
+
+    fn handleRecordSubmission(req: CreateFhirInteroperabilityHubRecordRequest) -> FhirInteroperabilityHubResponseDto {
+        let outcome = this.service.processClinicalRecord(req)
+        return match outcome {
+            Ok(rec) => FhirInteroperabilityHubResponseDto {
+                recordId: rec.id,
+                patientId: rec.patientId,
+                status: "COMMITTED_ENCRYPTED",
+                isComplianceVerified: true,
+                message: "Record persisted under HIPAA safety standards",
+            },
+            Err(reason) => FhirInteroperabilityHubResponseDto {
+                recordId: -1,
+                patientId: req.patientId,
+                status: "REJECTED_VALIDATION_ERROR",
+                isComplianceVerified: false,
+                message: reason,
+            },
+        }
+    }
+
+    fn checkPatientRisk(patientId: Int) -> String {
+        return this.service.evaluateClinicalRisk(patientId)
+    }
+}

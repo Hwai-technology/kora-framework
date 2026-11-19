@@ -1,0 +1,10 @@
+// Example 38: Radiology PACS DICOM Metadata Indexer
+// Domain Service Contract
+
+import { RadiologyPacsMetadataClinicalEntity } from "../entities/radiology_pacs_metadata_primary.entity"
+import { CreateRadiologyPacsMetadataRecordRequest } from "../models/radiology_pacs_metadata_request.dto"
+
+interface RadiologyPacsMetadataDomainContract {
+    fn processClinicalRecord(req: CreateRadiologyPacsMetadataRecordRequest) -> Result<RadiologyPacsMetadataClinicalEntity, String>
+    fn evaluateClinicalRisk(patientId: Int) -> String
+}

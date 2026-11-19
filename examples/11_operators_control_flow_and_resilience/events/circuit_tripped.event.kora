@@ -1,0 +1,7 @@
+// examples/11_operators_control_flow_and_resilience — Event: CircuitTrippedEvent
+
+model CircuitTrippedEvent {
+    serviceName: String
+    failureThreshold: Int
+    timestamp: Int
+}

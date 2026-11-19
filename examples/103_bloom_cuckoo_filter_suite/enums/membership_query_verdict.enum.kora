@@ -1,0 +1,6 @@
+// Example 103: Probabilistic Bloom & Cuckoo Filter Suite — Enum: MembershipQueryVerdict
+
+enum MembershipQueryVerdict {
+    DefinitelyNotMemberFalse
+    ProbablyInSetPotentialFalsePositive
+}

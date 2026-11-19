@@ -1,0 +1,27 @@
+// ============================================================================
+// Example 24: Fintech Core Banking — Router
+// ============================================================================
+
+import { Account } from "../entities/account.entity"
+import { BankingController } from "../controllers/banking.controller"
+import { TransferSagaCommand, SagaExecutionResult, AuditVerificationSummary } from "../models/banking.dto"
+
+class BankingRouter {
+    controller: BankingController
+
+    init(controller: BankingController) {
+        this.controller = controller
+    }
+
+    fn getAccount(id: Int) -> Option<Account> {
+        return this.controller.getAccountDetails(id)
+    }
+
+    fn postSagaTransfer(cmd: TransferSagaCommand) -> SagaExecutionResult {
+        return this.controller.executeSagaTransfer(cmd)
+    }
+
+    fn getAuditReport(baseline: Int) -> AuditVerificationSummary {
+        return this.controller.auditSystemConservation(baseline)
+    }
+}

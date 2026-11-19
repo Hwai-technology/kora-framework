@@ -1,0 +1,15 @@
+// Example 95: Multiplayer Game 60Hz Tick State Synchronizer
+// Transport Model: Command Request
+
+model CreateGamingStateSynchronizerTaskRequest {
+    taskKey: String
+    targetEntityId: Int
+    workloadCapacity: Int
+    domainContext: String
+}
+
+model QueryGamingStateSynchronizerFilterRequest {
+    filterKey: String
+    limit: Int
+    includeInactive: Bool
+}

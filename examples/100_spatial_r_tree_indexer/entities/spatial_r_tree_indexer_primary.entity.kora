@@ -1,0 +1,13 @@
+// Example 100: Spatial 2D R-Tree & k-Nearest Neighbors (k-NN)
+// Persistent Database Entity: Primary Record
+
+@table("spatial_r_tree_indexer_records")
+model SpatialRTreeIndexerPrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

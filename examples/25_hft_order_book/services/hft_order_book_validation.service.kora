@@ -1,0 +1,18 @@
+// Example 25: High-Frequency Trading Order Book
+// Validation Rules Engine
+
+import { CreateHftOrderBookRequest } from "../models/hft_order_book_request.dto"
+
+class HftOrderBookValidationService {
+    init() {}
+
+    fn validateInput(req: CreateHftOrderBookRequest) -> Result<Bool, String> {
+        if req.reference == "" {
+            return Err("Reference code is mandatory")
+        }
+        if req.volume < 10 {
+            return Err("Volume below minimum threshold")
+        }
+        return Ok(true)
+    }
+}

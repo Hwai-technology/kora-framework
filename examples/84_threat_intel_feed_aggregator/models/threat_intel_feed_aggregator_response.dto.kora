@@ -1,0 +1,16 @@
+// Example 84: Threat Intelligence STIX/TAXII Indicator Parser
+// Transport Model: Standard Response
+
+model ThreatIntelFeedAggregatorResponseDto {
+    operationId: String
+    entityId: Int
+    status: String
+    isVerified: Bool
+    message: String
+}
+
+model ThreatIntelFeedAggregatorSummaryDto {
+    totalProcessed: Int
+    healthyNodesCount: Int
+    systemState: String
+}

@@ -1,0 +1,10 @@
+// Example 33: Treasury Liquidity & Capital Allocation
+// Domain Service Interface
+
+import { TreasuryLiquidityPoolRecord } from "../entities/treasury_liquidity_pool_primary.entity"
+import { CreateTreasuryLiquidityPoolRequest } from "../models/treasury_liquidity_pool_request.dto"
+
+interface TreasuryLiquidityPoolServiceInterface {
+    fn processRequest(req: CreateTreasuryLiquidityPoolRequest) -> Result<TreasuryLiquidityPoolRecord, String>
+    fn validateState(id: Int) -> Bool
+}

@@ -1,0 +1,21 @@
+// Example 29: Algorithmic Market Maker & Quoting Engine
+// Query Controller (Reads & Lookups)
+
+import { AlgorithmicMarketMakerRecord } from "../entities/algorithmic_market_maker_primary.entity"
+import { AlgorithmicMarketMakerRepository } from "../interfaces/algorithmic_market_maker_repository.interface"
+
+class AlgorithmicMarketMakerQueryController {
+    repo: AlgorithmicMarketMakerRepository
+
+    init(repo: AlgorithmicMarketMakerRepository) {
+        this.repo = repo
+    }
+
+    fn getById(id: Int) -> Option<AlgorithmicMarketMakerRecord> {
+        return this.repo.findById(id)
+    }
+
+    fn getTotalVolume() -> Int {
+        return this.repo.countAll()
+    }
+}

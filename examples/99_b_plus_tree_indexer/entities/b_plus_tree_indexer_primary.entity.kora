@@ -1,0 +1,13 @@
+// Example 99: B+ Tree Disk Pager & Index Node Balancer
+// Persistent Database Entity: Primary Record
+
+@table("b_plus_tree_indexer_records")
+model BPlusTreeIndexerPrimaryRecord {
+    @id
+    id: Int
+    @unique
+    referenceCode: String
+    capacityScore: Int
+    operationalStatus: String
+    active: Bool
+}

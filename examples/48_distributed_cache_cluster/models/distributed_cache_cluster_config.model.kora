@@ -1,0 +1,9 @@
+// Example 48: Distributed Cache Cluster & Write-Behind
+// Configuration Model
+
+model DistributedCacheClusterClusterConfig {
+    heartbeatIntervalMs: Int
+    electionTimeoutMs: Int
+    quorumMajoritySize: Int
+    clusterName: String
+}

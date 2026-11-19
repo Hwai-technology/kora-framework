@@ -1,0 +1,33 @@
+// Example 78: High-Throughput Vector Embedding Ingestion Pipeline
+// Repository Implementation
+
+import { EmbeddingIngestionWorkerPrimaryRecord } from "../entities/embedding_ingestion_worker_primary.entity"
+import { EmbeddingIngestionWorkerRepository } from "../interfaces/embedding_ingestion_worker_repository.interface"
+
+class EmbeddingIngestionWorkerInMemoryRepository implements EmbeddingIngestionWorkerRepository {
+    init() {}
+
+    fn findById(id: Int) -> Option<EmbeddingIngestionWorkerPrimaryRecord> {
+        if id > 0 {
+            return Some(EmbeddingIngestionWorkerPrimaryRecord {
+                id: id,
+                referenceCode: "REF-" + id.toString(),
+                capacityScore: 100,
+                operationalStatus: "ACTIVE_VERIFIED",
+                active: true,
+            })
+        }
+        return None
+    }
+
+    fn save(record: EmbeddingIngestionWorkerPrimaryRecord) -> Result<EmbeddingIngestionWorkerPrimaryRecord, String> {
+        if record.id <= 0 {
+            return Err("Invalid identifier")
+        }
+        return Ok(record)
+    }
+
+    fn countActive() -> Int {
+        return 10
+    }
+}

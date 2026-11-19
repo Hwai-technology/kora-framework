@@ -1,0 +1,7 @@
+// Example 25: High-Frequency Trading Order Book
+// Notifier Interface
+
+interface HftOrderBookNotifier {
+    fn sendAlert(subject: String, level: String) -> Bool
+    fn ping() -> Bool
+}

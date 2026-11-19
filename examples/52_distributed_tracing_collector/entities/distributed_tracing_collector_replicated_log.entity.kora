@@ -1,0 +1,13 @@
+// Example 52: Distributed Tracing & OpenTelemetry Collector
+// Persistent Database Entity: Replicated Log
+
+@table("distributed_tracing_collector_replicated_logs")
+model DistributedTracingCollectorReplicatedLogEntry {
+    @id
+    id: Int
+    logIndex: Int
+    termNumber: Int
+    commandPayload: String
+    committedQuorum: Bool
+    timestamp: Int
+}
